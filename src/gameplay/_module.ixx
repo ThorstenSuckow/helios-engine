@@ -9,3 +9,5 @@ export module helios.gameplay;
 
 export import helios.gameplay.gamestate;
 export import helios.gameplay.matchstate;
+export import helios.gameplay.spawn;
+export import helios.gameplay.common;

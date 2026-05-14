@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <ctime>
-#include <helios/helios_config.h>
+#include <helios-engine-config.h>
 
 import helios.math;
 

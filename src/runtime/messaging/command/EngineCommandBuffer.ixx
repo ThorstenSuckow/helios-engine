@@ -21,11 +21,9 @@ import helios.runtime.messaging.command.TypedCommandBuffer;
 
 
 import helios.runtime.timing.commands;
-import helios.gameplay.combat.commands;
-import helios.gameplay.damage.commands;
-import helios.gameplay.scoring.commands;
+
 import helios.physics.motion.commands;
-import helios.gameplay.lifecycle.commands.WorldLifecycleCommand;
+import helios.runtime.lifecycle.commands.WorldLifecycleCommand;
 
 import helios.runtime.world.types;
 import helios.runtime.messaging.command.tags.CommandBufferRole;
@@ -39,12 +37,11 @@ export namespace helios::runtime::messaging::command {
             helios::physics::motion::commands::Move2DCommand<GameObjectHandle>,
             helios::physics::motion::commands::SteeringCommand<GameObjectHandle>,
 
-            helios::gameplay::scoring::commands::UpdateScoreCommand,
+
             helios::runtime::timing::commands::TimerControlCommand,
-            helios::gameplay::lifecycle::commands::WorldLifecycleCommand,
-            helios::gameplay::combat::commands::Aim2DCommand<GameObjectHandle>,
-            helios::gameplay::combat::commands::ShootCommand<GameObjectHandle>,
-            helios::gameplay::damage::commands::ApplyDamageCommand<GameObjectHandle>,
+            helios::runtime::lifecycle::commands::WorldLifecycleCommand,
+
+
 
             helios::gameplay::spawn::commands::ScheduledSpawnPlanCommand<GameObjectHandle>,
             helios::gameplay::spawn::commands::SpawnCommand<GameObjectHandle>,

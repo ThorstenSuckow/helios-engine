@@ -12,7 +12,7 @@ module;
 export module helios.runtime.world.Session;
 
 
-import helios.gameplay.lifecycle.components;
+import helios.ecs.components;
 import helios.gameplay.gamestate.types;
 import helios.gameplay.matchstate.types;
 
@@ -22,8 +22,6 @@ import helios.state.types.StateTransitionId;
 
 import helios.runtime.world.GameObject;
 import helios.ecs.types.EntityHandle;
-
-import helios.gameplay.lifecycle.components;
 
 import helios.rendering.viewport.types.ViewportHandle;
 
@@ -39,8 +37,8 @@ using namespace helios::rendering::viewport::components;
 
 using namespace helios::state::types;
 using namespace helios::rendering::viewport::types;
-using namespace helios::gameplay::lifecycle::components;
 using namespace helios::runtime::world;
+using namespace helios::ecs::components;
 export namespace helios::runtime::world {
 
     /**
@@ -91,23 +89,23 @@ export namespace helios::runtime::world {
          */
         explicit Session(const GameObject go) : gameObject_(go) {
             gameObject_.add<ActiveViewportHandlesStateComponent<Handle_type>>();
-            gameObject_.add<UninitializedComponent<Handle_type>>();
+            gameObject_.add<Uninitialized<Handle_type>>();
         }
 
         [[nodiscard]] bool isInitialized() const noexcept {
-            return !gameObject_.has<UninitializedComponent<Handle_type>>();
+            return !gameObject_.has<Uninitialized<Handle_type>>();
         }
 
         [[nodiscard]] bool initialize() noexcept {
-            return gameObject_.remove<UninitializedComponent<Handle_type>>();
+            return gameObject_.remove<Uninitialized<Handle_type>>();
         }
 
         [[nodiscard]] bool isDestroyed() noexcept {
-            return gameObject_.has<DestroyedComponent<Handle_type>>();
+            return gameObject_.has<Destroyed<Handle_type>>();
         }
 
         void destroy() noexcept {
-            gameObject_.add<DestroyedComponent<Handle_type>>();
+            gameObject_.add<Destroyed<Handle_type>>();
         }
 
         /**

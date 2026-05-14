@@ -9,8 +9,8 @@ module;
 
 export module helios.runtime.world.types.SystemTypeId;
 
-import helios.core.TypeIndexer;
-import helios.core.types;
+import helios.ecs.TypeIndexer;
+import helios.ecs.types;
 
 export namespace helios::runtime::world::types {
 
@@ -56,7 +56,7 @@ export namespace helios::runtime::world::types {
          *
          * @param no_init_t Tag to indicate no initialization.
          */
-        explicit SystemTypeId(helios::core::types::no_init_t) {}
+        explicit SystemTypeId(helios::ecs::types::no_init_t) {}
 
 
         /**
@@ -81,7 +81,7 @@ export namespace helios::runtime::world::types {
          */
         template <typename T>
         [[nodiscard]] static SystemTypeId id() {
-            static const size_t tid = helios::core::TypeIndexer<SystemType>::typeIndex<T>();
+            static const size_t tid = helios::ecs::TypeIndexer<SystemType>::typeIndex<T>();
             return SystemTypeId(tid);
         }
 

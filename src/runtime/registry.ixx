@@ -6,7 +6,7 @@ module;
 
 export module helios.runtime.registry;
 
-import helios.runtime.pooling.registry;
+
 
 export namespace helios::runtime {
 
@@ -15,7 +15,7 @@ export namespace helios::runtime {
      */
     template<typename TEntityManager>
     inline void registerComponents() {
-        helios::runtime::pooling::registerComponents<TEntityManager>();
+
     }
 
 }

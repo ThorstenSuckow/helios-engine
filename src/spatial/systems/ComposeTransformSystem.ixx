@@ -13,7 +13,7 @@ export module helios.spatial.systems.ComposeTransformSystem;
 import helios.spatial.components.TranslationStateComponent;
 import helios.spatial.components.RotationStateComponent;
 import helios.spatial.components.ComposeTransformComponent;
-import helios.gameplay.effects.gfx.components.SpinComponent;
+import helios.physics.motion.components.SpinComponent;
 
 import helios.runtime.world.GameWorld;
 

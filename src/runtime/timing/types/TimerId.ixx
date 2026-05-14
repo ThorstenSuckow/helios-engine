@@ -11,7 +11,7 @@ export module helios.runtime.timing.types.TimerId;
 
 import helios.core.types.FuncDefs;
 import helios.core.types;
-import helios.core.types.StrongId;
+import helios.ecs.types.StrongId;
 
 export namespace helios::runtime::timing::types {
 
@@ -25,8 +25,8 @@ export namespace helios::runtime::timing::types {
      *
      * @details Used to uniquely identify timers.
      *
-     * @see helios::core::types::StrongId
+     * @see helios::ecs::types::StrongId
      */
-    using TimerId = helios::core::types::StrongId<TimerIdTag>;
+    using TimerId = helios::ecs::types::StrongId<TimerIdTag>;
 
 }

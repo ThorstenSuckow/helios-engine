@@ -34,7 +34,7 @@ import helios.rendering.registry;
 import helios.rendering.RenderManager;
 import helios.runtime.registry;
 
-import helios.gameplay.lifecycle;
+import helios.runtime.lifecycle;
 import helios.runtime.timing;
 import helios.gameplay.gamestate;
 import helios.gameplay.matchstate;
@@ -163,7 +163,7 @@ export namespace helios::bootstrap {
         registerAllComponents();
 
         // managers
-        gameWorld->registerManager<helios::gameplay::lifecycle::WorldLifecycleManager>();
+        gameWorld->registerManager<helios::runtime::lifecycle::WorldLifecycleManager>();
 
         gameWorld->registerManager<helios::gameplay::gamestate::GameStateManager>(
             helios::gameplay::gamestate::rules::DefaultGameStateTransitionRules::rules());

@@ -8,3 +8,4 @@ export module helios.gameplay;
 
 
 export import helios.gameplay.gamestate;
+export import helios.gameplay.matchstate;

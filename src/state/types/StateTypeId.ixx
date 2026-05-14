@@ -6,8 +6,8 @@ module;
 
 export module helios.state.types.StateTypeId;
 
-import helios.core.TypeIndexer;
-import helios.core.types;
+import helios.ecs.TypeIndexer;
+import helios.ecs.types;
 
 export namespace helios::state::types {
 
@@ -38,9 +38,9 @@ export namespace helios::state::types {
         /**
          * @brief Constructs an uninitialized StateTypeId.
          *
-         * @param helios::core::types::no_init_t Tag to indicate no initialization.
+         * @param helios::ecs::types::no_init_t Tag to indicate no initialization.
          */
-        explicit StateTypeId(helios::core::types::no_init_t) {}
+        explicit StateTypeId(helios::ecs::types::no_init_t) {}
 
         /**
          * @brief Returns the underlying ID value.
@@ -63,7 +63,7 @@ export namespace helios::state::types {
          */
         template <typename T>
         [[nodiscard]] static StateTypeId id() {
-            static const size_t tid = helios::core::TypeIndexer<StateType>::typeIndex<T>();
+            static const size_t tid = helios::ecs::TypeIndexer<StateType>::typeIndex<T>();
             return StateTypeId(tid);
         }
 

@@ -6,7 +6,7 @@ module;
 
 export module helios.rendering.framebuffer.types.FramebufferId;
 
-import helios.core.types.StrongId;
+import helios.ecs.types.StrongId;
 import helios.rendering.framebuffer.types.FramebufferDomainTag;
 
 export namespace helios::rendering::framebuffer::types {
@@ -14,6 +14,6 @@ export namespace helios::rendering::framebuffer::types {
     /**
      * @brief Strongly-typed identifier for framebuffer resources.
      */
-    using FramebufferId = helios::core::types::StrongId<FramebufferDomainTag>;
+    using FramebufferId = helios::ecs::types::StrongId<FramebufferDomainTag>;
 
 }

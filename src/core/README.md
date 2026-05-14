@@ -51,7 +51,7 @@ import helios.core.types;
 auto id = helios::util::Guid::generate();
 
 // Declare uninitialized Guid for later assignment
-helios::util::Guid deferredId{helios::core::types::no_init};
+helios::util::Guid deferredId{helios::ecs::types::no_init};
 
 // Assign later when the value is known
 deferredId = helios::util::Guid::generate();
@@ -71,7 +71,7 @@ class Guid final {
 
 public:
     // Skip initialization for deferred assignment
-    explicit Guid(helios::core::types::no_init_t) {}
+    explicit Guid(helios::ecs::types::no_init_t) {}
 
     // Factory method for generating valid Guids
     static Guid generate() noexcept;

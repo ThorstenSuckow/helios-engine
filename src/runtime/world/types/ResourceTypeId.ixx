@@ -9,8 +9,8 @@ module;
 
 export module helios.runtime.world.types.ResourceTypeId;
 
-import helios.core.TypeIndexer;
-import helios.core.types;
+import helios.ecs.TypeIndexer;
+import helios.ecs.types;
 
 export namespace helios::runtime::world::types {
 
@@ -61,7 +61,7 @@ export namespace helios::runtime::world::types {
          *
          * @param no_init_t Tag to indicate no initialization.
          */
-        explicit ResourceTypeId(helios::core::types::no_init_t) {}
+        explicit ResourceTypeId(helios::ecs::types::no_init_t) {}
 
 
         /**
@@ -86,7 +86,7 @@ export namespace helios::runtime::world::types {
          */
         template <typename T>
         [[nodiscard]] static ResourceTypeId id() {
-            static const size_t tid = helios::core::TypeIndexer<ResourceType>::typeIndex<T>();
+            static const size_t tid = helios::ecs::TypeIndexer<ResourceType>::typeIndex<T>();
             return ResourceTypeId(tid);
         }
 

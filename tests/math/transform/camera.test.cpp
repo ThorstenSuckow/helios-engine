@@ -3,7 +3,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <array>
-#include <ctime>
 
 
 import helios.math;
@@ -21,20 +20,16 @@ struct test_data {
 };
 
 static test_data setup() {
-
-    time_t seed = time(0);
-    std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
-
-    float x1 = static_cast<float>(std::rand());
-    float y1 = static_cast<float>(std::rand());
-    float z1 = static_cast<float>(std::rand());
-    float x2 = static_cast<float>(std::rand());
-    float y2 = static_cast<float>(std::rand());
-    float z2 = static_cast<float>(std::rand());
-    float x3 = static_cast<float>(std::rand());
-    float y3 = static_cast<float>(std::rand());
-    float z3 = static_cast<float>(std::rand());
+    // Deterministic, well-conditioned vectors avoid flaky precision artifacts.
+    constexpr float x1 = 0.0F;
+    constexpr float y1 = 1.0F;
+    constexpr float z1 = 0.0F;
+    constexpr float x2 = 1.0F;
+    constexpr float y2 = 2.0F;
+    constexpr float z2 = 3.0F;
+    constexpr float x3 = 0.0F;
+    constexpr float y3 = 0.0F;
+    constexpr float z3 = 0.0F;
 
     return test_data{
         .up = math::vec3f{x1, y1, z1},

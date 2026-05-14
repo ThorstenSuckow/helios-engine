@@ -1,0 +1,16 @@
+/**
+ * @file _module.ixx
+ * @brief Aggregate module for helios::scene::components namespace.
+ */
+
+
+export module helios.scene.components;
+
+export import helios.scene.components.SceneMemberComponent;
+export import helios.scene.components.PerspectiveCameraComponent;
+export import helios.scene.components.LookAtComponent;
+export import helios.scene.components.ViewportComponent;
+export import helios.scene.components.SceneBindingComponent;
+export import helios.scene.components.CameraBindingComponent;
+export import helios.scene.components.ProjectionMatrixComponent;
+export import helios.scene.components.ViewMatrixComponent;

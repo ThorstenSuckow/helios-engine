@@ -1,0 +1,548 @@
+/**
+ * @file mat4.ixx
+ * @brief 4x4 matrix type and utilities.
+ */
+module;
+
+#include <cassert>
+#include <functional>
+#include <cstddef>
+#include <cmath>
+
+export module helios.math.types:mat4;
+
+import helios.math.TransformType;
+import :vec3;
+import :vec4;
+
+
+import helios.math.concepts;
+
+
+export namespace helios::math {
+
+
+
+    /**
+     * @brief Represents a 4x4 matrix, stored in column-major order.
+     *
+     * The `mat4` struct provides a lightweight and efficient way to handle 4D
+     * matrix mathematics for numeric data types.
+     * It stores its components as type `T`. For convenient access, type aliases
+     * `mat4f`, `mat4d` and `mat4i` are available, providing float/double/integer
+     * matrix representatives.
+     *
+     * @tparam T the numeric type of the matrix components.
+     */
+    template<helios::math::concepts::IsNumeric T>
+    struct mat4 {
+    private:
+        /**
+         * @brief Internal array storing matrix components.
+         *
+         * Components are stored in column-major order, that is, each 4 subsequent elements
+         * represent a matrix column.
+         */
+        T m[16];
+
+    public:
+        /**
+         * @brief Default constructor. Initializes all components to 0.
+         */
+        explicit constexpr mat4() noexcept : m{} {};
+
+        /**
+         * @brief Creates a diagonal matrix. The diagonal components are initialized
+         * with the value f.
+         *
+         * @param f The scalar value for the diagonal components.
+         */
+        explicit constexpr mat4(const T f) noexcept
+            : m{ f,  T{}, T{}, T{},
+                T{},  f,  T{}, T{},
+                T{}, T{},  f,  T{},
+                T{}, T{}, T{},  f} {}
+
+        /**
+        * @brief Creates a diagonal matrix with the components of vec3<T> as the
+        * diagonal elements. Element at [4, 4] is set to 1.
+        *
+        * @param f The vector containing the diagonal components.
+        */
+        explicit constexpr mat4(const vec3<T> f) noexcept
+            : m{ f[0],  T{}, T{}, T{},
+                T{},  f[1],  T{}, T{},
+                T{}, T{},  f[2],  T{},
+                T{}, T{}, T{},  static_cast<T>(1)} {}
+
+        /**
+         * @brief Constructs a new `mat4` with all 16 components explicitly specified.
+         *
+         * @details The values are stored in column major order, that is, the first 4 arguments
+         * represent the first column, and so on.
+         *
+         * Parameter naming convention: `fR_C` where R is the row index and C is the column index.
+         */
+        constexpr mat4(
+            const T f0_0, const T f1_0, const T f2_0, const T f3_0,
+            const T f0_1, const T f1_1, const T f2_1, const T f3_1,
+            const T f0_2, const T f1_2, const T f2_2, const T f3_2,
+            const T f0_3, const T f1_3, const T f2_3, const T f3_3
+        ) : m{
+             f0_0,  f1_0,  f2_0,  f3_0,
+             f0_1,  f1_1,  f2_1,  f3_1,
+             f0_2,  f1_2,  f2_2,  f3_2,
+             f0_3,  f1_3,  f2_3,  f3_3
+        } { }
+
+
+        /**
+         * @brief Convenient method to construct a 4x4 identity matrix
+         *
+         * @tparam T The numeric type of the matrix components.
+         *
+         * @return A new mat4<T>-identity matrix-
+         */
+        static mat4<T> identity() noexcept {
+            return mat4<T>(1);
+        }
+
+
+        /**
+         * @brief Provides read-only access to a matrix component.
+         *
+         * Elements are _accessed_ in column major order: `m[row + col * 4]`,
+         * while the specified indices represent an usual mxn-matrix access,
+         * i.e. for a given 2x4-matrix
+         *      [0, 1, 2, 3,
+         *       4, 5, 6, 7,
+         *       8, 9, 10, 11,
+         *       12, 13, 14, 15]
+         *
+         * a call to row(0, 2) returns "2", while the matrix is internally stored
+         * as (1, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15).
+         *
+         * Bounds checking is performed via `assert` in debug builds.
+         *
+         * @param row The zero based row index.
+         * @param col The zero based col index.
+         *
+         * @return A const ref to the component at the specified position.
+         */
+        constexpr const T& operator()(const size_t row, const size_t col) const {
+            assert(row < 4 && col < 4 && "mat4 - Index out of bounds.");
+            return m[row + col * 4];
+        }
+
+
+        /**
+         * @brief Provides read-write access to a matrix component.
+         *
+         * Elements are _accessed_ in column major order: `m[row + col * 4]`,
+         * while the specified indices represent an usual mxn-matrix access,
+         * i.e. for a given 2x4-matrix
+         *      [0, 1, 2, 3,
+         *       4, 5, 6, 7,
+         *       8, 9, 10, 11,
+         *       12, 13, 14, 15]
+         *
+         * a call to row(0, 2) returns "2", while the matrix is internally stored
+         * as (0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15).
+         *
+         * Bounds checking is performed via `assert` in debug builds.
+         *
+         * @param row The zero based row index.
+         * @param col The zero based col index.
+         *
+         * @return A ref to the component at the specified position.
+         */
+        constexpr T& operator()(const size_t row, const size_t col) {
+            assert(row < 4 && col < 4 && "mat4 - Index out of bounds.");
+            return m[row + col * 4];
+        }
+
+
+        /**
+         * @brief Compares this matrix element's with the rgt matrix considering
+         * an epsilon value.
+         * Returns true if for all elements the equation |a-b| <= EPSILON
+         * holds.
+         *
+         * EPSILON is set to 0.00001
+         *
+         * @param rgt The other matix to compare with this matrix for equality.
+         *
+         * @return True is the elements of the matrices are considered equal,
+         * otherwise false.
+         *
+         * @see https://realtimecollisiondetection.net/blog/?p=89
+         *
+         * @todo account for abs (values close to zero) and rel
+         * (larger values), move EPSILON to global constant
+         */
+        constexpr bool same(const mat4<T>& rgt) const {
+
+            static const T EPSILON = static_cast<T>(0.00001);
+
+            const auto* leftPtr = value_ptr(*this);
+            const auto* rgtPtr  = value_ptr(rgt);
+
+            for (int i = 0; i < 16; i++) {
+                if (std::fabs(leftPtr[i] - rgtPtr[i])  > EPSILON) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+
+        /**
+         * @brief Strictly compares the elements of this matrix with the elements
+         * of the rgt matrix.
+         *
+         * @param rgt The right matrix to compare for equal values
+         *
+         * @return True if all elements are equal (==), false otherwise.
+         */
+        constexpr bool operator==(const mat4<T>& rgt) const {
+
+            const auto* leftPtr = value_ptr(*this);
+            const auto* rgtPtr  = value_ptr(rgt);
+
+            for (int i = 0; i < 16; i++) {
+                if (leftPtr[i] != rgtPtr[i]) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+
+        /**
+         * @brief Performs matrix-multiplication with another `mat4`.
+         * This matrix is the left operand, while `m` is the right operand.
+         *
+         * @param m The right-hand side `mat4<T>` for multiplication.
+         *
+         * @return A new `mat4<T>`, representing the result of the matrix-multiplication.
+         */
+        constexpr mat4<T> operator*(const mat4<T>& m) const {
+            mat4<T> A{};
+            for (int row = 0; row < 4; row++) {
+                for (int col = 0; col < 4; col++) {
+                    T sum = T{};
+                    sum += (*this)(row, 0) * m(0, col);
+                    sum += (*this)(row, 1) * m(1, col);
+                    sum += (*this)(row, 2) * m(2, col);
+                    sum += (*this)(row, 3) * m(3, col);
+                    A(row, col) = sum;
+                }
+            }
+
+            return A;
+        }
+
+
+        /**
+         * @brief Performs matrix-vector-multiplication with a `vec4<T> v`.
+         *
+         * This matrix is the left operand, while `v` is the right operand.
+         *
+         * @param v The right-hand side `vec4<T>` for multiplication.
+         *
+         * @return A new `vec4<T>`, representing the result of the matrix-vector-multiplication.
+         */
+        constexpr vec4<T> operator*(const vec4<T>&  v) const {
+            const auto m = *this;
+            return vec4<T>{
+                m(0, 0) * v[0] + m(0, 1) * v[1] + m(0, 2) * v[2] + m(0, 3)  * v[3],
+                m(1, 0) * v[0] + m(1, 1) * v[1] + m(1, 2) * v[2] + m(1, 3)  * v[3],
+                m(2, 0) * v[0] + m(2, 1) * v[1] + m(2, 2) * v[2] + m(2, 3)  * v[3],
+                m(3, 0) * v[0] + m(3, 1) * v[1] + m(3, 2) * v[2] + m(3, 3)  * v[3]
+            };
+        }
+
+        /**
+         * @brief Computes the transpose of a 4x4 matrix.
+         *
+         * This function swaps rows and columns: M^T_{ij} = M_{ji}
+         *
+         * @note This is **not** a general-purpose inverse function. For matrices containing
+         * non-uniform scale or shear, use a full inverse calculation instead.
+         *
+         * @tparam T The numeric type of the matrix elements.
+         *
+         * @return The transposed matrix.
+         */
+        helios::math::mat4<T> transpose() const noexcept {
+            const auto m = *this;
+            return helios::math::mat4<T>{
+                m(0, 0), m(0, 1), m(0, 2), m(0, 3),
+                m(1, 0), m(1, 1), m(1, 2), m(1, 3),
+                m(2, 0), m(2, 1), m(2, 2), m(2, 3),
+                m(3, 0), m(3, 1), m(3, 2), m(3, 3)
+            };
+        }
+
+        /**
+         * @brief Returns the i-th column of the matrix.
+         *
+         * @param i The zero-based index of the column (0-3).
+         * @return A vec4<T> representing the column.
+         */
+        helios::math::vec4<T> column(unsigned int i) const noexcept {
+            assert(i <= 3 && "unexpected value for column");
+            const auto m = *this;
+            return helios::math::vec4<T>{
+                m(0, i), m(1, i), m(2, i), m(3, i)
+            };
+        }
+
+        /**
+         * @brief Computes the inverse of the matrix.
+         *
+         * @return The inverse matrix.
+         *
+         * @see [Len16, Listing 1.11, 44]
+         */
+        constexpr helios::math::mat4<T> inverse() const noexcept {
+            const auto m = *this;
+
+            const auto a = column(0).toVec3();
+            const auto b = column(1).toVec3();
+            const auto c = column(2).toVec3();
+            const auto d = column(3).toVec3();
+
+            const T x = m(3, 0);
+            const T y = m(3, 1);
+            const T z = m(3, 2);
+            const T w = m(3, 3);
+
+            auto s = helios::math::cross(a, b);
+            auto t = helios::math::cross(c, d);
+            auto u = a*y - b*x;
+            auto v = c*w - d*z;
+
+            T invDet = static_cast<T>(1) / (helios::math::dot(s, v) + helios::math::dot(t, u));
+
+            s = s * invDet;
+            t = t * invDet;
+            u = u * invDet;
+            v = v * invDet;
+
+            auto r0 = (helios::math::cross(b, v)) + t*y;
+            auto r1 = (helios::math::cross(v, a)) - t*x;
+            auto r2 = (helios::math::cross(d, u)) + s*w;
+            auto r3 = (helios::math::cross(u, c)) - s*z;
+
+            return helios::math::mat4<T>{
+                r0[0], r0[1], r0[2], -helios::math::dot(b, t),
+                r1[0], r1[1], r1[2],  helios::math::dot(a, t),
+                r2[0], r2[1], r2[2], -helios::math::dot(d, s),
+                r3[0], r3[1], r3[2],  helios::math::dot(c, s)
+            };
+        }
+
+        /**
+         * @brief Extracts the translation component from this matrix.
+         *
+         * @details Returns the translation vector stored in column 3 (elements [0,3], [1,3], [2,3]).
+         * This represents the position offset in a standard TRS (Translation-Rotation-Scale) matrix.
+         *
+         * @return A vec3<T> containing the x, y, z translation components.
+         */
+        helios::math::vec3<T> translation() const noexcept {
+            const auto m = *this;
+            return helios::math::vec3<T>{
+                m(0, 3), m(1, 3), m(2, 3)
+            };
+        }
+
+        /**
+         * @brief Creates a new matrix with the specified translation, preserving other components.
+         *
+         * @details Returns a copy of this matrix with column 3 (translation) replaced by the
+         * given vector. The w-component [3,3] is set to 1.0 for homogeneous coordinates.
+         *
+         * @param v The new translation vector (x, y, z).
+         *
+         * @return A new mat4<T> with the updated translation component.
+         */
+        helios::math::mat4<T> withTranslation(helios::math::vec3<T> v) const noexcept {
+            const auto m = *this;
+            return helios::math::mat4<T>{
+                m(0, 0), m(1, 0), m(2, 0), m(3, 0),
+                m(0, 1), m(1, 1), m(2, 1), m(3, 1),
+                m(0, 2), m(1, 2), m(2, 2), m(3, 2),
+                v[0], v[1], v[2], static_cast<T>(1)
+            };
+        }
+
+        /**
+         * @brief Returns a new 4x4 matrix derived by applying a scaling transformation.
+         *
+         * This function scales the current matrix by modifying specific components
+         * based on the scaling factors provided in the input vector.
+         *
+         * @tparam T The numeric type used for the matrix and vector components.
+         * @param v A 3D vector representing the scaling factors along the x, y, and z axes.
+         * @return A new 4x4 matrix with the scaling transformation applied.
+         * @note The operation maintains column-major order for the matrix components.
+         */
+        helios::math::mat4<T> withScaling(helios::math::vec3<T> v) const noexcept {
+            const auto m = *this;
+            return helios::math::mat4<T>{
+                m(0, 0) * v[0], m(1, 0) * v[0], m(2, 0) * v[0], m(3, 0) * v[0],
+                m(0, 1) * v[1], m(1, 1) * v[1], m(2, 1) * v[1], m(3, 1) * v[1],
+                m(0, 2) * v[2], m(1, 2) * v[2], m(2, 2) * v[2], m(3, 2) * v[2],
+                m(0, 3), m(1, 3), m(2, 3), m(3, 3),
+            };
+        }
+
+
+        /**
+         * @brief Creates a new matrix with the specified translation, preserving other components.
+         *
+         * @details Overload accepting a vec4. Only the xyz components are used; the w component
+         * is ignored and set to 1.0 in the resulting matrix.
+         *
+         * @param v The new translation vector (x, y, z, w). The w component is ignored.
+         *
+         * @return A new mat4<T> with the updated translation component.
+         */
+        helios::math::mat4<T> withTranslation(helios::math::vec4<T> v) const noexcept {
+            const auto m = *this;
+            return helios::math::mat4<T>{
+                m(0, 0), m(1, 0), m(2, 0), m(3, 0),
+                m(0, 1), m(1, 1), m(2, 1), m(3, 1),
+                m(0, 2), m(1, 2), m(2, 2), m(3, 2),
+                v[0], v[1], v[2], static_cast<T>(1)
+            };
+        }
+
+        /**
+         * @brief Decomposes this matrix, extracting only specified components.
+         *
+         * @details This function extracts Translation, Rotation, and/or Scale components
+         * from this 4x4 matrix based on the provided `TransformType` mask.
+         * Components not included in the mask are replaced with identity values.
+         *
+         * The decomposition supports the following cases:
+         * - **TransformType::All**: Returns the original matrix unchanged.
+         * - **TransformType::Translation**: Extracts only the translation (column 3).
+         * - **TransformType::Rotation**: Extracts the normalized rotation from the upper-left 3x3.
+         * - **TransformType::Scale**: Extracts the scale factors (column vector lengths).
+         * - **Combined flags**: Extracts multiple components as specified.
+         *
+         * @note For combined Rotation + Scale without Translation, the upper-left 3x3
+         * is copied directly. For Rotation-only, scale is removed by normalizing columns.
+         *
+         * @tparam T The numeric type of the matrix elements.
+         *
+         * @param type Bitmask specifying which components to extract.
+         *
+         * @return A new matrix containing only the requested transform components.
+         *
+         * @see helios::math::TransformType
+         * @see helios::math::transformTypeMatch()
+         */
+        helios::math::mat4<T> decompose(const helios::math::TransformType type) const noexcept {
+            const auto m = *this;
+            if (type == helios::math::TransformType::All) {
+                return m;
+            }
+
+            auto id = identity();
+            if (helios::math::transformTypeMatch(type, helios::math::TransformType::Translation)) {
+                id(0, 3) = m(0, 3);
+                id(1, 3) = m(1, 3);
+                id(2, 3) = m(2, 3);
+            }
+
+            if (helios::math::transformTypeMatch(type, helios::math::TransformType::Rotation)
+                && helios::math::transformTypeMatch(type, helios::math::TransformType::Scale)) {
+                id(0, 0) = m(0, 0); id(0, 1) = m(0, 1); id(0, 2) = m(0, 2);
+                id(1, 0) = m(1, 0); id(1, 1) = m(1, 1); id(1, 2) = m(1, 2);
+                id(2, 0) = m(2, 0); id(2, 1) = m(2, 1); id(2, 2) = m(2, 2);
+                } else {
+
+                    const auto bx = vec3<T>(m(0, 0), m(1, 0),  m(2, 0));
+                    const auto by = vec3<T>(m(0, 1), m(1, 1),  m(2, 1));
+                    const auto bz = vec3<T>(m(0, 2), m(1, 2),  m(2, 2));
+
+                    const auto sx = bx.length();
+                    const auto sy = by.length();
+                    const auto sz = bz.length();
+
+                    if (helios::math::transformTypeMatch(type, helios::math::TransformType::Rotation)) {
+                        vec3<T> rx = sx != 0 ? bx/sx : vec3<T>{1, 0, 0};
+                        vec3<T> ry = sy != 0 ? by/sy : vec3<T>{0, 1, 0};
+                        vec3<T> rz = sz != 0 ? bz/sz : vec3<T>{0, 0, 1};
+
+                        id(0, 0) = rx[0]; id(0, 1) = ry[0]; id(0, 2) = rz[0];
+                        id(1, 0) = rx[1]; id(1, 1) = ry[1]; id(1, 2) = rz[1];
+                        id(2, 0) = rx[2]; id(2, 1) = ry[2]; id(2, 2) = rz[2];
+                    } else  if (helios::math::transformTypeMatch(type, helios::math::TransformType::Scale)) {
+                        id(0, 0) = sx;
+                        id(1, 1) = sy;
+                        id(2, 2) = sz;
+                    }
+                }
+
+            return id;
+        }
+
+    };
+
+
+    /**
+     * @brief Returns a const pointer to the first element of the matrix's components.
+     *
+     * Useful for APIs that expect a pointer to matrix data, like OpenGL.
+     *
+     * @tparam T The numeric type of the matrix components.
+     *
+     * @param m A reference to the `mat4<T>` matrix.
+     *
+     * @return A const pointer to the element at [0, 0].
+     */
+    template<helios::math::concepts::IsNumeric T>
+    const T* value_ptr(const mat4<T>& m) noexcept {
+        return &m(0, 0);
+    }
+
+
+    /**
+     * @brief Returns a pointer to the first element of the matrix's components.
+     *
+     * Useful for APIs that expect a pointer to matrix data, like OpenGL.
+     *
+     * @tparam T The numeric type of the matrix components.
+     *
+     * @param m A reference to the `mat4<T>` matrix.
+     *
+     * @return A pointer to the element at [0, 0].
+     */
+    template<helios::math::concepts::IsNumeric T>
+    T* value_ptr(mat4<T>& m) noexcept {
+        return &m(0, 0);
+    }
+
+    /**
+     * @brief Type alias for a 4x4 float matrix.
+     */
+    using mat4f = mat4<float>;
+
+    /**
+     * @brief Type alias for a 4x4 double matrix.
+     */
+    using mat4d = mat4<double>;
+
+    /**
+     * @brief Type alias for a 4x4 integer matrix.
+     */
+    using mat4i = mat4<int>;
+
+} // namespace helios::math

@@ -1,45 +1,176 @@
-file(MAKE_DIRECTORY ${CMAKE_IFC_OUTPUT_DIRECTORY})
+cmake_minimum_required(VERSION 4.0)
+project(helios-engine LANGUAGES C CXX)
+
+if(PROJECT_IS_TOP_LEVEL)
+    set(CMAKE_CXX_STANDARD 23)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_CXX_EXTENSIONS OFF)
+endif()
+
+include(CTest)
+include(FetchContent)
+
+if(CMAKE_IFC_OUTPUT_DIRECTORY)
+    file(MAKE_DIRECTORY "${CMAKE_IFC_OUTPUT_DIRECTORY}")
+endif()
+
+set(HELIOS_ECS_LOCAL_PATH "${CMAKE_CURRENT_LIST_DIR}/../helios-ecs" CACHE PATH "Local path to helios-ecs repository")
+if(EXISTS "${HELIOS_ECS_LOCAL_PATH}/src/_module.ixx")
+    set(HELIOS_ECS_SOURCE_DIR "${HELIOS_ECS_LOCAL_PATH}")
+    message(STATUS "Using local helios-ecs: ${HELIOS_ECS_SOURCE_DIR}")
+else()
+    FetchContent_Declare(helios_ecs
+            GIT_REPOSITORY https://github.com/thorstensuckow/helios-ecs.git
+            GIT_TAG main
+    )
+    FetchContent_GetProperties(helios_ecs)
+    if(NOT helios_ecs_POPULATED)
+        FetchContent_Populate(helios_ecs)
+    endif()
+    set(HELIOS_ECS_SOURCE_DIR "${helios_ecs_SOURCE_DIR}")
+    message(STATUS "Using remote helios-ecs: ${HELIOS_ECS_SOURCE_DIR}")
+endif()
+
+# Provide compatibility config header expected by helios-ecs modules.
+set(HELIOS_ECS_COMPAT_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
+file(MAKE_DIRECTORY "${HELIOS_ECS_COMPAT_INCLUDE_DIR}/helios")
+file(WRITE "${HELIOS_ECS_COMPAT_INCLUDE_DIR}/helios/helios_config.h"
+        "#pragma once\n"
+        "#ifndef NDEBUG\n"
+        "#define HELIOS_DEBUG 1\n"
+        "#endif\n"
+        "#define DEFAULT_ENTITY_MANAGER_CAPACITY 1000\n")
+
+# Third-party dependencies required by engine modules.
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+
+set(FT_DISABLE_ZLIB ON CACHE BOOL "" FORCE)
+set(FT_DISABLE_PNG ON CACHE BOOL "" FORCE)
+set(FT_DISABLE_BZIP2 ON CACHE BOOL "" FORCE)
+set(FT_DISABLE_BROTLI ON CACHE BOOL "" FORCE)
+set(FT_DISABLE_HARFBUZZ ON CACHE BOOL "" FORCE)
+set(FT_DISABLE_FREETYPE_DEBUGGER ON CACHE BOOL "" FORCE)
+
+FetchContent_Declare(glfw
+        GIT_REPOSITORY https://github.com/glfw/glfw.git
+        GIT_TAG 3.4
+)
+FetchContent_Declare(freetype
+        GIT_REPOSITORY https://github.com/freetype/freetype.git
+        GIT_TAG VER-2-14-1
+)
+FetchContent_Declare(glad
+        GIT_REPOSITORY https://github.com/Dav1dde/glad.git
+        GIT_TAG v2.0.8
+        SOURCE_SUBDIR cmake
+)
+FetchContent_Declare(imgui
+        GIT_REPOSITORY https://github.com/ocornut/imgui.git
+        GIT_TAG docking
+)
+FetchContent_MakeAvailable(freetype glfw glad imgui)
+
+if(NOT TARGET thirdparty::glad)
+    glad_add_library(glad_gl_core_46 STATIC REPRODUCIBLE LOADER API gl:core=4.6)
+    add_library(thirdparty::glad ALIAS glad_gl_core_46)
+endif()
+if(NOT TARGET thirdparty::freetype)
+    add_library(thirdparty::freetype ALIAS freetype)
+endif()
+if(NOT TARGET thirdparty::glfw)
+    add_library(thirdparty::glfw ALIAS glfw)
+endif()
+if(NOT TARGET thirdparty_opengl)
+    add_library(thirdparty_opengl INTERFACE)
+    target_link_libraries(thirdparty_opengl INTERFACE thirdparty::glad thirdparty::glfw)
+    add_library(thirdparty::opengl ALIAS thirdparty_opengl)
+endif()
+if(NOT TARGET imgui)
+    add_library(imgui STATIC
+            ${imgui_SOURCE_DIR}/imgui.cpp
+            ${imgui_SOURCE_DIR}/imgui_demo.cpp
+            ${imgui_SOURCE_DIR}/imgui_draw.cpp
+            ${imgui_SOURCE_DIR}/imgui_tables.cpp
+            ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+            ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
+            ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
+    )
+    target_include_directories(imgui PUBLIC
+            ${imgui_SOURCE_DIR}
+            ${imgui_SOURCE_DIR}/backends
+    )
+    target_link_libraries(imgui PUBLIC thirdparty::glfw thirdparty::glad)
+endif()
+if(NOT TARGET thirdparty::imgui)
+    add_library(thirdparty::imgui ALIAS imgui)
+endif()
 
 file(GLOB_RECURSE CPP_FILES CONFIGURE_DEPENDS
-        "${CMAKE_CURRENT_SOURCE_DIR}/**/*.cpp")
-
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 file(GLOB_RECURSE MODULE_INTERFACE_FILES CONFIGURE_DEPENDS
-        "${CMAKE_CURRENT_SOURCE_DIR}/**/*.ixx"
-)
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.ixx")
+file(GLOB_RECURSE HELIOS_ECS_CPP_FILES CONFIGURE_DEPENDS
+        "${HELIOS_ECS_SOURCE_DIR}/src/*.cpp")
+file(GLOB_RECURSE HELIOS_ECS_MODULE_INTERFACE_FILES CONFIGURE_DEPENDS
+        "${HELIOS_ECS_SOURCE_DIR}/src/*.ixx")
+
+list(APPEND CPP_FILES ${HELIOS_ECS_CPP_FILES})
+list(APPEND MODULE_INTERFACE_FILES ${HELIOS_ECS_MODULE_INTERFACE_FILES})
 
 list(FILTER CPP_FILES EXCLUDE REGEX "/CMakeFiles/|/CMakeTmp/|/cmake_build_|/build/")
 list(FILTER MODULE_INTERFACE_FILES EXCLUDE REGEX "/CMakeFiles/|/CMakeTmp/|/cmake_build_|/build/")
 
-
-##########################
-# create lib target
-##########################
 add_library(helios STATIC)
-###
-###
+set_property(TARGET helios PROPERTY CXX_SCAN_FOR_MODULES ON)
+target_compile_features(helios PUBLIC cxx_std_23)
+target_sources(helios PRIVATE ${CPP_FILES})
 
+if(MODULE_INTERFACE_FILES)
+    target_sources(helios PUBLIC
+            FILE_SET modules TYPE CXX_MODULES
+            BASE_DIRS
+            "${CMAKE_CURRENT_SOURCE_DIR}/src"
+            "${HELIOS_ECS_SOURCE_DIR}/src"
+            FILES ${MODULE_INTERFACE_FILES}
+    )
+endif()
 
-target_link_libraries(
-        helios
+target_link_libraries(helios
         PUBLIC
         thirdparty::freetype
         thirdparty::opengl
         thirdparty::imgui
 )
 
-set_property(TARGET helios PROPERTY CXX_SCAN_FOR_MODULES ON)
-target_compile_features(helios PUBLIC cxx_std_20)
-
-target_sources(helios PRIVATE ${CPP_FILES})
-
-if(MODULE_INTERFACE_FILES)
-    target_sources(helios PUBLIC
-            FILE_SET modules TYPE CXX_MODULES
-            BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
-            FILES ${MODULE_INTERFACE_FILES}
-    )
-endif()
-
 target_include_directories(helios PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+        $<BUILD_INTERFACE:${HELIOS_ECS_SOURCE_DIR}/src>
+        $<BUILD_INTERFACE:${HELIOS_ECS_COMPAT_INCLUDE_DIR}>
 )
+
+if(BUILD_TESTING)
+    FetchContent_Declare(
+            googletest
+            GIT_REPOSITORY https://github.com/google/googletest.git
+            GIT_TAG v1.17.0
+    )
+    FetchContent_Declare(
+            glm
+            GIT_REPOSITORY https://github.com/g-truc/glm.git
+            GIT_TAG 1.0.1
+    )
+    set(GLM_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+    set(GLM_BUILD_INSTALL OFF CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(googletest glm)
+
+    file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.test.cpp")
+
+    add_executable(helios-engine-tests ${TEST_SOURCES})
+    target_link_libraries(helios-engine-tests PRIVATE helios GTest::gtest_main glm::glm)
+
+    include(GoogleTest)
+    gtest_discover_tests(helios-engine-tests)
+endif()

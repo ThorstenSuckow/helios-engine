@@ -15,6 +15,7 @@ if(CMAKE_IFC_OUTPUT_DIRECTORY)
 endif()
 
 set(HELIOS_ECS_LOCAL_PATH "${CMAKE_CURRENT_LIST_DIR}/../helios-ecs" CACHE PATH "Local path to helios-ecs repository")
+set(HELIOS_MATH_LOCAL_PATH "${CMAKE_CURRENT_LIST_DIR}/../helios-math" CACHE PATH "Local path to helios-math repository")
 if(EXISTS "${HELIOS_ECS_LOCAL_PATH}/src/_module.ixx")
     set(HELIOS_ECS_SOURCE_DIR "${HELIOS_ECS_LOCAL_PATH}")
     message(STATUS "Using local helios-ecs: ${HELIOS_ECS_SOURCE_DIR}")
@@ -31,15 +32,21 @@ else()
     message(STATUS "Using remote helios-ecs: ${HELIOS_ECS_SOURCE_DIR}")
 endif()
 
-# Provide compatibility config header expected by helios-ecs modules.
-set(HELIOS_ECS_COMPAT_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
-file(MAKE_DIRECTORY "${HELIOS_ECS_COMPAT_INCLUDE_DIR}/helios")
-file(WRITE "${HELIOS_ECS_COMPAT_INCLUDE_DIR}/helios/helios_config.h"
-        "#pragma once\n"
-        "#ifndef NDEBUG\n"
-        "#define HELIOS_DEBUG 1\n"
-        "#endif\n"
-        "#define DEFAULT_ENTITY_MANAGER_CAPACITY 1000\n")
+if(EXISTS "${HELIOS_MATH_LOCAL_PATH}/src/_module.ixx")
+    set(HELIOS_MATH_SOURCE_DIR "${HELIOS_MATH_LOCAL_PATH}")
+    message(STATUS "Using local helios-math: ${HELIOS_MATH_SOURCE_DIR}")
+else()
+    FetchContent_Declare(helios_math
+            GIT_REPOSITORY https://github.com/thorstensuckow/helios-math.git
+            GIT_TAG main
+    )
+    FetchContent_GetProperties(helios_math)
+    if(NOT helios_math_POPULATED)
+        FetchContent_Populate(helios_math)
+    endif()
+    set(HELIOS_MATH_SOURCE_DIR "${helios_math_SOURCE_DIR}")
+    message(STATUS "Using remote helios-math: ${HELIOS_MATH_SOURCE_DIR}")
+endif()
 
 # Third-party dependencies required by engine modules.
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
@@ -115,9 +122,15 @@ file(GLOB_RECURSE HELIOS_ECS_CPP_FILES CONFIGURE_DEPENDS
         "${HELIOS_ECS_SOURCE_DIR}/src/*.cpp")
 file(GLOB_RECURSE HELIOS_ECS_MODULE_INTERFACE_FILES CONFIGURE_DEPENDS
         "${HELIOS_ECS_SOURCE_DIR}/src/*.ixx")
+file(GLOB_RECURSE HELIOS_MATH_CPP_FILES CONFIGURE_DEPENDS
+        "${HELIOS_MATH_SOURCE_DIR}/src/*.cpp")
+file(GLOB_RECURSE HELIOS_MATH_MODULE_INTERFACE_FILES CONFIGURE_DEPENDS
+        "${HELIOS_MATH_SOURCE_DIR}/src/*.ixx")
 
 list(APPEND CPP_FILES ${HELIOS_ECS_CPP_FILES})
 list(APPEND MODULE_INTERFACE_FILES ${HELIOS_ECS_MODULE_INTERFACE_FILES})
+list(APPEND CPP_FILES ${HELIOS_MATH_CPP_FILES})
+list(APPEND MODULE_INTERFACE_FILES ${HELIOS_MATH_MODULE_INTERFACE_FILES})
 
 list(FILTER CPP_FILES EXCLUDE REGEX "/CMakeFiles/|/CMakeTmp/|/cmake_build_|/build/")
 list(FILTER MODULE_INTERFACE_FILES EXCLUDE REGEX "/CMakeFiles/|/CMakeTmp/|/cmake_build_|/build/")
@@ -133,6 +146,7 @@ if(MODULE_INTERFACE_FILES)
             BASE_DIRS
             "${CMAKE_CURRENT_SOURCE_DIR}/src"
             "${HELIOS_ECS_SOURCE_DIR}/src"
+            "${HELIOS_MATH_SOURCE_DIR}/src"
             FILES ${MODULE_INTERFACE_FILES}
     )
 endif()
@@ -147,6 +161,7 @@ target_link_libraries(helios
 target_include_directories(helios PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
         $<BUILD_INTERFACE:${HELIOS_ECS_SOURCE_DIR}/src>
+        $<BUILD_INTERFACE:${HELIOS_MATH_SOURCE_DIR}/src>
         $<BUILD_INTERFACE:${HELIOS_ECS_COMPAT_INCLUDE_DIR}>
 )
 

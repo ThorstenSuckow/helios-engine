@@ -152,18 +152,68 @@ if(MODULE_INTERFACE_FILES)
 endif()
 
 target_link_libraries(helios
-        PUBLIC
-        thirdparty::freetype
-        thirdparty::opengl
-        thirdparty::imgui
+        PRIVATE
+        $<BUILD_INTERFACE:thirdparty::freetype>
+        $<BUILD_INTERFACE:thirdparty::opengl>
+        $<BUILD_INTERFACE:thirdparty::imgui>
 )
 
 target_include_directories(helios PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
         $<BUILD_INTERFACE:${HELIOS_ECS_SOURCE_DIR}/src>
         $<BUILD_INTERFACE:${HELIOS_MATH_SOURCE_DIR}/src>
-        $<BUILD_INTERFACE:${HELIOS_ECS_COMPAT_INCLUDE_DIR}>
+        $<INSTALL_INTERFACE:include>
 )
+
+set(HELIOS_ENGINE_ENABLE_PACKAGE_DEFAULT OFF)
+if(PROJECT_IS_TOP_LEVEL)
+    set(HELIOS_ENGINE_ENABLE_PACKAGE_DEFAULT ON)
+endif()
+option(HELIOS_ENGINE_ENABLE_PACKAGE "Enable install/export package files" ${HELIOS_ENGINE_ENABLE_PACKAGE_DEFAULT})
+if(HELIOS_ENGINE_ENABLE_PACKAGE)
+    include(GNUInstallDirs)
+    include(CMakePackageConfigHelpers)
+
+    install(TARGETS helios
+            EXPORT helios-engineTargets
+            ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+            LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+            RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+            FILE_SET modules DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+    )
+
+    install(FILES
+            "${HELIOS_ECS_SOURCE_DIR}/src/helios-ecs-config.h"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/helios-engine-config.h"
+            DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+    )
+
+    set(HELIOS_ENGINE_INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/cmake/helios-engine")
+
+    configure_package_config_file(
+            "${CMAKE_CURRENT_SOURCE_DIR}/cmake/helios-engineConfig.cmake.in"
+            "${CMAKE_CURRENT_BINARY_DIR}/helios-engineConfig.cmake"
+            INSTALL_DESTINATION "${HELIOS_ENGINE_INSTALL_CMAKEDIR}"
+    )
+
+    write_basic_package_version_file(
+            "${CMAKE_CURRENT_BINARY_DIR}/helios-engineConfigVersion.cmake"
+            VERSION "0.1.0"
+            COMPATIBILITY SameMajorVersion
+    )
+
+    install(EXPORT helios-engineTargets
+            FILE helios-engineTargets.cmake
+            NAMESPACE helios::
+            DESTINATION "${HELIOS_ENGINE_INSTALL_CMAKEDIR}"
+    )
+
+    install(FILES
+            "${CMAKE_CURRENT_BINARY_DIR}/helios-engineConfig.cmake"
+            "${CMAKE_CURRENT_BINARY_DIR}/helios-engineConfigVersion.cmake"
+            DESTINATION "${HELIOS_ENGINE_INSTALL_CMAKEDIR}"
+    )
+endif()
 
 if(BUILD_TESTING)
     FetchContent_Declare(

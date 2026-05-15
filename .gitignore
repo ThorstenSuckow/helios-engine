@@ -2,3 +2,4 @@
 /build-test-check
 /build-test-unified
 /build-pkg-llvm-e2e/
+/.idea

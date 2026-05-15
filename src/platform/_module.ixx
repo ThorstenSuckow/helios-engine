@@ -5,7 +5,6 @@
 export module helios.platform;
 
 
-export import helios.platform.glfw;
 export import helios.platform.environment;
 export import helios.platform.lifecycle;
 export import helios.platform.window;

@@ -8,7 +8,7 @@ module;
 #include <cassert>
 #include <cmath>
 #include <format>
-#include <helios/helios_config.h>
+#include <helios-engine-config.h>
 #include <unordered_set>
 #include <vector>
 

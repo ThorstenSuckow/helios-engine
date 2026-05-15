@@ -6,7 +6,7 @@ module;
 
 #include <algorithm>
 #include <cassert>
-#include <helios/helios_config.h>
+#include <helios-engine-config.h>
 
 export module helios.input.gamepad.GamepadState;
 

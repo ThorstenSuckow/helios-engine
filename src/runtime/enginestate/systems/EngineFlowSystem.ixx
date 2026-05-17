@@ -13,7 +13,7 @@ import helios.engine.runtime.messaging.command.concepts;
 import helios.engine.state.commands;
 import helios.engine.state.types.StateTransitionRequest;
 import helios.engine.state.types.StateTransitionId;
-import helios.engine.runtime.enginestate.Bindings;
+import helios.engine.runtime.enginestate.EngineStateBindings;
 
 import helios.engine.runtime.enginestate.types;
 

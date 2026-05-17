@@ -8,7 +8,7 @@
  */
 module;
 
-export module helios.engine.runtime.enginestate.Bindings;
+export module helios.engine.runtime.enginestate.EngineStateBindings;
 
 export import helios.engine.state.types.StateTransitionId;
 export import helios.engine.runtime.enginestate.types.EngineState;

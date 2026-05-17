@@ -9,4 +9,4 @@ export import helios.engine.runtime.enginestate.types;
 export import helios.engine.runtime.enginestate.rules;
 
 export import helios.engine.runtime.enginestate.EngineStateManager;
-
+export import helios.engine.runtime.enginestate.EngineStateBindings;

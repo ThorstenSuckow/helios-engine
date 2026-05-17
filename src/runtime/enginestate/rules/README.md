@@ -1,4 +1,4 @@
-# helios::gameplay::gamestate::rules
+# helios::engine::runtime::enginestate::rules
 
 Transition rules for the game state machine.
 
@@ -6,9 +6,9 @@ Transition rules for the game state machine.
 
 | Class | Description |
 |-------|-------------|
-| `DefaultGameStateTransitionRules` | Provides the default set of transition rules |
+| `DefaultEngineStateTransitionRules` | Provides the default set of transition rules |
 
-## DefaultGameStateTransitionRules
+## DefaultEngineStateTransitionRules
 
 Defines standard transitions:
 
@@ -25,13 +25,13 @@ Defines standard transitions:
 | Running | TitleRequest | Title |
 | Running | ReadyMatchRequest | MatchReady |
 
-Custom rules can be provided to the `GameStateManager` constructor.
+Custom rules can be provided to the `EngineStateManager` constructor.
 
 ---
 
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::gameplay::gamestate::rules
+@namespace helios::engine::runtime::enginestate::rules
 @brief Transition rules for the game state machine.
 @details Contains rule definitions for valid state transitions.
 </p></details>

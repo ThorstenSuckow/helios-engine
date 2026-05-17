@@ -1,16 +1,16 @@
-# helios::gameplay::gamestate
+# helios::engine::runtime::enginestate
 
 Game state management for the helios engine.
 
-This module provides domain-specific types and bindings for managing game states (Booted, Title, MatchReady, Running, Paused). It uses the generic `helios::state` framework.
+This module provides domain-specific types and bindings for managing game states (Booted, Title, MatchReady, Running, Paused). It uses the generic `helios::engine::state` framework.
 
 ## Components
 
 | Component | Description |
 |-----------|-------------|
-| `GameStateManager` | Type alias for `StateManager<GameState>` |
-| `GameState` | Enum defining application-level states |
-| `GameStateTransitionId` | Enum defining valid transition triggers |
+| `EngineStateManager` | Type alias for `StateManager<EngineState>` |
+| `EngineState` | Enum defining application-level states |
+| `EngineStateTransitionId` | Enum defining valid transition triggers |
 
 ## Submodules
 
@@ -22,16 +22,16 @@ This module provides domain-specific types and bindings for managing game states
 
 ## Architecture
 
-`GameStateManager` is a type alias for `StateManager<GameState>`:
+`EngineStateManager` is a type alias for `StateManager<EngineState>`:
 
 ```cpp
-using GameStateManager = helios::state::StateManager<types::GameState>;
+using EngineStateManager = helios::engine::state::StateManager<types::EngineState>;
 ```
 
 The generic `StateManager` provides:
 - Rule-based transitions with optional guards
 - Listener notifications on state changes
-- Command-driven state changes via `StateCommand<GameState>`
+- Command-driven state changes via `StateCommand<EngineState>`
 
 ## State Flow
 
@@ -55,23 +55,23 @@ The generic `StateManager` provides:
 ## Usage
 
 ```cpp
-using namespace helios::gameplay::gamestate;
-using namespace helios::state;
-using namespace helios::state::commands;
+using namespace helios::engine::runtime::enginestate;
+using namespace helios::engine::state;
+using namespace helios::engine::state::commands;
 
 // Create manager with rules
-auto manager = std::make_unique<GameStateManager>(gameStateRules);
+auto manager = std::make_unique<EngineStateManager>(engineStateRules);
 
 // Add listeners
-manager->addStateListener(std::make_unique<LambdaStateListener<types::GameState>>(
+manager->addStateListener(std::make_unique<LambdaStateListener<types::EngineState>>(
     /* onExit, onTransition, onEnter callbacks */
 ));
 
 // Submit transition via command
-commandBuffer.add<StateCommand<types::GameState>>(
-    StateTransitionRequest<types::GameState>{
-        types::GameState::Title,
-        types::GameStateTransitionId::ReadyMatchRequest
+commandBuffer.add<StateCommand<types::EngineState>>(
+    StateTransitionRequest<types::EngineState>{
+        types::EngineState::Title,
+        types::EngineStateTransitionId::ReadyMatchRequest
     }
 );
 ```
@@ -80,7 +80,7 @@ commandBuffer.add<StateCommand<types::GameState>>(
 
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::gameplay::gamestate
+@namespace helios::engine::runtime::enginestate
 @brief Game state management for the helios engine.
-@details Provides domain-specific types and bindings for managing game states using the generic helios::state framework.
+@details Provides domain-specific types and bindings for managing game states using the generic helios::engine::state framework.
 </p></details>

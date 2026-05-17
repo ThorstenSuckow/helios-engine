@@ -1,4 +1,4 @@
-# helios::gameplay::gamestate::types
+# helios::engine::runtime::enginestate::types
 
 Core types for game state management.
 
@@ -6,26 +6,26 @@ Core types for game state management.
 
 | Type | Description |
 |------|-------------|
-| `GameState` | Enum of possible game states (bitmask) |
-| `GameStateTransitionContext` | Context for a state transition |
-| `GameStateTransitionId` | Enum of transition identifiers |
-| `GameStateTransitionRequest` | Request to transition from a state |
-| `GameStateTransitionRule` | Definition of a valid transition |
-| `GameStateTransitionType` | Categorization of transitions |
+| `EngineState` | Enum of possible game states (bitmask) |
+| `EngineStateTransitionContext` | Context for a state transition |
+| `EngineStateTransitionId` | Enum of transition identifiers |
+| `EngineStateTransitionRequest` | Request to transition from a state |
+| `EngineStateTransitionRule` | Definition of a valid transition |
+| `EngineStateTransitionType` | Categorization of transitions |
 
-## GameState
+## EngineState
 
 Bitmask enum with values:
 - `Undefined`, `Booted`, `Title`, `MatchReady`, `Running`, `Paused`, `Any`
 
 Supports bitwise operators for combining states.
 
-## GameStateTransitionId
+## EngineStateTransitionId
 
 Transition identifiers:
 - `Undefined`, `BootRequest`, `ReadyMatchRequest`, `StartMatchRequest`, `TogglePause`, `TitleRequest`
 
-## GameStateTransitionRule
+## EngineStateTransitionRule
 
 Defines a valid transition with:
 - Source state (`from`)
@@ -37,7 +37,7 @@ Defines a valid transition with:
 
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::gameplay::gamestate::types
+@namespace helios::engine::runtime::enginestate::types
 @brief Core types for game state management.
 @details Contains enums, structs, and classes for state machine operations.
 </p></details>

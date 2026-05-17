@@ -1,31 +1,29 @@
 /**
- * @file DefaultGameStateTransitionGuards.ixx
+ * @file DefaultEngineStateTransitionGuards.ixx
  * @brief Default guard functions for game state transitions.
  */
 module;
 
 #include <cassert>
 
-export module helios.gameplay.gamestate.rules.guards.DefaultGameStateTransitionGuards;
+export module helios.engine.runtime.enginestate.rules.guards.DefaultEngineStateTransitionGuards;
 
-import helios.runtime.world.UpdateContext;
-import helios.runtime.world.Session;
-import helios.runtime.world.GameWorld;
+import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.world.Session;
+import helios.engine.runtime.world.GameWorld;
 
-import helios.state.Bindings;
+import helios.engine.runtime.enginestate.types;
+import helios.engine.state.types;
 
-import helios.gameplay.gamestate.types;
-import helios.state.types;
+import helios.engine.rendering.shader.components;
 
-import helios.rendering.shader.components;
-
-using namespace helios::gameplay::gamestate::types;
-using namespace helios::state::types;
-using namespace helios::rendering::shader::components;
-export namespace helios::gameplay::gamestate::rules::guards {
+using namespace helios::engine::runtime::enginestate::types;
+using namespace helios::engine::state::types;
+using namespace helios::engine::rendering::shader::components;
+export namespace helios::engine::runtime::enginestate::rules::guards {
 
 
-    class DefaultGameStateTransitionGuards {
+    class DefaultEngineStateTransitionGuards {
 
     public:
 
@@ -38,8 +36,8 @@ export namespace helios::gameplay::gamestate::rules::guards {
          * @return True if an entity with a CurrentContext exists.
          */
         static bool isPlatformInitialized(
-            helios::runtime::world::UpdateContext& updateContext,
-            const StateTransitionRequest<GameState> transitionRequest
+            helios::engine::runtime::world::UpdateContext& updateContext,
+            const StateTransitionRequest<EngineState> transitionRequest
         ) {
             return updateContext.runtimeEnvironment().isInitialized();
         }
@@ -53,8 +51,8 @@ export namespace helios::gameplay::gamestate::rules::guards {
          * @return True if the infrastructure can be considered in a ready-state.
          */
         static bool isRuntimeInfrastructureReady(
-            helios::runtime::world::UpdateContext& updateContext,
-            const StateTransitionRequest<GameState> transitionRequest
+            helios::engine::runtime::world::UpdateContext& updateContext,
+            const StateTransitionRequest<EngineState> transitionRequest
         ) {
             return updateContext.runtimeEnvironment().isRuntimeInfrastructureReady();
         }

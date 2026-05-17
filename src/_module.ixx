@@ -11,10 +11,9 @@
  * input handling, event system, and application infrastructure. Importing this module
  * provides access to the entire helios engine API.
  */
-export module helios;
+export module helios.engine;
 
 export import helios.engine.core;
-export import helios.math;
 export import helios.engine.rendering;
 export import helios.engine.scene;
 export import helios.engine.input;
@@ -25,5 +24,5 @@ export import helios.engine.runtime;
 export import helios.engine.platform;
 export import helios.engine.tooling;
 
-export import helios.bootstrap;
+export import helios.engine.bootstrap;
 

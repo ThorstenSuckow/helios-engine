@@ -14,7 +14,7 @@ Consume from another project:
 
 ```cmake
 find_package(helios-engine CONFIG REQUIRED)
-target_link_libraries(your_target PRIVATE helios::helios)
+target_link_libraries(your_target PRIVATE helios::engine)
 ```
 
 Configure a consumer against an installed prefix:

@@ -6,10 +6,10 @@ file(GLOB_RECURSE HELIOS_ENGINE_MODULE_INTERFACE_FILES CONFIGURE_DEPENDS
 list(FILTER HELIOS_ENGINE_CPP_FILES EXCLUDE REGEX "/CMakeFiles/|/CMakeTmp/|/cmake_build_|/build/")
 list(FILTER HELIOS_ENGINE_MODULE_INTERFACE_FILES EXCLUDE REGEX "/CMakeFiles/|/CMakeTmp/|/cmake_build_|/build/")
 
-target_sources(helios PRIVATE ${HELIOS_ENGINE_CPP_FILES})
+target_sources(helios_engine PRIVATE ${HELIOS_ENGINE_CPP_FILES})
 
 if(HELIOS_ENGINE_MODULE_INTERFACE_FILES)
-    target_sources(helios PUBLIC
+    target_sources(helios_engine PUBLIC
             FILE_SET modules TYPE CXX_MODULES
             BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
             FILES ${HELIOS_ENGINE_MODULE_INTERFACE_FILES}

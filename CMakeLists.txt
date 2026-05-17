@@ -8,14 +8,15 @@ include(cmake/ProjectOptions.cmake)
 include(cmake/Dependencies.cmake)
 include(cmake/ThirdParty.cmake)
 
-add_library(helios STATIC)
-add_library(helios::helios ALIAS helios)
-set_property(TARGET helios PROPERTY CXX_SCAN_FOR_MODULES ON)
-target_compile_features(helios PUBLIC cxx_std_23)
+add_library(helios_engine STATIC)
+add_library(helios::engine ALIAS helios_engine)
+set_property(TARGET helios_engine PROPERTY CXX_SCAN_FOR_MODULES ON)
+set_target_properties(helios_engine PROPERTIES EXPORT_NAME engine)
+target_compile_features(helios_engine PUBLIC cxx_std_23)
 
 add_subdirectory(src)
 
-target_link_libraries(helios
+target_link_libraries(helios_engine
         PUBLIC
         $<BUILD_INTERFACE:helios::ecs>
         $<BUILD_INTERFACE:helios::math>
@@ -27,7 +28,7 @@ target_link_libraries(helios
         $<BUILD_INTERFACE:thirdparty::imgui>
 )
 
-target_include_directories(helios PUBLIC
+target_include_directories(helios_engine PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
         $<INSTALL_INTERFACE:include>
 )

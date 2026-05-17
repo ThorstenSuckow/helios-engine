@@ -18,7 +18,7 @@ file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS
         "${CMAKE_CURRENT_SOURCE_DIR}/*.test.cpp")
 
 add_executable(helios-engine-tests ${TEST_SOURCES})
-target_link_libraries(helios-engine-tests PRIVATE helios GTest::gtest_main glm::glm)
+target_link_libraries(helios-engine-tests PRIVATE helios::engine GTest::gtest_main glm::glm)
 
 include(GoogleTest)
 gtest_discover_tests(helios-engine-tests)

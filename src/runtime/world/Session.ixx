@@ -17,7 +17,7 @@ import helios.ecs.components;
 import helios.engine.state.types.StateTransitionContext;
 import helios.engine.state.components;
 import helios.engine.state.types.StateTransitionId;
-import helios.engine.runtime.enginestate.Bindings;
+import helios.engine.runtime.enginestate.EngineStateBindings;
 
 import helios.engine.runtime.world.GameObject;
 import helios.ecs.types.EntityHandle;

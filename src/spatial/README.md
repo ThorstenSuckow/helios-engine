@@ -1,4 +1,4 @@
-# helios::spatial
+# helios::engine::spatial
 
 Transform components and systems for spatial state management.
 
@@ -65,7 +65,7 @@ gameLoop.phase(PhaseType::Post).addPass()
 
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::spatial
+@namespace helios::engine::spatial
 @brief Transform components and systems for spatial state management.
 @details This namespace contains the transform layer of the spatial system. Components store individual transform properties while systems compose them into final world transforms each frame.
 </p></details>

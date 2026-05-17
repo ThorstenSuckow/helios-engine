@@ -1,8 +1,8 @@
 /**
  * @file _module.ixx
- * @brief Aggregate module for `helios::rendering::framebuffer::components`.
+ * @brief Aggregate module for `helios::engine::rendering::framebuffer::components`.
  */
-export module helios.rendering.framebuffer.components;
+export module helios.engine.rendering.framebuffer.components;
 
-export import helios.rendering.framebuffer.components.FramebufferBindingComponent;
+export import helios.engine.rendering.framebuffer.components.FramebufferBindingComponent;
 

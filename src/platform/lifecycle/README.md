@@ -1,4 +1,4 @@
-# helios::platform::lifecycle
+# helios::engine::platform::lifecycle
 
 Platform lifecycle orchestration for startup, warmup completion, and shutdown.
 
@@ -18,12 +18,12 @@ destruction.
 
 ## Notes
 
-Per-frame event polling remains in `helios::platform::environment`.
+Per-frame event polling remains in `helios::engine::platform::environment`.
 
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::platform::lifecycle
+@namespace helios::engine::platform::lifecycle
 @brief Platform lifecycle orchestration for startup and shutdown transitions.
 </p></details>
 

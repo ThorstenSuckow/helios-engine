@@ -6,13 +6,13 @@ module;
 
 #include <string>
 
-export module helios.util.io.StringFileReader;
+export module helios.engine.util.io.StringFileReader;
 
-import helios.util.log.Logger;
-import helios.util.log.LogManager;
+import helios.engine.util.log.Logger;
+import helios.engine.util.log.LogManager;
 
-#define HELIOS_LOG_SCOPE "helios::util::io.FileReader"
-export namespace helios::util::io {
+#define HELIOS_LOG_SCOPE "helios::engine::util::io.FileReader"
+export namespace helios::engine::util::io {
 
 
     /**
@@ -25,7 +25,7 @@ export namespace helios::util::io {
         /**
          * @brief Shared logger instance for all StringFileReader objects.
          */
-        inline static const helios::util::log::Logger& logger_ = helios::util::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
+        inline static const helios::engine::util::log::Logger& logger_ = helios::engine::util::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
 
 
     public:

@@ -1,13 +1,13 @@
 /**
  * @file _module.ixx
- * @brief Module aggregator for `helios.scene.types`.
+ * @brief Module aggregator for `helios.engine.scene.types`.
  */
 
-export module helios.scene.types;
+export module helios.engine.scene.types;
 
-export import helios.scene.types.PerspectiveCameraContext;
-export import helios.scene.types.CullingContext;
-export import helios.scene.types.SceneMemberRenderContext;
-export import helios.scene.types.SceneDomainTag;
-export import helios.scene.types.SceneHandle;
-export import helios.scene.types.SceneId;
+export import helios.engine.scene.types.PerspectiveCameraContext;
+export import helios.engine.scene.types.CullingContext;
+export import helios.engine.scene.types.SceneMemberRenderContext;
+export import helios.engine.scene.types.SceneDomainTag;
+export import helios.engine.scene.types.SceneHandle;
+export import helios.engine.scene.types.SceneId;

@@ -6,9 +6,9 @@ module;
 
 #include <string>
 
-export module helios.util.log.LogSink;
+export module helios.engine.util.log.LogSink;
 
-export namespace helios::util::log {
+export namespace helios::engine::util::log {
 
     /**
      * @brief Severity level for log messages.

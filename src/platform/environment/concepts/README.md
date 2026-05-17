@@ -1,4 +1,4 @@
-# helios::platform::environment::concepts
+# helios::engine::platform::environment::concepts
 
 Runtime-specific platform concepts.
 
@@ -10,12 +10,12 @@ Runtime-specific platform concepts.
 
 ## Related
 
-- `helios.platform.concepts.IsAnyPlatformHandle`
+- `helios.engine.platform.concepts.IsAnyPlatformHandle`
 
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::platform::environment::concepts
+@namespace helios::engine::platform::environment::concepts
 @brief Runtime-specific platform concepts.
 </p></details>
 

@@ -4,11 +4,11 @@
  */
 module;
 
-export module helios.core.components.ColorComponent;
+export module helios.engine.core.components.ColorComponent;
 
-import helios.core.components.Vec4Component;
+import helios.engine.core.components.Vec4Component;
 
-export namespace helios::core::components {
+export namespace helios::engine::core::components {
 
     /** @brief Domain tag used for color-valued components. */
     struct ColorDomainTag{};
@@ -22,6 +22,6 @@ export namespace helios::core::components {
      * typically interpreted as RGBA.
      */
     template<typename THandle>
-    using ColorComponent = helios::core::components::Vec4Component<ColorDomainTag, THandle, float>;
+    using ColorComponent = helios::engine::core::components::Vec4Component<ColorDomainTag, THandle, float>;
 
 }

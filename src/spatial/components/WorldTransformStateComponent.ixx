@@ -4,13 +4,13 @@
  */
 module;
 
-export module helios.spatial.components.WorldTransformStateComponent;
+export module helios.engine.spatial.components.WorldTransformStateComponent;
 
 import helios.math.types;
 
-import helios.core.spatial;
+import helios.engine.core.spatial;
 
-export namespace helios::spatial::components {
+export namespace helios::engine::spatial::components {
 
 
     /**

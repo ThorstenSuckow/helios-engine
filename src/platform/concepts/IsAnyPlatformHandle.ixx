@@ -6,14 +6,14 @@ module;
 
 #include <concepts>
 
-export module helios.platform.concepts.IsAnyPlatformHandle;
+export module helios.engine.platform.concepts.IsAnyPlatformHandle;
 
-import helios.platform.environment.concepts;
-import helios.platform.window.concepts;
+import helios.engine.platform.environment.concepts;
+import helios.engine.platform.window.concepts;
 
-using namespace helios::platform::environment::concepts;
-using namespace helios::platform::window::concepts;
-export namespace helios::platform::concepts {
+using namespace helios::engine::platform::environment::concepts;
+using namespace helios::engine::platform::window::concepts;
+export namespace helios::engine::platform::concepts {
 
     /**
      * @brief True when `THandle` is either a runtime platform handle or a window handle.

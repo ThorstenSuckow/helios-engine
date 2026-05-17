@@ -7,21 +7,21 @@ module;
 
 #include <vector>
 
-export module helios.runtime.lifecycle.systems.DelayedComponentEnablerSystem;
+export module helios.engine.runtime.lifecycle.systems.DelayedComponentEnablerSystem;
 
 
-import helios.runtime.world.GameWorld;
-import helios.runtime.world.UpdateContext;
-import helios.runtime.lifecycle.components.DelayedComponentEnabler;
+import helios.engine.runtime.world.GameWorld;
+import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.lifecycle.components.DelayedComponentEnabler;
 import helios.ecs.types.ComponentTypeId;
 
 import helios.ecs.ComponentOpsRegistry;
 
 import helios.ecs.components.Active;
 
-import helios.runtime.world.tags.SystemRole;
+import helios.engine.runtime.world.tags.SystemRole;
 
-export namespace helios::runtime::lifecycle::systems {
+export namespace helios::engine::runtime::lifecycle::systems {
 
     /**
      * @brief System that processes delayed component activations each frame.
@@ -51,7 +51,7 @@ export namespace helios::runtime::lifecycle::systems {
 
     public:
 
-        using EngineRoleTag = helios::runtime::world::tags::SystemRole;
+        using EngineRoleTag = helios::engine::runtime::world::tags::SystemRole;
         /**
          * @brief Processes all deferred components and activates expired ones.
          *
@@ -62,13 +62,13 @@ export namespace helios::runtime::lifecycle::systems {
          *
          * @param updateContext Provides deltaTime for timer updates.
          */
-        void update(helios::runtime::world::UpdateContext& updateContext) noexcept {
+        void update(helios::engine::runtime::world::UpdateContext& updateContext) noexcept {
 
             const float delta = updateContext.deltaTime();
 
             for (auto [entity, dce, active] : updateContext.view<
                 THandle,
-                helios::runtime::lifecycle::components::DelayedComponentEnabler<THandle>,
+                helios::engine::runtime::lifecycle::components::DelayedComponentEnabler<THandle>,
                 helios::ecs::components::Active<THandle>
             >().whereEnabled()) {
 

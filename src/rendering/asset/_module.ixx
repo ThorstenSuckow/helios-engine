@@ -3,6 +3,6 @@
  * @brief Module exports for rendering model assets.
  */
 
-export module helios.rendering.asset;
+export module helios.engine.rendering.asset;
 
-export import helios.rendering.asset.shape;
+export import helios.engine.rendering.asset.shape;

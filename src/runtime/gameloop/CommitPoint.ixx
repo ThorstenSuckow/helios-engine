@@ -7,10 +7,10 @@ module;
 #include <cstdint>
 #include <utility>
 
-export module helios.runtime.gameloop:CommitPoint;
+export module helios.engine.runtime.gameloop:CommitPoint;
 
 
-export namespace helios::runtime::gameloop {
+export namespace helios::engine::runtime::gameloop {
 
     /**
      * @brief Flags defining synchronization actions at the end of a pass.

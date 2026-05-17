@@ -1,4 +1,4 @@
-# helios::rendering::mesh::types
+# helios::engine::rendering::mesh::types
 
 Type layer for mesh resources and payloads.
 
@@ -13,7 +13,7 @@ Type layer for mesh resources and payloads.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::rendering::mesh::types
+@namespace helios::engine::rendering::mesh::types
 @brief Type layer for mesh resources and payloads.
 @details Defines ids, handles, config objects, and raw data structures used by mesh resource systems.
 </p></details>

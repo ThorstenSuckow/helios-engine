@@ -10,13 +10,13 @@ module;
 #include <memory>
 #include <vector>
 #include <ranges>
-export module helios.runtime.lifecycle.components.DelayedComponentEnabler;
+export module helios.engine.runtime.lifecycle.components.DelayedComponentEnabler;
 
 
 import helios.ecs.types.ComponentTypeId;
-import helios.core.types;
+import helios.engine.core.types;
 
-export namespace helios::runtime::lifecycle::components {
+export namespace helios::engine::runtime::lifecycle::components {
 
     /**
      * @brief Component that manages delayed activation of other components.

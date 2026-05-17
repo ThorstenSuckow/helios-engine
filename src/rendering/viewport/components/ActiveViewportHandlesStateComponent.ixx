@@ -7,18 +7,13 @@ module;
 #include <vector>
 #include <span>
 
-export module helios.rendering.viewport.components.ActiveViewportHandlesStateComponent;
+export module helios.engine.rendering.viewport.components.ActiveViewportHandlesStateComponent;
 
 import helios.ecs.types.EntityHandle;
-import helios.rendering.viewport.types.ViewportHandle;
+import helios.engine.rendering.viewport.types.ViewportHandle;
 
-import helios.gameplay.gamestate.types;
-import helios.gameplay.matchstate.types;
-
-using namespace helios::gameplay::gamestate::types;
-using namespace helios::gameplay::matchstate::types;
-using namespace helios::rendering::viewport::types;
-export namespace helios::rendering::viewport::components {
+using namespace helios::engine::rendering::viewport::types;
+export namespace helios::engine::rendering::viewport::components {
 
     /**
      * @brief Stores the currently active viewport IDs based on game/match state.

@@ -6,16 +6,16 @@
 
 module;
 
-export module helios.spatial.components.DimensionComponent;
+export module helios.engine.spatial.components.DimensionComponent;
 
-import helios.runtime.world.GameObject;
+import helios.engine.runtime.world.GameObject;
 import helios.math.types;
 
-import helios.core.spatial;
-import helios.core.units.Unit;
+import helios.engine.core.spatial;
+import helios.engine.core.units.Unit;
 
 
-export namespace helios::spatial::components {
+export namespace helios::engine::spatial::components {
 
     /**
      * @brief Component that defines the physical dimensions (scale) of an entity.
@@ -45,7 +45,7 @@ export namespace helios::spatial::components {
         /**
          * @brief Unit of measurement for the dimensions.
          */
-        helios::core::units::Unit unit_;
+        helios::engine::core::units::Unit unit_;
 
         /**
          * @brief Flag indicating if the scale has changed.
@@ -94,12 +94,12 @@ export namespace helios::spatial::components {
             const float width,
             const float height,
             const float depth,
-            const helios::core::units::Unit unit = helios::core::units::Unit::Meter) :
+            const helios::engine::core::units::Unit unit = helios::engine::core::units::Unit::Meter) :
         width_(width), height_(height), depth_(depth), unit_(unit) {}
 
         explicit DimensionComponent(
             const helios::math::vec3f scale,
-            const helios::core::units::Unit unit = helios::core::units::Unit::Meter) :
+            const helios::engine::core::units::Unit unit = helios::engine::core::units::Unit::Meter) :
             width_(scale[0]), height_(scale[1]), depth_(scale[2]), unit_(unit) {}
 
         /**
@@ -161,7 +161,7 @@ export namespace helios::spatial::components {
          *
          * @return The unit enum value.
          */
-        [[nodiscard]] helios::core::units::Unit unit() const noexcept {
+        [[nodiscard]] helios::engine::core::units::Unit unit() const noexcept {
             return unit_;
         }
 
@@ -183,7 +183,7 @@ export namespace helios::spatial::components {
          * @param unit New unit of measurement (default: Meter).
          */
         void setDimensions(const float width, const float height, const float depth,
-                      const helios::core::units::Unit unit = helios::core::units::Unit::Meter
+                      const helios::engine::core::units::Unit unit = helios::engine::core::units::Unit::Meter
         ) noexcept {
 
             width_ = width;

@@ -4,48 +4,42 @@
  */
 module;
 
-export module helios.runtime.messaging.command.EngineCommandBuffer;
+export module helios.engine.runtime.messaging.command.EngineCommandBuffer;
 
 
-import helios.gameplay.spawn.commands;
-
-import helios.platform.environment.types;
-import helios.platform.environment.commands;
-import helios.platform.window.commands;
+import helios.engine.platform.environment.types;
+import helios.engine.platform.environment.commands;
+import helios.engine.platform.window.commands;
 
 
-import helios.platform.lifecycle.commands;
+import helios.engine.platform.lifecycle.commands;
+
+import helios.engine.state;
+import helios.engine.runtime.enginestate;
 
 
-import helios.runtime.messaging.command.TypedCommandBuffer;
+import helios.engine.runtime.messaging.command.TypedCommandBuffer;
 
 
-import helios.runtime.timing.commands;
+import helios.engine.runtime.timing.commands;
 
-import helios.physics.motion.commands;
-import helios.runtime.lifecycle.commands.WorldLifecycleCommand;
+import helios.engine.runtime.lifecycle.commands.WorldLifecycleCommand;
 
-import helios.runtime.world.types;
-import helios.runtime.messaging.command.tags.CommandBufferRole;
+import helios.engine.runtime.world.types;
+import helios.engine.runtime.messaging.command.tags.CommandBufferRole;
 
-using namespace helios::runtime::world;
-using namespace helios::runtime::world::types;
-export namespace helios::runtime::messaging::command {
+using namespace helios::engine::runtime::world;
+using namespace helios::engine::runtime::world::types;
+export namespace helios::engine::runtime::messaging::command {
 
-    using EngineCommandBuffer = helios::runtime::messaging::command::TypedCommandBuffer<
+    using EngineCommandBuffer = helios::engine::runtime::messaging::command::TypedCommandBuffer<
 
-            helios::physics::motion::commands::Move2DCommand<GameObjectHandle>,
-            helios::physics::motion::commands::SteeringCommand<GameObjectHandle>,
+            helios::engine::runtime::timing::commands::TimerControlCommand,
+            helios::engine::runtime::lifecycle::commands::WorldLifecycleCommand,
 
+            helios::engine::state::commands::StateCommand<helios::engine::runtime::enginestate::types::EngineState>,
+            helios::engine::state::commands::DelayedStateCommand<helios::engine::runtime::enginestate::types::EngineState>
 
-            helios::runtime::timing::commands::TimerControlCommand,
-            helios::runtime::lifecycle::commands::WorldLifecycleCommand,
-
-
-
-            helios::gameplay::spawn::commands::ScheduledSpawnPlanCommand<GameObjectHandle>,
-            helios::gameplay::spawn::commands::SpawnCommand<GameObjectHandle>,
-            helios::gameplay::spawn::commands::DespawnCommand<GameObjectHandle>
 
         >;
 

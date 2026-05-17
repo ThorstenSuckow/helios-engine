@@ -9,18 +9,18 @@ module;
 #include "helios-engine-config.h"
 
 
-export module helios.platform.window.WindowEntityManager;
+export module helios.engine.platform.window.WindowEntityManager;
 
 import helios.ecs;
 
-import helios.platform.window.types;
+import helios.engine.platform.window.types;
 
 constexpr size_t WINDOW_SIZE = DEFAULT_WINDOW_POOL_CAPACITY;
 
 using namespace helios::ecs;
 using namespace helios::ecs::strategies;
-using namespace helios::platform::window::types;
-export namespace helios::platform::window {
+using namespace helios::engine::platform::window::types;
+export namespace helios::engine::platform::window {
 
     /**
      * @brief Entity registry type used to allocate and validate window entities.

@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-import helios.util.Guid;
+import helios.engine.util.Guid;
 
-using Guid = helios::util::Guid;
+using Guid = helios::engine::util::Guid;
 
 TEST(Guid, generateAndValue) {
 

@@ -7,14 +7,14 @@ module;
 #include <cassert>
 #include <memory>
 
-export module helios.runtime.timing.commands.TimerControlCommand;
+export module helios.engine.runtime.timing.commands.TimerControlCommand;
 
 
-import helios.runtime.timing.types;
+import helios.engine.runtime.timing.types;
 
 
 
-export namespace helios::runtime::timing::commands {
+export namespace helios::engine::runtime::timing::commands {
 
     /**
      * @brief Command that carries a TimerControlContext to the timer subsystem.
@@ -22,15 +22,15 @@ export namespace helios::runtime::timing::commands {
      * TimerControlCommand is dispatched through the command buffer to request
      * timer state transitions (start, pause, stop).
      *
-     * @see helios::runtime::timing::types::TimerControlContext
-     * @see helios::runtime::timing::TimerCommandDispatcher
+     * @see helios::engine::runtime::timing::types::TimerControlContext
+     * @see helios::engine::runtime::timing::TimerCommandDispatcher
      */
     class TimerControlCommand  {
 
         /**
          * @brief The timer control context describing the requested state transition.
          */
-        helios::runtime::timing::types::TimerControlContext timerContext_;
+        helios::engine::runtime::timing::types::TimerControlContext timerContext_;
 
     public:
 
@@ -40,7 +40,7 @@ export namespace helios::runtime::timing::commands {
          * @param timerContext The context describing which timer to control and the target state.
          */
         explicit TimerControlCommand(
-            helios::runtime::timing::types::TimerControlContext timerContext
+            helios::engine::runtime::timing::types::TimerControlContext timerContext
         ) : timerContext_(std::move(timerContext)) { }
 
 
@@ -49,7 +49,7 @@ export namespace helios::runtime::timing::commands {
          *
          * @return The TimerControlContext describing the requested state transition.
          */
-        [[nodiscard]] helios::runtime::timing::types::TimerControlContext timerControlContext() const noexcept {
+        [[nodiscard]] helios::engine::runtime::timing::types::TimerControlContext timerControlContext() const noexcept {
             return timerContext_;
         }
 

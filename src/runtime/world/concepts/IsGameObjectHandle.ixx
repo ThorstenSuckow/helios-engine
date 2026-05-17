@@ -6,12 +6,12 @@ module;
 
 #include <concepts>
 
-export module helios.runtime.world.concepts.IsGameObjectHandle;
+export module helios.engine.runtime.world.concepts.IsGameObjectHandle;
 
-import helios.runtime.world.types.GameObjectHandle;
+import helios.engine.runtime.world.types.GameObjectHandle;
 
-using namespace helios::runtime::world::types;
-export namespace helios::runtime::world::concepts {
+using namespace helios::engine::runtime::world::types;
+export namespace helios::engine::runtime::world::concepts {
 
     /**
      * @brief Constrains a type to `GameObjectHandle`.

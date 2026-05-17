@@ -6,9 +6,9 @@ module;
 
 #include <memory>
 
-export module helios.core.memory.ErasedUnique;
+export module helios.engine.core.memory.ErasedUnique;
 
-export namespace helios::core::memory {
+export namespace helios::engine::core::memory {
 
     /**
      * @brief Type-erased unique ownership wrapper.

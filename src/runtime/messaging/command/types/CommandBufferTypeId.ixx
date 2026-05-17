@@ -7,12 +7,12 @@ module;
 #include <functional>
 #include <cstddef>
 
-export module helios.runtime.messaging.command.types.CommandBufferTypeId;
+export module helios.engine.runtime.messaging.command.types.CommandBufferTypeId;
 
 import helios.ecs.TypeIndexer;
 import helios.ecs.types;
 
-export namespace helios::runtime::messaging::command::types {
+export namespace helios::engine::runtime::messaging::command::types {
 
     /**
      * @brief Unique type identifier for command buffer types.
@@ -98,8 +98,8 @@ export namespace helios::runtime::messaging::command::types {
  * @brief Hash specialization for CommandBufferTypeId.
  */
 template<>
-struct std::hash<helios::runtime::messaging::command::types::CommandBufferTypeId> {
-   std::size_t operator()(const helios::runtime::messaging::command::types::CommandBufferTypeId& id) const noexcept {
+struct std::hash<helios::engine::runtime::messaging::command::types::CommandBufferTypeId> {
+   std::size_t operator()(const helios::engine::runtime::messaging::command::types::CommandBufferTypeId& id) const noexcept {
         return id.value();
     }
 

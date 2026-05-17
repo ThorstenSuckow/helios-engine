@@ -1,4 +1,4 @@
-# helios::platform::window::concepts
+# helios::engine::platform::window::concepts
 
 Window-handle compile-time constraints.
 
@@ -10,13 +10,13 @@ Window-handle compile-time constraints.
 
 ## Related
 
-- `helios.platform.environment.concepts.IsPlatformHandle`
-- `helios.platform.concepts.IsAnyPlatformHandle`
+- `helios.engine.platform.environment.concepts.IsPlatformHandle`
+- `helios.engine.platform.concepts.IsAnyPlatformHandle`
 
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::platform::window::concepts
+@namespace helios::engine::platform::window::concepts
 @brief Window-handle compile-time constraints.
 </p></details>
 

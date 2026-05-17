@@ -1,11 +1,11 @@
 /**
  * @file _module.ixx
- * @brief Aggregate module for helios::core::container::buffer namespace.
+ * @brief Aggregate module for helios::engine::core::container::buffer namespace.
  */
 
-export module helios.core.container.buffer;
+export module helios.engine.core.container.buffer;
 
-export import helios.core.container.buffer.concepts;
+export import helios.engine.core.container.buffer.concepts;
 
 export import :Buffer;
 export import :DoubleBuffer;

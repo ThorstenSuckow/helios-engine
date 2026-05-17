@@ -6,32 +6,30 @@ module;
 
 #include <span>
 
-export module helios.runtime.timing.systems.TimerUpdateSystem;
+export module helios.engine.runtime.timing.systems.TimerUpdateSystem;
 
-import helios.runtime.timing.Timer;
-import helios.runtime.timing.TimerManager;
-
-import helios.state.Bindings;
+import helios.engine.runtime.timing.Timer;
+import helios.engine.runtime.timing.TimerManager;
 
 
-import helios.runtime.world.UpdateContext;
-import helios.runtime.messaging.command.NullCommandBuffer;
-import helios.runtime.messaging.command.concepts.IsCommandBufferLike;
+import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.messaging.command.NullCommandBuffer;
+import helios.engine.runtime.messaging.command.concepts.IsCommandBufferLike;
 
-import helios.runtime.world.tags.SystemRole;
+import helios.engine.runtime.world.tags.SystemRole;
 
-import helios.runtime.timing.types;
-import helios.runtime.timing.commands;
+import helios.engine.runtime.timing.types;
+import helios.engine.runtime.timing.commands;
 
-using namespace helios::runtime::timing;
+using namespace helios::engine::runtime::timing;
 
-using namespace helios::runtime::timing::types;
-using namespace helios::runtime::timing::commands;
-using namespace helios::runtime::world;
-using namespace helios::runtime::messaging::command;
-using namespace helios::runtime::messaging::command::concepts;
+using namespace helios::engine::runtime::timing::types;
+using namespace helios::engine::runtime::timing::commands;
+using namespace helios::engine::runtime::world;
+using namespace helios::engine::runtime::messaging::command;
+using namespace helios::engine::runtime::messaging::command::concepts;
 
-export namespace helios::runtime::timing::systems {
+export namespace helios::engine::runtime::timing::systems {
 
     /**
      * @brief Updates all game timers managed by the TimerManager.
@@ -54,7 +52,7 @@ export namespace helios::runtime::timing::systems {
     public:
 
 
-        using EngineRoleTag = helios::runtime::world::tags::SystemRole;
+        using EngineRoleTag = helios::engine::runtime::world::tags::SystemRole;
         using CommandBuffer_type = TCommandBuffer;
 
 
@@ -71,7 +69,7 @@ export namespace helios::runtime::timing::systems {
          *
          * @param updateContext The current frame's update context.
          */
-        void update(helios::runtime::world::UpdateContext& updateContext, TCommandBuffer& cmdBuffer) noexcept {
+        void update(helios::engine::runtime::world::UpdateContext& updateContext, TCommandBuffer& cmdBuffer) noexcept {
 
             for (auto& timer : timerManager_.timers()) {
                 if (timer.state() == TimerState::Running) {

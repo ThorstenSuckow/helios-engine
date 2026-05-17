@@ -1,8 +1,8 @@
 /**
  * @file _module.ixx
- * @brief Aggregate module for helios::core::container::buffer::concepts namespace.
+ * @brief Aggregate module for helios::engine::core::container::buffer::concepts namespace.
  */
 
-export module helios.core.container.buffer.concepts;
+export module helios.engine.core.container.buffer.concepts;
 
-export import helios.core.container.buffer.concepts.IsTypeIndexerLike;
+export import helios.engine.core.container.buffer.concepts.IsTypeIndexerLike;

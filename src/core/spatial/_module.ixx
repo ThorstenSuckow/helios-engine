@@ -1,8 +1,8 @@
 /**
  * @file _module.ixx
- * @brief Aggregate module for helios::core::spatial namespace.
+ * @brief Aggregate module for helios::engine::core::spatial namespace.
  */
 
-export module helios.core.spatial;
+export module helios.engine.core.spatial;
 
-export import helios.core.spatial.Transform;
+export import helios.engine.core.spatial.Transform;

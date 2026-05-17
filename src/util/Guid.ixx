@@ -8,12 +8,12 @@ module;
 #include <cstdint>
 #include <cstddef>
 
-export module helios.util.Guid;
+export module helios.engine.util.Guid;
 
 import helios.ecs.types;
 
 
-export namespace helios::util {
+export namespace helios::engine::util {
 
 
     /**
@@ -109,12 +109,12 @@ export namespace helios::util {
 
     };
 
-} // namespace helios::util
+} // namespace helios::engine::util
 
 
 template<>
-struct std::hash<helios::util::Guid> {
-    std::size_t operator()(const helios::util::Guid& guid) const noexcept {
+struct std::hash<helios::engine::util::Guid> {
+    std::size_t operator()(const helios::engine::util::Guid& guid) const noexcept {
         return guid.hash();
     }
 };

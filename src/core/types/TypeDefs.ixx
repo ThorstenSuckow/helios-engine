@@ -8,10 +8,10 @@ module;
 #include <limits>
 #include <cstddef>
 
-export module helios.core.types.TypeDefs;
+export module helios.engine.core.types.TypeDefs;
 
 
-export namespace helios::core::types {
+export namespace helios::engine::core::types {
 
 
 
@@ -31,24 +31,24 @@ export namespace helios::core::types {
      * Pass `no_init` as a constructor argument to request uninitialized storage:
      *
      * ```cpp
-     * import helios.util.Guid;
+     * import helios.engine.util.Guid;
      * import helios.ecs.types;
      *
      * // Generate a new unique Guid
-     * auto id = helios::util::Guid::generate();
+     * auto id = helios::engine::util::Guid::generate();
      *
      * // Declare uninitialized Guid for later assignment
-     * helios::util::Guid deferredId{helios::ecs::types::no_init};
+     * helios::engine::util::Guid deferredId{helios::ecs::types::no_init};
      *
      * // Assign later
-     * deferredId = helios::util::Guid::generate();
+     * deferredId = helios::engine::util::Guid::generate();
      * ```
      *
      * @note Objects constructed with `no_init` are in an indeterminate state.
      * Reading from them before assignment is undefined behavior.
      *
      * @see no_init
-     * @see helios::util::Guid
+     * @see helios::engine::util::Guid
      */
     struct no_init_t{};
 
@@ -59,11 +59,11 @@ export namespace helios::core::types {
      * passed to constructors supporting uninitialized construction.
      *
      * ```cpp
-     * helios::util::Guid id{helios::ecs::types::no_init};
+     * helios::engine::util::Guid id{helios::ecs::types::no_init};
      * ```
      *
      * @see no_init_t
-     * @see helios::util::Guid
+     * @see helios::engine::util::Guid
      */
     inline constexpr no_init_t no_init;
 

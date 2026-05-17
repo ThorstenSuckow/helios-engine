@@ -3,6 +3,6 @@
  * @brief Aggregate module for helios::model namespace.
  */
 
-export module helios.rendering.model;
+export module helios.engine.rendering.model;
 
-export import helios.rendering.model.components;
+export import helios.engine.rendering.model.components;

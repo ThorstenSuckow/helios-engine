@@ -6,15 +6,15 @@ module;
 
 #include <vector>
 
-export module helios.rendering.asset.shape.basic.Rhombus;
+export module helios.engine.rendering.asset.shape.basic.Rhombus;
 
-import helios.rendering.asset.shape.Shape;
-import helios.rendering.Vertex;
-import helios.rendering.mesh.types.PrimitiveType;
+import helios.engine.rendering.asset.shape.Shape;
+import helios.engine.rendering.Vertex;
+import helios.engine.rendering.mesh.types.PrimitiveType;
 
-using namespace helios::rendering;
+using namespace helios::engine::rendering;
 
-export namespace helios::rendering::asset::shape::basic {
+export namespace helios::engine::rendering::asset::shape::basic {
 
     /**
      * @brief A 2D rhombus (diamond) shape primitive.
@@ -65,7 +65,7 @@ export namespace helios::rendering::asset::shape::basic {
          *
          * @return PrimitiveType::Lines for wireframe rendering.
          */
-        [[nodiscard]] helios::rendering::mesh::types::PrimitiveType primitiveType() const noexcept override {
+        [[nodiscard]] helios::engine::rendering::mesh::types::PrimitiveType primitiveType() const noexcept override {
             return mesh::types::PrimitiveType::Lines;
         }
 

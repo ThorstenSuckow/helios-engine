@@ -10,17 +10,17 @@ module;
 #include <vector>
 
 
-export module helios.runtime.world.ManagerRegistry;
+export module helios.engine.runtime.world.ManagerRegistry;
 
-import helios.core.container;
-import helios.runtime.world.Manager;
-import helios.runtime.concepts;
-import helios.runtime.world.types;
+import helios.engine.core.container;
+import helios.engine.runtime.world.Manager;
+import helios.engine.runtime.concepts;
+import helios.engine.runtime.world.types;
 
-using namespace helios::core::container;
-using namespace helios::runtime::world::types;
+using namespace helios::engine::core::container;
+using namespace helios::engine::runtime::world::types;
 
-export namespace helios::runtime::world {
+export namespace helios::engine::runtime::world {
 
     /**
      * @brief Type alias for a ConceptModelRegistry specialized for Managers.

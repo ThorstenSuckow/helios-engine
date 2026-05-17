@@ -5,26 +5,26 @@
 module;
 
 
-export module helios.scene.types.SceneMemberRenderContext;
+export module helios.engine.scene.types.SceneMemberRenderContext;
 
 import helios.ecs.types.EntityHandle;
-import helios.scene.types.SceneHandle;
-import helios.rendering.mesh.types;
-import helios.rendering.material.types;
-import helios.rendering.shader.types;
-import helios.rendering.viewport.types;
-import helios.rendering.framebuffer.types;
+import helios.engine.scene.types.SceneHandle;
+import helios.engine.rendering.mesh.types;
+import helios.engine.rendering.material.types;
+import helios.engine.rendering.shader.types;
+import helios.engine.rendering.viewport.types;
+import helios.engine.rendering.framebuffer.types;
 import helios.math.types;
 
 using namespace helios::ecs::types;
-using namespace helios::rendering::viewport::types;
-using namespace helios::rendering::framebuffer::types;
-using namespace helios::rendering::mesh::types;
-using namespace helios::rendering::material::types;
-using namespace helios::rendering::shader::types;
-using namespace helios::scene;
+using namespace helios::engine::rendering::viewport::types;
+using namespace helios::engine::rendering::framebuffer::types;
+using namespace helios::engine::rendering::mesh::types;
+using namespace helios::engine::rendering::material::types;
+using namespace helios::engine::rendering::shader::types;
+using namespace helios::engine::scene;
 
-export namespace helios::scene::types {
+export namespace helios::engine::scene::types {
 
     /**
      * @brief Immutable render context for one scene member in one viewport.

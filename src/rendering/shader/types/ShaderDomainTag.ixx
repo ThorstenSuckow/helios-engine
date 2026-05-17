@@ -4,9 +4,9 @@
  */
 module;
 
-export module helios.rendering.shader.types.ShaderDomainTag;
+export module helios.engine.rendering.shader.types.ShaderDomainTag;
 
-export namespace helios::rendering::shader::types {
+export namespace helios::engine::rendering::shader::types {
 
     /**
      * @brief Tag type for shader resource identifiers.

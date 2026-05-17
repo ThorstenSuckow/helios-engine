@@ -1,15 +1,15 @@
 /**
  * @file _module.ixx
- * @brief Aggregate module for helios::core namespace.
+ * @brief Aggregate module for helios::engine::core namespace.
  */
 
-export module helios.core;
+export module helios.engine.core;
 
-export import helios.core.TypedTupleCat;
+export import helios.engine.core.TypedTupleCat;
 
-export import helios.core.components;
-export import helios.core.container;
-export import helios.core.types;
-export import helios.core.spatial;
-export import helios.core.memory;
-export import helios.core.units;
+export import helios.engine.core.components;
+export import helios.engine.core.container;
+export import helios.engine.core.types;
+export import helios.engine.core.spatial;
+export import helios.engine.core.memory;
+export import helios.engine.core.units;

@@ -4,12 +4,12 @@ module;
 #include <functional>
 #include <cstddef>
 
-export module helios.state.types.StateTypeId;
+export module helios.engine.state.types.StateTypeId;
 
 import helios.ecs.TypeIndexer;
 import helios.ecs.types;
 
-export namespace helios::state::types {
+export namespace helios::engine::state::types {
 
 
     class StateTypeId {
@@ -80,8 +80,8 @@ export namespace helios::state::types {
  * @details Enables use of StateTypeId as a key in unordered containers.
  */
 template<>
-struct std::hash<helios::state::types::StateTypeId> {
-   std::size_t operator()(const helios::state::types::StateTypeId& id) const noexcept {
+struct std::hash<helios::engine::state::types::StateTypeId> {
+   std::size_t operator()(const helios::engine::state::types::StateTypeId& id) const noexcept {
         return id.value();
     }
 

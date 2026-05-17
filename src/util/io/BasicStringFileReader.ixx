@@ -9,11 +9,11 @@ module;
 #include <string>
 #include <stdexcept>
 
-export module helios.util.io.BasicStringFileReader;
+export module helios.engine.util.io.BasicStringFileReader;
 
-import helios.util.io.StringFileReader;
+import helios.engine.util.io.StringFileReader;
 
-export namespace helios::util::io {
+export namespace helios::engine::util::io {
 
 
     /**

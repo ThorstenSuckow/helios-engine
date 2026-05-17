@@ -6,12 +6,12 @@ module;
 
 #include <concepts>
 
-export module helios.rendering.viewport.concepts.IsViewportHandle;
+export module helios.engine.rendering.viewport.concepts.IsViewportHandle;
 
-import helios.rendering.viewport.types.ViewportHandle;
+import helios.engine.rendering.viewport.types.ViewportHandle;
 
-using namespace helios::rendering::viewport::types;
-export namespace helios::rendering::viewport::concepts {
+using namespace helios::engine::rendering::viewport::types;
+export namespace helios::engine::rendering::viewport::concepts {
 
     /**
      * @brief Matches `ViewportHandle` exactly.

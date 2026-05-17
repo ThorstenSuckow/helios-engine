@@ -9,40 +9,34 @@ module;
 #include <vector>
 #include <span>
 
-export module helios.runtime.gameloop:GameLoop;
+export module helios.engine.runtime.gameloop:GameLoop;
 
-import helios.runtime.world.GameWorld;
+import helios.engine.runtime.world.GameWorld;
 
-import helios.runtime.world.UpdateContext;
-import helios.util.log.Logger;
-import helios.util.log.LogManager;
+import helios.engine.runtime.world.UpdateContext;
+import helios.engine.util.log.Logger;
+import helios.engine.util.log.LogManager;
 
 import helios.ecs;
 
-import helios.state.Bindings;
+import helios.engine.runtime.messaging.event.GameLoopEventBus;
 
-
-import helios.runtime.messaging.event.GameLoopEventBus;
-
-import helios.state.Bindings;
-
-import helios.gameplay.gamestate.types;
-import helios.gameplay.matchstate.types;
+import helios.engine.runtime.enginestate.types;
 
 import :CommitPoint;
 import :Phase;
 import :PassCommitListener;
 
-import helios.runtime.world.Manager;
+import helios.engine.runtime.world.Manager;
 
-import helios.input.InputSnapshot;
+import helios.engine.input.InputSnapshot;
 
-import helios.runtime.world.GameWorld;
+import helios.engine.runtime.world.GameWorld;
 
-using namespace helios::runtime::world;
+using namespace helios::engine::runtime::world;
 
-#define HELIOS_LOG_SCOPE "helios::runtime::gameloop::GameLoop"
-export namespace helios::runtime::gameloop {
+#define HELIOS_LOG_SCOPE "helios::engine::runtime::gameloop::GameLoop"
+export namespace helios::engine::runtime::gameloop {
 
     /**
      * @brief Central orchestrator for the game update cycle.
@@ -91,7 +85,7 @@ export namespace helios::runtime::gameloop {
      * @see EngineCommandBuffer
      * @see PassCommitListener
      */
-    class GameLoop : public helios::runtime::gameloop::PassCommitListener {
+    class GameLoop : public helios::engine::runtime::gameloop::PassCommitListener {
 
 
         /**
@@ -108,7 +102,7 @@ export namespace helios::runtime::gameloop {
         /**
          * @brief The logger used with this GameLoop instance.
          */
-        inline static const helios::util::log::Logger& logger_ = helios::util::log::LogManager::loggerForScope(
+        inline static const helios::engine::util::log::Logger& logger_ = helios::engine::util::log::LogManager::loggerForScope(
             HELIOS_LOG_SCOPE);
         GameWorld& gameWorld_;
 
@@ -116,17 +110,17 @@ export namespace helios::runtime::gameloop {
         /**
          * @brief The pre-update phase, executed before main gameplay logic.
          */
-        helios::runtime::gameloop::Phase prePhase_;
+        helios::engine::runtime::gameloop::Phase prePhase_;
 
         /**
          * @brief The main update phase for core gameplay systems.
          */
-        helios::runtime::gameloop::Phase mainPhase_;
+        helios::engine::runtime::gameloop::Phase mainPhase_;
 
         /**
          * @brief The post-update phase for cleanup and synchronization.
          */
-        helios::runtime::gameloop::Phase postPhase_;
+        helios::engine::runtime::gameloop::Phase postPhase_;
 
 
         /**
@@ -139,7 +133,7 @@ export namespace helios::runtime::gameloop {
          * @see UpdateContext::pushPhase()
          * @see UpdateContext::readPhase()
          */
-        helios::runtime::messaging::event::GameLoopEventBus phaseEventBus_{};
+        helios::engine::runtime::messaging::event::GameLoopEventBus phaseEventBus_{};
 
         /**
          * @brief Event bus for pass-level event propagation.
@@ -152,7 +146,7 @@ export namespace helios::runtime::gameloop {
          * @see UpdateContext::readPass()
          * @see Pass::addCommitPoint()
          */
-        helios::runtime::messaging::event::GameLoopEventBus passEventBus_{};
+        helios::engine::runtime::messaging::event::GameLoopEventBus passEventBus_{};
 
         /**
          * @brief Event bus for frame-level event propagation.
@@ -168,7 +162,7 @@ export namespace helios::runtime::gameloop {
          * @see UpdateContext::pushFrame()
          * @see UpdateContext::readFrame()
          */
-        helios::runtime::messaging::event::GameLoopEventBus frameEventBus_{};
+        helios::engine::runtime::messaging::event::GameLoopEventBus frameEventBus_{};
 
         /**
          * @brief Accumulated total time since the first frame, in seconds.
@@ -277,16 +271,16 @@ export namespace helios::runtime::gameloop {
          *
          * @return Reference to the requested Phase.
          */
-        [[nodiscard]] helios::runtime::gameloop::Phase& phase(const helios::runtime::gameloop::PhaseType phaseType) noexcept {
+        [[nodiscard]] helios::engine::runtime::gameloop::Phase& phase(const helios::engine::runtime::gameloop::PhaseType phaseType) noexcept {
 
             switch (phaseType) {
-                case helios::runtime::gameloop::PhaseType::Pre:
+                case helios::engine::runtime::gameloop::PhaseType::Pre:
                     return prePhase_;
                     break;
-                case helios::runtime::gameloop::PhaseType::Main:
+                case helios::engine::runtime::gameloop::PhaseType::Main:
                     return mainPhase_;
                     break;
-                case helios::runtime::gameloop::PhaseType::Post:
+                case helios::engine::runtime::gameloop::PhaseType::Post:
                     return postPhase_;
                     break;
             }
@@ -367,7 +361,7 @@ export namespace helios::runtime::gameloop {
         void update(
             GameWorld& gameWorld,
             float deltaTime,
-            const helios::input::InputSnapshot& inputSnapshot
+            const helios::engine::input::InputSnapshot& inputSnapshot
         ) noexcept {
 
             assert(initialized_ && "GameLoop not initialized");

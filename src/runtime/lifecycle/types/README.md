@@ -1,4 +1,4 @@
-# helios::runtime::lifecycle::types
+# helios::engine::runtime::lifecycle::types
 
 Core type definitions for the lifecycle module.
 
@@ -12,7 +12,7 @@ Core type definitions for the lifecycle module.
 
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::runtime::lifecycle::types
+@namespace helios::engine::runtime::lifecycle::types
 @brief Core type definitions for the lifecycle module.
 @details Contains action enums used by WorldLifecycleCommand and WorldLifecycleManager.
 </p></details>

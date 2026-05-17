@@ -7,19 +7,17 @@ module;
 #include <cassert>
 #include <memory>
 
-export module helios.state.commands.DelayedStateCommand;
+export module helios.engine.state.commands.DelayedStateCommand;
 
-import helios.runtime.timing.types.TimerId;
+import helios.engine.runtime.timing.types.TimerId;
 
-import helios.state.Bindings;
+import helios.engine.state.types.StateTransitionRequest;
 
-import helios.state.types.StateTransitionRequest;
-
-using namespace helios::state::types;
-using namespace helios::runtime::timing::types;
+using namespace helios::engine::state::types;
+using namespace helios::engine::runtime::timing::types;
 
 
-export namespace helios::state::commands {
+export namespace helios::engine::state::commands {
 
     /**
      * @brief Command that pairs a state transition request with a timer.

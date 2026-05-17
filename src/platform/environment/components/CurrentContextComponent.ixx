@@ -6,10 +6,10 @@ module;
 
 #include <string>
 
-export module helios.platform.environment.components.CurrentContextComponent;
+export module helios.engine.platform.environment.components.CurrentContextComponent;
 
 
-export namespace helios::platform::environment::components {
+export namespace helios::engine::platform::environment::components {
 
     /**
      * @brief Marker assigned to the entity owning the current platform context.
@@ -19,4 +19,4 @@ export namespace helios::platform::environment::components {
     template<typename THandle>
     struct CurrentContextComponent {};
 
-} // namespace helios::platform::environment::components
+} // namespace helios::engine::platform::environment::components

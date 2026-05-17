@@ -1,4 +1,4 @@
-# helios::platform::lifecycle::commands
+# helios::engine::platform::lifecycle::commands
 
 Commands for platform lifecycle control.
 
@@ -17,6 +17,6 @@ runtime managers during commit points.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::platform::lifecycle::commands
+@namespace helios::engine::platform::lifecycle::commands
 @brief Commands for platform lifecycle control.
 </p></details>

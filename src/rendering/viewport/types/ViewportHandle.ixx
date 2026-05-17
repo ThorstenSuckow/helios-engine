@@ -4,13 +4,13 @@
  */
 module;
 
-export module helios.rendering.viewport.types.ViewportHandle;
+export module helios.engine.rendering.viewport.types.ViewportHandle;
 
 
 import helios.ecs.types;
-import helios.rendering.viewport.types.ViewportDomainTag;
+import helios.engine.rendering.viewport.types.ViewportDomainTag;
 
-export namespace helios::rendering::viewport::types {
+export namespace helios::engine::rendering::viewport::types {
 
     /**
      * @brief Handle type used to reference viewport entities.

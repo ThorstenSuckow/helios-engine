@@ -1,4 +1,4 @@
-# helios::platform::window
+# helios::engine::platform::window
 
 Window-domain platform abstractions.
 
@@ -26,7 +26,7 @@ and systems for creating windows and swapping buffers.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::platform::window
+@namespace helios::engine::platform::window
 @brief Window-domain platform abstractions.
 </p></details>
 

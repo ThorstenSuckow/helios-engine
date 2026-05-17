@@ -4,14 +4,14 @@
  */
 module;
 
-export module helios.runtime.lifecycle.commands.WorldLifecycleCommand;
+export module helios.engine.runtime.lifecycle.commands.WorldLifecycleCommand;
 
 
-import helios.runtime.lifecycle.types;
+import helios.engine.runtime.lifecycle.types;
 
-using namespace helios::runtime::lifecycle::types;
+using namespace helios::engine::runtime::lifecycle::types;
 
-export namespace helios::runtime::lifecycle::commands {
+export namespace helios::engine::runtime::lifecycle::commands {
 
     /**
      * @brief Command for requesting a world-level lifecycle operation.

@@ -1,4 +1,4 @@
-# helios::state::types
+# helios::engine::state::types
 
 Type definitions for state transitions.
 
@@ -27,7 +27,7 @@ struct StateTransitionId<GameState> {
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::state::types
+@namespace helios::engine::state::types
 @brief Type definitions for state transitions.
 @details Provides type traits, context classes, and rule definitions used by the state management system.
 </p></details>

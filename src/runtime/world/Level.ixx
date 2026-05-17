@@ -4,14 +4,14 @@
  */
 module;
 
-export module helios.runtime.world.Level;
+export module helios.engine.runtime.world.Level;
 
 import helios.math.types;
-import helios.core.units.Unit;
+import helios.engine.core.units.Unit;
 
 
 
-export namespace helios::runtime::world {
+export namespace helios::engine::runtime::world {
 
     /**
      * @brief Represents a game level containing the scene graph and world boundaries.
@@ -43,9 +43,9 @@ export namespace helios::runtime::world {
          */
         void setBounds(
             const helios::math::aabbf& bounds,
-            const  helios::core::units::Unit unit = helios::core::units::Unit::Meter) noexcept {
+            const  helios::engine::core::units::Unit unit = helios::engine::core::units::Unit::Meter) noexcept {
 
-            bounds_ = helios::core::units::from(bounds, unit);
+            bounds_ = helios::engine::core::units::from(bounds, unit);
 
         }
 

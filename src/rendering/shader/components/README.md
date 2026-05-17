@@ -1,4 +1,4 @@
-# helios::rendering::shader::components
+# helios::engine::rendering::shader::components
 
 ECS components for shader resources.
 
@@ -9,7 +9,7 @@ ECS components for shader resources.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::rendering::shader::components
+@namespace helios::engine::rendering::shader::components
 @brief ECS components for shader resources.
 @details Contains component data used by shader systems and managers to resolve and compile shader sources.
 </p></details>

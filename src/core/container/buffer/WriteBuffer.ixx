@@ -7,13 +7,13 @@ module;
 #include <vector>
 #include <cstddef>
 
-export module helios.core.container.buffer:WriteBuffer;
+export module helios.engine.core.container.buffer:WriteBuffer;
 
 import :ReadWriteDoubleBufferFwd;
 import :ReadBuffer;
 
 
-export namespace helios::core::container::buffer {
+export namespace helios::engine::core::container::buffer {
 
     /**
      * @class WriteBuffer

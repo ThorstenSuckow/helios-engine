@@ -4,20 +4,20 @@
  */
 module;
 
-export module helios.rendering.common.components.RenderPrototypeComponent;
+export module helios.engine.rendering.common.components.RenderPrototypeComponent;
 
-import helios.rendering.mesh;
-import helios.rendering.shader;
-import helios.rendering.material;
+import helios.engine.rendering.mesh;
+import helios.engine.rendering.shader;
+import helios.engine.rendering.material;
 
 
-using namespace helios::rendering::mesh::types;
-using namespace helios::rendering::shader::types;
-using namespace helios::rendering::material::types;
-using namespace helios::rendering::mesh;
-using namespace helios::rendering::shader;
-using namespace helios::rendering::material;
-export namespace helios::rendering::common::components {
+using namespace helios::engine::rendering::mesh::types;
+using namespace helios::engine::rendering::shader::types;
+using namespace helios::engine::rendering::material::types;
+using namespace helios::engine::rendering::mesh;
+using namespace helios::engine::rendering::shader;
+using namespace helios::engine::rendering::material;
+export namespace helios::engine::rendering::common::components {
 
     /**
      * @brief Component that stores the resource handles needed for rendering.

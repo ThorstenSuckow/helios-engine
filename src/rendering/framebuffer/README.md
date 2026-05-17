@@ -1,4 +1,4 @@
-# helios::rendering::framebuffer
+# helios::engine::rendering::framebuffer
 
 Framebuffer abstractions and resource aliases.
 
@@ -17,7 +17,7 @@ Framebuffer abstractions and resource aliases.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::rendering::framebuffer
+@namespace helios::engine::rendering::framebuffer
 @brief Framebuffer abstractions and resource aliases.
 @details Provides framebuffer runtime representation and ECS-oriented registry/manager aliases.
 </p></details>

@@ -4,9 +4,9 @@
  */
 module;
 
-export module helios.platform.window.types.WindowDomainTag;
+export module helios.engine.platform.window.types.WindowDomainTag;
 
-export namespace helios::platform::window::types {
+export namespace helios::engine::platform::window::types {
 
     /**
      * @brief Domain tag for window identity and handles.

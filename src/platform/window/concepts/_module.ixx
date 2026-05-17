@@ -1,7 +1,7 @@
 /**
  * @file _module.ixx
- * @brief Module aggregator for `helios.platform.window.concepts`.
+ * @brief Module aggregator for `helios.engine.platform.window.concepts`.
  */
-export module helios.platform.window.concepts;
+export module helios.engine.platform.window.concepts;
 
-export import helios.platform.window.concepts.IsWindowHandle;
+export import helios.engine.platform.window.concepts.IsWindowHandle;

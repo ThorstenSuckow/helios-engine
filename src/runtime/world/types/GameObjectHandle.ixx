@@ -4,12 +4,12 @@
  */
 module;
 
-export module helios.runtime.world.types.GameObjectHandle;
+export module helios.engine.runtime.world.types.GameObjectHandle;
 
 import helios.ecs.types.EntityHandle;
-import helios.runtime.world.types.GameObjectDomainTag;
+import helios.engine.runtime.world.types.GameObjectDomainTag;
 
-export namespace helios::runtime::world::types {
+export namespace helios::engine::runtime::world::types {
 
     /**
      * @brief Entity handle specialized with `GameObjectDomainTag`.

@@ -4,16 +4,16 @@
  */
 module;
 
-export module helios.scene.NoCullingStrategy;
+export module helios.engine.scene.NoCullingStrategy;
 
 
 
 import helios.ecs.types.EntityHandle;
-import helios.scene.types.CullingContext;
+import helios.engine.scene.types.CullingContext;
 
 using namespace helios::ecs::types;
-using namespace helios::scene::types;
-export namespace helios::scene {
+using namespace helios::engine::scene::types;
+export namespace helios::engine::scene {
 
     /**
      * @brief No-op culling strategy implementation.

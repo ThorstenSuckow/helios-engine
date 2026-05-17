@@ -4,9 +4,9 @@
  */
 module;
 
-export module helios.input.types.Gamepad;
+export module helios.engine.input.types.Gamepad;
 
-export namespace helios::input::types {
+export namespace helios::engine::input::types {
 
     /**
      * @brief Bitmask enum for gamepad input buttons.

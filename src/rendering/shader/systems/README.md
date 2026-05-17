@@ -1,4 +1,4 @@
-# helios::rendering::shader::systems
+# helios::engine::rendering::shader::systems
 
 Runtime systems for shader resource processing.
 
@@ -9,7 +9,7 @@ Runtime systems for shader resource processing.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::rendering::shader::systems
+@namespace helios::engine::rendering::shader::systems
 @brief Runtime systems for shader resource processing.
 @details Contains systems that transform shader ECS state into command-buffer work items.
 </p></details>

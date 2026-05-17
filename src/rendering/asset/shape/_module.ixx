@@ -9,7 +9,7 @@
  * @details This module provides shape definitions and base classes for geometric
  * shapes, including basic shapes like cubes and other primitive geometries.
  */
-export module helios.rendering.asset.shape;
+export module helios.engine.rendering.asset.shape;
 
-export import helios.rendering.asset.shape.Shape;
-export import helios.rendering.asset.shape.basic;
+export import helios.engine.rendering.asset.shape.Shape;
+export import helios.engine.rendering.asset.shape.basic;

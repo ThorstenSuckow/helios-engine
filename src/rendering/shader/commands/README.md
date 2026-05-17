@@ -1,4 +1,4 @@
-# helios::rendering::shader::commands
+# helios::engine::rendering::shader::commands
 
 Shader command payload types.
 
@@ -13,7 +13,7 @@ request shader compilation work.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::rendering::shader::commands
+@namespace helios::engine::rendering::shader::commands
 @brief Shader command payload types.
 @details Defines command objects for single and batched shader compilation workflows.
 </p></details>

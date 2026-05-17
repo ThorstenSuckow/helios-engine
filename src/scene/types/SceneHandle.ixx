@@ -4,14 +4,14 @@
  */
 module;
 
-export module helios.scene.types.SceneHandle;
+export module helios.engine.scene.types.SceneHandle;
 
 
 import helios.ecs.types;
 
-import helios.scene.types.SceneDomainTag;
+import helios.engine.scene.types.SceneDomainTag;
 
-export namespace helios::scene::types {
+export namespace helios::engine::scene::types {
 
     /**
      * @brief ECS handle type referencing scene entities.

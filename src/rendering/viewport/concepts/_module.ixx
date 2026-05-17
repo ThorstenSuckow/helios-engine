@@ -2,6 +2,6 @@
  * @file _module.ixx
  * @brief Viewport concepts submodule.
  */
-export module helios.rendering.viewport.concepts;
+export module helios.engine.rendering.viewport.concepts;
 
-export import helios.rendering.viewport.concepts.IsViewportHandle;
+export import helios.engine.rendering.viewport.concepts.IsViewportHandle;

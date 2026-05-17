@@ -1,3 +1,3 @@
-export module helios.util.time;
+export module helios.engine.util.time;
 
-export import helios.util.time.Stopwatch;
+export import helios.engine.util.time.Stopwatch;

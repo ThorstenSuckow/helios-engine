@@ -1,7 +1,7 @@
 /**
  * @file _module.ixx
- * @brief Aggregate module for helios::runtime::pooling namespace.
+ * @brief Aggregate module for helios::engine::runtime::pooling namespace.
  */
-export module helios.runtime.pooling.components;
+export module helios.engine.runtime.pooling.components;
 
-export import helios.runtime.pooling.components.PrefabIdComponent;
+export import helios.engine.runtime.pooling.components.PrefabIdComponent;

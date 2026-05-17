@@ -6,15 +6,15 @@ module;
 
 #include <concepts>
 
-export module helios.runtime.world.concepts.IsManagerLike;
+export module helios.engine.runtime.world.concepts.IsManagerLike;
 
-import helios.runtime.concepts.HasTag;
-import helios.runtime.world.tags.ManagerRole;
+import helios.engine.runtime.concepts.HasTag;
+import helios.engine.runtime.world.tags.ManagerRole;
 
-import helios.runtime.world.UpdateContext;
+import helios.engine.runtime.world.UpdateContext;
 
-using namespace helios::runtime::concepts;
-export namespace helios::runtime::world::concepts {
+using namespace helios::engine::runtime::concepts;
+export namespace helios::engine::runtime::world::concepts {
 
     /**
      * @brief Constrains T to types that provide `flush(UpdateContext&)` and
@@ -33,7 +33,7 @@ export namespace helios::runtime::world::concepts {
      * @see Manager
      */
     template<class T>
-    concept IsManagerLike = requires(T& t, helios::runtime::world::UpdateContext& updateContext) {
+    concept IsManagerLike = requires(T& t, helios::engine::runtime::world::UpdateContext& updateContext) {
         {t.flush(updateContext) } -> std::same_as<void>;
     } && HasTag<T, tags::ManagerRole>;
 }

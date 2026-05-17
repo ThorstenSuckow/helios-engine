@@ -6,13 +6,13 @@ module;
 
 #include <string>
 
-export module helios.platform.window.components.WindowComponent;
+export module helios.engine.platform.window.components.WindowComponent;
 
-import helios.platform.window.concepts.IsWindowHandle;
+import helios.engine.platform.window.concepts.IsWindowHandle;
 
 
-using namespace helios::platform::window::concepts;
-export namespace helios::platform::window::components {
+using namespace helios::engine::platform::window::concepts;
+export namespace helios::engine::platform::window::components {
 
     /**
      * @brief Stores platform-window properties associated with an entity.
@@ -34,4 +34,4 @@ export namespace helios::platform::window::components {
 
     };
 
-} // namespace helios::platform::window::components
+} // namespace helios::engine::platform::window::components

@@ -6,20 +6,20 @@ module;
 
 #include "helios-engine-config.h"
 
-export module helios.rendering.mesh.MeshEntityManager;
+export module helios.engine.rendering.mesh.MeshEntityManager;
 
 import helios.ecs.EntityManager;
 import helios.ecs.EntityRegistry;
 import helios.ecs.strategies;
 
-import helios.rendering.mesh.types;
+import helios.engine.rendering.mesh.types;
 
 constexpr auto MESH_SIZE = DEFAULT_MESH_POOL_CAPACITY;
 
-using namespace helios::rendering::mesh::types;
+using namespace helios::engine::rendering::mesh::types;
 using namespace helios::ecs;
 using namespace helios::ecs::strategies;
-export namespace helios::rendering::mesh {
+export namespace helios::engine::rendering::mesh {
 
     /**
      * @brief Entity registry used for mesh resources.

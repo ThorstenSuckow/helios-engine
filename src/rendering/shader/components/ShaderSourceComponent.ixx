@@ -6,12 +6,12 @@ module;
 
 #include <string>
 
-export module helios.rendering.shader.components.ShaderSourceComponent;
+export module helios.engine.rendering.shader.components.ShaderSourceComponent;
 
-import helios.rendering.shader.concepts.IsShaderHandle;
+import helios.engine.rendering.shader.concepts.IsShaderHandle;
 
-using namespace helios::rendering::shader::concepts;
-export namespace helios::rendering::shader::components {
+using namespace helios::engine::rendering::shader::concepts;
+export namespace helios::engine::rendering::shader::components {
 
     /**
      * @brief Source-location component for shader entities.

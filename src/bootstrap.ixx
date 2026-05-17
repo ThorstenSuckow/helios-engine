@@ -12,41 +12,36 @@ module;
 
 export module helios.bootstrap;
 
-import helios.runtime.gameloop;
-import helios.runtime.world;
+import helios.engine.runtime.gameloop;
+import helios.engine.runtime.world;
 
-import helios.state.Bindings;
-import helios.state.types.StateTransitionContext;
-import helios.runtime.messaging.command;
+import helios.engine.state.types.StateTransitionContext;
+import helios.engine.runtime.messaging.command;
 
-import helios.runtime.world.types.GameObjectHandle;
+import helios.engine.runtime.world.types.GameObjectHandle;
 
-import helios.platform;
+import helios.engine.platform;
 
-import helios.registry;
-import helios.scene.registry;
-import helios.spatial.registry;
-import helios.scene.registry;
-import helios.physics.registry;
-import helios.gameplay.registry;
-import helios.ecs.registry;
-import helios.rendering.registry;
-import helios.rendering.RenderManager;
-import helios.runtime.registry;
+import helios.engine.scene.registry;
+import helios.engine.spatial.registry;
+import helios.engine.scene.registry;
 
-import helios.runtime.lifecycle;
-import helios.runtime.timing;
-import helios.gameplay.gamestate;
-import helios.gameplay.matchstate;
+import helios.engine.rendering.registry;
+import helios.engine.rendering.RenderManager;
+import helios.engine.runtime.registry;
 
-using namespace helios::state::types;
-using namespace helios::gameplay::gamestate::types;
-using namespace helios::platform::environment;
-using namespace helios::platform::window;
-using namespace helios::runtime::world;
-using namespace helios::runtime::world::types;
-using namespace helios::runtime::gameloop;
-using namespace helios::runtime::messaging::command;
+import helios.engine.runtime.lifecycle;
+import helios.engine.runtime.timing;
+import helios.engine.runtime.enginestate;
+
+using namespace helios::engine::state::types;
+using namespace helios::engine::runtime::enginestate::types;
+using namespace helios::engine::platform::environment;
+using namespace helios::engine::platform::window;
+using namespace helios::engine::runtime::world;
+using namespace helios::engine::runtime::world::types;
+using namespace helios::engine::runtime::gameloop;
+using namespace helios::engine::runtime::messaging::command;
 
 export namespace helios::bootstrap {
 
@@ -56,14 +51,10 @@ export namespace helios::bootstrap {
     template<typename... TEntityManagers>
     struct ComponentRegistrar<std::tuple<TEntityManagers...>> {
         static void registerComponents() {
-            (helios::registerComponents<TEntityManagers>(), ...);
-            (helios::gameplay::registerComponents<TEntityManagers>(), ...);
-            (helios::ecs::registerComponents<TEntityManagers>(), ...);
-            (helios::rendering::registerComponents<TEntityManagers>(), ...);
-            (helios::runtime::registerComponents<TEntityManagers>(), ...);
-            (helios::scene::registerComponents<TEntityManagers>(), ...);
-            (helios::spatial::registerComponents<TEntityManagers>(), ...);
-            (helios::physics::registerComponents<TEntityManagers>(), ...);
+            (helios::engine::rendering::registerComponents<TEntityManagers>(), ...);
+            (helios::engine::runtime::registerComponents<TEntityManagers>(), ...);
+            (helios::engine::scene::registerComponents<TEntityManagers>(), ...);
+            (helios::engine::spatial::registerComponents<TEntityManagers>(), ...);
         }
 
     };
@@ -155,38 +146,32 @@ export namespace helios::bootstrap {
     inline std::pair<std::unique_ptr<GameWorld>, std::unique_ptr<GameLoop>> bootstrapGameWorld(
         const size_t capacity = ENTITY_MANAGER_DEFAULT_CAPACITY
     ) {
-        auto gameWorld = std::make_unique<helios::runtime::world::GameWorld>(capacity);
+        auto gameWorld = std::make_unique<helios::engine::runtime::world::GameWorld>(capacity);
 
-        auto gameLoop = std::make_unique<helios::runtime::gameloop::GameLoop>(*gameWorld);
+        auto gameLoop = std::make_unique<helios::engine::runtime::gameloop::GameLoop>(*gameWorld);
 
 
         registerAllComponents();
 
         // managers
-        gameWorld->registerManager<helios::runtime::lifecycle::WorldLifecycleManager>();
+        gameWorld->registerManager<helios::engine::runtime::lifecycle::WorldLifecycleManager>();
 
-        gameWorld->registerManager<helios::gameplay::gamestate::GameStateManager>(
-            helios::gameplay::gamestate::rules::DefaultGameStateTransitionRules::rules());
-        gameWorld->registerManager<helios::gameplay::matchstate::MatchStateManager>(
-            helios::gameplay::matchstate::rules::DefaultMatchStateTransitionRules::rules());
+        gameWorld->registerManager<helios::engine::runtime::enginestate::EngineStateManager>(
+            helios::engine::runtime::enginestate::rules::DefaultEngineStateTransitionRules::rules());
 
-        gameWorld->registerManager<helios::runtime::timing::TimerManager>();
+        gameWorld->registerManager<helios::engine::runtime::timing::TimerManager>();
 
-
-        gameWorld->session().trackState<helios::gameplay::gamestate::types::GameState>();
-        gameWorld->session().trackState<helios::gameplay::matchstate::types::MatchState>();
+        gameWorld->session().trackState<helios::engine::runtime::enginestate::types::EngineState>();
 
         gameWorld->registerCommandBuffer<RenderCommandBuffer>();
         gameWorld->registerCommandBuffer<PlatformCommandBuffer>();
         gameWorld->registerCommandBuffer<EngineCommandBuffer>();
-        gameWorld->registerCommandBuffer<StateCommandBuffer>();
 
-
-        gameWorld->session().setStateFrom<GameState>(
-            StateTransitionContext<GameState>(
-            GameState::Undefined,
-            GameState::Booting,
-            GameStateTransitionId::BootRequest
+        gameWorld->session().setStateFrom<EngineState>(
+            StateTransitionContext<EngineState>(
+            EngineState::Undefined,
+            EngineState::Booting,
+            EngineStateTransitionId::BootRequest
         ));
 
 

@@ -2,7 +2,7 @@ module;
 
 #include <cassert>
 
-export module helios.core.components.AABBComponent;
+export module helios.engine.core.components.AABBComponent;
 
 import helios.math.types;
 
@@ -10,7 +10,7 @@ import helios.math.concepts;
 
 using namespace helios::math;
 using namespace helios::math::concepts;
-export namespace helios::core::components {
+export namespace helios::engine::core::components {
 
     /**
      * @brief Generic AABB value component with dirty-state tracking.

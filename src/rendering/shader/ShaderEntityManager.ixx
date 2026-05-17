@@ -6,20 +6,20 @@ module;
 
 #include "helios-engine-config.h"
 
-export module helios.rendering.shader.ShaderEntityManager;
+export module helios.engine.rendering.shader.ShaderEntityManager;
 
 import helios.ecs.EntityManager;
 import helios.ecs.EntityRegistry;
 import helios.ecs.strategies;
 
-import helios.rendering.shader.types;
+import helios.engine.rendering.shader.types;
 
 constexpr auto SHADER_SIZE = DEFAULT_SHADER_POOL_CAPACITY;
 
-using namespace helios::rendering::shader::types;
+using namespace helios::engine::rendering::shader::types;
 using namespace helios::ecs;
 using namespace helios::ecs::strategies;
-export namespace helios::rendering::shader {
+export namespace helios::engine::rendering::shader {
 
     /**
      * @brief Entity registry used for shader resources.

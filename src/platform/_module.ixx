@@ -1,11 +1,11 @@
 /**
  * @file _module.ixx
- * @brief Module aggregator for `helios.platform`.
+ * @brief Module aggregator for `helios.engine.platform`.
  */
-export module helios.platform;
+export module helios.engine.platform;
 
 
-export import helios.platform.environment;
-export import helios.platform.lifecycle;
-export import helios.platform.window;
-export import helios.platform.concepts;
+export import helios.engine.platform.environment;
+export import helios.engine.platform.lifecycle;
+export import helios.engine.platform.window;
+export import helios.engine.platform.concepts;

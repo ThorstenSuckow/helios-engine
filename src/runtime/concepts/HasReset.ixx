@@ -6,9 +6,9 @@ module;
 
 #include <concepts>
 
-export module helios.runtime.concepts.HasReset;
+export module helios.engine.runtime.concepts.HasReset;
 
-export namespace helios::runtime::concepts {
+export namespace helios::engine::runtime::concepts {
 
     /**
      * @brief Constrains types that provide a `reset()` method returning void.

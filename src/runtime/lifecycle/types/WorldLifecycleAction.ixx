@@ -6,9 +6,9 @@ module;
 
 #include <cstdint>
 
-export module helios.runtime.lifecycle.types.WorldLifecycleAction;
+export module helios.engine.runtime.lifecycle.types.WorldLifecycleAction;
 
-export namespace helios::runtime::lifecycle::types {
+export namespace helios::engine::runtime::lifecycle::types {
 
     /**
      * @brief Actions that can be requested via WorldLifecycleCommand.

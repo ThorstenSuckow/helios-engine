@@ -4,6 +4,6 @@
  */
 
 
-export module helios.rendering.model.components;
+export module helios.engine.rendering.model.components;
 
-export import helios.rendering.model.components.ModelAabbComponent;
+export import helios.engine.rendering.model.components.ModelAabbComponent;

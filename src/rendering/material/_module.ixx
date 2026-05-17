@@ -1,14 +1,14 @@
 /**
  * @file _module.ixx
- * @brief Aggregate module for `helios::rendering::material`.
+ * @brief Aggregate module for `helios::engine::rendering::material`.
  */
-export module helios.rendering.material;
+export module helios.engine.rendering.material;
 
-export import helios.rendering.material.types;
+export import helios.engine.rendering.material.types;
 
 
-export import helios.rendering.material.MaterialEntityManager;
-export import helios.rendering.material.MaterialEntity;
-export import helios.rendering.material.MaterialProperties;
-export import helios.rendering.material.MaterialShaderProperties;
-export import helios.rendering.material.MaterialShaderPropertiesOverride;
+export import helios.engine.rendering.material.MaterialEntityManager;
+export import helios.engine.rendering.material.MaterialEntity;
+export import helios.engine.rendering.material.MaterialProperties;
+export import helios.engine.rendering.material.MaterialShaderProperties;
+export import helios.engine.rendering.material.MaterialShaderPropertiesOverride;

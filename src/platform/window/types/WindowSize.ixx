@@ -4,16 +4,16 @@
  */
 module;
 
-export module helios.platform.window.types.WindowSize;
+export module helios.engine.platform.window.types.WindowSize;
 
 import helios.math;
 
 using namespace helios::math;
-export namespace helios::platform::window::types {
+export namespace helios::engine::platform::window::types {
 
     /**
      * @brief Width/height pair used for window creation and resize operations.
      */
     using WindowSize = helios::math::vec2f;
 
-} // namespace helios::platform::window::types
+} // namespace helios::engine::platform::window::types

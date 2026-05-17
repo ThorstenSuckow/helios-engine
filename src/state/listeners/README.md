@@ -1,4 +1,4 @@
-# helios::state::listeners
+# helios::engine::state::listeners
 
 Listeners for observing state transitions.
 
@@ -13,7 +13,7 @@ Listeners for observing state transitions.
 ### Full listener (exit, transition, enter)
 
 ```cpp
-using namespace helios::state::listeners;
+using namespace helios::engine::state::listeners;
 
 auto listener = std::make_unique<LambdaStateListener<GameState>>(
     // onExit
@@ -56,7 +56,7 @@ auto transitionListener = std::make_unique<LambdaStateListener<GameState>>(
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::state::listeners
+@namespace helios::engine::state::listeners
 @brief State transition listeners.
 @details Provides listener implementations for reacting to state changes.
 </p></details>

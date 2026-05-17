@@ -9,29 +9,29 @@ module;
 #include <span>
 #include <vector>
 
-export module helios.runtime.world.ResourceRegistry;
+export module helios.engine.runtime.world.ResourceRegistry;
 
-import helios.runtime.world.Manager;
+import helios.engine.runtime.world.Manager;
 
-import helios.core.memory.ErasedUnique;
+import helios.engine.core.memory.ErasedUnique;
 
-import helios.runtime.messaging.command.CommandBuffer;
-import helios.runtime.messaging.command.CommandBufferRegistry;
-import helios.runtime.messaging.command.CommandHandlerRegistry;
+import helios.engine.runtime.messaging.command.CommandBuffer;
+import helios.engine.runtime.messaging.command.CommandBufferRegistry;
+import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
 
-import helios.runtime.world.ManagerRegistry;
+import helios.engine.runtime.world.ManagerRegistry;
 
-import helios.runtime.world.concepts;
-import helios.runtime.messaging.command.concepts;
-import helios.runtime.world.types;
+import helios.engine.runtime.world.concepts;
+import helios.engine.runtime.messaging.command.concepts;
+import helios.engine.runtime.world.types;
 
-using namespace helios::runtime::messaging::command;
-using namespace helios::runtime::messaging::command::concepts;
-using namespace helios::runtime::world::types;
-using namespace helios::core::memory;
-using namespace helios::runtime::world::concepts;
-using namespace helios::runtime::messaging::command::concepts;
-export namespace helios::runtime::world {
+using namespace helios::engine::runtime::messaging::command;
+using namespace helios::engine::runtime::messaging::command::concepts;
+using namespace helios::engine::runtime::world::types;
+using namespace helios::engine::core::memory;
+using namespace helios::engine::runtime::world::concepts;
+using namespace helios::engine::runtime::messaging::command::concepts;
+export namespace helios::engine::runtime::world {
 
 
     /**

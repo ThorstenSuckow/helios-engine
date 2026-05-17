@@ -8,9 +8,9 @@ module;
 #include <vector>
 #include <cstddef>
 
-export module helios.core.container.buffer:ReadWriteDoubleBufferFwd;
+export module helios.engine.core.container.buffer:ReadWriteDoubleBufferFwd;
 
-export namespace helios::core::container::buffer {
+export namespace helios::engine::core::container::buffer {
     template <typename T>
     class ReadWriteDoubleBuffer;
 }

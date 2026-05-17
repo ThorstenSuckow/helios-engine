@@ -4,19 +4,19 @@
  */
 module;
 
-export module helios.platform.window.commands.WindowResizeCommand;
+export module helios.engine.platform.window.commands.WindowResizeCommand;
 
 
-import helios.rendering.framebuffer.types.FramebufferSize;
+import helios.engine.rendering.framebuffer.types.FramebufferSize;
 
-import helios.platform.window.types.WindowHandle;
-import helios.platform.window.types.WindowSize;
-import helios.platform.window.concepts.IsWindowHandle;
+import helios.engine.platform.window.types.WindowHandle;
+import helios.engine.platform.window.types.WindowSize;
+import helios.engine.platform.window.concepts.IsWindowHandle;
 
-using namespace helios::platform::window::types;
-using namespace helios::rendering::framebuffer::types;
-using namespace helios::platform::window::concepts;
-export namespace helios::platform::window::commands {
+using namespace helios::engine::platform::window::types;
+using namespace helios::engine::rendering::framebuffer::types;
+using namespace helios::engine::platform::window::concepts;
+export namespace helios::engine::platform::window::commands {
 
     /**
      * @brief Carries a resize update for a target window entity.

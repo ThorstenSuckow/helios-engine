@@ -7,20 +7,20 @@ module;
 #include <vector>
 #include <cassert>
 
-export module helios.runtime.lifecycle.WorldLifecycleManager;
+export module helios.engine.runtime.lifecycle.WorldLifecycleManager;
 
-import helios.runtime.messaging.command.CommandHandlerRegistry;
-import helios.runtime.world.UpdateContext;
+import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
+import helios.engine.runtime.world.UpdateContext;
 
-import helios.runtime.lifecycle.types;
-import helios.runtime.lifecycle.commands.WorldLifecycleCommand;
-import helios.runtime.world.tags.ManagerRole;
+import helios.engine.runtime.lifecycle.types;
+import helios.engine.runtime.lifecycle.commands.WorldLifecycleCommand;
+import helios.engine.runtime.world.tags.ManagerRole;
 
-using namespace helios::runtime::world;
-using namespace helios::runtime::lifecycle::commands;
-using namespace helios::runtime::lifecycle::types;
-using namespace helios::runtime::messaging::command;
-export namespace helios::runtime::lifecycle {
+using namespace helios::engine::runtime::world;
+using namespace helios::engine::runtime::lifecycle::commands;
+using namespace helios::engine::runtime::lifecycle::types;
+using namespace helios::engine::runtime::messaging::command;
+export namespace helios::engine::runtime::lifecycle {
 
     /**
      * @brief Manager that processes deferred world lifecycle commands.
@@ -48,7 +48,7 @@ export namespace helios::runtime::lifecycle {
 
     public:
 
-        using EngineRoleTag = helios::runtime::world::tags::ManagerRole;
+        using EngineRoleTag = helios::engine::runtime::world::tags::ManagerRole;
 
         /**
          * @brief Enqueues a lifecycle command for deferred processing.

@@ -4,9 +4,9 @@
  */
 module;
 
-export module helios.platform.window.components.WindowShownComponent;
+export module helios.engine.platform.window.components.WindowShownComponent;
 
-export namespace helios::platform::window::components {
+export namespace helios::engine::platform::window::components {
 
     /**
      * @brief Marker set once a window is visible and participates in render/present flow.
@@ -16,4 +16,4 @@ export namespace helios::platform::window::components {
     template<typename THandle>
     struct WindowShownComponent {};
 
-} // namespace helios::platform::window::components
+} // namespace helios::engine::platform::window::components

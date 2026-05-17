@@ -4,15 +4,15 @@
  */
 module;
 
-export module helios.rendering.material.MaterialShaderProperties;
+export module helios.engine.rendering.material.MaterialShaderProperties;
 
-import helios.rendering.material.MaterialShaderPropertiesOverride;
+import helios.engine.rendering.material.MaterialShaderPropertiesOverride;
 
 import helios.math.types;
-import helios.rendering.shader.UniformValueMap;
-import helios.rendering.shader.UniformSemantics;
+import helios.engine.rendering.shader.UniformValueMap;
+import helios.engine.rendering.shader.UniformSemantics;
 
-export namespace helios::rendering::material {
+export namespace helios::engine::rendering::material {
 
     /**
      * @brief Represents a Value Object for an immutable set of material properties.
@@ -133,8 +133,8 @@ export namespace helios::rendering::material {
              * @param uniformValueMap Target map receiving the uniform values.
              */
              void writeUniformValues(shader::UniformValueMap& uniformValueMap) const noexcept {
-                uniformValueMap.set(helios::rendering::shader::UniformSemantics::MaterialBaseColor, baseColor_);
-                uniformValueMap.set(helios::rendering::shader::UniformSemantics::MaterialRoughness, roughness_);
+                uniformValueMap.set(helios::engine::rendering::shader::UniformSemantics::MaterialBaseColor, baseColor_);
+                uniformValueMap.set(helios::engine::rendering::shader::UniformSemantics::MaterialRoughness, roughness_);
             }
 
     };

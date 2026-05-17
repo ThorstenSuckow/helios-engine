@@ -4,9 +4,9 @@
  */
 module;
 
-export module helios.runtime.world.types.GameObjectDomainTag;
+export module helios.engine.runtime.world.types.GameObjectDomainTag;
 
-export namespace helios::runtime::world::types {
+export namespace helios::engine::runtime::world::types {
 
     /**
      * @brief Domain tag for game-object identity and handles.

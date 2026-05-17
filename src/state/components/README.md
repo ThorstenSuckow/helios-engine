@@ -1,4 +1,4 @@
-# helios::state::components
+# helios::engine::state::components
 
 Components for storing state on entities.
 
@@ -20,7 +20,7 @@ GameState current = stateComponent.state();
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::state::components
+@namespace helios::engine::state::components
 @brief State storage components.
 @details Provides component types for storing state information on entities.
 </p></details>

@@ -7,10 +7,10 @@ module;
 #include <cstdint>
 #include <type_traits>
 
-export module helios.state.types.StateTransitionId;
+export module helios.engine.state.types.StateTransitionId;
 
 
-export namespace helios::state::types {
+export namespace helios::engine::state::types {
 
     /**
      * @brief Helper for dependent false in static_assert.

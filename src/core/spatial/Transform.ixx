@@ -6,13 +6,13 @@
 module;
 
 
-export module helios.core.spatial.Transform;
+export module helios.engine.core.spatial.Transform;
 
 import helios.math.types;
 import helios.math.transform;
 
 
-export namespace helios::core::spatial {
+export namespace helios::engine::core::spatial {
 
     /**
      * @brief Represents a 3D transformation consisting of translation, rotation

@@ -1,4 +1,4 @@
-# helios::platform::environment::systems
+# helios::engine::platform::environment::systems
 
 Systems executing runtime platform lifecycle logic.
 
@@ -14,7 +14,7 @@ Systems executing runtime platform lifecycle logic.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::platform::environment::systems
+@namespace helios::engine::platform::environment::systems
 @brief Systems for runtime platform lifecycle processing.
 </p></details>
 

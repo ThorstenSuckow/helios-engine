@@ -1,9 +1,9 @@
 /**
  * @file _module.ixx
- * @brief Aggregate module for `helios::rendering::common::components`.
+ * @brief Aggregate module for `helios::engine::rendering::common::components`.
  */
-export module helios.rendering.common.components;
+export module helios.engine.rendering.common.components;
 
-export import helios.rendering.common.components.RenderPrototypeComponent;
-export import helios.rendering.common.components.MaterialOverrideComponent;
-export import helios.rendering.common.components.ClearComponent;
+export import helios.engine.rendering.common.components.RenderPrototypeComponent;
+export import helios.engine.rendering.common.components.MaterialOverrideComponent;
+export import helios.engine.rendering.common.components.ClearComponent;

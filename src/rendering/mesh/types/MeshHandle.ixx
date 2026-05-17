@@ -4,13 +4,13 @@
  */
 module;
 
-export module helios.rendering.mesh.types.MeshHandle;
+export module helios.engine.rendering.mesh.types.MeshHandle;
 
 
 import helios.ecs.types;
-import helios.rendering.mesh.types.MeshDomainTag;
+import helios.engine.rendering.mesh.types.MeshDomainTag;
 
-export namespace helios::rendering::mesh::types {
+export namespace helios::engine::rendering::mesh::types {
 
     /**
      * @brief Handle type used to reference mesh entities.

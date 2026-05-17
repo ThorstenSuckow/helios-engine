@@ -4,13 +4,13 @@
  */
 module;
 
-export module helios.platform.environment.types.PlatformId;
+export module helios.engine.platform.environment.types.PlatformId;
 
 import helios.ecs.types.StrongId;
-import helios.platform.environment.types.PlatformDomainTag;
+import helios.engine.platform.environment.types.PlatformDomainTag;
 
 using namespace helios::ecs::types;
-export namespace helios::platform::environment::types {
+export namespace helios::engine::platform::environment::types {
 
     /**
      * @brief Strong id identifying runtime platform entities.

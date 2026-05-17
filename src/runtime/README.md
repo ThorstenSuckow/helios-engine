@@ -1,4 +1,4 @@
-# helios::runtime
+# helios::engine::runtime
 
 Runtime infrastructure for game execution, world management, and lifecycle orchestration.
 
@@ -42,7 +42,7 @@ runtime/
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::runtime
+@namespace helios::engine::runtime
 @brief Runtime infrastructure for game execution and lifecycle orchestration.
 @details Provides the core runtime components including GameWorld, GameLoop, messaging (commands/events), and object pooling systems.
 </p></details>

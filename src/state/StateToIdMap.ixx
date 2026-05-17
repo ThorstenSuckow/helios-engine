@@ -13,18 +13,15 @@ module;
 #include <cstddef>
 #include <utility>
 
-export module helios.state.StateToIdMap;
+export module helios.engine.state.StateToIdMap;
 
 
-import helios.state.types;
-import helios.gameplay.matchstate.types;
+import helios.engine.state.types;
 
-import helios.core.types;
+import helios.engine.core.types;
 
-using namespace helios::state::types;
-using namespace helios::gameplay::matchstate::types;
-
-export namespace helios::state {
+using namespace helios::engine::state::types;
+export namespace helios::engine::state {
 
     /**
      * @brief Maps state enum values to lists of IDs.

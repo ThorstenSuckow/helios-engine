@@ -4,16 +4,16 @@
  */
 module;
 
-export module helios.rendering.framebuffer.types.FramebufferSize;
+export module helios.engine.rendering.framebuffer.types.FramebufferSize;
 
 import helios.math;
 
 using namespace helios::math;
-export namespace helios::rendering::framebuffer::types {
+export namespace helios::engine::rendering::framebuffer::types {
 
     /**
      * @brief Width/height pair used for framebuffer resize operations.
      */
     using FramebufferSize = helios::math::vec2f;
 
-} // namespace helios::rendering::platform::types
+} // namespace helios::engine::rendering::platform::types

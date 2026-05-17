@@ -4,17 +4,17 @@
  */
 module;
 
-export module helios.runtime.timing.components.TimerBindingComponent;
+export module helios.engine.runtime.timing.components.TimerBindingComponent;
 
-import helios.runtime.timing.types;
+import helios.engine.runtime.timing.types;
 
-import helios.runtime.timing.types.TimerId;
-import helios.core.types;
+import helios.engine.runtime.timing.types.TimerId;
+import helios.engine.core.types;
 
-using namespace helios::runtime::timing::types;
-using namespace helios::runtime::timing::types;
+using namespace helios::engine::runtime::timing::types;
+using namespace helios::engine::runtime::timing::types;
 
-export namespace helios::runtime::timing::components {
+export namespace helios::engine::runtime::timing::components {
 
     /**
      * @brief Component that tracks the revision of a specific Timer.
@@ -64,7 +64,7 @@ export namespace helios::runtime::timing::components {
          *
          * @param timerId The timer id.
          */
-        void setTimerId(const helios::runtime::timing::types::TimerId timerId) noexcept {
+        void setTimerId(const helios::engine::runtime::timing::types::TimerId timerId) noexcept {
             timerId_ = timerId;
         }
 
@@ -73,7 +73,7 @@ export namespace helios::runtime::timing::components {
          *
          * @return The TimerId.
          */
-        [[nodiscard]] helios::runtime::timing::types::TimerId timerId() const noexcept {
+        [[nodiscard]] helios::engine::runtime::timing::types::TimerId timerId() const noexcept {
             return timerId_;
         }
 

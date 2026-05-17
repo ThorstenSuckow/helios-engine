@@ -1,10 +1,10 @@
-# helios::rendering::common::types
+# helios::engine::rendering::common::types
 
 Shared rendering value types used across common render flow APIs.
 
 ## Overview
 
-`helios::rendering::common::types` defines small value types shared between
+`helios::engine::rendering::common::types` defines small value types shared between
 render extraction, render pass setup, and backend execution code.
 
 ## Types
@@ -22,7 +22,7 @@ render extraction, render pass setup, and backend execution code.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::rendering::common::types
+@namespace helios::engine::rendering::common::types
 @brief Shared rendering value types used across common render flow APIs.
 @details Defines lightweight common types such as clear flags and render pass
 context data shared between rendering modules.

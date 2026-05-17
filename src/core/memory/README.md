@@ -1,4 +1,4 @@
-# helios::core::memory
+# helios::engine::core::memory
 
 Low-level memory utilities for type-erased ownership.
 
@@ -50,7 +50,7 @@ ErasedUnique b = std::move(a); // a is now empty
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::core::memory
+@namespace helios::engine::core::memory
 @brief Low-level memory utilities for type-erased ownership.
 @details Provides ErasedUnique, a 16-byte type-erased unique ownership wrapper used by ResourceRegistry to store heterogeneous resource types without requiring a common base class or virtual destructor.
 </p></details>

@@ -1,4 +1,4 @@
-# helios::runtime::pooling
+# helios::engine::runtime::pooling
 
 Entity pooling for efficient object recycling.
 
@@ -58,7 +58,7 @@ poolManager->release(EntityPoolId{1}, bullet->guid());
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::runtime::pooling
+@namespace helios::engine::runtime::pooling
 @brief Entity pooling for efficient object recycling.
 @details Provides EntityPool for handle-based entity tracking, registries for pool lookup, configuration structures for declarative pool setup, and managers for integration with GameWorld.
 </p></details>

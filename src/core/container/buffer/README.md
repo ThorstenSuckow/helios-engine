@@ -1,4 +1,4 @@
-# helios::core::container::buffer
+# helios::engine::core::container::buffer
 
 Double-buffering infrastructure for thread-safe message passing.
 
@@ -23,7 +23,7 @@ This module provides read and write buffers for implementing double-buffered mes
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::core::container::buffer
+@namespace helios::engine::core::container::buffer
 @brief Double-buffering infrastructure for thread-safe message passing.
 @details This module provides read and write buffers for implementing double-buffered message systems, enabling safe producer-consumer patterns across frame boundaries. Includes both double-buffered (ReadBuffer, WriteBuffer, ReadWriteDoubleBuffer) and single-buffered (ReadWriteBuffer) implementations, with type-indexed variants for heterogeneous message handling.
 </p></details>

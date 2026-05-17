@@ -6,15 +6,15 @@ module;
 
 #include <concepts>
 
-export module helios.runtime.world.concepts.IsSystemLike;
+export module helios.engine.runtime.world.concepts.IsSystemLike;
 
-import helios.runtime.concepts.HasTag;
-import helios.runtime.world.tags.SystemRole;
+import helios.engine.runtime.concepts.HasTag;
+import helios.engine.runtime.world.tags.SystemRole;
 
-import helios.runtime.world.UpdateContext;
+import helios.engine.runtime.world.UpdateContext;
 
-using namespace helios::runtime::concepts;
-export namespace helios::runtime::world::concepts {
+using namespace helios::engine::runtime::concepts;
+export namespace helios::engine::runtime::world::concepts {
 
     /**
      * @brief Constrains T to types eligible for System registration.
@@ -34,9 +34,9 @@ export namespace helios::runtime::world::concepts {
      * @see System
      */
     template<class T>
-    concept IsSystemLike = (requires(T& t, helios::runtime::world::UpdateContext& updateContext) {
+    concept IsSystemLike = (requires(T& t, helios::engine::runtime::world::UpdateContext& updateContext) {
         {t.update(updateContext) } -> std::same_as<void>;
-    } || requires(T& t, helios::runtime::world::UpdateContext& updateContext, typename T::CommandBuffer_type& buf)
+    } || requires(T& t, helios::engine::runtime::world::UpdateContext& updateContext, typename T::CommandBuffer_type& buf)
     {
         t.update(updateContext, buf);
     }) && HasTag<T, tags::SystemRole>;

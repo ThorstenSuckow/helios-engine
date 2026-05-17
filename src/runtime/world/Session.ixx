@@ -9,37 +9,32 @@ module;
 #include <span>
 #include <cassert>
 
-export module helios.runtime.world.Session;
+export module helios.engine.runtime.world.Session;
 
 
 import helios.ecs.components;
-import helios.gameplay.gamestate.types;
-import helios.gameplay.matchstate.types;
 
-import helios.state.types.StateTransitionContext;
-import helios.state.components;
-import helios.state.types.StateTransitionId;
+import helios.engine.state.types.StateTransitionContext;
+import helios.engine.state.components;
+import helios.engine.state.types.StateTransitionId;
+import helios.engine.runtime.enginestate.Bindings;
 
-import helios.runtime.world.GameObject;
+import helios.engine.runtime.world.GameObject;
 import helios.ecs.types.EntityHandle;
 
-import helios.rendering.viewport.types.ViewportHandle;
+import helios.engine.rendering.viewport.types.ViewportHandle;
 
-import helios.rendering.viewport.components.ActiveViewportHandlesStateComponent;
+import helios.engine.rendering.viewport.components.ActiveViewportHandlesStateComponent;
 
-using namespace helios::gameplay::matchstate::types;
-using namespace helios::gameplay::gamestate::types;
+using namespace helios::engine::state::components;
 
+using namespace helios::engine::rendering::viewport::components;
 
-using namespace helios::state::components;
-
-using namespace helios::rendering::viewport::components;
-
-using namespace helios::state::types;
-using namespace helios::rendering::viewport::types;
-using namespace helios::runtime::world;
+using namespace helios::engine::state::types;
+using namespace helios::engine::rendering::viewport::types;
+using namespace helios::engine::runtime::world;
 using namespace helios::ecs::components;
-export namespace helios::runtime::world {
+export namespace helios::engine::runtime::world {
 
     /**
      * @brief Holds session-level state for the current game instance.

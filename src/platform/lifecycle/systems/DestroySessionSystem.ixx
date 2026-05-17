@@ -4,16 +4,16 @@
  */
 module;
 
-export module helios.platform.lifecycle.systems.DestroySessionSystem;
+export module helios.engine.platform.lifecycle.systems.DestroySessionSystem;
 
 
-import helios.runtime.world.UpdateContext;
-import helios.runtime.world.Session;
-import helios.runtime.world.tags.SystemRole;
+import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.world.Session;
+import helios.engine.runtime.world.tags.SystemRole;
 
-using namespace helios::runtime::world;
+using namespace helios::engine::runtime::world;
 
-export namespace helios::platform::lifecycle::systems {
+export namespace helios::engine::platform::lifecycle::systems {
 
     /**
      * @brief System that marks the active session as destroyed.
@@ -28,14 +28,14 @@ export namespace helios::platform::lifecycle::systems {
         /**
          * @brief Engine role marker used by runtime system registries.
          */
-        using EngineRoleTag = helios::runtime::world::tags::SystemRole;
+        using EngineRoleTag = helios::engine::runtime::world::tags::SystemRole;
 
         /**
          * @brief Destroys the active session in the current update context.
          *
          * @param updateContext Frame-local update context.
          */
-        void update(helios::runtime::world::UpdateContext& updateContext) noexcept {
+        void update(helios::engine::runtime::world::UpdateContext& updateContext) noexcept {
             updateContext.session().destroy();
         }
     };

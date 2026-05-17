@@ -4,11 +4,11 @@
  */
 module;
 
-export module helios.rendering.Vertex;
+export module helios.engine.rendering.Vertex;
 
 import helios.math.types;
 
-export namespace helios::rendering {
+export namespace helios::engine::rendering {
 
     /**
      * @brief Represents a standard vertex with position, normal,

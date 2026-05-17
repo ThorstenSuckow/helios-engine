@@ -8,13 +8,13 @@ module;
 #include <algorithm>
 #include <cmath>
 
-export module helios.core.components.NumericValueComponent;
+export module helios.engine.core.components.NumericValueComponent;
 
 import helios.math;
 
 using namespace helios::math;
 using namespace helios::math::concepts;
-export namespace helios::core::components {
+export namespace helios::engine::core::components {
 
     /**
      * @brief Generic numeric value component with dirty-state tracking.

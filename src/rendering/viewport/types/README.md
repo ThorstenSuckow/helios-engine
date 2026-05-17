@@ -1,4 +1,4 @@
-# helios::rendering::viewport::types
+# helios::engine::rendering::viewport::types
 
 Strong ID and handle aliases for viewport resources.
 
@@ -11,7 +11,7 @@ Strong ID and handle aliases for viewport resources.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::rendering::viewport::types
+@namespace helios::engine::rendering::viewport::types
 @brief Strong ID and handle aliases for viewport resources.
 @details Defines a shared domain tag used by both StrongId and EntityHandle
 for viewport ECS registries and managers.

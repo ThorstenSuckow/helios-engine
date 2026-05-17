@@ -6,13 +6,13 @@ module;
 
 #include <cmath>
 
-export module helios.input.gamepad.RadialDeadzoneStrategy;
+export module helios.engine.input.gamepad.RadialDeadzoneStrategy;
 
-import helios.input.gamepad.DeadzoneStrategy;
+import helios.engine.input.gamepad.DeadzoneStrategy;
 import helios.math.utils;
 
 
-export namespace helios::input::gamepad {
+export namespace helios::engine::input::gamepad {
 
     /**
      * @brief Implements a radial (circular) deadzone strategy for analog stick normalization.
@@ -39,12 +39,12 @@ export namespace helios::input::gamepad {
     public:
 
         /**
-         * @copydoc helios::input::gamepad::DeadzoneStrategy::DeadzoneStrategy()
+         * @copydoc helios::engine::input::gamepad::DeadzoneStrategy::DeadzoneStrategy()
          */
         RadialDeadzoneStrategy() : DeadzoneStrategy() {}
 
         /**
-         * @copydoc helios::input::gamepad::DeadzoneStrategy::DeadzoneStrategy(float stickNoiseThreshold)
+         * @copydoc helios::engine::input::gamepad::DeadzoneStrategy::DeadzoneStrategy(float stickNoiseThreshold)
          */
         RadialDeadzoneStrategy(float stickNoiseThreshold) : DeadzoneStrategy(stickNoiseThreshold) {}
 

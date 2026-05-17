@@ -15,19 +15,18 @@ module;
 #include <cstddef>
 #include <utility>
 
-export module helios.state.CombinedStateToIdMapPair;
+export module helios.engine.state.CombinedStateToIdMapPair;
 
-import helios.state.StateToIdMap;
+import helios.engine.state.StateToIdMap;
 
-import helios.state.types;
-import helios.gameplay.matchstate.types;
+import helios.engine.state.types;
 
-import helios.core.types;
 
-using namespace helios::state::types;
-using namespace helios::gameplay::matchstate::types;
+import helios.engine.core.types;
 
-export namespace helios::state {
+using namespace helios::engine::state::types;
+
+export namespace helios::engine::state {
 
     /**
      * @brief Maps combined state pairs directly to ID lists.

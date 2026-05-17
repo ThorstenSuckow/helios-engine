@@ -4,13 +4,13 @@
  */
 module;
 
-export module helios.spatial.components.LocalTransformComponent;
+export module helios.engine.spatial.components.LocalTransformComponent;
 
 import helios.math.types;
 
-import helios.core.spatial;
+import helios.engine.core.spatial;
 
-export namespace helios::spatial::components {
+export namespace helios::engine::spatial::components {
 
     /**
      * @brief Component that holds transformation data (position, rotation, scale).
@@ -26,7 +26,7 @@ export namespace helios::spatial::components {
         /**
          * @brief The local transformation (translation, rotation, scale).
          */
-        helios::core::spatial::Transform transform_{};
+        helios::engine::core::spatial::Transform transform_{};
 
         /**
          * @brief Flag indicating if the transform has changed since the last update.

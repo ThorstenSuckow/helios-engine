@@ -12,31 +12,31 @@ module;
 #include <cstddef>
 
 
-export module helios.runtime.pooling.EntityPoolManager;
+export module helios.engine.runtime.pooling.EntityPoolManager;
 
 import helios.ecs.Entity;
-import helios.runtime.pooling.types.EntityPoolId;
+import helios.engine.runtime.pooling.types.EntityPoolId;
 
-import helios.runtime.world.UpdateContext;
+import helios.engine.runtime.world.UpdateContext;
 
-import helios.runtime.world.EngineWorld;
-import helios.runtime.pooling.EntityPool;
-import helios.runtime.pooling.EntityPoolRegistry;
+import helios.engine.runtime.world.EngineWorld;
+import helios.engine.runtime.pooling.EntityPool;
+import helios.engine.runtime.pooling.EntityPoolRegistry;
 
-import helios.runtime.pooling.EntityPoolConfig;
-import helios.runtime.pooling.components.PrefabIdComponent;
+import helios.engine.runtime.pooling.EntityPoolConfig;
+import helios.engine.runtime.pooling.components.PrefabIdComponent;
 
-import helios.runtime.messaging.command.CommandHandlerRegistry;
+import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
 
 
 import helios.ecs.types.EntityHandle;
-import helios.core.types;
-import helios.runtime.world.tags;
+import helios.engine.core.types;
+import helios.engine.runtime.world.tags;
 
-import helios.runtime.pooling.EntityPoolSnapshot;
+import helios.engine.runtime.pooling.EntityPoolSnapshot;
 
-using namespace helios::runtime::messaging::command;
-export namespace helios::runtime::pooling {
+using namespace helios::engine::runtime::messaging::command;
+export namespace helios::engine::runtime::pooling {
 
     /**
      * @brief High-level manager for Entity pooling operations.
@@ -119,7 +119,7 @@ export namespace helios::runtime::pooling {
          * @details Pools enable efficient reuse of Entities without repeated
          * allocation/deallocation. Each pool is identified by a EntityPoolId.
          */
-        helios::runtime::pooling::EntityPoolRegistry<Handle_type> pools_{};
+        helios::engine::runtime::pooling::EntityPoolRegistry<Handle_type> pools_{};
 
         /**
          * @brief Non-owning pointer to the associated GameWorld.
@@ -127,7 +127,7 @@ export namespace helios::runtime::pooling {
          * @details Set during `init()`. Used for cloning prefabs and looking up
          * Entities by their EntityHandle.
          */
-        helios::runtime::world::EngineWorld* engineWorld_ = nullptr;
+        helios::engine::runtime::world::EngineWorld* engineWorld_ = nullptr;
 
         /**
          * @brief Pending pool configurations awaiting initialization.
@@ -136,7 +136,7 @@ export namespace helios::runtime::pooling {
          * populate the actual pools.
          */
         std::unordered_map<
-            helios::runtime::pooling::types::EntityPoolId,
+            helios::engine::runtime::pooling::types::EntityPoolId,
             std::unique_ptr<EntityPoolConfig>> poolConfigs_;
 
         /**
@@ -160,7 +160,7 @@ export namespace helios::runtime::pooling {
          * @post The pool is locked and ready for acquire/release operations.
          */
         void fillPool(
-            const helios::runtime::pooling::types::EntityPoolId entityPoolId,
+            const helios::engine::runtime::pooling::types::EntityPoolId entityPoolId,
             TEntity entityPrefab
         ) {
             Handle_type entityHandle{};
@@ -181,10 +181,10 @@ export namespace helios::runtime::pooling {
         }
         
     public:
-        using EngineRoleTag = helios::runtime::world::tags::ManagerRole;
+        using EngineRoleTag = helios::engine::runtime::world::tags::ManagerRole;
 
 
-        explicit EntityPoolManager(helios::runtime::world::EngineWorld& engineWorld) : engineWorld_(&engineWorld) {}
+        explicit EntityPoolManager(helios::engine::runtime::world::EngineWorld& engineWorld) : engineWorld_(&engineWorld) {}
 
         /**
          * @brief Registers a pool configuration for later initialization.
@@ -219,8 +219,8 @@ export namespace helios::runtime::pooling {
          *
          * @return A EntityPoolSnapshot containing active and inactive counts.
          */
-        [[nodiscard]] helios::runtime::pooling::EntityPoolSnapshot poolSnapshot(
-            const helios::runtime::pooling::types::EntityPoolId entityPoolId
+        [[nodiscard]] helios::engine::runtime::pooling::EntityPoolSnapshot poolSnapshot(
+            const helios::engine::runtime::pooling::types::EntityPoolId entityPoolId
         ) const {
             auto* entityPool = pool(entityPoolId);
 
@@ -243,7 +243,7 @@ export namespace helios::runtime::pooling {
          *         std::nullopt if the entity was not found in the GameWorld.
          */
         std::optional<TEntity> release(
-            const helios::runtime::pooling::types::EntityPoolId entityPoolId,
+            const helios::engine::runtime::pooling::types::EntityPoolId entityPoolId,
             const Handle_type& entityHandle
         ) {
             auto* entityPool = pool(entityPoolId);
@@ -276,7 +276,7 @@ export namespace helios::runtime::pooling {
          *         std::nullopt if the pool is exhausted.
          */
         [[nodiscard]] std::optional<TEntity> acquire(
-            const helios::runtime::pooling::types::EntityPoolId entityPoolId
+            const helios::engine::runtime::pooling::types::EntityPoolId entityPoolId
         )  {
             Handle_type entityHandle{};
 
@@ -314,14 +314,14 @@ export namespace helios::runtime::pooling {
             
             for (const auto& [entityPoolId, poolConfig] : poolConfigs_) {
 
-                auto pool = std::make_unique<helios::runtime::pooling::EntityPool<Handle_type>>(
+                auto pool = std::make_unique<helios::engine::runtime::pooling::EntityPool<Handle_type>>(
                     poolConfig->amount);
 
                 pools_.addPool(entityPoolId, std::move(pool));
 
                 for (auto [entity, pic] : engineWorld_->view<
                     Handle_type,
-                    helios::runtime::pooling::components::PrefabIdComponent<Handle_type>>().whereEnabled()) {
+                    helios::engine::runtime::pooling::components::PrefabIdComponent<Handle_type>>().whereEnabled()) {
                     if (pic->prefabId() == poolConfig->prefabId) {
                         fillPool(entityPoolId, entity);
                         break;
@@ -342,7 +342,7 @@ export namespace helios::runtime::pooling {
          * @param update_context The current frame's update context.
          */
         void flush(
-            helios::runtime::world::UpdateContext& update_context
+            helios::engine::runtime::world::UpdateContext& update_context
         ) noexcept {
 
         }
@@ -357,7 +357,7 @@ export namespace helios::runtime::pooling {
          * @pre The pool must be registered with this manager.
          */
         [[nodiscard]] EntityPool<Handle_type>* pool(
-            const helios::runtime::pooling::types::EntityPoolId entityPoolId
+            const helios::engine::runtime::pooling::types::EntityPoolId entityPoolId
         ) const {
             assert(pools_.has(entityPoolId) && "EntityPoolId not registered with this manager");
             return pools_.pool(entityPoolId);

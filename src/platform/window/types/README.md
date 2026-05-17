@@ -1,4 +1,4 @@
-# helios::platform::window::types
+# helios::engine::platform::window::types
 
 Strong ids, handles, and value types for windows.
 
@@ -15,7 +15,7 @@ Strong ids, handles, and value types for windows.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::platform::window::types
+@namespace helios::engine::platform::window::types
 @brief Window-domain ids, handles, and config/value types.
 </p></details>
 

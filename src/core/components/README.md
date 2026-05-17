@@ -1,8 +1,8 @@
-# helios::core::components
+# helios::engine::core::components
 
 Lightweight value components for shared math types.
 
-`helios.core.components` provides small, reusable ECS components for common
+`helios.engine.core.components` provides small, reusable ECS components for common
 math primitives, scalar values, and a consistent dirty-state workflow.
 
 ## Components
@@ -41,18 +41,18 @@ small scalar deltas.
 ## Minimal Usage
 
 ```cpp
-import helios.core.components;
+import helios.engine.core.components;
 
 struct WorldTag;
 using Handle = MyEntity::Handle_type;
 
-auto& v = entity.add<helios::core::components::Vec3Component<WorldTag, Handle, float>>({0.0f, 1.0f, 0.0f});
+auto& v = entity.add<helios::engine::core::components::Vec3Component<WorldTag, Handle, float>>({0.0f, 1.0f, 0.0f});
 if (v.isDirty()) {
     v.clearDirty();
 }
 
-auto& color = entity.add<helios::core::components::ColorComponent<Handle>>({1.0f, 0.5f, 0.25f, 1.0f});
-auto& exposure = entity.add<helios::core::components::NumericValueComponent<WorldTag, Handle, float>>(1.0f);
+auto& color = entity.add<helios::engine::core::components::ColorComponent<Handle>>({1.0f, 0.5f, 0.25f, 1.0f});
+auto& exposure = entity.add<helios::engine::core::components::NumericValueComponent<WorldTag, Handle, float>>(1.0f);
 ```
 
 

@@ -1,4 +1,4 @@
-# helios::scene::components
+# helios::engine::scene::components
 
 Scene graph and camera integration components.
 
@@ -23,7 +23,7 @@ viewports, and derived render data.
 
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::scene::components
+@namespace helios::engine::scene::components
 @brief Scene graph and camera integration components.
 @details This module contains components that bridge game objects, scenes,
 camera bindings, viewport bindings, and derived render data used by the scene

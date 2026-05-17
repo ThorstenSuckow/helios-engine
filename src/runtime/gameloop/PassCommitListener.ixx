@@ -5,16 +5,16 @@
 module;
 
 
-export module helios.runtime.gameloop:PassCommitListener;
+export module helios.engine.runtime.gameloop:PassCommitListener;
 
 import :CommitPoint;
 
-import helios.runtime.world.GameWorld;
-import helios.runtime.world.UpdateContext;
+import helios.engine.runtime.world.GameWorld;
+import helios.engine.runtime.world.UpdateContext;
 
-using namespace helios::runtime::world;
+using namespace helios::engine::runtime::world;
 
-export namespace helios::runtime::gameloop {
+export namespace helios::engine::runtime::gameloop {
 
     /**
      * @brief Interface for receiving notifications when a pass reaches its commit point.

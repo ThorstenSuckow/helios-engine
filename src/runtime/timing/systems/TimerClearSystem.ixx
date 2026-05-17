@@ -6,22 +6,22 @@ module;
 
 #include <span>
 
-export module helios.runtime.timing.systems.TimerClearSystem;
+export module helios.engine.runtime.timing.systems.TimerClearSystem;
 
-import helios.runtime.timing.Timer;
-import helios.runtime.timing.TimerManager;
+import helios.engine.runtime.timing.Timer;
+import helios.engine.runtime.timing.TimerManager;
 
-import helios.runtime.world.UpdateContext;
+import helios.engine.runtime.world.UpdateContext;
 
-import helios.runtime.world.tags.SystemRole;
+import helios.engine.runtime.world.tags.SystemRole;
 
-import helios.runtime.timing.types;
+import helios.engine.runtime.timing.types;
 
-using namespace helios::runtime::timing;
+using namespace helios::engine::runtime::timing;
 
-using namespace helios::runtime::timing::types;
+using namespace helios::engine::runtime::timing::types;
 
-export namespace helios::runtime::timing::systems {
+export namespace helios::engine::runtime::timing::systems {
 
     /**
      * @brief Resets finished game timers to an undefined state.
@@ -45,7 +45,7 @@ export namespace helios::runtime::timing::systems {
     public:
 
 
-        using EngineRoleTag = helios::runtime::world::tags::SystemRole;
+        using EngineRoleTag = helios::engine::runtime::world::tags::SystemRole;
 
         /**
          * @brief Constructs the system with a reference to the TimerManager.
@@ -60,7 +60,7 @@ export namespace helios::runtime::timing::systems {
          *
          * @param updateContext The current frame's update context.
          */
-        void update(helios::runtime::world::UpdateContext& updateContext) noexcept {
+        void update(helios::engine::runtime::world::UpdateContext& updateContext) noexcept {
 
             for (auto& timer : timerManager_.timers()) {
                 if (timer.state() == TimerState::Finished || timer.state() == TimerState::Cancelled) {

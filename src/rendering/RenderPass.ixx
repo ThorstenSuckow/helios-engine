@@ -6,17 +6,17 @@ module;
 
 #include <vector>
 
-export module helios.rendering.RenderPass;
+export module helios.engine.rendering.RenderPass;
 
-import helios.rendering.viewport.types.ViewportHandle;
-import helios.rendering.framebuffer.types.FramebufferHandle;
-import helios.scene.types.SceneMemberRenderContext;
+import helios.engine.rendering.viewport.types.ViewportHandle;
+import helios.engine.rendering.framebuffer.types.FramebufferHandle;
+import helios.engine.scene.types.SceneMemberRenderContext;
 
-using helios::rendering::viewport::types::ViewportHandle;
-using helios::rendering::framebuffer::types::FramebufferHandle;
-using namespace helios::scene::types;
+using helios::engine::rendering::viewport::types::ViewportHandle;
+using helios::engine::rendering::framebuffer::types::FramebufferHandle;
+using namespace helios::engine::scene::types;
 
-export namespace helios::rendering {
+export namespace helios::engine::rendering {
 
     /**
      * @brief DTO representing one render pass for a framebuffer/viewport pair.

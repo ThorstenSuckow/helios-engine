@@ -3,12 +3,12 @@
  * @brief Module exports for scene-graph-related functionality.
  */
 
-export module helios.scene;
+export module helios.engine.scene;
 
-export import helios.scene.components;
-export import helios.scene.concepts;
-export import helios.scene.types;
+export import helios.engine.scene.components;
+export import helios.engine.scene.concepts;
+export import helios.engine.scene.types;
 
-export import helios.scene.NoCullingStrategy;
-export import helios.scene.SceneEntityManager;
+export import helios.engine.scene.NoCullingStrategy;
+export import helios.engine.scene.SceneEntityManager;
 

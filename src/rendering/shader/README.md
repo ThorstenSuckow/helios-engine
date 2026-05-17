@@ -1,4 +1,4 @@
-# helios::rendering::shader
+# helios::engine::rendering::shader
 
 Shader-domain abstractions and resource types.
 
@@ -29,7 +29,7 @@ systems, and types.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::rendering::shader
+@namespace helios::engine::rendering::shader
 @brief Shader-domain abstractions and resource types.
 @details Provides the core shader interface, uniform semantics/value mapping, and ECS resource aliases. Functional concerns are split into commands, components, concepts, systems, and types submodules.
 </p></details>

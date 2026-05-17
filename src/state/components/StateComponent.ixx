@@ -4,13 +4,13 @@
  */
 module;
 
-export module helios.state.components.StateComponent;
+export module helios.engine.state.components.StateComponent;
 
-import helios.state.types.StateTransitionId;
-import helios.state.types.StateTransitionContext;
+import helios.engine.state.types.StateTransitionId;
+import helios.engine.state.types.StateTransitionContext;
 
 
-export namespace helios::state::components {
+export namespace helios::engine::state::components {
 
     /**
      * @brief Stores the current state and last transition for an entity.
@@ -26,7 +26,7 @@ export namespace helios::state::components {
     template<typename StateType>
     class StateComponent  {
 
-        using StateTransitionIdType = helios::state::types::StateTransitionIdType<StateType>;
+        using StateTransitionIdType = helios::engine::state::types::StateTransitionIdType<StateType>;
 
         /**
          * @brief The state that was transitioned from.
@@ -68,7 +68,7 @@ export namespace helios::state::components {
          *
          * @param stateTransitionContext The completed transition context.
          */
-        void setStateFromTransitionContext(const helios::state::types::StateTransitionContext<StateType> stateTransitionContext) noexcept {
+        void setStateFromTransitionContext(const helios::engine::state::types::StateTransitionContext<StateType> stateTransitionContext) noexcept {
             from_         = stateTransitionContext.from();
             state_        = stateTransitionContext.to();
             transitionId_ = stateTransitionContext.transitionId();

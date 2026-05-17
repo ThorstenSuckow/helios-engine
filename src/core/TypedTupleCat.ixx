@@ -6,9 +6,9 @@ module;
 
 #include <tuple>
 
-export module helios.core.TypedTupleCat;
+export module helios.engine.core.TypedTupleCat;
 
-export namespace helios::core {
+export namespace helios::engine::core {
 
     /**
      * @brief Concatenates multiple `std::tuple` type lists at compile time.

@@ -4,13 +4,13 @@
  */
 module;
 
-export module helios.rendering.material.MaterialProperties;
+export module helios.engine.rendering.material.MaterialProperties;
 
 
 import helios.math.types;
 
 
-export namespace helios::rendering::material {
+export namespace helios::engine::rendering::material {
 
     /**
      * @brief Simple material property container.

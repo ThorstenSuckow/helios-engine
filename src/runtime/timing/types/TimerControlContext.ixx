@@ -5,14 +5,14 @@
 module;
 
 
-export module helios.runtime.timing.types.TimerControlContext;
+export module helios.engine.runtime.timing.types.TimerControlContext;
 
-import helios.runtime.timing.types.TimerState;
-import helios.runtime.timing.types.TimerId;
+import helios.engine.runtime.timing.types.TimerState;
+import helios.engine.runtime.timing.types.TimerId;
 
-using namespace helios::runtime::timing::types;
+using namespace helios::engine::runtime::timing::types;
 
-export namespace helios::runtime::timing::types {
+export namespace helios::engine::runtime::timing::types {
 
     /**
      * @brief Context describing a requested timer state transition.

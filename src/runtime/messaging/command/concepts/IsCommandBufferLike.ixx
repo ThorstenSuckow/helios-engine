@@ -6,20 +6,20 @@ module;
 
 #include <concepts>
 
-export module helios.runtime.messaging.command.concepts.IsCommandBufferLike;
+export module helios.engine.runtime.messaging.command.concepts.IsCommandBufferLike;
 
-import helios.runtime.concepts.HasTag;
-import helios.runtime.concepts.HasClear;
+import helios.engine.runtime.concepts.HasTag;
+import helios.engine.runtime.concepts.HasClear;
 
-import helios.runtime.world.UpdateContext;
+import helios.engine.runtime.world.UpdateContext;
 
-import helios.runtime.messaging.command.tags.CommandBufferRole;
+import helios.engine.runtime.messaging.command.tags.CommandBufferRole;
 
 
-using namespace helios::runtime::world::tags;
-using namespace helios::runtime::world;
-using namespace helios::runtime::concepts;
-export namespace helios::runtime::messaging::command::concepts {
+using namespace helios::engine::runtime::world::tags;
+using namespace helios::engine::runtime::world;
+using namespace helios::engine::runtime::concepts;
+export namespace helios::engine::runtime::messaging::command::concepts {
 
     /**
      * @brief Constrains types that can serve as concrete command buffers.

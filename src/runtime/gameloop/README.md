@@ -1,4 +1,4 @@
-# helios::runtime::gameloop
+# helios::engine::runtime::gameloop
 
 Central game loop orchestration module providing phased system execution.
 
@@ -37,11 +37,11 @@ Flags can be combined using bitwise OR to trigger multiple actions at once.
 ## Usage
 
 ```cpp
-import helios.runtime.gameloop.GameLoop;
-import helios.runtime.world.GameWorld;
+import helios.engine.runtime.gameloop.GameLoop;
+import helios.engine.runtime.world.GameWorld;
 
-helios::runtime::gameloop::GameLoop gameLoop;
-helios::runtime::world::GameWorld gameWorld;
+helios::engine::runtime::gameloop::GameLoop gameLoop;
+helios::engine::runtime::world::GameWorld gameWorld;
 
 // Register state types with session
 gameWorld.session().trackState<GameState>();
@@ -167,7 +167,7 @@ This ordering ensures that commands can generate manager requests before manager
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::runtime::gameloop
+@namespace helios::engine::runtime::gameloop
 @brief Central game loop orchestration module.
 @details Provides the GameLoop, Phase, and Pass classes for managing phased system execution with deterministic ordering and event synchronization.
 </p></details>

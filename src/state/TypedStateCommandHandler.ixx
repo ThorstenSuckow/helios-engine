@@ -4,13 +4,13 @@
  */
 module;
 
-export module helios.state.TypedStateCommandHandler;
+export module helios.engine.state.TypedStateCommandHandler;
 
-import helios.state.StateCommandHandler;
-import helios.state.commands;
+import helios.engine.state.StateCommandHandler;
+import helios.engine.state.commands;
 
 
-export namespace helios::state {
+export namespace helios::engine::state {
 
     /**
      * @brief Typed interface for handling state commands.
@@ -32,12 +32,12 @@ export namespace helios::state {
         /**
          * @brief Submits a state command for processing.
          *
-         * @param gameStateCommand The command to submit.
+         * @param stateCommand The command to submit.
          *
          * @return True if the command was accepted.
          */
         virtual bool submit(
-        const helios::state::commands::StateCommand<StateType>& gameStateCommand
+        const helios::engine::state::commands::StateCommand<StateType>& stateCommand
         ) noexcept = 0;
 
 

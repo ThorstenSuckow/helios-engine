@@ -14,50 +14,50 @@ module;
 #include <unordered_map>
 #include <cstddef>
 
-export module helios.runtime.world.GameWorld;
+export module helios.engine.runtime.world.GameWorld;
 
-import helios.runtime.world.Session;
+import helios.engine.runtime.world.Session;
 
-import helios.runtime.timing.TimerManager;
+import helios.engine.runtime.timing.TimerManager;
 
 import helios.ecs.Entity;
-import helios.runtime.world.RuntimeEnvironment;
-import helios.platform.environment.types;
+import helios.engine.runtime.world.RuntimeEnvironment;
+import helios.engine.platform.environment.types;
 
-import helios.runtime.messaging.command.CommandHandlerRegistry;
-import helios.runtime.messaging.command.CommandBufferRegistry;
+import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
+import helios.engine.runtime.messaging.command.CommandBufferRegistry;
 
-import helios.runtime.world.ResourceRegistry;
+import helios.engine.runtime.world.ResourceRegistry;
 
-import helios.runtime.world.UpdateContext;
-import helios.runtime.world.GameObject;
-import helios.runtime.world.types.GameObjectId;
-import helios.runtime.world.types.GameObjectHandle;
-import helios.runtime.world.Manager;
+import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.world.GameObject;
+import helios.engine.runtime.world.types.GameObjectId;
+import helios.engine.runtime.world.types.GameObjectHandle;
+import helios.engine.runtime.world.Manager;
 
-import helios.util.Guid;
-import helios.util.log.Logger;
-import helios.util.log.LogManager;
-import helios.runtime.world.Level;
+import helios.engine.util.Guid;
+import helios.engine.util.log.Logger;
+import helios.engine.util.log.LogManager;
+import helios.engine.runtime.world.Level;
 
 import helios.ecs.types.EntityHandle;
 import helios.ecs.EntityManager;
 import helios.ecs.EntityRegistry;
 import helios.ecs.View;
 
-import helios.runtime.messaging.command.concepts;
+import helios.engine.runtime.messaging.command.concepts;
 
-import helios.runtime.world.EngineWorld;
-import helios.runtime.world.concepts;
+import helios.engine.runtime.world.EngineWorld;
+import helios.engine.runtime.world.concepts;
 
-using namespace helios::runtime::timing;
-using namespace helios::runtime::messaging::command::concepts;
-using namespace helios::runtime::messaging::command;
-using namespace helios::runtime::world::concepts;
-using namespace helios::platform::environment::types;
-using namespace helios::runtime::world::types;
+using namespace helios::engine::runtime::timing;
+using namespace helios::engine::runtime::messaging::command::concepts;
+using namespace helios::engine::runtime::messaging::command;
+using namespace helios::engine::runtime::world::concepts;
+using namespace helios::engine::platform::environment::types;
+using namespace helios::engine::runtime::world::types;
 #define HELIOS_LOG_SCOPE "GameWorld"
-export namespace helios::runtime::world {
+export namespace helios::engine::runtime::world {
 
     /**
      * @brief Runtime root object coordinating world domains, resources, and frame services.
@@ -79,7 +79,7 @@ export namespace helios::runtime::world {
          *
          * Defaults to HELIOS_LOG_SCOPE.
          */
-        inline static const helios::util::log::Logger& logger_ = helios::util::log::LogManager::loggerForScope(
+        inline static const helios::engine::util::log::Logger& logger_ = helios::engine::util::log::LogManager::loggerForScope(
             HELIOS_LOG_SCOPE);
 
         /**
@@ -545,7 +545,7 @@ export namespace helios::runtime::world {
          *
          * @return Reference to the internal CommandBufferRegistry.
          */
-        helios::runtime::messaging::command::CommandBufferRegistry& commandBufferRegistry() noexcept {
+        helios::engine::runtime::messaging::command::CommandBufferRegistry& commandBufferRegistry() noexcept {
             return resourceRegistry().commandBufferRegistry();
         }
 

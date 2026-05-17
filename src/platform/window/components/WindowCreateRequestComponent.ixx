@@ -4,12 +4,12 @@
  */
 module;
 
-export module helios.platform.window.components.WindowCreateRequestComponent;
+export module helios.engine.platform.window.components.WindowCreateRequestComponent;
 
-import helios.platform.window.types.WindowConfig;
+import helios.engine.platform.window.types.WindowConfig;
 
-using namespace helios::platform::window::types;
-export namespace helios::platform::window::components {
+using namespace helios::engine::platform::window::types;
+export namespace helios::engine::platform::window::components {
 
     /**
      * @brief Pending request component consumed by `WindowCreateSystem`.
@@ -24,4 +24,4 @@ export namespace helios::platform::window::components {
 
     };
 
-} // namespace helios::platform::window::components
+} // namespace helios::engine::platform::window::components

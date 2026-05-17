@@ -4,13 +4,13 @@
  */
 module;
 
-export module helios.rendering.material.MaterialEntity;
+export module helios.engine.rendering.material.MaterialEntity;
 
-import helios.rendering.material.MaterialEntityManager;
+import helios.engine.rendering.material.MaterialEntityManager;
 import helios.ecs.Entity;
 
 using namespace helios::ecs;
-export namespace helios::rendering::material {
+export namespace helios::engine::rendering::material {
 
     /** @brief ECS entity alias bound to `MaterialEntityManager`. */
     using MaterialEntity = Entity<MaterialEntityManager>;

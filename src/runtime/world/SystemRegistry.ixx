@@ -10,17 +10,17 @@ module;
 #include <vector>
 
 
-export module helios.runtime.world.SystemRegistry;
+export module helios.engine.runtime.world.SystemRegistry;
 
-import helios.core.container.ConceptModelRegistry;
-import helios.runtime.world.System;
-import helios.runtime.world.types.SystemTypeId;
+import helios.engine.core.container.ConceptModelRegistry;
+import helios.engine.runtime.world.System;
+import helios.engine.runtime.world.types.SystemTypeId;
 
 
-using namespace helios::core::container;
-using namespace helios::runtime::world::types;
+using namespace helios::engine::core::container;
+using namespace helios::engine::runtime::world::types;
 
-export namespace helios::runtime::world {
+export namespace helios::engine::runtime::world {
 
     /**
      * @brief Type alias for a ConceptModelRegistry specialized for Systems.

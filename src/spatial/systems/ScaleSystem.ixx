@@ -6,35 +6,35 @@ module;
 
 
 
-export module helios.spatial.systems.ScaleSystem;
+export module helios.engine.spatial.systems.ScaleSystem;
 
 
 import helios.math;
 
-import helios.core.units.Unit;
+import helios.engine.core.units.Unit;
 
-import helios.runtime.messaging.command.NullCommandBuffer;
+import helios.engine.runtime.messaging.command.NullCommandBuffer;
 
-import helios.runtime.world.GameObject;
-import helios.runtime.world.GameWorld;
-import helios.runtime.world.UpdateContext;
+import helios.engine.runtime.world.GameObject;
+import helios.engine.runtime.world.GameWorld;
+import helios.engine.runtime.world.UpdateContext;
 
-import helios.spatial.components.ScaleStateComponent;
-import helios.spatial.components.ComposeTransformComponent;
+import helios.engine.spatial.components.ScaleStateComponent;
+import helios.engine.spatial.components.ComposeTransformComponent;
 
-import helios.rendering.model.components.ModelAabbComponent;
+import helios.engine.rendering.model.components.ModelAabbComponent;
 
 import helios.ecs.components.Active;
 
-import helios.runtime.messaging.command.concepts.IsCommandBufferLike;
+import helios.engine.runtime.messaging.command.concepts.IsCommandBufferLike;
 import helios.ecs.concepts.IsEntityHandle;
-import helios.runtime.world.tags.SystemRole;
+import helios.engine.runtime.world.tags.SystemRole;
 
-using namespace helios::runtime::messaging::command;
-using namespace helios::runtime::messaging::command::concepts;
+using namespace helios::engine::runtime::messaging::command;
+using namespace helios::engine::runtime::messaging::command::concepts;
 
 using namespace helios::ecs::concepts;
-export namespace helios::spatial::systems {
+export namespace helios::engine::spatial::systems {
 
     /**
      * @brief System that applies scaling to entities based on their ScaleStateComponent.
@@ -56,7 +56,7 @@ export namespace helios::spatial::systems {
 
     public:
 
-        using EngineRoleTag = helios::runtime::world::tags::SystemRole;
+        using EngineRoleTag = helios::engine::runtime::world::tags::SystemRole;
         /**
          * @brief Updates scale for all entities with dirty ScaleComponents.
          *
@@ -66,13 +66,13 @@ export namespace helios::spatial::systems {
          *
          * @param updateContext Context containing deltaTime and other frame data.
          */
-        void update(helios::runtime::world::UpdateContext& updateContext) noexcept {
+        void update(helios::engine::runtime::world::UpdateContext& updateContext) noexcept {
 
             for (auto [entity, mab, sc, tc, active] : updateContext.view<
                 THandle,
-                helios::rendering::model::components::ModelAabbComponent<THandle>,
-                helios::spatial::components::ScaleStateComponent<THandle>,
-                helios::spatial::components::ComposeTransformComponent<THandle>,
+                helios::engine::rendering::model::components::ModelAabbComponent<THandle>,
+                helios::engine::spatial::components::ScaleStateComponent<THandle>,
+                helios::engine::spatial::components::ComposeTransformComponent<THandle>,
                 helios::ecs::components::Active<THandle>
             >().whereEnabled()) {
 
@@ -91,9 +91,9 @@ export namespace helios::spatial::systems {
                 // Calculate scale factors: desired_size / current_size
                 // Convert desired size to engine units (meters)
                 auto scale = helios::math::vec3f{
-                    wscale[0] != 0 && cscale[0] != 0 ? helios::core::units::from(wscale[0], unit) / cscale[0] : currentScale[0],
-                    wscale[1] != 0 && cscale[1] != 0 ? helios::core::units::from(wscale[1], unit) / cscale[1] : currentScale[1],
-                    wscale[2] != 0 && cscale[2] != 0 ? helios::core::units::from(wscale[2], unit) / cscale[2] : currentScale[2]
+                    wscale[0] != 0 && cscale[0] != 0 ? helios::engine::core::units::from(wscale[0], unit) / cscale[0] : currentScale[0],
+                    wscale[1] != 0 && cscale[1] != 0 ? helios::engine::core::units::from(wscale[1], unit) / cscale[1] : currentScale[1],
+                    wscale[2] != 0 && cscale[2] != 0 ? helios::engine::core::units::from(wscale[2], unit) / cscale[2] : currentScale[2]
                 };
 
                 tc->setLocalScale(scale);

@@ -1,4 +1,4 @@
-# helios::spatial::components
+# helios::engine::spatial::components
 
 Transform state and derived spatial components.
 
@@ -41,7 +41,7 @@ translation.setTranslation({0.0f, 0.0f, -5.0f});
 
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::spatial::components
+@namespace helios::engine::spatial::components
 @brief Transform state and derived spatial components.
 @details This namespace contains components that store individual aspects of an
 entity's spatial state including position, scale, local transforms, world

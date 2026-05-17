@@ -9,12 +9,12 @@ module;
 #include <chrono>
 #include <cassert>
 
-export module helios.tooling.FramePacer;
+export module helios.engine.tooling.FramePacer;
 
-import helios.util.time.Stopwatch;
-import helios.tooling.FrameStats;
+import helios.engine.util.time.Stopwatch;
+import helios.engine.tooling.FrameStats;
 
-export namespace helios::tooling {
+export namespace helios::engine::tooling {
 
     /**
      * @class FramePacer
@@ -32,7 +32,7 @@ export namespace helios::tooling {
      *
      * @par Usage Example:
      * ```cpp
-     * auto stopwatch = std::make_unique<helios::util::time::Stopwatch>();
+     * auto stopwatch = std::make_unique<helios::engine::util::time::Stopwatch>();
      * FramePacer pacer(std::move(stopwatch));
      * pacer.setTargetFps(60.0f);
      *
@@ -47,7 +47,7 @@ export namespace helios::tooling {
         /**
          * @brief The stopwatch used for high-resolution time measurement.
          */
-        helios::util::time::Stopwatch stopwatch_{};
+        helios::engine::util::time::Stopwatch stopwatch_{};
 
         /**
          * @brief The target frame rate in Frames Per Second (FPS).

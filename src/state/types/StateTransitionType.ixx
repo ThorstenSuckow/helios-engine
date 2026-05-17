@@ -6,9 +6,9 @@ module;
 
 #include <cstdint>
 
-export module helios.state.types.StateTransitionType;
+export module helios.engine.state.types.StateTransitionType;
 
-export namespace helios::state::types {
+export namespace helios::engine::state::types {
 
     /**
      * @brief Type trait for state transition customization points.

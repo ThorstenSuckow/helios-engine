@@ -5,16 +5,16 @@
 module;
 
 
-export module helios.scene.components.ViewportComponent;
+export module helios.engine.scene.components.ViewportComponent;
 
 import helios.ecs.types.EntityHandle;
-import helios.scene.types;
-import helios.rendering.viewport.types;
+import helios.engine.scene.types;
+import helios.engine.rendering.viewport.types;
 
 using namespace helios::ecs::types;
-using namespace helios::scene::types;
-using namespace helios::rendering::viewport::types;
-export namespace helios::scene::components {
+using namespace helios::engine::scene::types;
+using namespace helios::engine::rendering::viewport::types;
+export namespace helios::engine::scene::components {
 
     /**
      * @brief Component that groups viewport, scene, and camera bindings.

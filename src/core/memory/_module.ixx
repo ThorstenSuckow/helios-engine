@@ -1,8 +1,8 @@
 /**
  * @file _module.ixx
- * @brief Aggregate module for helios::core namespace.
+ * @brief Aggregate module for helios::engine::core namespace.
  */
 
-export module helios.core.memory;
+export module helios.engine.core.memory;
 
-export import helios.core.memory.ErasedUnique;
+export import helios.engine.core.memory.ErasedUnique;

@@ -5,9 +5,9 @@
 module;
 
 
-export module helios.platform.environment.commands.PollEventsCommand;
+export module helios.engine.platform.environment.commands.PollEventsCommand;
 
-export namespace helios::platform::environment::commands {
+export namespace helios::engine::platform::environment::commands {
 
     /**
      * @brief Marker command that triggers platform event polling.

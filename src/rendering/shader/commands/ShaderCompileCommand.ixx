@@ -4,12 +4,12 @@
  */
 module;
 
-export module helios.rendering.shader.commands.ShaderCompileCommand;
+export module helios.engine.rendering.shader.commands.ShaderCompileCommand;
 
-import helios.rendering.shader.types.ShaderHandle;
+import helios.engine.rendering.shader.types.ShaderHandle;
 
-using namespace helios::rendering::shader::types;
-export namespace helios::rendering::shader::commands {
+using namespace helios::engine::rendering::shader::types;
+export namespace helios::engine::rendering::shader::commands {
 
     /**
      * @brief Requests compilation of one shader handle.

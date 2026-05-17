@@ -8,11 +8,11 @@ module;
 #include <numeric>
 #include <cstddef>
 
-export module helios.tooling.FpsMetrics;
+export module helios.engine.tooling.FpsMetrics;
 
-import helios.tooling.FrameStats;
+import helios.engine.tooling.FrameStats;
 
-export namespace helios::tooling {
+export namespace helios::engine::tooling {
 
     /**
      * @class FpsMetrics
@@ -27,11 +27,11 @@ export namespace helios::tooling {
      *
      * @par Usage Example:
      * ```cpp
-     * helios::tooling::FpsMetrics metrics;
+     * helios::engine::tooling::FpsMetrics metrics;
      * metrics.setHistorySize(120);
      *
      * // In game loop:
-     * helios::tooling::FrameStats stats = framePacer.sync();
+     * helios::engine::tooling::FrameStats stats = framePacer.sync();
      * metrics.addFrame(stats);
      *
      * float fps          = metrics.getFps();
@@ -50,7 +50,7 @@ export namespace helios::tooling {
          * The use of a `std::deque` allows efficient addition and removal
          * of frame timing records while maintaining the order of events.
          */
-        std::deque<helios::tooling::FrameStats> history_;
+        std::deque<helios::engine::tooling::FrameStats> history_;
 
         /**
          * @brief Size of the history buffer for storing frame statistics.
@@ -172,14 +172,14 @@ export namespace helios::tooling {
          *
          * @note When used together with FramePacer, a typical usage pattern is:
          * @code
-         * helios::tooling::FrameStats stats = framePacer.sync();
+         * helios::engine::tooling::FrameStats stats = framePacer.sync();
          * metrics.addFrame(stats);
          * @endcode
          * This should usually be called once per frame at the end of the
          * frame loop, after timing information for the current frame has
          * been measured.
          */
-        void addFrame(const helios::tooling::FrameStats& stats) {
+        void addFrame(const helios::engine::tooling::FrameStats& stats) {
             needsUpdate_ = true;
 
             history_.push_back(stats);
@@ -324,7 +324,7 @@ export namespace helios::tooling {
          * @note Useful for rendering frame time graphs or diagnostic views
          *       in debug overlays.
          */
-        [[nodiscard]] const std::deque<helios::tooling::FrameStats>& getHistory() const noexcept {
+        [[nodiscard]] const std::deque<helios::engine::tooling::FrameStats>& getHistory() const noexcept {
             return history_;
         }
 

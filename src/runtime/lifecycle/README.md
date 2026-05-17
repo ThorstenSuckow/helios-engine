@@ -1,4 +1,4 @@
-# helios::runtime::lifecycle
+# helios::engine::runtime::lifecycle
 
 Lifecycle management for entity components and world-level lifecycle operations.
 
@@ -83,7 +83,7 @@ The manager is auto-registered by `bootstrap::bootstrapGameWorld()` and processe
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::runtime::lifecycle
+@namespace helios::engine::runtime::lifecycle
 @brief Lifecycle management for entity components and world-level operations.
 @details Provides delayed component activation mechanisms for spawn immunity, staggered effects, and sequenced initialization patterns. Also includes world-level lifecycle management for deferred reset operations through the command pipeline.
 </p></details>

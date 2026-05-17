@@ -6,12 +6,12 @@ module;
 
 
 
-export module helios.rendering.common.commands.RenderCommand;
+export module helios.engine.rendering.common.commands.RenderCommand;
 
-import helios.scene.types.SceneMemberRenderContext;
+import helios.engine.scene.types.SceneMemberRenderContext;
 
-using namespace helios::scene::types;
-export namespace helios::rendering::common::commands {
+using namespace helios::engine::scene::types;
+export namespace helios::engine::rendering::common::commands {
 
 
     /**

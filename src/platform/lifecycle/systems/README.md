@@ -1,4 +1,4 @@
-# helios::platform::lifecycle::systems
+# helios::engine::platform::lifecycle::systems
 
 Systems executing platform lifecycle transitions.
 
@@ -13,12 +13,12 @@ Systems executing platform lifecycle transitions.
 
 ## Notes
 
-`PollEventsSystem` belongs to `helios::platform::environment::systems` and is
+`PollEventsSystem` belongs to `helios::engine::platform::environment::systems` and is
 executed as part of regular frame service, not lifecycle transition handling.
 
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::platform::lifecycle::systems
+@namespace helios::engine::platform::lifecycle::systems
 @brief Systems for platform lifecycle transition processing.
 </p></details>

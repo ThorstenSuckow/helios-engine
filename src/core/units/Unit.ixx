@@ -7,10 +7,10 @@ module;
 
 #include <string>
 
-export module helios.core.units.Unit;
+export module helios.engine.core.units.Unit;
 import helios.math.types;
 
-export namespace helios::core::units {
+export namespace helios::engine::core::units {
 
     /**
      * @brief Enumeration of length and time units supported by helios.

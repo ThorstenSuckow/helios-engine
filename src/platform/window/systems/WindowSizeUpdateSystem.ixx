@@ -6,32 +6,32 @@ module;
 
 #include <cassert>
 
-export module helios.platform.window.systems.WindowSizeUpdateSystem;
+export module helios.engine.platform.window.systems.WindowSizeUpdateSystem;
 
-import helios.runtime.world.tags.SystemRole;
-import helios.runtime.world.UpdateContext;
+import helios.engine.runtime.world.tags.SystemRole;
+import helios.engine.runtime.world.UpdateContext;
 
-import helios.platform.window.components;
+import helios.engine.platform.window.components;
 import helios.ecs.components.Active;
-import helios.platform.window.concepts.IsWindowHandle;
+import helios.engine.platform.window.concepts.IsWindowHandle;
 
-import helios.rendering.framebuffer;
+import helios.engine.rendering.framebuffer;
 
-import helios.util.log;
+import helios.engine.util.log;
 
-import helios.spatial.components.Size2DComponent;
+import helios.engine.spatial.components.Size2DComponent;
 
-using namespace helios::spatial::components;
-using namespace helios::rendering::framebuffer::components;
-using namespace helios::rendering::framebuffer::types;
-using namespace helios::runtime::world::tags;
-using namespace helios::platform::window::concepts;
-using namespace helios::runtime::world;
-using namespace helios::platform::window::components;
+using namespace helios::engine::spatial::components;
+using namespace helios::engine::rendering::framebuffer::components;
+using namespace helios::engine::rendering::framebuffer::types;
+using namespace helios::engine::runtime::world::tags;
+using namespace helios::engine::platform::window::concepts;
+using namespace helios::engine::runtime::world;
+using namespace helios::engine::platform::window::components;
 using namespace helios::ecs::components;
 
-#define HELIOS_LOG_SCOPE "helios::platform::window::systems::WindowSizeUpdateSystem"
-export namespace helios::platform::window::systems {
+#define HELIOS_LOG_SCOPE "helios::engine::platform::window::systems::WindowSizeUpdateSystem"
+export namespace helios::engine::platform::window::systems {
 
     /**
      * @brief System that reacts to dirty window size components.
@@ -42,7 +42,7 @@ export namespace helios::platform::window::systems {
     requires IsWindowHandle<TMemberHandle>
     class WindowSizeUpdateSystem {
 
-        static inline auto& logger_ = helios::util::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
+        static inline auto& logger_ = helios::engine::util::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
 
     public:
 

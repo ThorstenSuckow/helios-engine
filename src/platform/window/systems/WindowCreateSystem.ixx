@@ -4,32 +4,32 @@
  */
 module;
 
-export module helios.platform.window.systems.WindowCreateSystem;
+export module helios.engine.platform.window.systems.WindowCreateSystem;
 
 
 
-import helios.runtime.world.UpdateContext;
-import helios.runtime.messaging.command.NullCommandBuffer;
-import helios.runtime.messaging.command.concepts.IsCommandBufferLike;
+import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.messaging.command.NullCommandBuffer;
+import helios.engine.runtime.messaging.command.concepts.IsCommandBufferLike;
 
-import helios.runtime.world.tags.SystemRole;
+import helios.engine.runtime.world.tags.SystemRole;
 
-import helios.platform.window.components.WindowCreateRequestComponent;
-import helios.platform.window.commands.WindowCreateCommand;
+import helios.engine.platform.window.components.WindowCreateRequestComponent;
+import helios.engine.platform.window.commands.WindowCreateCommand;
 
 import helios.ecs.components.Active;
-import helios.platform.window.concepts.IsWindowHandle;
+import helios.engine.platform.window.concepts.IsWindowHandle;
 
-using namespace helios::platform::window::concepts;
-using namespace helios::runtime::world::tags;
-using namespace helios::runtime::world;
-using namespace helios::runtime::messaging::command;
-using namespace helios::runtime::messaging::command::concepts;
-using namespace helios::platform::window::components;
-using namespace helios::platform::window::commands;
+using namespace helios::engine::platform::window::concepts;
+using namespace helios::engine::runtime::world::tags;
+using namespace helios::engine::runtime::world;
+using namespace helios::engine::runtime::messaging::command;
+using namespace helios::engine::runtime::messaging::command::concepts;
+using namespace helios::engine::platform::window::components;
+using namespace helios::engine::platform::window::commands;
 using namespace helios::ecs::components;
-using namespace helios::platform::window::components;
-export namespace helios::platform::window::systems {
+using namespace helios::engine::platform::window::components;
+export namespace helios::engine::platform::window::systems {
 
     /**
      * @brief Queues `WindowCreateCommand` for active entities with pending create requests.

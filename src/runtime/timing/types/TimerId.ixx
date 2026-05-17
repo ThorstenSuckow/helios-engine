@@ -7,13 +7,13 @@ module;
 #include <cstdint>
 #include <string_view>
 
-export module helios.runtime.timing.types.TimerId;
+export module helios.engine.runtime.timing.types.TimerId;
 
-import helios.core.types.FuncDefs;
-import helios.core.types;
+import helios.engine.core.types.FuncDefs;
+import helios.engine.core.types;
 import helios.ecs.types.StrongId;
 
-export namespace helios::runtime::timing::types {
+export namespace helios::engine::runtime::timing::types {
 
     /**
      * @brief Tag type for TimerId.

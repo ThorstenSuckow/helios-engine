@@ -5,14 +5,14 @@
 module;
 
 
-export module helios.scene.components.SceneBindingComponent;
+export module helios.engine.scene.components.SceneBindingComponent;
 
-import helios.scene.types.SceneHandle;
+import helios.engine.scene.types.SceneHandle;
 import helios.ecs.components.BindingComponent;
 
-using namespace helios::scene::types;
+using namespace helios::engine::scene::types;
 using namespace helios::ecs::components;
-export namespace helios::scene::components {
+export namespace helios::engine::scene::components {
 
     /**
      * @brief Binds an owning entity to a scene handle.

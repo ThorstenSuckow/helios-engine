@@ -6,16 +6,16 @@ module;
 
 #include <functional>
 
-export module helios.state.types.StateTransitionRule;
+export module helios.engine.state.types.StateTransitionRule;
 
-import helios.state.types.StateTransitionRequest;
-import helios.state.types.StateTransitionId;
-import helios.state.types.StateTransitionType;
+import helios.engine.state.types.StateTransitionRequest;
+import helios.engine.state.types.StateTransitionId;
+import helios.engine.state.types.StateTransitionType;
 
 
-import helios.runtime.world.UpdateContext;
+import helios.engine.runtime.world.UpdateContext;
 
-export namespace helios::state::types {
+export namespace helios::engine::state::types {
 
     /**
      * @brief Function pointer type for transition guards.
@@ -27,7 +27,7 @@ export namespace helios::state::types {
      */
     template<typename StateType>
     using GuardCallback = bool(*)(
-        helios::runtime::world::UpdateContext&,
+        helios::engine::runtime::world::UpdateContext&,
         const StateTransitionRequest<StateType>
     );
 

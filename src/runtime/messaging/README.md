@@ -1,4 +1,4 @@
-# helios::runtime::messaging
+# helios::engine::runtime::messaging
 
 Communication infrastructure for commands and events within the game loop.
 
@@ -32,7 +32,7 @@ This module provides the messaging backbone for the helios engine. It includes t
 
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::runtime::messaging
+@namespace helios::engine::runtime::messaging
 @brief Communication infrastructure for commands and events.
 @details Provides compile-time typed command buffering with handler routing, and double-buffered event buses for decoupled inter-system communication within the game loop.
 </p></details>

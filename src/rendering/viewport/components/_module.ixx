@@ -2,6 +2,6 @@
  * @file _module.ixx
  * @brief Viewport components submodule.
  */
-export module helios.rendering.viewport.components;
+export module helios.engine.rendering.viewport.components;
 
-export import helios.rendering.viewport.components.ActiveViewportHandlesStateComponent;
+export import helios.engine.rendering.viewport.components.ActiveViewportHandlesStateComponent;

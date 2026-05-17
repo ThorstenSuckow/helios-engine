@@ -1,11 +1,11 @@
 /**
  * @file _module.ixx
- * @brief Aggregate module for helios::core::container namespace.
+ * @brief Aggregate module for helios::engine::core::container namespace.
  */
 
-export module helios.core.container;
+export module helios.engine.core.container;
 
-export import helios.core.container.buffer;
+export import helios.engine.core.container.buffer;
 
-export import helios.core.container.ConceptModelRegistry;
-export import helios.core.container.HandleMultiMap;
+export import helios.engine.core.container.ConceptModelRegistry;
+export import helios.engine.core.container.HandleMultiMap;

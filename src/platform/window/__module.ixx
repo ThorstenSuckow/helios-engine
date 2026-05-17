@@ -1,13 +1,13 @@
 /**
  * @file __module.ixx
- * @brief Module aggregator for `helios.platform.window`.
+ * @brief Module aggregator for `helios.engine.platform.window`.
  */
-export module helios.platform.window;
+export module helios.engine.platform.window;
 
-export import helios.platform.window.commands;
-export import helios.platform.window.components;
-export import helios.platform.window.types;
-export import helios.platform.window.systems;
-export import helios.platform.window.concepts;
+export import helios.engine.platform.window.commands;
+export import helios.engine.platform.window.components;
+export import helios.engine.platform.window.types;
+export import helios.engine.platform.window.systems;
+export import helios.engine.platform.window.concepts;
 
-export import helios.platform.window.WindowEntityManager;
+export import helios.engine.platform.window.WindowEntityManager;

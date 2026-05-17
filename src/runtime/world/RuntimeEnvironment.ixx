@@ -8,22 +8,22 @@ module;
 #include <vector>
 #include <cassert>
 
-export module helios.runtime.world.RuntimeEnvironment;
+export module helios.engine.runtime.world.RuntimeEnvironment;
 
 import helios.ecs.Entity;
 import helios.ecs.types.EntityHandle;
 
-import helios.platform.environment.types;
-import helios.platform.environment.components;
+import helios.engine.platform.environment.types;
+import helios.engine.platform.environment.components;
 
-import helios.platform.environment.PlatformEntityManager;
+import helios.engine.platform.environment.PlatformEntityManager;
 
 using namespace helios::ecs;
-using namespace helios::platform::environment;
-using namespace helios::platform::environment::types;
-using namespace helios::platform::environment::components;
+using namespace helios::engine::platform::environment;
+using namespace helios::engine::platform::environment::types;
+using namespace helios::engine::platform::environment::components;
 
-export namespace helios::runtime::world {
+export namespace helios::engine::runtime::world {
 
 
     /**

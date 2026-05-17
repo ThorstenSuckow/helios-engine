@@ -9,13 +9,13 @@ module;
 #include <variant>
 #include <utility>
 
-export module helios.rendering.shader.UniformValueMap;
+export module helios.engine.rendering.shader.UniformValueMap;
 
-import helios.rendering.shader.UniformSemantics;
+import helios.engine.rendering.shader.UniformSemantics;
 
 import helios.math.types;
 
-export namespace helios::rendering::shader {
+export namespace helios::engine::rendering::shader {
 
     /**
      * @brief A type alias for the variant containing all supported

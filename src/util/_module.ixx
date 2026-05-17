@@ -3,12 +3,12 @@
  * @brief Module exports for non-domain-specific utility functions.
  */
 
-export module helios.util;
+export module helios.engine.util;
 
-export import helios.util.Guid;
-export import helios.util.Colors;
-export import helios.util.Random;
+export import helios.engine.util.Guid;
+export import helios.engine.util.Colors;
+export import helios.engine.util.Random;
 
-export import helios.util.log;
-export import helios.util.io;
-export import helios.util.time;
+export import helios.engine.util.log;
+export import helios.engine.util.io;
+export import helios.engine.util.time;

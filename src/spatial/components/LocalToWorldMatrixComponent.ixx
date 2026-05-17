@@ -4,12 +4,12 @@
  */
 module;
 
-export module helios.spatial.components.LocalToWorldMatrixComponent;
+export module helios.engine.spatial.components.LocalToWorldMatrixComponent;
 
-import helios.core.components.Mat4Component;
+import helios.engine.core.components.Mat4Component;
 
-using namespace helios::core::components;
-export namespace helios::spatial::components {
+using namespace helios::engine::core::components;
+export namespace helios::engine::spatial::components {
 
     /**
      * @brief Domain tag for computed local-to-world matrices.

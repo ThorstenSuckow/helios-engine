@@ -9,9 +9,9 @@
  * @details This module provides logging functionality including logger instances,
  * log management, and configurable output sinks for flexible log destinations.
  */
-export module helios.util.log;
+export module helios.engine.util.log;
 
-export import helios.util.log.LogSink;
-export import helios.util.log.ConsoleSink;
-export import helios.util.log.Logger;
-export import helios.util.log.LogManager;
+export import helios.engine.util.log.LogSink;
+export import helios.engine.util.log.ConsoleSink;
+export import helios.engine.util.log.Logger;
+export import helios.engine.util.log.LogManager;

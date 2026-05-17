@@ -1,4 +1,4 @@
-# helios::platform::environment
+# helios::engine::platform::environment
 
 Platform environment module for per-frame platform services.
 
@@ -7,7 +7,7 @@ Platform environment module for per-frame platform services.
 This module contains environment-facing APIs used during normal frame updates,
 including event polling and environment state components. Lifecycle transitions
 (init, warmup done, shutdown/session destroy) are provided by
-`helios::platform::lifecycle`.
+`helios::engine::platform::lifecycle`.
 
 ## Subdirectories
 
@@ -32,6 +32,6 @@ including event polling and environment state components. Lifecycle transitions
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::platform::environment
+@namespace helios::engine::platform::environment
 @brief Platform environment APIs for per-frame services.
 </p></details>

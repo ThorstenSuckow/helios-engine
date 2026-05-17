@@ -7,12 +7,12 @@ module;
 #include <memory>
 #include <cstddef>
 
-export module helios.runtime.pooling.EntityPoolConfig;
+export module helios.engine.runtime.pooling.EntityPoolConfig;
 
-import helios.runtime.pooling.types.EntityPoolId;
-import helios.gameplay.common.types.PrefabId;
+import helios.engine.runtime.pooling.types.EntityPoolId;
+import helios.engine.runtime.pooling.types.PrefabId;
 
-export namespace helios::runtime::pooling {
+export namespace helios::engine::runtime::pooling {
 
     /**
      * @brief Configuration structure for creating a EntityPool.
@@ -57,7 +57,7 @@ export namespace helios::runtime::pooling {
          *
          * Used to reference and retrieve the pool from registries.
          */
-        const helios::runtime::pooling::types::EntityPoolId entityPoolId;
+        const helios::engine::runtime::pooling::types::EntityPoolId entityPoolId;
 
         /**
          * @brief Identifier of the prefab template used for cloning.
@@ -66,7 +66,7 @@ export namespace helios::runtime::pooling {
          * PrefabIdComponent. The pool system resolves this ID to the
          * actual entity at initialization time.
          */
-        const helios::gameplay::common::types::PrefabId prefabId;
+        const helios::engine::runtime::pooling::types::PrefabId prefabId;
 
         /**
          * @brief Initial number of objects to pre-allocate in the pool.

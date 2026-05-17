@@ -8,67 +8,67 @@ module;
 #include <tuple>
 #include <type_traits>
 
-export module helios.runtime.world.EngineWorld;
+export module helios.engine.runtime.world.EngineWorld;
 
 import helios.ecs;
 
-import helios.runtime.world.GameObjectEntityManager;
+import helios.engine.runtime.world.GameObjectEntityManager;
 
-import helios.platform.window.WindowEntityManager;
-import helios.platform.window.concepts;
-import helios.platform.window.types;
+import helios.engine.platform.window.WindowEntityManager;
+import helios.engine.platform.window.concepts;
+import helios.engine.platform.window.types;
 
-import helios.platform.environment.PlatformEntityManager;
-import helios.platform.environment.types;
+import helios.engine.platform.environment.PlatformEntityManager;
+import helios.engine.platform.environment.types;
 
-import helios.platform.concepts;
-import helios.rendering.common.concepts;
+import helios.engine.platform.concepts;
+import helios.engine.rendering.common.concepts;
 
-import helios.rendering.shader.ShaderEntityManager;
-import helios.rendering.material.MaterialEntityManager;
-import helios.rendering.mesh.MeshEntityManager;
+import helios.engine.rendering.shader.ShaderEntityManager;
+import helios.engine.rendering.material.MaterialEntityManager;
+import helios.engine.rendering.mesh.MeshEntityManager;
 
-import helios.runtime.world.concepts.IsGameObjectHandle;
-import helios.runtime.world.types.GameObjectHandle;
+import helios.engine.runtime.world.concepts.IsGameObjectHandle;
+import helios.engine.runtime.world.types.GameObjectHandle;
 
-import helios.platform.window.concepts;
-import helios.rendering.common.concepts.IsRenderResourceHandle;
+import helios.engine.platform.window.concepts;
+import helios.engine.rendering.common.concepts.IsRenderResourceHandle;
 
-import helios.rendering.common.concepts;
+import helios.engine.rendering.common.concepts;
 
-import helios.scene.SceneEntityManager;
-import helios.scene.concepts;
+import helios.engine.scene.SceneEntityManager;
+import helios.engine.scene.concepts;
 
-import helios.rendering.viewport.ViewportEntityManager;
-import helios.rendering.framebuffer.FramebufferEntityManager;
+import helios.engine.rendering.viewport.ViewportEntityManager;
+import helios.engine.rendering.framebuffer.FramebufferEntityManager;
 
-import helios.core.TypedTupleCat;
+import helios.engine.core.TypedTupleCat;
 
 using namespace helios::ecs;
-using namespace helios::platform::environment;
-using namespace helios::platform::environment::types;
-using namespace helios::platform::concepts;
-using namespace helios::platform::window;
-using namespace helios::platform::window::types;
-using namespace helios::platform::window::concepts;
-using namespace helios::runtime::world::types;
-using namespace helios::runtime::world::concepts;
-using namespace helios::rendering::shader;
-using namespace helios::rendering::material;
-using namespace helios::rendering::mesh;
-using namespace helios::rendering::common::concepts;
-using namespace helios::rendering::framebuffer;
-using namespace helios::rendering::viewport;
-using namespace helios::scene;
-using namespace helios::scene::concepts;
+using namespace helios::engine::platform::environment;
+using namespace helios::engine::platform::environment::types;
+using namespace helios::engine::platform::concepts;
+using namespace helios::engine::platform::window;
+using namespace helios::engine::platform::window::types;
+using namespace helios::engine::platform::window::concepts;
+using namespace helios::engine::runtime::world::types;
+using namespace helios::engine::runtime::world::concepts;
+using namespace helios::engine::rendering::shader;
+using namespace helios::engine::rendering::material;
+using namespace helios::engine::rendering::mesh;
+using namespace helios::engine::rendering::common::concepts;
+using namespace helios::engine::rendering::framebuffer;
+using namespace helios::engine::rendering::viewport;
+using namespace helios::engine::scene;
+using namespace helios::engine::scene::concepts;
 
 template<typename T>
 inline constexpr bool typed_false = false;
 
 template<typename T>
-concept IsGameplaySystemHandle = IsGameObjectHandle<T> || helios::scene::concepts::IsSceneHandle<T>;
+concept IsGameplaySystemHandle = IsGameObjectHandle<T> || helios::engine::scene::concepts::IsSceneHandle<T>;
 
-export namespace helios::runtime::world {
+export namespace helios::engine::runtime::world {
 
     /**
      * @brief Typed world containing game-object entity managers.
@@ -93,7 +93,7 @@ export namespace helios::runtime::world {
     /**
      * @brief Concatenated tuple of all entity-manager types used by `EngineWorld`.
      */
-    using RegisteredEntityManagers = helios::core::TypedTupleCat<
+    using RegisteredEntityManagers = helios::engine::core::TypedTupleCat<
         GameObjectWorld::EntityManager_types,
         RenderResourceWorld::EntityManager_types,
         PlatformWorld::EntityManager_types,

@@ -1,4 +1,4 @@
-# helios::runtime::lifecycle::components
+# helios::engine::runtime::lifecycle::components
 
 Components for managing entity lifecycle states.
 
@@ -52,7 +52,7 @@ enabler->defer(entity, ComponentTypeId::id<CollisionComponent>(), 0.5f);
 
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::runtime::lifecycle::components
+@namespace helios::engine::runtime::lifecycle::components
 @brief Components for managing entity lifecycle states.
 @details Provides tag components for activation state, a dead-entity marker, and a component for tracking delayed component activations.
 </p></details>

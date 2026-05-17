@@ -5,14 +5,14 @@
 module;
 
 
-export module helios.platform.window.commands.SwapBuffersCommand;
+export module helios.engine.platform.window.commands.SwapBuffersCommand;
 
-import helios.platform.window.types.WindowHandle;
-import helios.platform.window.concepts;
+import helios.engine.platform.window.types.WindowHandle;
+import helios.engine.platform.window.concepts;
 
-using namespace helios::platform::window::types;
-using namespace helios::platform::window::concepts;
-export namespace helios::platform::window::commands {
+using namespace helios::engine::platform::window::types;
+using namespace helios::engine::platform::window::concepts;
+export namespace helios::engine::platform::window::commands {
 
     /**
      * @brief Requests buffer swap for the given window handle.

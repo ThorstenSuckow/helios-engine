@@ -5,13 +5,13 @@
 module;
 
 
-export module helios.scene.components.LookAtComponent;
+export module helios.engine.scene.components.LookAtComponent;
 
 
 import helios.math;
 
 using namespace helios::math;
-export namespace helios::scene::components {
+export namespace helios::engine::scene::components {
 
     /**
      * @brief Component that stores a target position and up vector.

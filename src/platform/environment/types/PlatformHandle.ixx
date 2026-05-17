@@ -4,12 +4,12 @@
  */
 module;
 
-export module helios.platform.environment.types.PlatformHandle;
+export module helios.engine.platform.environment.types.PlatformHandle;
 
 import helios.ecs.types.EntityHandle;
-import helios.platform.environment.types.PlatformDomainTag;
+import helios.engine.platform.environment.types.PlatformDomainTag;
 
-export namespace helios::platform::environment::types {
+export namespace helios::engine::platform::environment::types {
 
     /**
      * @brief ECS handle type referencing runtime platform entities.

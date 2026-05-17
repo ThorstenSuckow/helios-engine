@@ -1,4 +1,4 @@
-# helios::platform::environment::commands
+# helios::engine::platform::environment::commands
 
 Commands for platform runtime lifecycle control.
 
@@ -18,7 +18,7 @@ runtime platform systems/managers.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::platform::environment::commands
+@namespace helios::engine::platform::environment::commands
 @brief Commands for platform runtime lifecycle control.
 </p></details>
 

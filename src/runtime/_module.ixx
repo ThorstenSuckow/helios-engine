@@ -1,12 +1,12 @@
 /**
  * @file _module.ixx
- * @brief Aggregate module for helios::runtime namespace.
+ * @brief Aggregate module for helios::engine::runtime namespace.
  */
-export module helios.runtime;
+export module helios.engine.runtime;
 
-export import helios.runtime.gameloop;
-export import helios.runtime.world;
-export import helios.runtime.pooling;
-export import helios.runtime.messaging;
-export import helios.runtime.concepts;
-export import helios.runtime.timing;
+export import helios.engine.runtime.gameloop;
+export import helios.engine.runtime.world;
+export import helios.engine.runtime.pooling;
+export import helios.engine.runtime.messaging;
+export import helios.engine.runtime.concepts;
+export import helios.engine.runtime.timing;

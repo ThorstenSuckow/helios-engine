@@ -1,4 +1,4 @@
-# helios::platform::window::components
+# helios::engine::platform::window::components
 
 Window-domain ECS components.
 
@@ -13,7 +13,7 @@ Window-domain ECS components.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::platform::window::components
+@namespace helios::engine::platform::window::components
 @brief Window-domain ECS components.
 </p></details>
 

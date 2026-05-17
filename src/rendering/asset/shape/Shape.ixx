@@ -7,14 +7,14 @@ module;
 #include <memory>
 #include <vector>
 
-export module helios.rendering.asset.shape.Shape;
+export module helios.engine.rendering.asset.shape.Shape;
 
-import helios.rendering.Vertex;
-import helios.rendering.mesh.types.PrimitiveType;
+import helios.engine.rendering.Vertex;
+import helios.engine.rendering.mesh.types.PrimitiveType;
 
-using namespace helios::rendering;
+using namespace helios::engine::rendering;
 
-export namespace helios::rendering::asset::shape {
+export namespace helios::engine::rendering::asset::shape {
 
     /**
      * @brief Struct representing geometric primitives and indices for various shapes.
@@ -55,7 +55,7 @@ export namespace helios::rendering::asset::shape {
          *
          * @return The intended PrimitiveType of this Shape.
          */
-        [[nodiscard]] virtual helios::rendering::mesh::types::PrimitiveType primitiveType() const noexcept = 0;
+        [[nodiscard]] virtual helios::engine::rendering::mesh::types::PrimitiveType primitiveType() const noexcept = 0;
     };
 
 }

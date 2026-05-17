@@ -4,10 +4,10 @@
  */
 module;
 
-export module helios.rendering.mesh.types.PrimitiveType;
+export module helios.engine.rendering.mesh.types.PrimitiveType;
 
 
-export namespace helios::rendering::mesh::types {
+export namespace helios::engine::rendering::mesh::types {
 
     /**
      * @brief Defines how vertices are assembled into primitives during rendering.

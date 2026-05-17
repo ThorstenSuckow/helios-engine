@@ -6,11 +6,11 @@ module;
 
 #include <string>
 
-export module helios.platform.window.types.WindowConfig;
+export module helios.engine.platform.window.types.WindowConfig;
 
-import helios.platform.window.types.WindowSize;
+import helios.engine.platform.window.types.WindowSize;
 
-export namespace helios::platform::window::types {
+export namespace helios::engine::platform::window::types {
 
     /**
      * @brief Immutable-like value object carrying window creation parameters.
@@ -31,4 +31,4 @@ export namespace helios::platform::window::types {
 
     };
 
-} // namespace helios::platform::window::types
+} // namespace helios::engine::platform::window::types

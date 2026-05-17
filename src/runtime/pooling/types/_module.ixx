@@ -1,8 +1,9 @@
 /**
  * @file _module.ixx
- * @brief Aggregate module for helios::runtime::pooling::types.
+ * @brief Aggregate module for helios::engine::runtime::pooling::types.
  */
-export module helios.runtime.pooling.types;
+export module helios.engine.runtime.pooling.types;
 
-export import helios.runtime.pooling.types.EntityPoolId;
+export import helios.engine.runtime.pooling.types.EntityPoolId;
+export import helios.engine.runtime.pooling.types.PrefabId;
 

@@ -5,12 +5,12 @@
 module;
 
 
-export module helios.state.types.StateTransitionContext;
+export module helios.engine.state.types.StateTransitionContext;
 
-import helios.state.types.StateTransitionId;
-import helios.state.types.StateTransitionType;
+import helios.engine.state.types.StateTransitionId;
+import helios.engine.state.types.StateTransitionType;
 
-export namespace helios::state::types {
+export namespace helios::engine::state::types {
 
     /**
      * @brief Captures the complete context of a state transition.

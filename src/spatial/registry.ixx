@@ -4,12 +4,12 @@
  */
 module;
 
-export module helios.spatial.registry;
+export module helios.engine.spatial.registry;
 
 import helios.ecs.ComponentReflector;
-import helios.spatial.components;
+import helios.engine.spatial.components;
 
-export namespace helios::spatial {
+export namespace helios::engine::spatial {
 
     /**
      * @brief Registers all spatial transform components with the ComponentReflector.

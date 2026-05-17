@@ -4,9 +4,9 @@
  */
 module;
 
-export module helios.rendering.mesh.types.MeshDomainTag;
+export module helios.engine.rendering.mesh.types.MeshDomainTag;
 
-export namespace helios::rendering::mesh::types {
+export namespace helios::engine::rendering::mesh::types {
 
     /**
      * @brief Domain tag for mesh identity and handles.

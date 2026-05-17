@@ -1,8 +1,8 @@
 /**
  * @file _module.ixx
- * @brief Aggregate module for `helios::rendering::common::commands`.
+ * @brief Aggregate module for `helios::engine::rendering::common::commands`.
  */
-export module helios.rendering.common.commands;
+export module helios.engine.rendering.common.commands;
 
-export import helios.rendering.common.commands.RenderCommand;
+export import helios.engine.rendering.common.commands.RenderCommand;
 

@@ -4,12 +4,12 @@
  */
 module;
 
-export module helios.rendering.mesh.types.MeshId;
+export module helios.engine.rendering.mesh.types.MeshId;
 
 import helios.ecs.types.StrongId;
-import helios.rendering.mesh.types.MeshDomainTag;
+import helios.engine.rendering.mesh.types.MeshDomainTag;
 
-export namespace helios::rendering::mesh::types {
+export namespace helios::engine::rendering::mesh::types {
 
     /**
      * @brief Strongly-typed identifier for mesh resources.

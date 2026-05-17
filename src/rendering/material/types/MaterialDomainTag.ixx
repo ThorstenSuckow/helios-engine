@@ -4,9 +4,9 @@
  */
 module;
 
-export module helios.rendering.material.types.MaterialDomainTag;
+export module helios.engine.rendering.material.types.MaterialDomainTag;
 
-export namespace helios::rendering::material::types {
+export namespace helios::engine::rendering::material::types {
 
     /**
      * @brief Domain tag for material identity and handles.

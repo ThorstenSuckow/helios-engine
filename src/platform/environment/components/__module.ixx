@@ -1,10 +1,10 @@
 /**
  * @file __module.ixx
- * @brief Module aggregator for `helios.platform.environment.components`.
+ * @brief Module aggregator for `helios.engine.platform.environment.components`.
  */
-export module helios.platform.environment.components;
+export module helios.engine.platform.environment.components;
 
 
-export import helios.platform.environment.components.CurrentContextComponent;
-export import helios.platform.environment.components.GPUContextReadyComponent;
-export import helios.platform.environment.components.PlatformInitializedComponent;
+export import helios.engine.platform.environment.components.CurrentContextComponent;
+export import helios.engine.platform.environment.components.GPUContextReadyComponent;
+export import helios.engine.platform.environment.components.PlatformInitializedComponent;

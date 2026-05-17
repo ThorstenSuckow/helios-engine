@@ -4,13 +4,13 @@
  */
 module;
 
-export module helios.rendering.common.components.MaterialOverrideComponent;
+export module helios.engine.rendering.common.components.MaterialOverrideComponent;
 
-import helios.rendering.material;
+import helios.engine.rendering.material;
 
-using namespace helios::rendering::material;
-using namespace helios::rendering::material::types;
-export namespace helios::rendering::common::components {
+using namespace helios::engine::rendering::material;
+using namespace helios::engine::rendering::material::types;
+export namespace helios::engine::rendering::common::components {
 
     /**
      * @brief Component that stores a replacement material handle.

@@ -11,12 +11,12 @@ module;
 #include <iterator>
 #include <cstddef>
 
-export module helios.core.container.HandleMultiMap;
+export module helios.engine.core.container.HandleMultiMap;
 
 import helios.ecs.types.EntityHandle;
 
 using namespace helios::ecs;
-export namespace helios::core::container {
+export namespace helios::engine::core::container {
 
     /**
      * @brief Stores a one-to-many relation between handle domains.

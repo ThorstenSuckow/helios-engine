@@ -5,11 +5,11 @@
 module;
 
 
-export module helios.spatial.components.Scale2DComponent;
+export module helios.engine.spatial.components.Scale2DComponent;
 
-import helios.core.components.Vec2Component;
+import helios.engine.core.components.Vec2Component;
 
-export namespace helios::spatial::components {
+export namespace helios::engine::spatial::components {
 
     /** @brief Domain tag for 2D scale values. */
     struct Scale2DComponentDomain {};
@@ -20,5 +20,5 @@ export namespace helios::spatial::components {
      * @tparam THandle Owning entity handle type.
      */
     template<typename THandle>
-    using Scale2DComponent = helios::core::components::Vec2Component<Scale2DComponentDomain, THandle, float>;
+    using Scale2DComponent = helios::engine::core::components::Vec2Component<Scale2DComponentDomain, THandle, float>;
 }

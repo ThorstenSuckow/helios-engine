@@ -6,13 +6,13 @@ module;
 
 #include <cassert>
 
-export module helios.scene.components.PerspectiveCameraComponent;
+export module helios.engine.scene.components.PerspectiveCameraComponent;
 
 
 import helios.math;
 
 using namespace helios::math;
-export namespace helios::scene::components {
+export namespace helios::engine::scene::components {
 
     /**
      * @brief Component that stores perspective camera projection parameters.

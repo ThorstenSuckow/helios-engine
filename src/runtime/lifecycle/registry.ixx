@@ -4,12 +4,12 @@
  */
 module;
 
-export module helios.runtime.lifecycle.registry;
+export module helios.engine.runtime.lifecycle.registry;
 
 import helios.ecs.ComponentReflector;
-import helios.runtime.lifecycle.components;
+import helios.engine.runtime.lifecycle.components;
 
-export namespace helios::runtime::lifecycle {
+export namespace helios::engine::runtime::lifecycle {
 
     /**
      * @brief Registers all lifecycle components with the ComponentReflector.

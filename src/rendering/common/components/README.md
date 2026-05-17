@@ -1,4 +1,4 @@
-# helios::rendering::common::components
+# helios::engine::rendering::common::components
 
 Shared ECS components used across rendering workflows.
 
@@ -19,7 +19,7 @@ state independent of a specific backend or resource subsystem.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::rendering::common::components
+@namespace helios::engine::rendering::common::components
 @brief Shared ECS components used across rendering workflows.
 </p></details>
 

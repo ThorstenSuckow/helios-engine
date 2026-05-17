@@ -10,10 +10,10 @@
  * for different input sources and managers for processing user input. Includes
  * type definitions for various input events and states.
  */
-export module helios.input;
+export module helios.engine.input;
 
-export import helios.input.types;
-export import helios.input.gamepad;
-export import helios.input.InputAdapter;
-export import helios.input.InputManager;
-export import helios.input.InputSnapshot;
+export import helios.engine.input.types;
+export import helios.engine.input.gamepad;
+export import helios.engine.input.InputAdapter;
+export import helios.engine.input.InputManager;
+export import helios.engine.input.InputSnapshot;

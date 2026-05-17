@@ -1,4 +1,4 @@
-# helios::rendering::material
+# helios::engine::rendering::material
 
 Material abstractions and shader property models.
 
@@ -22,7 +22,7 @@ This module provides immutable material definitions (`Material`,
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::rendering::material
+@namespace helios::engine::rendering::material
 @brief Material abstractions and shader property models.
 @details Contains immutable material property models, override payloads, and ECS resource aliases for material resources.
 </p></details>

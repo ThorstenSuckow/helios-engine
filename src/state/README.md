@@ -1,4 +1,4 @@
-# helios::state
+# helios::engine::state
 
 Generic, template-based state management system with rule-based transitions.
 
@@ -46,7 +46,7 @@ To use `StateManager<YourState>`, you must specialize `StateTransitionId`:
 ```cpp
 // In your bindings module:
 template<>
-struct helios::state::types::StateTransitionId<GameState> {
+struct helios::engine::state::types::StateTransitionId<GameState> {
     using Type = GameStateTransitionId;
 };
 ```
@@ -56,8 +56,8 @@ struct helios::state::types::StateTransitionId<GameState> {
 ### Defining Rules
 
 ```cpp
-using namespace helios::state;
-using namespace helios::state::types;
+using namespace helios::engine::state;
+using namespace helios::engine::state::types;
 
 constexpr StateTransitionRule<GameState> gameStateRules[] = {
     {GameState::MainMenu, GameStateTransitionId::StartGame, GameState::Running},
@@ -143,7 +143,7 @@ viewportPolicy.freeze();
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::state
+@namespace helios::engine::state
 @brief Generic, template-based state management system.
 @details Provides a complete framework for managing application state with rule-based transitions, guards, listeners, and ID mapping utilities. All components are parameterized by state type for maximum reuse.
 </p></details>

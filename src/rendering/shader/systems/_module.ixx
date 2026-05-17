@@ -1,7 +1,7 @@
 /**
  * @file _module.ixx
- * @brief Aggregate module for `helios::rendering::shader::systems`.
+ * @brief Aggregate module for `helios::engine::rendering::shader::systems`.
  */
-export module helios.rendering.shader.systems;
+export module helios.engine.rendering.shader.systems;
 
-export import helios.rendering.shader.systems.ShaderCompileSystem;
+export import helios.engine.rendering.shader.systems.ShaderCompileSystem;

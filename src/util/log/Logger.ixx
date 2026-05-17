@@ -13,11 +13,11 @@ module;
 #include <cstddef>
 #include <utility>
 
-export module helios.util.log.Logger;
+export module helios.engine.util.log.Logger;
 
-import helios.util.log.LogSink;
+import helios.engine.util.log.LogSink;
 
-export namespace helios::util::log {
+export namespace helios::engine::util::log {
 
     /**
      * @brief Logger implementation with configurable output sinks.
@@ -105,7 +105,7 @@ export namespace helios::util::log {
         /**
          * @brief Creates a new Logger, tagged with a specific scope.
          *
-         * @param scope The textual scope used as a prefix in log output (e.g. "helios::rendering").
+         * @param scope The textual scope used as a prefix in log output (e.g. "helios::engine::rendering").
          */
         explicit Logger(std::string scope) :
             scope_(std::move(scope)) {}

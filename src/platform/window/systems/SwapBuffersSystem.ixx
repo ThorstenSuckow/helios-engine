@@ -7,38 +7,33 @@ module;
 #include <GLFW/glfw3.h>
 #include <cassert>
 
-export module helios.platform.window.systems.SwapBuffersSystem;
+export module helios.engine.platform.window.systems.SwapBuffersSystem;
 
 
 
-import helios.runtime.world.UpdateContext;
+import helios.engine.runtime.world.UpdateContext;
 
-import helios.runtime.world.tags.SystemRole;
+import helios.engine.runtime.world.tags.SystemRole;
 
-import helios.runtime.world;
-import helios.runtime.messaging.command.NullCommandBuffer;
-import helios.runtime.messaging.command.concepts.IsCommandBufferLike;
+import helios.engine.runtime.world;
+import helios.engine.runtime.messaging.command.NullCommandBuffer;
+import helios.engine.runtime.messaging.command.concepts.IsCommandBufferLike;
 
 import helios.ecs.components.Active;
 
-import helios.platform.window.commands;
-import helios.platform.window.components;
-import helios.platform.window.concepts.IsWindowHandle;
+import helios.engine.platform.window.commands;
+import helios.engine.platform.window.components;
+import helios.engine.platform.window.concepts.IsWindowHandle;
 
-
-import helios.state.Bindings;
-import helios.gameplay.gamestate.types;
-
-using namespace helios::runtime::world::tags;
-using namespace helios::runtime::world;
-using namespace helios::runtime::messaging::command;
-using namespace helios::runtime::messaging::command::concepts;
-using namespace helios::platform::window::components;
-using namespace helios::platform::window::concepts;
-using namespace helios::platform::window::commands;
+using namespace helios::engine::runtime::world::tags;
+using namespace helios::engine::runtime::world;
+using namespace helios::engine::runtime::messaging::command;
+using namespace helios::engine::runtime::messaging::command::concepts;
+using namespace helios::engine::platform::window::components;
+using namespace helios::engine::platform::window::concepts;
+using namespace helios::engine::platform::window::commands;
 using namespace helios::ecs::components;
-using namespace helios::gameplay::gamestate::types;
-export namespace helios::platform::window::systems {
+export namespace helios::engine::platform::window::systems {
 
     /**
      * @brief Emits `SwapBuffersCommand` for each active and shown window.

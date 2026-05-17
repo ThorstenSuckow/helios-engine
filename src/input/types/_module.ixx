@@ -9,7 +9,7 @@
  * @details This module exports type definitions for input handling, including
  * key codes and input device states used throughout the input system.
  */
-export module helios.input.types;
+export module helios.engine.input.types;
 
-export import helios.input.types.Key;
-export import helios.input.types.Gamepad;
+export import helios.engine.input.types.Key;
+export import helios.engine.input.types.Gamepad;

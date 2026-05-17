@@ -12,13 +12,13 @@ module;
 #include <vector>
 #include <cstring>
 
-export module helios.util.log.LogManager;
+export module helios.engine.util.log.LogManager;
 
-import helios.util.log.LogSink;
-import helios.util.log.Logger;
+import helios.engine.util.log.LogSink;
+import helios.engine.util.log.Logger;
 
 #define LOGGING_ENABLED true
-export namespace helios::util::log {
+export namespace helios::engine::util::log {
 
     /**
      * @brief LogManager for managing scoped Loggers and global sink configuration.

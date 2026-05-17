@@ -8,20 +8,20 @@ module;
 #include <cassert>
 #include <vector>
 
-export module helios.rendering.viewport.systems.StateToViewportPolicyUpdateSystem;
+export module helios.engine.rendering.viewport.systems.StateToViewportPolicyUpdateSystem;
 
-import helios.runtime.world.GameWorld;
-import helios.runtime.world.Session;
+import helios.engine.runtime.world.GameWorld;
+import helios.engine.runtime.world.Session;
 
-import helios.state.StateToIdMapPair;
+import helios.engine.state.StateToIdMapPair;
 
-import helios.runtime.world.UpdateContext;
-import helios.rendering.viewport.types.ViewportHandle;
-import helios.runtime.world.tags.SystemRole;
+import helios.engine.runtime.world.UpdateContext;
+import helios.engine.rendering.viewport.types.ViewportHandle;
+import helios.engine.runtime.world.tags.SystemRole;
 
-using namespace helios::state;
-using namespace helios::rendering::viewport::types;
-export namespace helios::rendering::viewport::systems {
+using namespace helios::engine::state;
+using namespace helios::engine::rendering::viewport::types;
+export namespace helios::engine::rendering::viewport::systems {
 
     /**
      * @brief Updates the session's active viewport list based on state policy.
@@ -62,7 +62,7 @@ export namespace helios::rendering::viewport::systems {
 
     public:
 
-        using EngineRoleTag = helios::runtime::world::tags::SystemRole;
+        using EngineRoleTag = helios::engine::runtime::world::tags::SystemRole;
 
         /**
          * @brief Constructs the system with a state-to-ID map pair.
@@ -80,7 +80,7 @@ export namespace helios::rendering::viewport::systems {
          *
          * @param updateContext The current frame's update context.
          */
-        void update(helios::runtime::world::UpdateContext& updateContext) noexcept {
+        void update(helios::engine::runtime::world::UpdateContext& updateContext) noexcept {
 
             auto& session = updateContext.session();
 

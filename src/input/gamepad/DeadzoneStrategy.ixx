@@ -6,10 +6,10 @@ module;
 
 #include <algorithm>
 
-export module helios.input.gamepad.DeadzoneStrategy;
+export module helios.engine.input.gamepad.DeadzoneStrategy;
 
 
-export namespace helios::input::gamepad {
+export namespace helios::engine::input::gamepad {
 
     /**
      * @brief Abstract strategy interface for normalizing gamepad stick input with deadzone handling.

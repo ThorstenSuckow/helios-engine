@@ -1,4 +1,4 @@
-# helios::platform::concepts
+# helios::engine::platform::concepts
 
 Shared compile-time constraints for platform handles.
 
@@ -10,13 +10,13 @@ Shared compile-time constraints for platform handles.
 
 ## Related Modules
 
-- `helios.platform.environment.concepts`
-- `helios.platform.window.concepts`
+- `helios.engine.platform.environment.concepts`
+- `helios.engine.platform.window.concepts`
 
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::platform::concepts
+@namespace helios::engine::platform::concepts
 @brief Shared platform-level concepts.
 </p></details>
 

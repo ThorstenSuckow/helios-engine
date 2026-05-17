@@ -6,13 +6,13 @@ module;
 
 #include <vector>
 
-export module helios.rendering.shader.commands.ShaderBatchCompileCommand;
+export module helios.engine.rendering.shader.commands.ShaderBatchCompileCommand;
 
-import helios.rendering.shader.types.ShaderHandle;
-import helios.rendering.shader.concepts.IsShaderHandle;
+import helios.engine.rendering.shader.types.ShaderHandle;
+import helios.engine.rendering.shader.concepts.IsShaderHandle;
 
-using namespace helios::rendering::shader::concepts;
-export namespace helios::rendering::shader::commands {
+using namespace helios::engine::rendering::shader::concepts;
+export namespace helios::engine::rendering::shader::commands {
 
     /**
      * @brief Requests batched compilation for multiple shader handles.

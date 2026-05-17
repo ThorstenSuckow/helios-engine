@@ -1,10 +1,10 @@
 /**
  * @file _module.ixx
- * @brief Aggregate module for helios::spatial::systems namespace.
+ * @brief Aggregate module for helios::engine::spatial::systems namespace.
  */
-export module helios.spatial.systems;
+export module helios.engine.spatial.systems;
 
-export import helios.spatial.systems.ComposeTransformSystem;
-export import helios.spatial.systems.ScaleSystem;
-export import helios.spatial.systems.TransformClearSystem;
+export import helios.engine.spatial.systems.ComposeTransformSystem;
+export import helios.engine.spatial.systems.ScaleSystem;
+export import helios.engine.spatial.systems.TransformClearSystem;
 

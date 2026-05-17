@@ -17,13 +17,13 @@ module;
 #include <cstddef>
 
 
-export module helios.runtime.pooling.EntityPool;
+export module helios.engine.runtime.pooling.EntityPool;
 
-import helios.util.Guid;
+import helios.engine.util.Guid;
 import helios.ecs.types.EntityHandle;
 import helios.ecs.types;
 
-export namespace helios::runtime::pooling {
+export namespace helios::engine::runtime::pooling {
 
 
     /**
@@ -95,7 +95,7 @@ export namespace helios::runtime::pooling {
         /**
          * @brief Unique identifier for this pool instance.
          */
-        const helios::util::Guid guid_;
+        const helios::engine::util::Guid guid_;
 
         /**
          * @brief True if the pool is locked and ready for acquire/release operations.
@@ -117,7 +117,7 @@ export namespace helios::runtime::pooling {
             size_t poolSize
         ) :
         poolSize_(poolSize),
-        guid_(helios::util::Guid::generate()) {
+        guid_(helios::engine::util::Guid::generate()) {
             activeEntities_.reserve(poolSize);
             inactiveEntities_.reserve(poolSize);
         }
@@ -128,7 +128,7 @@ export namespace helios::runtime::pooling {
          *
          * @return The Guid assigned to this pool instance.
          */
-        [[nodiscard]] helios::util::Guid guid() const noexcept {
+        [[nodiscard]] helios::engine::util::Guid guid() const noexcept {
             return guid_;
         }
 

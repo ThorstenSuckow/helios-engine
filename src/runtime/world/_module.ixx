@@ -1,25 +1,25 @@
 /**
  * @file _module.ixx
- * @brief Aggregate module for helios::runtime::world namespace.
+ * @brief Aggregate module for helios::engine::runtime::world namespace.
  */
-export module helios.runtime.world;
+export module helios.engine.runtime.world;
 
-export import helios.runtime.world.types;
-export import helios.runtime.world.concepts;
-export import helios.runtime.world.tags;
+export import helios.engine.runtime.world.types;
+export import helios.engine.runtime.world.concepts;
+export import helios.engine.runtime.world.tags;
 
 
-export import helios.runtime.world.EngineWorld;
-export import helios.runtime.world.GameWorld;
-export import helios.runtime.world.GameObject;
-export import helios.runtime.world.GameObjectEntityManager;
-export import helios.runtime.world.Level;
-export import helios.runtime.world.UpdateContext;
-export import helios.runtime.world.SystemRegistry;
-export import helios.runtime.world.RuntimeEnvironment;
-export import helios.runtime.world.Manager;
-export import helios.runtime.world.Session;
-export import helios.runtime.world.ResourceRegistry;
-export import helios.runtime.world.System;
+export import helios.engine.runtime.world.EngineWorld;
+export import helios.engine.runtime.world.GameWorld;
+export import helios.engine.runtime.world.GameObject;
+export import helios.engine.runtime.world.GameObjectEntityManager;
+export import helios.engine.runtime.world.Level;
+export import helios.engine.runtime.world.UpdateContext;
+export import helios.engine.runtime.world.SystemRegistry;
+export import helios.engine.runtime.world.RuntimeEnvironment;
+export import helios.engine.runtime.world.Manager;
+export import helios.engine.runtime.world.Session;
+export import helios.engine.runtime.world.ResourceRegistry;
+export import helios.engine.runtime.world.System;
 
 

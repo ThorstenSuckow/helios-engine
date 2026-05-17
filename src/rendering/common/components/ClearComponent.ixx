@@ -4,12 +4,12 @@
  */
 module;
 
-export module helios.rendering.common.components.ClearComponent;
+export module helios.engine.rendering.common.components.ClearComponent;
 
-import helios.rendering.common.types.ClearFlags;
+import helios.engine.rendering.common.types.ClearFlags;
 
-using namespace helios::rendering::common::types;
-export namespace helios::rendering::common::components {
+using namespace helios::engine::rendering::common::types;
+export namespace helios::engine::rendering::common::components {
 
     /**
      * @brief Component that stores clear flags.

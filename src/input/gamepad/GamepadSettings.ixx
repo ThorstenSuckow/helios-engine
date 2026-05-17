@@ -6,9 +6,9 @@ module;
 
 #include <algorithm>
 
-export module helios.input.gamepad.GamepadSettings;
+export module helios.engine.input.gamepad.GamepadSettings;
 
-export namespace helios::input::gamepad {
+export namespace helios::engine::input::gamepad {
 
     /**
      * @brief Configuration class for gamepad input normalization and axis behavior.

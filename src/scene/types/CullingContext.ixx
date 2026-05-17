@@ -7,13 +7,13 @@ module;
 
 
 
-export module helios.scene.types.CullingContext;
+export module helios.engine.scene.types.CullingContext;
 
 
 import helios.math;
 
 using namespace helios::math;
-export namespace helios::scene::types {
+export namespace helios::engine::scene::types {
 
     /**
      * @brief Groups the matrices, bounds, and handle needed for a culling test.

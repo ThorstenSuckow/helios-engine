@@ -4,9 +4,9 @@
  */
 module;
 
-export module helios.rendering.viewport.types.ViewportDomainTag;
+export module helios.engine.rendering.viewport.types.ViewportDomainTag;
 
-export namespace helios::rendering::viewport::types {
+export namespace helios::engine::rendering::viewport::types {
 
     /**
      * @brief Domain tag for viewport identity and handles.

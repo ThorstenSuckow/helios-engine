@@ -6,9 +6,9 @@ module;
 
 
 #include <cstddef>
-export module helios.runtime.pooling.EntityPoolSnapshot;
+export module helios.engine.runtime.pooling.EntityPoolSnapshot;
 
-export namespace helios::runtime::pooling {
+export namespace helios::engine::runtime::pooling {
 
     /**
      * @brief Immutable snapshot of a EntityPool's current state.

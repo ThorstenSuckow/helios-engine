@@ -4,12 +4,12 @@
  */
 module;
 
-export module helios.state.StateCommandHandler;
+export module helios.engine.state.StateCommandHandler;
 
-import helios.state.commands;
+import helios.engine.state.commands;
 
 
-export namespace helios::state {
+export namespace helios::engine::state {
 
     /**
      * @brief Abstract base for type-erased state command handling.

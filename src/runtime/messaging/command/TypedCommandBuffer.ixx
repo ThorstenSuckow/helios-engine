@@ -12,26 +12,26 @@ module;
 #include <utility>
 #include <vector>
 
-export module helios.runtime.messaging.command.TypedCommandBuffer;
+export module helios.engine.runtime.messaging.command.TypedCommandBuffer;
 
-import helios.state.components;
+import helios.engine.state.components;
 
-import helios.runtime.world.UpdateContext;
-import helios.runtime.messaging.command.CommandHandlerRegistry;
+import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
 
-import helios.state.commands.DelayedStateCommand;
+import helios.engine.state.commands.DelayedStateCommand;
 
-import helios.runtime.timing.TimerManager;
-import helios.runtime.timing.types;
+import helios.engine.runtime.timing.TimerManager;
+import helios.engine.runtime.timing.types;
 
-import helios.runtime.messaging.command.tags.CommandBufferRole;
+import helios.engine.runtime.messaging.command.tags.CommandBufferRole;
 
-using namespace helios::runtime::world;
-using namespace helios::state::commands;
-using namespace helios::runtime::timing;
-using namespace helios::runtime::timing::types;
+using namespace helios::engine::runtime::world;
+using namespace helios::engine::state::commands;
+using namespace helios::engine::runtime::timing;
+using namespace helios::engine::runtime::timing::types;
 
-export namespace helios::runtime::messaging::command {
+export namespace helios::engine::runtime::messaging::command {
 
     /**
      * @brief Concept constraining commands that can self-execute.
@@ -286,7 +286,7 @@ export namespace helios::runtime::messaging::command {
 
     public:
 
-        using EngineRoleTag = helios::runtime::world::tags::CommandBufferRole;
+        using EngineRoleTag = helios::engine::runtime::world::tags::CommandBufferRole;
 
         /**
          * @brief Enqueues a command of the specified type.

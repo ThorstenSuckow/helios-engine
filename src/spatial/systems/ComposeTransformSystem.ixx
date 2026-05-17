@@ -6,26 +6,26 @@ module;
 
 
 
-export module helios.spatial.systems.ComposeTransformSystem;
+export module helios.engine.spatial.systems.ComposeTransformSystem;
 
 
 
-import helios.spatial.components.TranslationStateComponent;
-import helios.spatial.components.RotationStateComponent;
-import helios.spatial.components.ComposeTransformComponent;
-import helios.physics.motion.components.SpinComponent;
+import helios.engine.spatial.components.TranslationStateComponent;
+import helios.engine.spatial.components.RotationStateComponent;
+import helios.engine.spatial.components.ComposeTransformComponent;
 
-import helios.runtime.world.GameWorld;
 
-import helios.runtime.world.UpdateContext;
+import helios.engine.runtime.world.GameWorld;
+
+import helios.engine.runtime.world.UpdateContext;
 
 import helios.ecs.components.Active;
 
 import helios.math;
 
-import helios.runtime.world.tags.SystemRole;
+import helios.engine.runtime.world.tags.SystemRole;
 
-export namespace helios::spatial::systems {
+export namespace helios::engine::spatial::systems {
 
     /**
      * @brief System that composes the final ComposeTransformComponent from state components.
@@ -41,21 +41,21 @@ export namespace helios::spatial::systems {
 
     public:
 
-        using EngineRoleTag = helios::runtime::world::tags::SystemRole;
+        using EngineRoleTag = helios::engine::runtime::world::tags::SystemRole;
 
         /**
          * @brief Updates TransformComponents based on state components.
          *
          * @param updateContext Context containing frame timing and game state.
          */
-        void update(helios::runtime::world::UpdateContext& updateContext) noexcept {
+        void update(helios::engine::runtime::world::UpdateContext& updateContext) noexcept {
 
             const float deltaTime = updateContext.deltaTime();
 
             for (auto [entity, tc, tsc, active] : updateContext.view<
                 THandle,
-                helios::spatial::components::ComposeTransformComponent<THandle>,
-                helios::spatial::components::TranslationStateComponent<THandle>,
+                helios::engine::spatial::components::ComposeTransformComponent<THandle>,
+                helios::engine::spatial::components::TranslationStateComponent<THandle>,
                 helios::ecs::components::Active<THandle>
             >().whereEnabled()) {
                 tc->setLocalTranslation(tsc->translation());
@@ -63,8 +63,8 @@ export namespace helios::spatial::systems {
 
             for (auto [entity, tc, rsc, active] : updateContext.view<
                 THandle,
-                helios::spatial::components::ComposeTransformComponent<THandle>,
-                helios::spatial::components::RotationStateComponent<THandle>,
+                helios::engine::spatial::components::ComposeTransformComponent<THandle>,
+                helios::engine::spatial::components::RotationStateComponent<THandle>,
                 helios::ecs::components::Active<THandle>
             >().whereEnabled()) {
                tc->setLocalRotation(rsc->rotation());

@@ -5,15 +5,15 @@
 module;
 
 
-export module helios.scene.components.SceneMemberComponent;
+export module helios.engine.scene.components.SceneMemberComponent;
 
-import helios.scene.types.SceneHandle;
+import helios.engine.scene.types.SceneHandle;
 
 import helios.ecs.components.BindingComponent;
 
-using namespace helios::scene::types;
+using namespace helios::engine::scene::types;
 using namespace helios::ecs::components;
-export namespace helios::scene::components {
+export namespace helios::engine::scene::components {
 
     /**
      * @brief Marks an owning entity as a member of a scene.

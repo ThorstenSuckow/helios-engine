@@ -7,11 +7,11 @@ module;
 #include <iostream>
 #include <string>
 
-export module helios.util.log.ConsoleSink;
+export module helios.engine.util.log.ConsoleSink;
 
-import helios.util.log.LogSink;
+import helios.engine.util.log.LogSink;
 
-export namespace helios::util::log {
+export namespace helios::engine::util::log {
 
     /**
      * @class ConsoleSink

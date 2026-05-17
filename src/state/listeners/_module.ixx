@@ -2,7 +2,7 @@
  * @file _module.ixx
  * @brief State transition listeners submodule.
  */
-export module helios.state.listeners;
+export module helios.engine.state.listeners;
 
 
-export import helios.state.listeners.LambdaStateListener;
+export import helios.engine.state.listeners.LambdaStateListener;

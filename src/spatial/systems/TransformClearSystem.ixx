@@ -6,21 +6,21 @@ module;
 
 
 
-export module helios.spatial.systems.TransformClearSystem;
+export module helios.engine.spatial.systems.TransformClearSystem;
 
-import helios.runtime.world.GameWorld;
+import helios.engine.runtime.world.GameWorld;
 
-import helios.runtime.world.UpdateContext;
+import helios.engine.runtime.world.UpdateContext;
 
-import helios.spatial.components.ComposeTransformComponent;
+import helios.engine.spatial.components.ComposeTransformComponent;
 
-import helios.spatial.components.ScaleStateComponent;
+import helios.engine.spatial.components.ScaleStateComponent;
 
 import helios.ecs.components.Active;
 
-import helios.runtime.world.tags.SystemRole;
+import helios.engine.runtime.world.tags.SystemRole;
 
-export namespace helios::spatial::systems {
+export namespace helios::engine::spatial::systems {
 
     /**
      * @brief System that clears the dirty state of TransformComponents and ScaleComponents
@@ -37,18 +37,18 @@ export namespace helios::spatial::systems {
 
     public:
 
-        using EngineRoleTag = helios::runtime::world::tags::SystemRole;
+        using EngineRoleTag = helios::engine::runtime::world::tags::SystemRole;
 
         /**
          * @brief Updates the system, clearing dirty flags of Transform- and ScaleStateComponent.
          *
          * @param updateContext The update context.
          */
-        void update(helios::runtime::world::UpdateContext& updateContext) noexcept {
+        void update(helios::engine::runtime::world::UpdateContext& updateContext) noexcept {
 
             for (auto [entity, tc, active] : updateContext.view<
                 THandle,
-                helios::spatial::components::ComposeTransformComponent<THandle>,
+                helios::engine::spatial::components::ComposeTransformComponent<THandle>,
                 helios::ecs::components::Active<THandle>
                 >().whereEnabled()) {
                 tc->clearDirty();
@@ -56,7 +56,7 @@ export namespace helios::spatial::systems {
 
             for (auto [entity, sc, active] : updateContext.view<
                 THandle,
-                helios::spatial::components::ScaleStateComponent<THandle>,
+                helios::engine::spatial::components::ScaleStateComponent<THandle>,
                 helios::ecs::components::Active<THandle>
             >().whereEnabled()) {
                 sc->clearDirty();

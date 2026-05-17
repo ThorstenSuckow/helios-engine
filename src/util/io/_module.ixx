@@ -2,7 +2,7 @@
  * @file _module.ixx
  * @brief Module exports for IO utilities.
  */
-export module helios.util.io;
+export module helios.engine.util.io;
 
 /**
  * @brief Input/output utilities for file operations.
@@ -10,5 +10,5 @@ export module helios.util.io;
  * @details This module provides file reading utilities including string-based
  * file readers for loading text and shader files.
  */
-export import helios.util.io.StringFileReader;
-export import helios.util.io.BasicStringFileReader;
+export import helios.engine.util.io.StringFileReader;
+export import helios.engine.util.io.BasicStringFileReader;

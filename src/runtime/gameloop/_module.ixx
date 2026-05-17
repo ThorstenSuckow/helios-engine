@@ -1,8 +1,8 @@
 /**
  * @file _module.ixx
- * @brief Module aggregator for helios.runtime.gameloop.
+ * @brief Module aggregator for helios.engine.runtime.gameloop.
  */
-export module helios.runtime.gameloop;
+export module helios.engine.runtime.gameloop;
 
 export import :CommitPoint;
 export import :GameLoop;

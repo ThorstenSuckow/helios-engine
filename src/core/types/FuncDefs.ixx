@@ -6,11 +6,11 @@ module;
 
 #include <string>
 
-export module helios.core.types.FuncDefs;
+export module helios.engine.core.types.FuncDefs;
 
 
 
-export namespace helios::core::types {
+export namespace helios::engine::core::types {
 
     /**
      * @brief Computes a 32-bit FNV-1a hash from a string.

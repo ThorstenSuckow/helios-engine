@@ -4,16 +4,16 @@
  */
 module;
 
-export module helios.runtime.timing.Timer;
+export module helios.engine.runtime.timing.Timer;
 
-import helios.runtime.timing.types.TimerId;
+import helios.engine.runtime.timing.types.TimerId;
 
-import helios.runtime.timing.types;
+import helios.engine.runtime.timing.types;
 
-using namespace helios::runtime::timing::types;
-using namespace helios::runtime::timing::types;
+using namespace helios::engine::runtime::timing::types;
+using namespace helios::engine::runtime::timing::types;
 
-export namespace helios::runtime::timing {
+export namespace helios::engine::runtime::timing {
 
     /**
      * @brief A game timer identified by a TimerId.
@@ -58,7 +58,7 @@ export namespace helios::runtime::timing {
          *
          * @param timerId The unique identifier for this timer.
          */
-        explicit Timer(const helios::runtime::timing::types::TimerId timerId)
+        explicit Timer(const helios::engine::runtime::timing::types::TimerId timerId)
             : timerId_{timerId} {}
 
         /**
@@ -66,7 +66,7 @@ export namespace helios::runtime::timing {
          *
          * @return The TimerId assigned to this timer.
          */
-        [[nodiscard]] helios::runtime::timing::types::TimerId timerId() const noexcept {
+        [[nodiscard]] helios::engine::runtime::timing::types::TimerId timerId() const noexcept {
             return timerId_;
         }
 

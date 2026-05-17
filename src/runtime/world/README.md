@@ -1,4 +1,4 @@
-# helios::runtime::world
+# helios::engine::runtime::world
 
 Runtime world coordination, registries, and frame update context.
 
@@ -34,13 +34,13 @@ bus channels, viewport snapshots, level pointer, and typed command submission).
 ## Usage
 
 ```cpp
-helios::runtime::world::GameWorld world;
+helios::engine::runtime::world::GameWorld world;
 
 world.registerCommandBuffer<EngineCommandBuffer>();
 world.registerManager<SomeManager>();
 world.init();
 
-auto entity = world.add<helios::runtime::world::types::GameObjectHandle>();
+auto entity = world.add<helios::engine::runtime::world::types::GameObjectHandle>();
 
 // In systems: UpdateContext is used for frame-scoped access
 // updateContext.queueCommand<EngineCommandBuffer, SomeCommand>(...);
@@ -49,6 +49,6 @@ auto entity = world.add<helios::runtime::world::types::GameObjectHandle>();
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::runtime::world
+@namespace helios::engine::runtime::world
 @brief Runtime world coordination, registries, and per-frame update context.
 </p></details>

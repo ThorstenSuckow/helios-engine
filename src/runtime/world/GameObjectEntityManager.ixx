@@ -9,18 +9,18 @@ module;
 #include "helios-engine-config.h"
 
 
-export module helios.runtime.world.GameObjectEntityManager;
+export module helios.engine.runtime.world.GameObjectEntityManager;
 
 import helios.ecs;
-import helios.runtime.world.types;
+import helios.engine.runtime.world.types;
 
 constexpr size_t GAMEOBJECT_SIZE = DEFAULT_GAMEOBJECT_CAPACITY;
 
 
 using namespace helios::ecs;
 using namespace helios::ecs::strategies;
-using namespace helios::runtime::world::types;
-export namespace helios::runtime::world {
+using namespace helios::engine::runtime::world::types;
+export namespace helios::engine::runtime::world {
 
     /**
      * @brief Entity registry configuration used for game objects.

@@ -1,8 +1,8 @@
 /**
  * @file _module.ixx
- * @brief Module aggregator for `helios.platform.lifecycle`.
+ * @brief Module aggregator for `helios.engine.platform.lifecycle`.
  */
-export module helios.platform.lifecycle;
+export module helios.engine.platform.lifecycle;
 
-export import helios.platform.lifecycle.commands;
-export import helios.platform.lifecycle.systems;
+export import helios.engine.platform.lifecycle.commands;
+export import helios.engine.platform.lifecycle.systems;

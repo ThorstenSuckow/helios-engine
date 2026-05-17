@@ -4,23 +4,23 @@
  */
 module;
 
-export module helios.rendering.registry;
+export module helios.engine.rendering.registry;
 
 import helios.ecs.ComponentReflector;
 
 
-import helios.rendering.model.registry;
+import helios.engine.rendering.model.registry;
 
-import helios.rendering.common.components;
+import helios.engine.rendering.common.components;
 
-export namespace helios::rendering {
+export namespace helios::engine::rendering {
 
     /**
      * @brief Registers all rendering components with the ComponentReflector.
      */
     template<typename TEntityManager>
     inline void registerComponents() {
-        helios::rendering::model::registerComponents<TEntityManager>();
+        helios::engine::rendering::model::registerComponents<TEntityManager>();
 
         using R = helios::ecs::ComponentReflector<TEntityManager>;
 

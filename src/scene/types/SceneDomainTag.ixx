@@ -4,9 +4,9 @@
  */
 module;
 
-export module helios.scene.types.SceneDomainTag;
+export module helios.engine.scene.types.SceneDomainTag;
 
-export namespace helios::scene::types {
+export namespace helios::engine::scene::types {
 
     /**
      * @brief Domain tag for scene identity and handles.

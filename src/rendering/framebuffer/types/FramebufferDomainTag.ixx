@@ -4,9 +4,9 @@
  */
 module;
 
-export module helios.rendering.framebuffer.types.FramebufferDomainTag;
+export module helios.engine.rendering.framebuffer.types.FramebufferDomainTag;
 
-export namespace helios::rendering::framebuffer::types {
+export namespace helios::engine::rendering::framebuffer::types {
 
     /**
      * @brief Domain tag for framebuffer identity and handles.

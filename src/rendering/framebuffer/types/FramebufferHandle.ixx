@@ -4,13 +4,13 @@
  */
 module;
 
-export module helios.rendering.framebuffer.types.FramebufferHandle;
+export module helios.engine.rendering.framebuffer.types.FramebufferHandle;
 
 
 import helios.ecs.types;
-import helios.rendering.framebuffer.types.FramebufferDomainTag;
+import helios.engine.rendering.framebuffer.types.FramebufferDomainTag;
 
-export namespace helios::rendering::framebuffer::types {
+export namespace helios::engine::rendering::framebuffer::types {
 
     /**
      * @brief Handle type used to reference framebuffer entities.

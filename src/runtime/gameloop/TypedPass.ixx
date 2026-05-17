@@ -7,19 +7,19 @@ module;
 #include <type_traits>
 #include <utility>
 
-export module helios.runtime.gameloop:TypedPass;
+export module helios.engine.runtime.gameloop:TypedPass;
 
 import :CommitPoint;
 import :Pass;
 
-import helios.runtime.world.SystemRegistry;
+import helios.engine.runtime.world.SystemRegistry;
 
-import helios.runtime.world.UpdateContext;
-import helios.runtime.world.Session;
+import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.world.Session;
 
-import helios.gameplay.gamestate.types;
+import helios.engine.runtime.enginestate.types;
 
-export namespace helios::runtime::gameloop {
+export namespace helios::engine::runtime::gameloop {
 
     class Phase;
 
@@ -54,7 +54,7 @@ export namespace helios::runtime::gameloop {
     template<typename StateType>
     class TypedPass : public Pass {
 
-        friend class helios::runtime::gameloop::Phase;
+        friend class helios::engine::runtime::gameloop::Phase;
 
         /**
          * @brief Reference to the owning Phase.
@@ -71,7 +71,7 @@ export namespace helios::runtime::gameloop {
          *
          * @param updateContext The current update context.
          */
-        void update(helios::runtime::world::UpdateContext& updateContext) override {
+        void update(helios::engine::runtime::world::UpdateContext& updateContext) override {
             for (auto& sys : systemRegistry_.items()) {
                 sys->update(updateContext);
             }
@@ -83,7 +83,7 @@ export namespace helios::runtime::gameloop {
          *
          * @param gameWorld Reference to the game world.
          */
-        void init(helios::runtime::world::GameWorld& gameWorld) override {
+        void init(helios::engine::runtime::world::GameWorld& gameWorld) override {
 
         }
 
@@ -104,7 +104,7 @@ export namespace helios::runtime::gameloop {
          * @param mask State mask controlling when this pass runs.
          * @param gameWorld GameWorld used by the base Pass for buffer injection.
          */
-        explicit TypedPass(Phase& owner, const StateType mask, helios::runtime::world::GameWorld& gameWorld) : owner_(owner), mask_(mask), Pass(gameWorld) {}
+        explicit TypedPass(Phase& owner, const StateType mask, helios::engine::runtime::world::GameWorld& gameWorld) : owner_(owner), mask_(mask), Pass(gameWorld) {}
 
 
         /**
@@ -166,7 +166,7 @@ export namespace helios::runtime::gameloop {
          *
          * @return True if the pass should execute.
          */
-        [[nodiscard]] bool shouldRun(helios::runtime::world::UpdateContext& updateContext) const noexcept override {
+        [[nodiscard]] bool shouldRun(helios::engine::runtime::world::UpdateContext& updateContext) const noexcept override {
             auto state = updateContext.session().state<StateType>();
             return hasFlag(mask_, state);
         }

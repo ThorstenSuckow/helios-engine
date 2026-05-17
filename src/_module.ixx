@@ -13,19 +13,17 @@
  */
 export module helios;
 
-export import helios.core;
+export import helios.engine.core;
 export import helios.math;
-export import helios.rendering;
-export import helios.scene;
-export import helios.input;
-export import helios.util;
-export import helios.state;
-export import helios.physics;
-export import helios.spatial;
-export import helios.gameplay;
-export import helios.runtime;
-export import helios.platform;
-export import helios.tooling;
+export import helios.engine.rendering;
+export import helios.engine.scene;
+export import helios.engine.input;
+export import helios.engine.util;
+export import helios.engine.state;
+export import helios.engine.spatial;
+export import helios.engine.runtime;
+export import helios.engine.platform;
+export import helios.engine.tooling;
 
 export import helios.bootstrap;
 

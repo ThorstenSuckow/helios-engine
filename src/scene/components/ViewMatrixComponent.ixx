@@ -4,12 +4,12 @@
  */
 module;
 
-export module helios.scene.components.ViewMatrixComponent;
+export module helios.engine.scene.components.ViewMatrixComponent;
 
-import helios.core.components.Mat4Component;
+import helios.engine.core.components.Mat4Component;
 
-using namespace helios::core::components;
-export namespace helios::scene::components {
+using namespace helios::engine::core::components;
+export namespace helios::engine::scene::components {
 
     /** @brief Domain tag for computed view matrix values. */
     struct ViewMatrixTag {};

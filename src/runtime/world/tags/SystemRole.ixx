@@ -4,9 +4,9 @@
  */
 module;
 
-export module helios.runtime.world.tags.SystemRole;
+export module helios.engine.runtime.world.tags.SystemRole;
 
-export namespace helios::runtime::world::tags {
+export namespace helios::engine::runtime::world::tags {
 
     /**
      * @brief Compile-time tag identifying a class as a System.

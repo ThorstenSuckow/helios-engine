@@ -7,16 +7,13 @@ module;
 #include <cassert>
 #include <memory>
 
-export module helios.state.commands.StateCommand;
+export module helios.engine.state.commands.StateCommand;
 
+import helios.engine.state.types.StateTransitionRequest;
 
-import helios.state.Bindings;
+using namespace helios::engine::state::types;
 
-import helios.state.types.StateTransitionRequest;
-
-using namespace helios::state::types;
-
-export namespace helios::state::commands {
+export namespace helios::engine::state::commands {
 
     /**
      * @brief Command that requests a state transition.

@@ -9,23 +9,23 @@ module;
 #include <array>
 #include <utility>
 
-export module helios.input.InputAdapter;
+export module helios.engine.input.InputAdapter;
 
-import helios.input.types.Gamepad;
-import helios.input.gamepad.GamepadState;
-import helios.input.types.Key;
+import helios.engine.input.types.Gamepad;
+import helios.engine.input.gamepad.GamepadState;
+import helios.engine.input.types.Key;
 
-import helios.util.log.Logger;
-import helios.util.log.LogManager;
-import helios.input.gamepad.GamepadSettings;
-import helios.input.gamepad.DeadzoneStrategy;
+import helios.engine.util.log.Logger;
+import helios.engine.util.log.LogManager;
+import helios.engine.input.gamepad.GamepadSettings;
+import helios.engine.input.gamepad.DeadzoneStrategy;
 
 namespace helios::window {
     class Window;
 }
 
-#define HELIOS_LOG_SCOPE "helios::input::InputAdapter"
-export namespace helios::input {
+#define HELIOS_LOG_SCOPE "helios::engine::input::InputAdapter"
+export namespace helios::engine::input {
 
     /**
      * @brief Abstract interface for platform-specific input adapters.
@@ -49,7 +49,7 @@ export namespace helios::input {
         /**
          * @brief Shared logger instance for all InputAdapter objects.
          */
-        inline static const helios::util::log::Logger& logger_ = helios::util::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
+        inline static const helios::engine::util::log::Logger& logger_ = helios::engine::util::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
 
         /**
          * @brief Strategy used to normalize analog stick input within deadzones.
@@ -57,7 +57,7 @@ export namespace helios::input {
          * Ownership is held by the adapter. Applied during gamepad state updates
          * to filter out hardware drift and rescale input values.
          */
-        std::unique_ptr<helios::input::gamepad::DeadzoneStrategy> deadzoneStrategy_;
+        std::unique_ptr<helios::engine::input::gamepad::DeadzoneStrategy> deadzoneStrategy_;
 
         /**
          * @brief Per-gamepad configuration settings.
@@ -65,7 +65,7 @@ export namespace helios::input {
          * Array indexed by gamepad ID, storing deadzone thresholds and axis
          * inversion flags for each connected controller.
          */
-        std::array<helios::input::gamepad::GamepadSettings, std::to_underlying(helios::input::types::Gamepad::size_)> gamepadSettings_ = {};
+        std::array<helios::engine::input::gamepad::GamepadSettings, std::to_underlying(helios::engine::input::types::Gamepad::size_)> gamepadSettings_ = {};
 
 
         public:
@@ -81,7 +81,7 @@ export namespace helios::input {
          * @param deadzoneStrategy The strategy used for analog stick normalization.
          *                         Ownership is transferred to this adapter.
          */
-        explicit InputAdapter(std::unique_ptr<helios::input::gamepad::DeadzoneStrategy> deadzoneStrategy) :
+        explicit InputAdapter(std::unique_ptr<helios::engine::input::gamepad::DeadzoneStrategy> deadzoneStrategy) :
         deadzoneStrategy_(std::move(deadzoneStrategy))
         {}
 
@@ -93,7 +93,7 @@ export namespace helios::input {
          *
          * @return True if the key is pressed, otherwise false.
          */
-        [[nodiscard]] virtual bool isKeyPressed(helios::input::types::Key key, const helios::window::Window win) const noexcept = 0;
+        [[nodiscard]] virtual bool isKeyPressed(helios::engine::input::types::Key key, const helios::window::Window win) const noexcept = 0;
 
         /**
          * @brief Returns true if the key is released, otherwise false.
@@ -104,7 +104,7 @@ export namespace helios::input {
          * @return True if the key is released, otherwise false.
          */
         [[nodiscard]] virtual bool isKeyReleased(
-            helios::input::types::Key key,
+            helios::engine::input::types::Key key,
             const helios::window::Window win) const noexcept = 0;
 
 
@@ -116,7 +116,7 @@ export namespace helios::input {
          *
          * @return true if the Gamepad identified by gamepadId is connected, otherwise false.
          */
-        [[nodiscard]] virtual bool isConnected(helios::input::types::Gamepad gamepadId) const noexcept = 0;
+        [[nodiscard]] virtual bool isConnected(helios::engine::input::types::Gamepad gamepadId) const noexcept = 0;
 
 
         /**
@@ -153,8 +153,8 @@ export namespace helios::input {
          * @see updateGamepadState
          * @see isConnected
          */
-        [[nodiscard]] virtual const helios::input::gamepad::GamepadState& gamepadState(
-            helios::input::types::Gamepad gamepadId) const noexcept = 0;
+        [[nodiscard]] virtual const helios::engine::input::gamepad::GamepadState& gamepadState(
+            helios::engine::input::types::Gamepad gamepadId) const noexcept = 0;
 
 
         /**
@@ -171,7 +171,7 @@ export namespace helios::input {
          *
          * @see GamepadSettings for available configuration options.
          */
-        [[nodiscard]] helios::input::gamepad::GamepadSettings& gamepadSettings(helios::input::types::Gamepad gamepadId) noexcept {
+        [[nodiscard]] helios::engine::input::gamepad::GamepadSettings& gamepadSettings(helios::engine::input::types::Gamepad gamepadId) noexcept {
             const auto id = static_cast<unsigned int>(gamepadId);
             const auto idx = std::countr_zero(id);
 

@@ -4,11 +4,11 @@
  */
 module;
 
-export module helios.runtime.registry;
+export module helios.engine.runtime.registry;
 
 
 
-export namespace helios::runtime {
+export namespace helios::engine::runtime {
 
     /**
      * @brief Registers all runtime components with the ComponentReflector.

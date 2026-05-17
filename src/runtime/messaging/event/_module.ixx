@@ -1,9 +1,9 @@
 /**
  * @file _module.ixx
- * @brief Aggregate module for helios::runtime::messaging::event namespace.
+ * @brief Aggregate module for helios::engine::runtime::messaging::event namespace.
  */
 
-export module helios.runtime.messaging.event;
+export module helios.engine.runtime.messaging.event;
 
-export import helios.runtime.messaging.event.GameLoopEventBus;
+export import helios.engine.runtime.messaging.event.GameLoopEventBus;
 

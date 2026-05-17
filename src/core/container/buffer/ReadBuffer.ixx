@@ -8,11 +8,11 @@ module;
 #include <vector>
 #include <cstddef>
 
-export module helios.core.container.buffer:ReadBuffer;
+export module helios.engine.core.container.buffer:ReadBuffer;
 
 import :ReadWriteDoubleBufferFwd;
 
-export namespace helios::core::container::buffer {
+export namespace helios::engine::core::container::buffer {
 
     /**
      * @class ReadBuffer

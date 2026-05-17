@@ -6,16 +6,16 @@ module;
 
 #include <string>
 
-export module helios.platform.window.commands.WindowCreateCommand;
+export module helios.engine.platform.window.commands.WindowCreateCommand;
 
-import helios.platform.window.types.WindowConfig;
+import helios.engine.platform.window.types.WindowConfig;
 
-import helios.platform.window.types.WindowHandle;
-import helios.platform.window.concepts.IsWindowHandle;
+import helios.engine.platform.window.types.WindowHandle;
+import helios.engine.platform.window.concepts.IsWindowHandle;
 
-using namespace helios::platform::window::types;
-using namespace helios::platform::window::concepts;
-export namespace helios::platform::window::commands {
+using namespace helios::engine::platform::window::types;
+using namespace helios::engine::platform::window::concepts;
+export namespace helios::engine::platform::window::commands {
 
     /**
      * @brief Requests creation of a window for a specific window entity.

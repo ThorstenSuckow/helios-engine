@@ -6,9 +6,9 @@ module;
 
 
 
-export module helios.runtime.timing.types.TimerState;
+export module helios.engine.runtime.timing.types.TimerState;
 
-export namespace helios::runtime::timing::types {
+export namespace helios::engine::runtime::timing::types {
 
     /**
      * @brief Represents the state of a Timer.

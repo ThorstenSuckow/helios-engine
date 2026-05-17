@@ -6,20 +6,20 @@ module;
 
 #include "helios-engine-config.h"
 
-export module helios.rendering.framebuffer.FramebufferEntityManager;
+export module helios.engine.rendering.framebuffer.FramebufferEntityManager;
 
 import helios.ecs.EntityManager;
 import helios.ecs.EntityRegistry;
 import helios.ecs.strategies;
 
-import helios.rendering.framebuffer.types;
+import helios.engine.rendering.framebuffer.types;
 
 constexpr auto FRAMEBUFFER_SIZE = DEFAULT_FRAMEBUFFER_POOL_CAPACITY;
 
-using namespace helios::rendering::framebuffer::types;
+using namespace helios::engine::rendering::framebuffer::types;
 using namespace helios::ecs;
 using namespace helios::ecs::strategies;
-export namespace helios::rendering::framebuffer {
+export namespace helios::engine::rendering::framebuffer {
 
     /**
      * @brief Entity registry used for framebuffer resources.

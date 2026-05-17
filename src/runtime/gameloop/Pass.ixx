@@ -9,22 +9,22 @@ module;
 #include <memory>
 #include <cassert>
 
-export module helios.runtime.gameloop:Pass;
+export module helios.engine.runtime.gameloop:Pass;
 
 import :CommitPoint;
 
-import helios.runtime.world.GameWorld;
-import helios.runtime.world.SystemRegistry;
-import helios.runtime.world.System;
-import helios.runtime.world.concepts;
+import helios.engine.runtime.world.GameWorld;
+import helios.engine.runtime.world.SystemRegistry;
+import helios.engine.runtime.world.System;
+import helios.engine.runtime.world.concepts;
 
 
-import helios.runtime.world.UpdateContext;
+import helios.engine.runtime.world.UpdateContext;
 
-import helios.gameplay.gamestate.types;
+import helios.engine.runtime.enginestate.types;
 
-using namespace helios::runtime::world;
-export namespace helios::runtime::gameloop {
+using namespace helios::engine::runtime::world;
+export namespace helios::engine::runtime::gameloop {
 
     class Phase;
 
@@ -51,7 +51,7 @@ export namespace helios::runtime::gameloop {
         /**
          * @brief Registry holding all systems for this pass.
          */
-        helios::runtime::world::SystemRegistry systemRegistry_{};
+        helios::engine::runtime::world::SystemRegistry systemRegistry_{};
 
         /**
          * @brief Reference to the owning GameWorld.
@@ -78,14 +78,14 @@ export namespace helios::runtime::gameloop {
          *
          * @param updateContext The current update context.
          */
-        virtual void update(helios::runtime::world::UpdateContext& updateContext) = 0;
+        virtual void update(helios::engine::runtime::world::UpdateContext& updateContext) = 0;
 
         /**
          * @brief Initializes all systems in this pass.
          *
          * @param gameWorld Reference to the game world.
          */
-        virtual void init(helios::runtime::world::GameWorld& gameWorld) = 0;
+        virtual void init(helios::engine::runtime::world::GameWorld& gameWorld) = 0;
 
         /**
          * @brief Adds a commit point and returns the owning Phase.
@@ -110,7 +110,7 @@ export namespace helios::runtime::gameloop {
          *
          * @return True if the pass should run.
          */
-        virtual bool shouldRun(helios::runtime::world::UpdateContext& updateContext) const noexcept = 0;
+        virtual bool shouldRun(helios::engine::runtime::world::UpdateContext& updateContext) const noexcept = 0;
 
         /**
          * @brief Adds a system of type T to this pass.
@@ -122,12 +122,12 @@ export namespace helios::runtime::gameloop {
          *
          * @details If `T` defines `CommandBuffer_type`, the buffer is resolved
          * from the bound `GameWorld` and injected into the wrapped
-         * `helios::runtime::world::System`.
+         * `helios::engine::runtime::world::System`.
          *
          * @return Reference to this Pass for method chaining.
          */
         template<typename T, typename... Args>
-        requires helios::runtime::world::concepts::IsSystemLike<T>
+        requires helios::engine::runtime::world::concepts::IsSystemLike<T>
         Pass& addSystem(Args&&... args) {
 
             T concreteSystem(std::forward<Args>(args)...);

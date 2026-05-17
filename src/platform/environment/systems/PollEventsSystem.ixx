@@ -4,23 +4,23 @@
  */
 module;
 
-export module helios.platform.environment.systems.PollEventsSystem;
+export module helios.engine.platform.environment.systems.PollEventsSystem;
 
 
 
-import helios.runtime.world.UpdateContext;
-import helios.runtime.messaging.command.NullCommandBuffer;
-import helios.runtime.messaging.command.concepts.IsCommandBufferLike;
-import helios.runtime.world.tags.SystemRole;
+import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.messaging.command.NullCommandBuffer;
+import helios.engine.runtime.messaging.command.concepts.IsCommandBufferLike;
+import helios.engine.runtime.world.tags.SystemRole;
 
-import helios.platform.environment.commands.PollEventsCommand;
+import helios.engine.platform.environment.commands.PollEventsCommand;
 
-using namespace helios::runtime::world::tags;
-using namespace helios::runtime::world;
-using namespace helios::runtime::messaging::command;
-using namespace helios::runtime::messaging::command::concepts;
-using namespace helios::platform::environment::commands;
-export namespace helios::platform::environment::systems {
+using namespace helios::engine::runtime::world::tags;
+using namespace helios::engine::runtime::world;
+using namespace helios::engine::runtime::messaging::command;
+using namespace helios::engine::runtime::messaging::command::concepts;
+using namespace helios::engine::platform::environment::commands;
+export namespace helios::engine::platform::environment::systems {
 
     /**
      * @brief Queues `PollEventsCommand` once per update call.

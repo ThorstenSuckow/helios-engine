@@ -8,16 +8,16 @@ module;
 #include <stdexcept>
 #include <vector>
 
-export module helios.rendering.asset.shape.basic.Grid;
+export module helios.engine.rendering.asset.shape.basic.Grid;
 
-import helios.rendering.asset.shape.Shape;
-import helios.rendering.Vertex;
+import helios.engine.rendering.asset.shape.Shape;
+import helios.engine.rendering.Vertex;
 import helios.math.types;
-import helios.rendering.mesh.types.PrimitiveType;
+import helios.engine.rendering.mesh.types.PrimitiveType;
 
-using namespace helios::rendering;
+using namespace helios::engine::rendering;
 
-export namespace helios::rendering::asset::shape::basic {
+export namespace helios::engine::rendering::asset::shape::basic {
 
     /**
      * @brief A configurable grid shape for rendering reference lines in 3D space.
@@ -156,7 +156,7 @@ export namespace helios::rendering::asset::shape::basic {
          *
          * @return `PrimitiveType::Lines` since the grid is rendered as line segments.
          */
-        [[nodiscard]] helios::rendering::mesh::types::PrimitiveType primitiveType() const noexcept override {
+        [[nodiscard]] helios::engine::rendering::mesh::types::PrimitiveType primitiveType() const noexcept override {
             return mesh::types::PrimitiveType::Lines;
         }
     };

@@ -1,4 +1,4 @@
-# helios::platform::environment::types
+# helios::engine::platform::environment::types
 
 Strong ids and handles for runtime platform entities.
 
@@ -13,7 +13,7 @@ Strong ids and handles for runtime platform entities.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::platform::environment::types
+@namespace helios::engine::platform::environment::types
 @brief Runtime platform id and handle types.
 </p></details>
 

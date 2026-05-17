@@ -6,11 +6,11 @@ module;
 
 #include <concepts>
 
-export module helios.runtime.world.concepts.HasUpdate;
+export module helios.engine.runtime.world.concepts.HasUpdate;
 
-import helios.runtime.world.UpdateContext;
+import helios.engine.runtime.world.UpdateContext;
 
-export namespace helios::runtime::world::concepts {
+export namespace helios::engine::runtime::world::concepts {
 
     /**a
      * @brief Requires that T provides a `void update(UpdateContext&)` method.
@@ -23,7 +23,7 @@ export namespace helios::runtime::world::concepts {
      * @see System
      */
     template<typename T>
-    concept HasUpdate = requires(T& t, helios::runtime::world::UpdateContext& updateContext) {
+    concept HasUpdate = requires(T& t, helios::engine::runtime::world::UpdateContext& updateContext) {
         {t.update(updateContext) } -> std::same_as<void>;
     };
 

@@ -6,7 +6,7 @@ module;
 
 #include <cassert>
 
-export module helios.core.components.Vec4Component;
+export module helios.engine.core.components.Vec4Component;
 
 import helios.math.types;
 
@@ -14,7 +14,7 @@ import helios.math.concepts;
 
 using namespace helios::math;
 using namespace helios::math::concepts;
-export namespace helios::core::components {
+export namespace helios::engine::core::components {
 
     /**
      * @brief Generic 4D value component with dirty-state tracking.

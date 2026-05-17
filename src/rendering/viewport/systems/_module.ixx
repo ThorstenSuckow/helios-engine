@@ -2,7 +2,7 @@
  * @file _module.ixx
  * @brief Viewport systems submodule.
  */
-export module helios.rendering.viewport.systems;
+export module helios.engine.rendering.viewport.systems;
 
-export import helios.rendering.viewport.systems.StateToViewportPolicyUpdateSystem;
-export import helios.rendering.viewport.systems.SceneRenderExtractionSystem;
+export import helios.engine.rendering.viewport.systems.StateToViewportPolicyUpdateSystem;
+export import helios.engine.rendering.viewport.systems.SceneRenderExtractionSystem;

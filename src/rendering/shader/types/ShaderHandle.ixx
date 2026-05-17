@@ -4,12 +4,12 @@
  */
 module;
 
-export module helios.rendering.shader.types.ShaderHandle;
+export module helios.engine.rendering.shader.types.ShaderHandle;
 
 import helios.ecs.types;
-import helios.rendering.shader.types.ShaderDomainTag;
+import helios.engine.rendering.shader.types.ShaderDomainTag;
 
-export namespace helios::rendering::shader::types {
+export namespace helios::engine::rendering::shader::types {
 
     /**
      * @brief Handle type used to reference shader entities.

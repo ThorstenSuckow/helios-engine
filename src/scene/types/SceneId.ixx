@@ -4,13 +4,13 @@
  */
 module;
 
-export module helios.scene.types.SceneId;
+export module helios.engine.scene.types.SceneId;
 
 import helios.ecs.types.StrongId;
-import helios.scene.types.SceneDomainTag;
+import helios.engine.scene.types.SceneDomainTag;
 
 using namespace helios::ecs::types;
-export namespace helios::scene::types {
+export namespace helios::engine::scene::types {
 
     /**
      * @brief Strong id identifying scene entities.

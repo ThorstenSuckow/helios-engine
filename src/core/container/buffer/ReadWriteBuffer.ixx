@@ -8,11 +8,11 @@ module;
 #include <vector>
 #include <cstddef>
 
-export module helios.core.container.buffer:ReadWriteBuffer;
+export module helios.engine.core.container.buffer:ReadWriteBuffer;
 
 import :Buffer;
 
-export namespace helios::core::container::buffer {
+export namespace helios::engine::core::container::buffer {
 
     /**
      * @brief Combined read-write buffer with immediate visibility.
@@ -28,7 +28,7 @@ export namespace helios::core::container::buffer {
      * @tparam T The message type stored in the buffer.
      */
     template<typename T>
-    class ReadWriteBuffer : public helios::core::container::buffer::Buffer {
+    class ReadWriteBuffer : public helios::engine::core::container::buffer::Buffer {
 
         /**
          * @brief Internal storage for buffered messages.

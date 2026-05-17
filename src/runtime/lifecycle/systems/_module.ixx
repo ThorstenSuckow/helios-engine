@@ -2,6 +2,6 @@
  * @file _module.ixx
  * @brief Aggregates lifecycle-related system modules.
  */
-export module helios.runtime.lifecycle.systems;
+export module helios.engine.runtime.lifecycle.systems;
 
-export import helios.runtime.lifecycle.systems.DelayedComponentEnablerSystem;
+export import helios.engine.runtime.lifecycle.systems.DelayedComponentEnablerSystem;

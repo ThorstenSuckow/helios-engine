@@ -4,15 +4,15 @@
  */
 module;
 
-export module helios.scene.components.CameraBindingComponent;
+export module helios.engine.scene.components.CameraBindingComponent;
 
-import helios.runtime.world.types.GameObjectHandle;
+import helios.engine.runtime.world.types.GameObjectHandle;
 
 import helios.ecs.components.BindingComponent;
 
-using namespace helios::runtime::world::types;
+using namespace helios::engine::runtime::world::types;
 using namespace helios::ecs::components;
-export namespace helios::scene::components {
+export namespace helios::engine::scene::components {
 
     /**
      * @brief Binds an owning entity to a camera game object handle.

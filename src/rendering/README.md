@@ -1,4 +1,4 @@
-# helios::rendering
+# helios::engine::rendering
 
 Core rendering system and entity rendering components for helios.
 
@@ -48,7 +48,7 @@ various graphics APIs (OpenGL, Vulkan, DirectX).
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::rendering
+@namespace helios::engine::rendering
 @brief Graphics rendering infrastructure and entity rendering components.
 @details This namespace provides the core rendering system including rendering devices, render commands, queues, passes, and vertex definitions. Encompasses asset, model, and shader management functionality for comprehensive 3D graphics rendering. Provides a platform-independent rendering abstraction that can be implemented by various graphics APIs (OpenGL, Vulkan, DirectX). Also includes components that link game logic entities to the rendering system for visual representation.
 </p></details>

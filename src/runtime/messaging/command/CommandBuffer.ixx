@@ -7,19 +7,19 @@ module;
 #include <cassert>
 #include <memory>
 
-export module helios.runtime.messaging.command.CommandBuffer;
+export module helios.engine.runtime.messaging.command.CommandBuffer;
 
-import helios.runtime.world.UpdateContext;
+import helios.engine.runtime.world.UpdateContext;
 
-import helios.runtime.messaging.command.concepts.IsCommandBufferLike;
+import helios.engine.runtime.messaging.command.concepts.IsCommandBufferLike;
 
-import helios.runtime.timing.TimerManager;
-import helios.runtime.messaging.command.CommandHandlerRegistry;
+import helios.engine.runtime.timing.TimerManager;
+import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
 
-using namespace helios::runtime::timing;
-using namespace helios::runtime::messaging::command::concepts;
-using namespace helios::runtime::world;
-export namespace helios::runtime::messaging::command {
+using namespace helios::engine::runtime::timing;
+using namespace helios::engine::runtime::messaging::command::concepts;
+using namespace helios::engine::runtime::world;
+export namespace helios::engine::runtime::messaging::command {
 
     /**
      * @brief Type-erased wrapper for command buffers using the Concept/Model pattern.

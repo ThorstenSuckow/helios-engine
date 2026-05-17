@@ -1,4 +1,4 @@
-# helios::runtime::lifecycle::systems
+# helios::engine::runtime::lifecycle::systems
 
 Systems for processing entity lifecycle transitions.
 
@@ -43,7 +43,7 @@ GameObjectLifecycleSystem      → after health manager flush
 
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::runtime::lifecycle::systems
+@namespace helios::engine::runtime::lifecycle::systems
 @brief Systems for processing entity lifecycle transitions.
 @details Provides frame-based processing of delayed activations, health-depletion reactions, and entity despawning.
 </p></details>

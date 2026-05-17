@@ -9,32 +9,32 @@ module;
 #include <cstddef>
 #include "helios-engine-config.h"
 
-export module helios.rendering.shader.systems.ShaderCompileSystem;
+export module helios.engine.rendering.shader.systems.ShaderCompileSystem;
 
-import helios.runtime.messaging.command.RenderCommandBuffer;
-import helios.runtime.messaging.command.NullCommandBuffer;
+import helios.engine.runtime.messaging.command.RenderCommandBuffer;
+import helios.engine.runtime.messaging.command.NullCommandBuffer;
 
-import helios.runtime.world.UpdateContext;
-import helios.runtime.world.tags.SystemRole;
+import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.world.tags.SystemRole;
 
-import helios.rendering.shader.components;
-import helios.rendering.shader.concepts;
-import helios.rendering.shader.commands;
+import helios.engine.rendering.shader.components;
+import helios.engine.rendering.shader.concepts;
+import helios.engine.rendering.shader.commands;
 
-import helios.runtime.messaging.command.concepts.IsCommandBufferLike;
+import helios.engine.runtime.messaging.command.concepts.IsCommandBufferLike;
 
 import helios.ecs.components;
 
-using namespace helios::runtime::world::tags;
-using namespace helios::runtime::world;
-using namespace helios::runtime::messaging::command;
-using namespace helios::rendering::shader;
-using namespace helios::runtime::messaging::command::concepts;
-using namespace helios::rendering::shader::components;
-using namespace helios::rendering::shader::commands;
+using namespace helios::engine::runtime::world::tags;
+using namespace helios::engine::runtime::world;
+using namespace helios::engine::runtime::messaging::command;
+using namespace helios::engine::rendering::shader;
+using namespace helios::engine::runtime::messaging::command::concepts;
+using namespace helios::engine::rendering::shader::components;
+using namespace helios::engine::rendering::shader::commands;
 using namespace helios::ecs::components;
-using namespace helios::rendering::shader::concepts;
-export namespace helios::rendering::shader::systems {
+using namespace helios::engine::rendering::shader::concepts;
+export namespace helios::engine::rendering::shader::systems {
 
     /**
      * @brief System that batches shader compile requests for active shader entities.

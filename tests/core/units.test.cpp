@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-import helios.core.units.Unit;
+import helios.engine.core.units.Unit;
 
-using namespace helios::core::units;
+using namespace helios::engine::core::units;
 
 TEST(UnitsTest, Constants) {
     EXPECT_FLOAT_EQ(CENTIMETERS, 0.01f);

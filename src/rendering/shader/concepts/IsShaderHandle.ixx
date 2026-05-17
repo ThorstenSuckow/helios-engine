@@ -6,12 +6,12 @@ module;
 
 #include <concepts>
 
-export module helios.rendering.shader.concepts.IsShaderHandle;
+export module helios.engine.rendering.shader.concepts.IsShaderHandle;
 
-import helios.rendering.shader.types.ShaderHandle;
+import helios.engine.rendering.shader.types.ShaderHandle;
 
-using namespace helios::rendering::shader::types;
-export namespace helios::rendering::shader::concepts {
+using namespace helios::engine::rendering::shader::types;
+export namespace helios::engine::rendering::shader::concepts {
 
     /**
      * @brief Constrains a type to the shader handle alias.

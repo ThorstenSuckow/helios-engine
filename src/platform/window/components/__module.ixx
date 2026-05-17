@@ -1,10 +1,10 @@
 /**
  * @file __module.ixx
- * @brief Module aggregator for `helios.platform.window.components`.
+ * @brief Module aggregator for `helios.engine.platform.window.components`.
  */
-export module helios.platform.window.components;
+export module helios.engine.platform.window.components;
 
 
-export import helios.platform.window.components.WindowComponent;
-export import helios.platform.window.components.WindowShownComponent;
-export import helios.platform.window.components.WindowCreateRequestComponent;
+export import helios.engine.platform.window.components.WindowComponent;
+export import helios.engine.platform.window.components.WindowShownComponent;
+export import helios.engine.platform.window.components.WindowCreateRequestComponent;

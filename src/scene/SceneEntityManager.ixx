@@ -6,20 +6,20 @@ module;
 
 #include "helios-engine-config.h"
 
-export module helios.scene.SceneEntityManager;
+export module helios.engine.scene.SceneEntityManager;
 
 import helios.ecs.EntityManager;
 import helios.ecs.EntityRegistry;
 import helios.ecs.strategies;
 
-import helios.scene.types;
+import helios.engine.scene.types;
 
 constexpr auto SCENE_SIZE = DEFAULT_SCENE_POOL_CAPACITY;
 
-using namespace helios::scene::types;
+using namespace helios::engine::scene::types;
 using namespace helios::ecs;
 using namespace helios::ecs::strategies;
-export namespace helios::scene {
+export namespace helios::engine::scene {
 
     /**
      * @brief Entity registry used for scene resources.

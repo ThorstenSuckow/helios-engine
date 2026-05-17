@@ -8,20 +8,20 @@ module;
 #include <cassert>
 #include <helios-engine-config.h>
 
-export module helios.input.gamepad.GamepadState;
+export module helios.engine.input.gamepad.GamepadState;
 
 import helios.math.types;
-import helios.util.log.Logger;
-import helios.util.log.LogManager;
+import helios.engine.util.log.Logger;
+import helios.engine.util.log.LogManager;
 
-import helios.input.types.Gamepad;
+import helios.engine.input.types.Gamepad;
 
 
-#define HELIOS_LOG_SCOPE "helios::input::gamepad::GamepadState"
+#define HELIOS_LOG_SCOPE "helios::engine::input::gamepad::GamepadState"
 
-using namespace helios::input::types;
+using namespace helios::engine::input::types;
 
-export namespace helios::input::gamepad {
+export namespace helios::engine::input::gamepad {
 
     /**
      * @brief A lightweight class for transferring the state of a Gamepad.
@@ -66,7 +66,7 @@ export namespace helios::input::gamepad {
         /**
          * @brief Shared logger instance for all GamepadState objects.
          */
-        inline static const helios::util::log::Logger& logger_ = helios::util::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
+        inline static const helios::engine::util::log::Logger& logger_ = helios::engine::util::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
 
 
         /**
@@ -715,4 +715,4 @@ export namespace helios::input::gamepad {
     };
 
 
-} // namespace helios::input
+} // namespace helios::engine::input

@@ -11,27 +11,27 @@ module;
 #include <stdexcept>
 #include <ranges>
 
-export module helios.runtime.timing.TimerManager;
+export module helios.engine.runtime.timing.TimerManager;
 
-import helios.runtime.timing.types;
-import helios.runtime.timing.commands;
+import helios.engine.runtime.timing.types;
+import helios.engine.runtime.timing.commands;
 
-import helios.runtime.timing.Timer;
+import helios.engine.runtime.timing.Timer;
 
-import helios.runtime.timing.types.TimerId;
+import helios.engine.runtime.timing.types.TimerId;
 
-import helios.runtime.world.UpdateContext;
-import helios.runtime.messaging.command.CommandHandlerRegistry;
+import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
 
-import helios.core.types;
-import helios.util.Guid;
-import helios.runtime.world.tags.ManagerRole;
+import helios.engine.core.types;
+import helios.engine.util.Guid;
+import helios.engine.runtime.world.tags.ManagerRole;
 
-using namespace helios::runtime::timing::commands;
-using namespace helios::runtime::timing::types;
-using namespace helios::runtime::timing::types;
-using namespace helios::runtime::world;
-export namespace helios::runtime::timing {
+using namespace helios::engine::runtime::timing::commands;
+using namespace helios::engine::runtime::timing::types;
+using namespace helios::engine::runtime::timing::types;
+using namespace helios::engine::runtime::world;
+export namespace helios::engine::runtime::timing {
 
     /**
      * @brief Manager that owns game timers and processes timer control commands.
@@ -82,7 +82,7 @@ export namespace helios::runtime::timing {
         }
 
     public:
-        using EngineRoleTag = helios::runtime::world::tags::ManagerRole;
+        using EngineRoleTag = helios::engine::runtime::world::tags::ManagerRole;
 
         /**
          * @brief Registers a new game timer.
@@ -138,7 +138,7 @@ export namespace helios::runtime::timing {
          * @param updateContext Reference to the current update context.
          */
         void flush(
-            helios::runtime::world::UpdateContext& updateContext
+            helios::engine::runtime::world::UpdateContext& updateContext
         ) noexcept {
 
             for (const auto& controlContext : pendingControlContexts_) {
@@ -171,7 +171,7 @@ export namespace helios::runtime::timing {
          *
          * @param gameWorld The game world to register with.
          */
-        void init(helios::runtime::messaging::command::CommandHandlerRegistry& commandHandlerRegistry) {
+        void init(helios::engine::runtime::messaging::command::CommandHandlerRegistry& commandHandlerRegistry) {
             commandHandlerRegistry.registerHandler<TimerControlCommand>(*this);
         }
 

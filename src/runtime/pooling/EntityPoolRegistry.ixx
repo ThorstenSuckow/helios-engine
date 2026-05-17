@@ -8,14 +8,14 @@ module;
 #include <unordered_map>
 #include <ranges>
 
-export module helios.runtime.pooling.EntityPoolRegistry;
+export module helios.engine.runtime.pooling.EntityPoolRegistry;
 
 
-import helios.runtime.pooling.EntityPool;
-import helios.runtime.pooling.types.EntityPoolId;
+import helios.engine.runtime.pooling.EntityPool;
+import helios.engine.runtime.pooling.types.EntityPoolId;
 
 
-export namespace helios::runtime::pooling {
+export namespace helios::engine::runtime::pooling {
 
     /**
      * @brief Central registry for managing multiple named EntityPools.
@@ -36,7 +36,7 @@ export namespace helios::runtime::pooling {
      *
      * // Later, acquire a bullet from the pool
      * auto* pool = registry.pool(BULLET_POOL);
-     * helios::util::Guid bulletGuid;
+     * helios::engine::util::Guid bulletGuid;
      * if (pool && pool->acquire(bulletGuid)) {
      *     // Use the bullet
      * }
@@ -50,7 +50,7 @@ export namespace helios::runtime::pooling {
         /**
          * @brief Maps pool IDs to their corresponding EntityPool instances.
          */
-        std::unordered_map<helios::runtime::pooling::types::EntityPoolId, std::unique_ptr<EntityPool<THandle>>> pools_;
+        std::unordered_map<helios::engine::runtime::pooling::types::EntityPoolId, std::unique_ptr<EntityPool<THandle>>> pools_;
 
     public:
 
@@ -71,7 +71,7 @@ export namespace helios::runtime::pooling {
          * @return Raw pointer to the added pool for immediate use.
          */
         EntityPool<THandle>* addPool(
-            const helios::runtime::pooling::types::EntityPoolId id,
+            const helios::engine::runtime::pooling::types::EntityPoolId id,
             std::unique_ptr<EntityPool<THandle>> entityPool
         ) noexcept {
             pools_[id] = std::move(entityPool);
@@ -86,7 +86,7 @@ export namespace helios::runtime::pooling {
          *
          * @return Reference to the pool map.
          */
-        [[nodiscard]]std::unordered_map<helios::runtime::pooling::types::EntityPoolId, std::unique_ptr<EntityPool<THandle>>>& pools() {
+        [[nodiscard]]std::unordered_map<helios::engine::runtime::pooling::types::EntityPoolId, std::unique_ptr<EntityPool<THandle>>>& pools() {
             return pools_;
         }
 
@@ -98,7 +98,7 @@ export namespace helios::runtime::pooling {
          *
          * @return Pointer to the pool, or nullptr if not found.
          */
-        [[nodiscard]] EntityPool<THandle>* pool(const helios::runtime::pooling::types::EntityPoolId id) const {
+        [[nodiscard]] EntityPool<THandle>* pool(const helios::engine::runtime::pooling::types::EntityPoolId id) const {
 
             const auto& it = pools_.find(id);
 
@@ -116,7 +116,7 @@ export namespace helios::runtime::pooling {
          *
          * @return True if the pool exists, false otherwise.
          */
-        [[nodiscard]] bool has(const helios::runtime::pooling::types::EntityPoolId id) const noexcept {
+        [[nodiscard]] bool has(const helios::engine::runtime::pooling::types::EntityPoolId id) const noexcept {
             return pools_.contains(id);
         }
 

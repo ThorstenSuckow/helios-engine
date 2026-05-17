@@ -9,38 +9,38 @@ module;
 #include <vector>
 
 
-export module helios.state.StateManager;
+export module helios.engine.state.StateManager;
 
 
-import helios.state.TypedStateCommandHandler;
-import helios.state.StateTransitionListener;
-import helios.state.types.StateTransitionRule;
+import helios.engine.state.TypedStateCommandHandler;
+import helios.engine.state.StateTransitionListener;
+import helios.engine.state.types.StateTransitionRule;
 
-import helios.state.components;
-import helios.state.commands;
-import helios.state.types;
+import helios.engine.state.components;
+import helios.engine.state.commands;
+import helios.engine.state.types;
 
-import helios.runtime.world.GameObject;
+import helios.engine.runtime.world.GameObject;
 
 
-import helios.runtime.world.UpdateContext;
+import helios.engine.runtime.world.UpdateContext;
 
-import helios.runtime.messaging.command.CommandHandlerRegistry;
-import helios.runtime.world.Session;
+import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
+import helios.engine.runtime.world.Session;
 
-import helios.runtime.world.Session;
+import helios.engine.runtime.world.Session;
 
-import helios.core.types;
-import helios.util.Guid;
-import helios.runtime.world.tags.ManagerRole;
+import helios.engine.core.types;
+import helios.engine.util.Guid;
+import helios.engine.runtime.world.tags.ManagerRole;
 
-using helios::state::types::StateTransitionIdType;
-using helios::state::types::StateTransitionContext;
-using helios::state::types::StateTransitionRule;
-using helios::state::commands::StateCommand;
-using helios::state::commands::DelayedStateCommand;
+using helios::engine::state::types::StateTransitionIdType;
+using helios::engine::state::types::StateTransitionContext;
+using helios::engine::state::types::StateTransitionRule;
+using helios::engine::state::commands::StateCommand;
+using helios::engine::state::commands::DelayedStateCommand;
 
-export namespace helios::state {
+export namespace helios::engine::state {
 
 
     /**
@@ -96,7 +96,7 @@ export namespace helios::state {
             const StateType from,
             const StateType to,
             const StateTransitionIdType<StateType> transitionId,
-            helios::runtime::world::UpdateContext& updateContext)  {
+            helios::engine::runtime::world::UpdateContext& updateContext)  {
 
             for (auto& listener : listeners_) {
                 listener->onStateExit(updateContext, from);
@@ -115,7 +115,7 @@ export namespace helios::state {
            const StateType from,
            const StateType to,
            const StateTransitionIdType<StateType> transitionId,
-           helios::runtime::world::UpdateContext& updateContext)  {
+           helios::engine::runtime::world::UpdateContext& updateContext)  {
 
             for (auto& listener : listeners_) {
                 listener->onStateTransition(
@@ -137,7 +137,7 @@ export namespace helios::state {
            const StateType from,
            const StateType to,
            const StateTransitionIdType<StateType> transitionId,
-           helios::runtime::world::UpdateContext& updateContext)  {
+           helios::engine::runtime::world::UpdateContext& updateContext)  {
 
             for (auto& listener : listeners_) {
                 listener->onStateEnter(updateContext, to);
@@ -147,7 +147,7 @@ export namespace helios::state {
 
 
     public:
-        using EngineRoleTag = helios::runtime::world::tags::ManagerRole;
+        using EngineRoleTag = helios::engine::runtime::world::tags::ManagerRole;
 
         /**
          * @brief Constructs a state manager with transition rules.
@@ -178,7 +178,7 @@ export namespace helios::state {
          * @param updateContext The current frame's update context.
          */
         void flush(
-            helios::runtime::world::UpdateContext& updateContext
+            helios::engine::runtime::world::UpdateContext& updateContext
         ) noexcept {
 
             if (pending_.empty()) {
@@ -259,7 +259,7 @@ export namespace helios::state {
          *
          * @param commandHandlerRegistry The command-handler registry to register with.
          */
-        void init(helios::runtime::messaging::command::CommandHandlerRegistry& commandHandlerRegistry) {
+        void init(helios::engine::runtime::messaging::command::CommandHandlerRegistry& commandHandlerRegistry) {
             commandHandlerRegistry.registerHandler<StateCommand<StateType>>(*this);
             commandHandlerRegistry.registerHandler<DelayedStateCommand<StateType>>(*this);
         }

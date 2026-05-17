@@ -1,4 +1,4 @@
-# helios::runtime::world::concepts
+# helios::engine::runtime::world::concepts
 
 Concept constraints for the runtime-world domain.
 
@@ -11,7 +11,7 @@ Concept constraints for the runtime-world domain.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::runtime::world::concepts
+@namespace helios::engine::runtime::world::concepts
 @brief Concept constraints for the runtime-world domain.
 </p></details>
 

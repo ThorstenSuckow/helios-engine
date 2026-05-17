@@ -4,9 +4,9 @@
  */
 module;
 
-export module helios.platform.environment.types.PlatformDomainTag;
+export module helios.engine.platform.environment.types.PlatformDomainTag;
 
-export namespace helios::platform::environment::types {
+export namespace helios::engine::platform::environment::types {
 
     /**
      * @brief Domain tag for platform identity and handles.

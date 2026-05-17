@@ -1,14 +1,14 @@
 /**
  * @file _module.ixx
- * @brief Aggregate module for helios::core::components namespace.
+ * @brief Aggregate module for helios::engine::core::components namespace.
  */
 
-export module helios.core.components;
+export module helios.engine.core.components;
 
-export import helios.core.components.Vec2Component;
-export import helios.core.components.Vec3Component;
-export import helios.core.components.Vec4Component;
-export import helios.core.components.Mat4Component;
-export import helios.core.components.AABBComponent;
-export import helios.core.components.ColorComponent;
-export import helios.core.components.NumericValueComponent;
+export import helios.engine.core.components.Vec2Component;
+export import helios.engine.core.components.Vec3Component;
+export import helios.engine.core.components.Vec4Component;
+export import helios.engine.core.components.Mat4Component;
+export import helios.engine.core.components.AABBComponent;
+export import helios.engine.core.components.ColorComponent;
+export import helios.engine.core.components.NumericValueComponent;

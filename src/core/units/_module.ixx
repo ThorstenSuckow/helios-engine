@@ -1,8 +1,8 @@
 /**
  * @file _module.ixx
- * @brief Aggregate module for helios::core::units namespace.
+ * @brief Aggregate module for helios::engine::core::units namespace.
  */
 
-export module helios.core.units;
+export module helios.engine.core.units;
 
-export import helios.core.units.Unit;
+export import helios.engine.core.units.Unit;

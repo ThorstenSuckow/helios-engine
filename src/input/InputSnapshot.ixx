@@ -5,11 +5,11 @@
 module;
 
 
-export module helios.input.InputSnapshot;
+export module helios.engine.input.InputSnapshot;
 
-import helios.input.gamepad.GamepadState;
+import helios.engine.input.gamepad.GamepadState;
 
-export namespace helios::input {
+export namespace helios::engine::input {
 
     /**
      * @brief Immutable snapshot capturing input state at a specific point in time.
@@ -27,8 +27,8 @@ export namespace helios::input {
      * Typical usage:
      * ```cpp
      * // Capture input at start of frame
-     * auto snapshot = helios::input::InputSnapshot(
-     *     inputManager.gamepadState(helios::input::types::Gamepad::ONE)
+     * auto snapshot = helios::engine::input::InputSnapshot(
+     *     inputManager.gamepadState(helios::engine::input::types::Gamepad::ONE)
      * );
      *
      * // Process input (potentially in parallel or deferred)
@@ -49,7 +49,7 @@ export namespace helios::input {
          *
          * @details Stored as a const member to enforce immutability of the snapshot.
          */
-        const helios::input::gamepad::GamepadState gamepadState_;
+        const helios::engine::input::gamepad::GamepadState gamepadState_;
 
     public:
 
@@ -61,7 +61,7 @@ export namespace helios::input {
          * @note This operation is noexcept and cheap as GamepadState is a small struct.
          *       The snapshot remains valid even if the source state is modified or destroyed.
          */
-        explicit InputSnapshot(const helios::input::gamepad::GamepadState& gamepadState) noexcept
+        explicit InputSnapshot(const helios::engine::input::gamepad::GamepadState& gamepadState) noexcept
         : gamepadState_(gamepadState) {
         }
 
@@ -72,7 +72,7 @@ export namespace helios::input {
          *         of this InputSnapshot. The state is immutable and reflects input at
          *         the time of snapshot creation.
          */
-        [[nodiscard]] const helios::input::gamepad::GamepadState& gamepadState() const noexcept {
+        [[nodiscard]] const helios::engine::input::gamepad::GamepadState& gamepadState() const noexcept {
             return gamepadState_;
         }
     };

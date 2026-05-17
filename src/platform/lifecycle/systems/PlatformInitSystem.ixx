@@ -4,28 +4,28 @@
  */
 module;
 
-export module helios.platform.lifecycle.systems.PlatformInitSystem;
+export module helios.engine.platform.lifecycle.systems.PlatformInitSystem;
 
 
 
-import helios.runtime.world.UpdateContext;
+import helios.engine.runtime.world.UpdateContext;
 
-import helios.runtime.world.tags.SystemRole;
+import helios.engine.runtime.world.tags.SystemRole;
 
-import helios.runtime.world;
-import helios.runtime.messaging.command.NullCommandBuffer;
-import helios.runtime.messaging.command.concepts.IsCommandBufferLike;
+import helios.engine.runtime.world;
+import helios.engine.runtime.messaging.command.NullCommandBuffer;
+import helios.engine.runtime.messaging.command.concepts.IsCommandBufferLike;
 
-import helios.platform.lifecycle.commands;
+import helios.engine.platform.lifecycle.commands;
 
 import helios.ecs.components.Active;
 
-using namespace helios::runtime::world::tags;
-using namespace helios::runtime::world;
-using namespace helios::runtime::messaging::command;
-using namespace helios::runtime::messaging::command::concepts;
-using namespace helios::platform::lifecycle::commands;
-export namespace helios::platform::lifecycle::systems {
+using namespace helios::engine::runtime::world::tags;
+using namespace helios::engine::runtime::world;
+using namespace helios::engine::runtime::messaging::command;
+using namespace helios::engine::runtime::messaging::command::concepts;
+using namespace helios::engine::platform::lifecycle::commands;
+export namespace helios::engine::platform::lifecycle::systems {
 
     /**
      * @brief Submits `PlatformInitCommand` until session/runtime initialization completed.

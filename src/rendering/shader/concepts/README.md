@@ -1,4 +1,4 @@
-# helios::rendering::shader::concepts
+# helios::engine::rendering::shader::concepts
 
 Shader-related type constraints.
 
@@ -9,7 +9,7 @@ Shader-related type constraints.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::rendering::shader::concepts
+@namespace helios::engine::rendering::shader::concepts
 @brief Shader-related type constraints.
 @details Provides concepts used to constrain templates that operate on shader resource handles.
 </p></details>

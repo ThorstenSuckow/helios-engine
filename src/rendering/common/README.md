@@ -1,10 +1,10 @@
-# helios::rendering::common
+# helios::engine::rendering::common
 
 Shared rendering-layer commands, components, concepts, and value types.
 
 ## Overview
 
-`helios::rendering::common` bundles the small cross-cutting building blocks used
+`helios::engine::rendering::common` bundles the small cross-cutting building blocks used
 by multiple rendering subsystems. It provides lightweight command payloads,
 shared ECS components, backend-related concepts, and compact value types used
 for render pass setup and render extraction.
@@ -21,7 +21,7 @@ for render pass setup and render extraction.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::rendering::common
+@namespace helios::engine::rendering::common
 @brief Shared rendering-layer commands, components, concepts, and value types.
 </p></details>
 

@@ -1,18 +1,17 @@
 /**
  * @file _module.ixx
- * @brief Aggregate module for helios::runtime::messaging::command namespace.
+ * @brief Aggregate module for helios::engine::runtime::messaging::command namespace.
  */
-export module helios.runtime.messaging.command;
+export module helios.engine.runtime.messaging.command;
 
-export import helios.runtime.messaging.command.types;
-export import helios.runtime.messaging.command.concepts;
-export import helios.runtime.messaging.command.tags;
+export import helios.engine.runtime.messaging.command.types;
+export import helios.engine.runtime.messaging.command.concepts;
+export import helios.engine.runtime.messaging.command.tags;
 
-export import helios.runtime.messaging.command.EngineCommandBuffer;
-export import helios.runtime.messaging.command.StateCommandBuffer;
-export import helios.runtime.messaging.command.RenderCommandBuffer;
-export import helios.runtime.messaging.command.PlatformCommandBuffer;
-export import helios.runtime.messaging.command.NullCommandBuffer;
-export import helios.runtime.messaging.command.TypedCommandBuffer;
-export import helios.runtime.messaging.command.CommandBuffer;
-export import helios.runtime.messaging.command.CommandBufferRegistry;
+export import helios.engine.runtime.messaging.command.EngineCommandBuffer;
+export import helios.engine.runtime.messaging.command.RenderCommandBuffer;
+export import helios.engine.runtime.messaging.command.PlatformCommandBuffer;
+export import helios.engine.runtime.messaging.command.NullCommandBuffer;
+export import helios.engine.runtime.messaging.command.TypedCommandBuffer;
+export import helios.engine.runtime.messaging.command.CommandBuffer;
+export import helios.engine.runtime.messaging.command.CommandBufferRegistry;

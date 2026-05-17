@@ -4,19 +4,19 @@
  */
 module;
 
-export module helios.rendering.FramebufferToViewportMap;
+export module helios.engine.rendering.FramebufferToViewportMap;
 
-import helios.core.container.HandleMultiMap;
+import helios.engine.core.container.HandleMultiMap;
 
-import helios.rendering.viewport.types.ViewportHandle;
-import helios.rendering.framebuffer.types.FramebufferHandle;
+import helios.engine.rendering.viewport.types.ViewportHandle;
+import helios.engine.rendering.framebuffer.types.FramebufferHandle;
 
 
 
-using namespace helios::rendering::framebuffer::types;
-using namespace helios::rendering::viewport::types;
-using namespace helios::core::container;
-export namespace helios::rendering {
+using namespace helios::engine::rendering::framebuffer::types;
+using namespace helios::engine::rendering::viewport::types;
+using namespace helios::engine::core::container;
+export namespace helios::engine::rendering {
 
     /**
      * @brief One-to-many mapping from framebuffer handle to viewport handles.

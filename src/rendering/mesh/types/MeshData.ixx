@@ -6,13 +6,13 @@ module;
 
 #include <vector>
 
-export module helios.rendering.mesh.types.MeshData;
+export module helios.engine.rendering.mesh.types.MeshData;
 
-import helios.rendering.Vertex;
+import helios.engine.rendering.Vertex;
 
-using namespace helios::rendering;
+using namespace helios::engine::rendering;
 
-export namespace helios::rendering::mesh::types {
+export namespace helios::engine::rendering::mesh::types {
 
     /**
      * @brief Raw mesh data container.

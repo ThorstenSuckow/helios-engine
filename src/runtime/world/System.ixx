@@ -7,17 +7,17 @@ module;
 #include <cassert>
 #include <memory>
 
-export module helios.runtime.world.System;
+export module helios.engine.runtime.world.System;
 
 
-import helios.runtime.world.UpdateContext;
-import helios.runtime.world.GameWorld;
+import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.world.GameWorld;
 
-import helios.runtime.world.concepts;
+import helios.engine.runtime.world.concepts;
 
-using namespace helios::runtime::world;
-using namespace helios::runtime::world::concepts;
-export namespace helios::runtime::world {
+using namespace helios::engine::runtime::world;
+using namespace helios::engine::runtime::world::concepts;
+export namespace helios::engine::runtime::world {
 
 
     /**

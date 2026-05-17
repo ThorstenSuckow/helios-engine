@@ -5,13 +5,13 @@
 module;
 
 
-export module helios.state.types.StateTransitionRequest;
+export module helios.engine.state.types.StateTransitionRequest;
 
 
-import helios.state.types.StateTransitionId;
-import helios.state.types.StateTransitionType;
+import helios.engine.state.types.StateTransitionId;
+import helios.engine.state.types.StateTransitionType;
 
-export namespace helios::state::types {
+export namespace helios::engine::state::types {
 
     /**
      * @brief Represents a request to perform a state transition.

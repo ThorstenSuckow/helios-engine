@@ -12,19 +12,17 @@ module;
 #include <algorithm>
 #include <iterator>
 
-export module helios.state.StateToIdMapPair;
+export module helios.engine.state.StateToIdMapPair;
 
-import helios.state.StateToIdMap;
+import helios.engine.state.StateToIdMap;
 
-import helios.state.types;
-import helios.gameplay.matchstate.types;
+import helios.engine.state.types;
 
-import helios.core.types;
+import helios.engine.core.types;
 
-using namespace helios::state::types;
-using namespace helios::gameplay::matchstate::types;
+using namespace helios::engine::state::types;
 
-export namespace helios::state {
+export namespace helios::engine::state {
 
     /**
      * @brief Combines two StateToIdMap instances for dual-state lookups.

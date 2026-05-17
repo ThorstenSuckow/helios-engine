@@ -1,4 +1,4 @@
-# helios::core::container
+# helios::engine::core::container
 
 Generic container types shared across the engine.
 
@@ -56,7 +56,7 @@ Typical use case:
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::core::container
+@namespace helios::engine::core::container
 @brief Generic container types shared across the engine.
 </p></details>
 

@@ -1,4 +1,4 @@
-# helios::platform::window::commands
+# helios::engine::platform::window::commands
 
 Commands for window lifecycle and buffer presentation.
 
@@ -14,7 +14,7 @@ Commands for window lifecycle and buffer presentation.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::platform::window::commands
+@namespace helios::engine::platform::window::commands
 @brief Commands for window lifecycle and buffer presentation.
 </p></details>
 

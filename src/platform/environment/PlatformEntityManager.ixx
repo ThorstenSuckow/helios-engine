@@ -8,18 +8,18 @@ module;
 #include <cstddef>
 #include "helios-engine-config.h"
 
-export module helios.platform.environment.PlatformEntityManager;
+export module helios.engine.platform.environment.PlatformEntityManager;
 
 import helios.ecs;
 
-import helios.platform.environment.types;
+import helios.engine.platform.environment.types;
 
 constexpr size_t PLATFORM_SIZE = 1;
 
 using namespace helios::ecs;
 using namespace helios::ecs::strategies;
-using namespace helios::platform::environment::types;
-export namespace helios::platform::environment {
+using namespace helios::engine::platform::environment::types;
+export namespace helios::engine::platform::environment {
 
     /**
      * @brief Registry type for runtime platform entity lifecycle management.

@@ -2,7 +2,7 @@ module;
 
 #include <cassert>
 
-export module helios.core.components.Mat4Component;
+export module helios.engine.core.components.Mat4Component;
 
 import helios.math.types;
 
@@ -10,7 +10,7 @@ import helios.math.concepts;
 
 using namespace helios::math;
 using namespace helios::math::concepts;
-export namespace helios::core::components {
+export namespace helios::engine::core::components {
 
     /**
      * @brief Generic 4x4 matrix component with dirty-state tracking.

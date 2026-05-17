@@ -1,4 +1,4 @@
-# helios::rendering::shader::types
+# helios::engine::rendering::shader::types
 
 Strong ID and handle aliases for shader resources.
 
@@ -11,7 +11,7 @@ Strong ID and handle aliases for shader resources.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::rendering::shader::types
+@namespace helios::engine::rendering::shader::types
 @brief Strong ID and handle aliases for shader resources.
 @details Defines a shared domain tag used by both StrongId and EntityHandle
 for shader entity registries and managers.

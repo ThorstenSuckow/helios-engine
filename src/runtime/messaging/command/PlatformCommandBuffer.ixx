@@ -4,23 +4,23 @@
  */
 module;
 
-export module helios.runtime.messaging.command.PlatformCommandBuffer;
+export module helios.engine.runtime.messaging.command.PlatformCommandBuffer;
 
 
 
-import helios.platform.environment.types;
-import helios.platform.environment.commands;
-import helios.platform.window.commands;
+import helios.engine.platform.environment.types;
+import helios.engine.platform.environment.commands;
+import helios.engine.platform.window.commands;
 
-import helios.platform.lifecycle.commands;
+import helios.engine.platform.lifecycle.commands;
 
-import helios.runtime.messaging.command.TypedCommandBuffer;
+import helios.engine.runtime.messaging.command.TypedCommandBuffer;
 
-import helios.platform.window.types.WindowHandle;
+import helios.engine.platform.window.types.WindowHandle;
 
-using namespace helios::platform::environment::types;
-using namespace helios::platform::window::types;
-export namespace helios::runtime::messaging::command {
+using namespace helios::engine::platform::environment::types;
+using namespace helios::engine::platform::window::types;
+export namespace helios::engine::runtime::messaging::command {
 
     /**
      * @brief Platform-focused `TypedCommandBuffer` specialization.
@@ -29,18 +29,18 @@ export namespace helios::runtime::messaging::command {
      * and runtime platform commands (init/poll/shutdown) into a single
      * concrete command buffer type.
      */
-    using PlatformCommandBuffer = helios::runtime::messaging::command::TypedCommandBuffer<
+    using PlatformCommandBuffer = helios::engine::runtime::messaging::command::TypedCommandBuffer<
 
             // window
-            helios::platform::window::commands::WindowCreateCommand<WindowHandle>,
-            helios::platform::window::commands::WindowResizeCommand<WindowHandle>,
-            helios::platform::window::commands::SwapBuffersCommand<WindowHandle>,
-            helios::platform::window::commands::WindowCloseCommand<WindowHandle>,
+            helios::engine::platform::window::commands::WindowCreateCommand<WindowHandle>,
+            helios::engine::platform::window::commands::WindowResizeCommand<WindowHandle>,
+            helios::engine::platform::window::commands::SwapBuffersCommand<WindowHandle>,
+            helios::engine::platform::window::commands::WindowCloseCommand<WindowHandle>,
 
             // runtime platform
-            helios::platform::lifecycle::commands::PlatformInitCommand,
-            helios::platform::environment::commands::PollEventsCommand,
-            helios::platform::lifecycle::commands::ShutdownCommand
+            helios::engine::platform::lifecycle::commands::PlatformInitCommand,
+            helios::engine::platform::environment::commands::PollEventsCommand,
+            helios::engine::platform::lifecycle::commands::ShutdownCommand
         >;
 
 }

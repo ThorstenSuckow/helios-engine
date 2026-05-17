@@ -6,25 +6,25 @@ module;
 
 #include <concepts>
 
-export module helios.rendering.common.concepts.IsRenderBackendLike;
+export module helios.engine.rendering.common.concepts.IsRenderBackendLike;
 
 import helios.math.types;
 
-import helios.rendering.common.types.RenderPassContext;
-import helios.rendering.framebuffer.types.FramebufferHandle;
-import helios.rendering.viewport.types.ViewportHandle;
-import helios.util.Colors;
+import helios.engine.rendering.common.types.RenderPassContext;
+import helios.engine.rendering.framebuffer.types.FramebufferHandle;
+import helios.engine.rendering.viewport.types.ViewportHandle;
+import helios.engine.util.Colors;
 
-import helios.scene.types.SceneMemberRenderContext;
+import helios.engine.scene.types.SceneMemberRenderContext;
 
 
 using namespace helios::math;
-using namespace helios::rendering::framebuffer::types;
-using namespace helios::rendering::viewport::types;
-using namespace helios::rendering::common::types;
-using namespace helios::scene::types;
+using namespace helios::engine::rendering::framebuffer::types;
+using namespace helios::engine::rendering::viewport::types;
+using namespace helios::engine::rendering::common::types;
+using namespace helios::engine::scene::types;
 
-export namespace helios::rendering::common::concepts {
+export namespace helios::engine::rendering::common::concepts {
 
     /**
      * @brief Constrains types that provide the rendering backend API surface.

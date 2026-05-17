@@ -1,4 +1,4 @@
-# helios::runtime::messaging::command
+# helios::engine::runtime::messaging::command
 
 Compile-time typed command buffering and handler routing infrastructure.
 
@@ -111,7 +111,7 @@ gameWorld.flushManagers(updateContext);         // Managers process queued reque
 
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::runtime::messaging::command
+@namespace helios::engine::runtime::messaging::command
 @brief Compile-time typed command buffering and handler routing.
 @details Provides deferred command execution with type-safe queues, handler-or-execute routing, and integration with the Manager flush cycle.
 </p></details>

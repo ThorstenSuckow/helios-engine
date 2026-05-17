@@ -7,16 +7,16 @@ module;
 #include <cassert>
 #include <memory>
 
-export module helios.runtime.world.Manager;
+export module helios.engine.runtime.world.Manager;
 
-import helios.runtime.world.concepts.IsManagerLike;
+import helios.engine.runtime.world.concepts.IsManagerLike;
 
-import helios.runtime.world.UpdateContext;
-import helios.runtime.messaging.command.CommandHandlerRegistry;
+import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
 
-using namespace helios::runtime::messaging::command;
-using namespace helios::runtime::world::concepts;
-export namespace helios::runtime::world {
+using namespace helios::engine::runtime::messaging::command;
+using namespace helios::engine::runtime::world::concepts;
+export namespace helios::engine::runtime::world {
 
     /**
      * @brief Concept detecting an optional `init(CommandHandlerRegistry&)` method on a manager.

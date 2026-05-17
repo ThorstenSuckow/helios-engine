@@ -6,12 +6,12 @@ module;
 
 #include <concepts>
 
-export module helios.runtime.messaging.command.concepts.IsPlatformCommandBuffer;
+export module helios.engine.runtime.messaging.command.concepts.IsPlatformCommandBuffer;
 
-import helios.runtime.messaging.command.PlatformCommandBuffer;
+import helios.engine.runtime.messaging.command.PlatformCommandBuffer;
 
-using namespace helios::runtime::messaging::command;
-export namespace helios::runtime::messaging::command::concepts {
+using namespace helios::engine::runtime::messaging::command;
+export namespace helios::engine::runtime::messaging::command::concepts {
 
     /**
      * @brief Constrains types that can serve as concrete command buffers.

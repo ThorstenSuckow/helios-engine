@@ -7,25 +7,25 @@ module;
 #include <memory>
 #include <vector>
 
-export module helios.runtime.gameloop:Phase;
+export module helios.engine.runtime.gameloop:Phase;
 
 import :PassCommitListener;
 import :Pass;
 import :TypedPass;
 import :CommitPoint;
 
-import helios.runtime.world.UpdateContext;
-import helios.runtime.world.GameWorld;
+import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.world.GameWorld;
 
-import helios.runtime.world.Session;
+import helios.engine.runtime.world.Session;
 
 
-import helios.gameplay.gamestate.types;
+import helios.engine.runtime.enginestate.types;
 
-using namespace helios::gameplay::gamestate::types;
-using namespace helios::runtime::world;
+using namespace helios::engine::runtime::enginestate::types;
+using namespace helios::engine::runtime::world;
 
-export namespace helios::runtime::gameloop {
+export namespace helios::engine::runtime::gameloop {
     class GameLoop;
 
 
@@ -73,7 +73,7 @@ export namespace helios::runtime::gameloop {
      */
     class Phase {
 
-        friend class helios::runtime::gameloop::GameLoop;
+        friend class helios::engine::runtime::gameloop::GameLoop;
 
         /**
          * @brief Collection of listeners to be notified when a pass commits.
@@ -115,7 +115,6 @@ export namespace helios::runtime::gameloop {
          *
          * @param gameWorld The game world where the update occurred.
          * @param updateContext The current update context.
-         * @param gameState The current game state used to filter pass execution.
          *
          * @see CommitPoint
          * @see Pass::addCommitPoint()
@@ -166,9 +165,9 @@ export namespace helios::runtime::gameloop {
         /**
          * @brief Reference to the owning GameLoop.
          */
-        helios::runtime::gameloop::GameLoop& gameloop_;
+        helios::engine::runtime::gameloop::GameLoop& gameloop_;
 
-        helios::runtime::world::GameWorld& gameWorld_;
+        helios::engine::runtime::world::GameWorld& gameWorld_;
 
     public:
 
@@ -178,7 +177,7 @@ export namespace helios::runtime::gameloop {
          * @param gameloop Reference to the parent GameLoop.
          * @param gameWorld Shared GameWorld used by passes in this phase.
          */
-        explicit Phase(helios::runtime::gameloop::GameLoop& gameloop, GameWorld& gameWorld) : gameloop_(gameloop), gameWorld_(gameWorld) {
+        explicit Phase(helios::engine::runtime::gameloop::GameLoop& gameloop, GameWorld& gameWorld) : gameloop_(gameloop), gameWorld_(gameWorld) {
 
         }
 
@@ -232,8 +231,7 @@ export namespace helios::runtime::gameloop {
          * @see Session::state()
          */
         template<typename StateType>
-        Pass& addPass(const StateType t) {//    const helios::gameplay::gamestate::types::GameState gameState = helios::gameplay::gamestate::types::GameState::Any) {
-
+        Pass& addPass(const StateType t) {
             auto entry = std::make_unique<TypedPass<StateType>>(*this, t, gameWorld_);
             auto* raw = entry.get();
             passEntries_.emplace_back(std::move(entry));
@@ -246,7 +244,7 @@ export namespace helios::runtime::gameloop {
          *
          * @return Reference to the parent GameLoop.
          */
-        [[nodiscard]] helios::runtime::gameloop::GameLoop& gameLoop() noexcept {
+        [[nodiscard]] helios::engine::runtime::gameloop::GameLoop& gameLoop() noexcept {
             return gameloop_;
         }
 

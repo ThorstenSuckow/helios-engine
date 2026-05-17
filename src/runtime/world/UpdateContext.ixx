@@ -7,23 +7,23 @@ module;
 #include <span>
 #include <cassert>
 
-export module helios.runtime.world.UpdateContext;
+export module helios.engine.runtime.world.UpdateContext;
 
-import helios.input.InputSnapshot;
+import helios.engine.input.InputSnapshot;
 
-import helios.runtime.world.Level;
-import helios.runtime.messaging.event.GameLoopEventBus;
+import helios.engine.runtime.world.Level;
+import helios.engine.runtime.messaging.event.GameLoopEventBus;
 
-import helios.runtime.world.RuntimeEnvironment;
+import helios.engine.runtime.world.RuntimeEnvironment;
 import helios.ecs.types.EntityHandle;
 
 import helios.ecs.View;
-import helios.runtime.world.Session;
+import helios.engine.runtime.world.Session;
 
 
-import helios.runtime.world.EngineWorld;
+import helios.engine.runtime.world.EngineWorld;
 
-export namespace helios::runtime::world {
+export namespace helios::engine::runtime::world {
 
 
     /**
@@ -59,17 +59,17 @@ export namespace helios::runtime::world {
         /**
          * @brief Immutable snapshot of input state for the current frame.
          */
-        const helios::input::InputSnapshot& inputSnapshot_;
+        const helios::engine::input::InputSnapshot& inputSnapshot_;
 
         /**
          * @brief Reference to the current game session for state tracking.
          */
-        helios::runtime::world::Session& session_;
+        helios::engine::runtime::world::Session& session_;
 
         /**
          * @brief Reference to the current platform entity.
          */
-        helios::runtime::world::RuntimeEnvironment& runtimeEnvironment_;
+        helios::engine::runtime::world::RuntimeEnvironment& runtimeEnvironment_;
 
         /**
          * @brief Sink for pushing phase-level events during update.
@@ -77,12 +77,12 @@ export namespace helios::runtime::world {
          * Used by systems and components to publish events (e.g., collision,
          * spawn requests) that will be processed in the next phase of the game loop.
          */
-        helios::runtime::messaging::event::GameLoopEventBus::WriteSink phaseEventSink_;
+        helios::engine::runtime::messaging::event::GameLoopEventBus::WriteSink phaseEventSink_;
 
         /**
          * @brief Source for reading phase-level events from the previous phase.
          */
-        const helios::runtime::messaging::event::GameLoopEventBus::ReadSource phaseEventSource_;
+        const helios::engine::runtime::messaging::event::GameLoopEventBus::ReadSource phaseEventSource_;
 
         /**
          * @brief Sink for pushing pass-level events during update.
@@ -90,12 +90,12 @@ export namespace helios::runtime::world {
          * Used by systems and components to publish events that will be processed
          * in subsequent passes within the same phase, after a commit point.
          */
-        helios::runtime::messaging::event::GameLoopEventBus::WriteSink passEventSink_;
+        helios::engine::runtime::messaging::event::GameLoopEventBus::WriteSink passEventSink_;
 
         /**
          * @brief Source for reading pass-level events from previous passes.
          */
-        const helios::runtime::messaging::event::GameLoopEventBus::ReadSource passEventSource_;
+        const helios::engine::runtime::messaging::event::GameLoopEventBus::ReadSource passEventSource_;
 
         /**
          * @brief Sink for pushing frame-level events during update.
@@ -104,12 +104,12 @@ export namespace helios::runtime::world {
          * in the next frame. Frame-level events persist across all phases and are
          * swapped at the end of the Post phase.
          */
-        helios::runtime::messaging::event::GameLoopEventBus::WriteSink frameEventSink_;
+        helios::engine::runtime::messaging::event::GameLoopEventBus::WriteSink frameEventSink_;
 
         /**
          * @brief Source for reading frame-level events from the previous frame.
          */
-        const helios::runtime::messaging::event::GameLoopEventBus::ReadSource frameEventSource_;
+        const helios::engine::runtime::messaging::event::GameLoopEventBus::ReadSource frameEventSource_;
 
         /**
          * @brief Pointer to the active Level, or nullptr if no level is loaded.
@@ -119,7 +119,7 @@ export namespace helios::runtime::world {
         /**
          * @brief Aggregate typed world used for domain-routed ECS operations.
          */
-        helios::runtime::world::EngineWorld& engineWorld_;
+        helios::engine::runtime::world::EngineWorld& engineWorld_;
     public:
 
 
@@ -139,14 +139,14 @@ export namespace helios::runtime::world {
          * @param engineWorld Aggregate typed world for entity operations.
          */
         UpdateContext(
-            helios::runtime::world::Session& session,
-            helios::runtime::world::RuntimeEnvironment& runtimeEnvironment,
+            helios::engine::runtime::world::Session& session,
+            helios::engine::runtime::world::RuntimeEnvironment& runtimeEnvironment,
             const float deltaTime,
             const float totalTime,
-            helios::runtime::messaging::event::GameLoopEventBus& phaseEventBus,
-            helios::runtime::messaging::event::GameLoopEventBus& passEventBus,
-            helios::runtime::messaging::event::GameLoopEventBus& frameEventBus,
-            const helios::input::InputSnapshot& inputSnapshot,
+            helios::engine::runtime::messaging::event::GameLoopEventBus& phaseEventBus,
+            helios::engine::runtime::messaging::event::GameLoopEventBus& passEventBus,
+            helios::engine::runtime::messaging::event::GameLoopEventBus& frameEventBus,
+            const helios::engine::input::InputSnapshot& inputSnapshot,
             const Level* level,
             EngineWorld& engineWorld
         ) :
@@ -192,7 +192,7 @@ export namespace helios::runtime::world {
          *
          * @return Const ref to the current InputSnapshot.
          */
-        [[nodiscard]] const helios::input::InputSnapshot& inputSnapshot() const noexcept {
+        [[nodiscard]] const helios::engine::input::InputSnapshot& inputSnapshot() const noexcept {
             return inputSnapshot_;
         }
 
@@ -226,7 +226,7 @@ export namespace helios::runtime::world {
          *
          * @return Ref to the Session used with this UpdateContext.
          */
-        [[nodiscard]] helios::runtime::world::Session& session() const noexcept {
+        [[nodiscard]] helios::engine::runtime::world::Session& session() const noexcept {
             return session_;
         }
 
@@ -235,7 +235,7 @@ export namespace helios::runtime::world {
          *
          * @return Reference to runtime environment.
          */
-        [[nodiscard]] helios::runtime::world::RuntimeEnvironment& runtimeEnvironment() const noexcept {
+        [[nodiscard]] helios::engine::runtime::world::RuntimeEnvironment& runtimeEnvironment() const noexcept {
             return runtimeEnvironment_;
         }
 

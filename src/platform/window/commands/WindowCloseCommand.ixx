@@ -4,14 +4,14 @@
  */
 module;
 
-export module helios.platform.window.commands.WindowCloseCommand;
+export module helios.engine.platform.window.commands.WindowCloseCommand;
 
-import helios.platform.window.types.WindowHandle;
-import helios.platform.window.concepts.IsWindowHandle;
+import helios.engine.platform.window.types.WindowHandle;
+import helios.engine.platform.window.concepts.IsWindowHandle;
 
-using namespace helios::platform::window::types;
-using namespace helios::platform::window::concepts;
-export namespace helios::platform::window::commands {
+using namespace helios::engine::platform::window::types;
+using namespace helios::engine::platform::window::concepts;
+export namespace helios::engine::platform::window::commands {
 
     /**
      * @brief Requests closing a single window.

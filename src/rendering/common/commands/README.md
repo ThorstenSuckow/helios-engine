@@ -1,4 +1,4 @@
-# helios::rendering::common::commands
+# helios::engine::rendering::common::commands
 
 Command payloads shared by render submission and execution paths.
 
@@ -16,7 +16,7 @@ render work between runtime systems and rendering managers/backends.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::rendering::common::commands
+@namespace helios::engine::rendering::common::commands
 @brief Command payloads shared by render submission and execution paths.
 </p></details>
 

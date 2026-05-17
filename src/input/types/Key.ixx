@@ -4,9 +4,9 @@
  */
 module;
 
-export module helios.input.types.Key;
+export module helios.engine.input.types.Key;
 
-export namespace helios::input::types {
+export namespace helios::engine::input::types {
 
     /**
      * @brief Enumerates common keyboard keys.

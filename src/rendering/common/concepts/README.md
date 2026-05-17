@@ -1,4 +1,4 @@
-# helios::rendering::common::concepts
+# helios::engine::rendering::common::concepts
 
 Concepts for render-layer type constraints.
 
@@ -18,7 +18,7 @@ rendering handle categories used across the rendering layer.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::rendering::common::concepts
+@namespace helios::engine::rendering::common::concepts
 @brief Concepts for render-layer type constraints.
 @details Provides compile-time constraints for rendering backends and handle categories.
 </p></details>

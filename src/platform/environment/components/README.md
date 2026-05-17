@@ -1,4 +1,4 @@
-# helios::platform::environment::components
+# helios::engine::platform::environment::components
 
 Runtime platform state components.
 
@@ -13,7 +13,7 @@ Runtime platform state components.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::platform::environment::components
+@namespace helios::engine::platform::environment::components
 @brief Runtime platform state components.
 </p></details>
 

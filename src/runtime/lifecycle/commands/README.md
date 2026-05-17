@@ -1,4 +1,4 @@
-# helios::runtime::lifecycle::commands
+# helios::engine::runtime::lifecycle::commands
 
 World-level lifecycle commands for the command buffer.
 
@@ -10,7 +10,7 @@ This namespace contains command classes used to request world-level lifecycle op
 |---------|-------------|
 | `WorldLifecycleCommand` | Carries a `WorldLifecycleAction` to request a world-level operation (e.g. Reset) |
 
-`WorldLifecycleAction` is defined in the sibling `types` submodule (`helios.runtime.lifecycle.types`).
+`WorldLifecycleAction` is defined in the sibling `types` submodule (`helios.engine.runtime.lifecycle.types`).
 
 ## Usage
 
@@ -26,7 +26,7 @@ The command is routed through the `EngineCommandBuffer` to the `WorldLifecycleMa
 
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::runtime::lifecycle::commands
+@namespace helios::engine::runtime::lifecycle::commands
 @brief World-level lifecycle commands for the command buffer.
 @details Contains command classes for requesting world-level lifecycle operations through the engine's command system.
 </p></details>

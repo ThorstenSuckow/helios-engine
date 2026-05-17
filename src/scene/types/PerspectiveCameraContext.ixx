@@ -6,14 +6,14 @@ module;
 
 #include <cassert>
 
-export module helios.scene.types.PerspectiveCameraContext;
+export module helios.engine.scene.types.PerspectiveCameraContext;
 
 
 import helios.math;
 
 using namespace helios::math;
 
-export namespace helios::scene::types {
+export namespace helios::engine::scene::types {
 
     /**
      * @brief Immutable projection context for perspective-camera dependent operations.

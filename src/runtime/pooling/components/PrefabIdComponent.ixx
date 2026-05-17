@@ -4,15 +4,15 @@
  */
 module;
 
-export module helios.runtime.pooling.components.PrefabIdComponent;
+export module helios.engine.runtime.pooling.components.PrefabIdComponent;
 
 
-import helios.gameplay.common.types.PrefabId;
-import helios.core.types;
+import helios.engine.runtime.pooling.types.PrefabId;
+import helios.engine.core.types;
 
-using namespace helios::gameplay::common::types;
+using namespace helios::engine::runtime::pooling::types;
 
-export namespace helios::runtime::pooling::components {
+export namespace helios::engine::runtime::pooling::components {
 
     /**
      * @brief Component that stores the PrefabId identifying a Entity's prefab origin.

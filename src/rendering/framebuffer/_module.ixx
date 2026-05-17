@@ -1,12 +1,12 @@
 /**
  * @file _module.ixx
- * @brief Aggregate module for `helios::rendering::framebuffer`.
+ * @brief Aggregate module for `helios::engine::rendering::framebuffer`.
  */
-export module helios.rendering.framebuffer;
+export module helios.engine.rendering.framebuffer;
 
 
-export import helios.rendering.framebuffer.types;
-export import helios.rendering.framebuffer.components;
+export import helios.engine.rendering.framebuffer.types;
+export import helios.engine.rendering.framebuffer.components;
 
-export import helios.rendering.framebuffer.FramebufferEntityManager;
+export import helios.engine.rendering.framebuffer.FramebufferEntityManager;
 

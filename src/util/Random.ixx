@@ -7,10 +7,10 @@ module;
 #include <cstdint>
 #include <random>
 
-export module helios.util.Random;
+export module helios.engine.util.Random;
 
 
-export namespace helios::util {
+export namespace helios::engine::util {
 
     /**
      * @brief Utility class for generating pseudo-random numbers.
@@ -20,7 +20,7 @@ export namespace helios::util {
      *
      * Example usage:
      * ```cpp
-     * auto rng = helios::util::Random(12345);
+     * auto rng = helios::engine::util::Random(12345);
      * float value = rng.randomFloat(0.0f, 1.0f);
      * ```
      */

@@ -5,14 +5,14 @@
 module;
 
 
-export module helios.rendering.framebuffer.components.FramebufferBindingComponent;
+export module helios.engine.rendering.framebuffer.components.FramebufferBindingComponent;
 
-import helios.rendering.framebuffer.types.FramebufferHandle;
+import helios.engine.rendering.framebuffer.types.FramebufferHandle;
 import helios.ecs.components.BindingComponent;
 
-using namespace helios::rendering::framebuffer::types;
+using namespace helios::engine::rendering::framebuffer::types;
 using namespace helios::ecs::components;
-export namespace helios::rendering::framebuffer::components {
+export namespace helios::engine::rendering::framebuffer::components {
 
     /**
      * @brief Binds an owning entity to a framebuffer handle.

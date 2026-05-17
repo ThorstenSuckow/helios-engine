@@ -2,25 +2,25 @@ module;
 
 #include <cassert>
 
-export module helios.platform.window.systems.WindowSizeDirtyClearSystem;
+export module helios.engine.platform.window.systems.WindowSizeDirtyClearSystem;
 
-import helios.runtime.world.tags.SystemRole;
-import helios.runtime.world.UpdateContext;
+import helios.engine.runtime.world.tags.SystemRole;
+import helios.engine.runtime.world.UpdateContext;
 
-import helios.platform.window.components;
+import helios.engine.platform.window.components;
 
 import helios.ecs.components.Active;
-import helios.platform.window.concepts.IsWindowHandle;
+import helios.engine.platform.window.concepts.IsWindowHandle;
 
-import helios.spatial.components.Size2DComponent;
+import helios.engine.spatial.components.Size2DComponent;
 
-using namespace helios::spatial::components;
-using namespace helios::runtime::world::tags;
-using namespace helios::platform::window::concepts;
-using namespace helios::runtime::world;
-using namespace helios::platform::window::components;
+using namespace helios::engine::spatial::components;
+using namespace helios::engine::runtime::world::tags;
+using namespace helios::engine::platform::window::concepts;
+using namespace helios::engine::runtime::world;
+using namespace helios::engine::platform::window::components;
 using namespace helios::ecs::components;
-export namespace helios::platform::window::systems {
+export namespace helios::engine::platform::window::systems {
 
     template<typename TMemberHandle>
     requires IsWindowHandle<TMemberHandle>

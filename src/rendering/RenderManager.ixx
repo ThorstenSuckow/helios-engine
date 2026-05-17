@@ -9,45 +9,45 @@ module;
 #include "helios-engine-config.h"
 #include <optional>
 
-export module helios.rendering.RenderManager;
+export module helios.engine.rendering.RenderManager;
 
-import helios.runtime.world.tags.ManagerRole;
+import helios.engine.runtime.world.tags.ManagerRole;
 
-import helios.rendering.framebuffer.types.FramebufferHandle;
-import helios.rendering.viewport.types.ViewportHandle;
-import helios.scene.types.SceneHandle;
+import helios.engine.rendering.framebuffer.types.FramebufferHandle;
+import helios.engine.rendering.viewport.types.ViewportHandle;
+import helios.engine.scene.types.SceneHandle;
 
-import helios.rendering.common.commands.RenderCommand;
-import helios.rendering.common.types.RenderPassContext;
-import helios.scene.types.SceneMemberRenderContext;
-import helios.runtime.messaging.command.CommandHandlerRegistry;
+import helios.engine.rendering.common.commands.RenderCommand;
+import helios.engine.rendering.common.types.RenderPassContext;
+import helios.engine.scene.types.SceneMemberRenderContext;
+import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
 
 import helios.ecs.types.TypeDefs;
 
-import helios.util.log;
-import helios.runtime.world.UpdateContext;
+import helios.engine.util.log;
+import helios.engine.runtime.world.UpdateContext;
 
-import helios.rendering.common.concepts.IsRenderBackendLike;
+import helios.engine.rendering.common.concepts.IsRenderBackendLike;
 
-import helios.core.container.HandleMultiMap;
+import helios.engine.core.container.HandleMultiMap;
 
-using namespace helios::core::container;
-using namespace helios::runtime::world;
-using namespace helios::runtime::world::tags;
-using namespace helios::runtime::messaging::command;
-using namespace helios::rendering::common::commands;
-using namespace helios::rendering::common::types;
+using namespace helios::engine::core::container;
+using namespace helios::engine::runtime::world;
+using namespace helios::engine::runtime::world::tags;
+using namespace helios::engine::runtime::messaging::command;
+using namespace helios::engine::rendering::common::commands;
+using namespace helios::engine::rendering::common::types;
 
-using namespace helios::rendering::framebuffer::types;
-using namespace helios::rendering::viewport::types;
-using namespace helios::scene::types;
+using namespace helios::engine::rendering::framebuffer::types;
+using namespace helios::engine::rendering::viewport::types;
+using namespace helios::engine::scene::types;
 
-using namespace helios::scene::types;
-using namespace helios::util::log;
-using namespace helios::rendering::common::concepts;
+using namespace helios::engine::scene::types;
+using namespace helios::engine::util::log;
+using namespace helios::engine::rendering::common::concepts;
 
-#define HELIOS_LOG_SCOPE "helios::rendering::RenderManager"
-export namespace helios::rendering {
+#define HELIOS_LOG_SCOPE "helios::engine::rendering::RenderManager"
+export namespace helios::engine::rendering {
 
 
     /**

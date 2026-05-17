@@ -4,12 +4,12 @@
  */
 module;
 
-export module helios.rendering.shader.types.ShaderId;
+export module helios.engine.rendering.shader.types.ShaderId;
 
-import helios.rendering.shader.types.ShaderDomainTag;
+import helios.engine.rendering.shader.types.ShaderDomainTag;
 import helios.ecs.types.StrongId;
 
-export namespace helios::rendering::shader::types {
+export namespace helios::engine::rendering::shader::types {
 
     /**
      * @brief Strongly-typed identifier for shader resources.

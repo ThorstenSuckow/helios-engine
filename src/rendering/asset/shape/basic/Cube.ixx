@@ -7,16 +7,16 @@ module;
 
 #include <vector>
 
-export module helios.rendering.asset.shape.basic.Cube;
+export module helios.engine.rendering.asset.shape.basic.Cube;
 
-import helios.rendering.asset.shape.Shape;
+import helios.engine.rendering.asset.shape.Shape;
 
-import helios.rendering.Vertex;
-import helios.rendering.mesh.types.PrimitiveType;
+import helios.engine.rendering.Vertex;
+import helios.engine.rendering.mesh.types.PrimitiveType;
 
-using namespace helios::rendering;
+using namespace helios::engine::rendering;
 
-export namespace helios::rendering::asset::shape::basic {
+export namespace helios::engine::rendering::asset::shape::basic {
 
     /**
      * @brief Basic Cube Shape.
@@ -78,7 +78,7 @@ export namespace helios::rendering::asset::shape::basic {
             }
         ) {}
 
-        [[nodiscard]] helios::rendering::mesh::types::PrimitiveType primitiveType() const noexcept override {
+        [[nodiscard]] helios::engine::rendering::mesh::types::PrimitiveType primitiveType() const noexcept override {
             return mesh::types::PrimitiveType::LineLoop;
         }
     };

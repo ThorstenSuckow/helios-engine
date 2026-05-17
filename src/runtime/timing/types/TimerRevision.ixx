@@ -6,10 +6,10 @@ module;
 
 #include <cstdint>
 
-export module helios.runtime.timing.types.TimerRevision;
+export module helios.engine.runtime.timing.types.TimerRevision;
 
 
-export namespace helios::runtime::timing::types {
+export namespace helios::engine::runtime::timing::types {
 
     /**
      * @brief Monotonically increasing revision counter for Timer updates.

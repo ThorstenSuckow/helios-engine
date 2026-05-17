@@ -5,11 +5,11 @@
 module;
 
 
-export module helios.spatial.components.Size2DComponent;
+export module helios.engine.spatial.components.Size2DComponent;
 
-import helios.core.components.Vec2Component;
+import helios.engine.core.components.Vec2Component;
 
-export namespace helios::spatial::components {
+export namespace helios::engine::spatial::components {
 
     /** @brief Domain tag for 2D size values. */
     struct Size2DComponentDomain {};
@@ -20,5 +20,5 @@ export namespace helios::spatial::components {
      * @tparam THandle Owning entity handle type.
      */
     template<typename THandle>
-    using Size2DComponent = helios::core::components::Vec2Component<Size2DComponentDomain, THandle, float>;
+    using Size2DComponent = helios::engine::core::components::Vec2Component<Size2DComponentDomain, THandle, float>;
 }

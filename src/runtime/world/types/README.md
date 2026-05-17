@@ -1,4 +1,4 @@
-# helios::runtime::world::types
+# helios::engine::runtime::world::types
 
 Type aliases and type-id utilities for the runtime-world domain.
 
@@ -16,7 +16,7 @@ Type aliases and type-id utilities for the runtime-world domain.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::runtime::world::types
+@namespace helios::engine::runtime::world::types
 @brief Type aliases and type-id utilities for the runtime-world domain.
 </p></details>
 

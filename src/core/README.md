@@ -1,4 +1,4 @@
-# helios::core
+# helios::engine::core
 
 Core-level utilities shared across the helios engine.
 
@@ -8,14 +8,14 @@ This module provides foundational infrastructure including double-buffering for 
 
 ### algorithms
 
-The `helios.core.types.FuncDefs` module provides core algorithms used throughout the engine.
+The `helios.engine.core.types.FuncDefs` module provides core algorithms used throughout the engine.
 
 #### FNV-1a Hash
 
 A fast, compile-time capable hash function for generating identifiers from strings:
 
 ```cpp
-import helios.core.types.FuncDefs;
+import helios.engine.core.types.FuncDefs;
 
 // Compile-time hash
 constexpr uint32_t id = helios::ecs::types::fnv1a_hash("enemy_spawn");
@@ -30,7 +30,7 @@ constexpr SpawnRuleId RULE{"wave_spawn"};      // calls fnv1a_hash
 
 ### types
 
-The `helios.core.types` module provides core type definitions and tag types used throughout the engine.
+The `helios.engine.core.types` module provides core type definitions and tag types used throughout the engine.
 
 #### Tag Types
 
@@ -44,27 +44,27 @@ The `helios.core.types` module provides core type definitions and tag types used
 The `no_init` tag enables performance-critical code to skip default initialization when objects will be immediately overwritten:
 
 ```cpp
-import helios.util.Guid;
-import helios.core.types;
+import helios.engine.util.Guid;
+import helios.engine.core.types;
 
 // Generate a new unique Guid
-auto id = helios::util::Guid::generate();
+auto id = helios::engine::util::Guid::generate();
 
 // Declare uninitialized Guid for later assignment
-helios::util::Guid deferredId{helios::ecs::types::no_init};
+helios::engine::util::Guid deferredId{helios::ecs::types::no_init};
 
 // Assign later when the value is known
-deferredId = helios::util::Guid::generate();
+deferredId = helios::engine::util::Guid::generate();
 ```
 
 > **Warning:** Objects constructed with `no_init` are in an indeterminate state. Reading from them before assignment is undefined behavior.
 
 #### Supporting no_init in Custom Types
 
-The `helios::util::Guid` class demonstrates how to add `no_init` support:
+The `helios::engine::util::Guid` class demonstrates how to add `no_init` support:
 
 ```cpp
-import helios.core.types;
+import helios.engine.core.types;
 
 class Guid final {
     uint64_t value_{};
@@ -80,7 +80,7 @@ public:
 
 ### concepts
 
-The `helios.core.concepts` module provides shared compile-time constraints used
+The `helios.engine.core.concepts` module provides shared compile-time constraints used
 across multiple domains.
 
 | Concept | Purpose |
@@ -90,7 +90,7 @@ across multiple domains.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::core
+@namespace helios::engine::core
 @brief Core utilities shared across the helios engine.
 @details This module provides foundational infrastructure including double-buffering, spatial transformations, type definitions, hash algorithms, and data structures used by higher-level subsystems.
 </p></details>

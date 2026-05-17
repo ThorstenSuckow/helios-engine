@@ -4,12 +4,12 @@
  */
 module;
 
-export module helios.runtime.pooling.registry;
+export module helios.engine.runtime.pooling.registry;
 
 import helios.ecs.ComponentReflector;
-import helios.runtime.pooling.components;
+import helios.engine.runtime.pooling.components;
 
-export namespace helios::runtime::pooling {
+export namespace helios::engine::runtime::pooling {
 
     /**
      * @brief Registers all runtime pooling components with the ComponentReflector.

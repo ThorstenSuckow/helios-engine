@@ -6,12 +6,12 @@ module;
 
 #include <concepts>
 
-export module helios.platform.window.concepts.IsWindowHandle;
+export module helios.engine.platform.window.concepts.IsWindowHandle;
 
-import helios.platform.window.types.WindowHandle;
+import helios.engine.platform.window.types.WindowHandle;
 
-using namespace helios::platform::window::types;
-export namespace helios::platform::window::concepts {
+using namespace helios::engine::platform::window::types;
+export namespace helios::engine::platform::window::concepts {
 
     /**
      * @brief True when `T` is exactly `WindowHandle`.

@@ -8,16 +8,16 @@ module;
 #include <cmath>
 #include <numbers>
 
-export module helios.rendering.asset.shape.basic.Circle;
+export module helios.engine.rendering.asset.shape.basic.Circle;
 
-import helios.rendering.asset.shape.Shape;
-import helios.rendering.Vertex;
+import helios.engine.rendering.asset.shape.Shape;
+import helios.engine.rendering.Vertex;
 import helios.math.types;
-import helios.rendering.mesh.types.PrimitiveType;
+import helios.engine.rendering.mesh.types.PrimitiveType;
 
-using namespace helios::rendering;
+using namespace helios::engine::rendering;
 
-export namespace helios::rendering::asset::shape::basic {
+export namespace helios::engine::rendering::asset::shape::basic {
 
     /**
      * @brief Basic Circle Shape (2D, in XY plane).
@@ -106,7 +106,7 @@ export namespace helios::rendering::asset::shape::basic {
                 generateIndices(segments)
             ) {}
 
-        [[nodiscard]] helios::rendering::mesh::types::PrimitiveType primitiveType() const noexcept override {
+        [[nodiscard]] helios::engine::rendering::mesh::types::PrimitiveType primitiveType() const noexcept override {
             return mesh::types::PrimitiveType::Triangles;
         }
     };

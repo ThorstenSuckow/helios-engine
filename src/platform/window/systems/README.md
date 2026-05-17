@@ -1,4 +1,4 @@
-# helios::platform::window::systems
+# helios::engine::platform::window::systems
 
 Systems for window creation and presentation.
 
@@ -12,7 +12,7 @@ Systems for window creation and presentation.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::platform::window::systems
+@namespace helios::engine::platform::window::systems
 @brief Systems for window creation and presentation.
 </p></details>
 

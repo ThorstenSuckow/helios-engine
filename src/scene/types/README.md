@@ -1,10 +1,10 @@
-# helios::scene::types
+# helios::engine::scene::types
 
 Type layer for scene-domain handles and render/camera contexts.
 
 ## Overview
 
-`helios::scene::types` contains strong-id aliases and immutable context payloads
+`helios::engine::scene::types` contains strong-id aliases and immutable context payloads
 used across scene extraction, culling, and rendering integration.
 
 ## Types
@@ -20,14 +20,14 @@ used across scene extraction, culling, and rendering integration.
 
 ## Related Modules
 
-- `helios.scene.Scene`
-- `helios.scene.SceneNode`
-- `helios.scene.SceneToViewportMap`
+- `helios.engine.scene.Scene`
+- `helios.engine.scene.SceneNode`
+- `helios.engine.scene.SceneToViewportMap`
 
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::scene::types
+@namespace helios::engine::scene::types
 @brief Type layer for scene-domain handles and render/camera contexts.
 </p></details>
 

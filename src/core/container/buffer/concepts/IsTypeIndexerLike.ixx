@@ -7,9 +7,9 @@ module;
 #include <concepts>
 #include <cstddef>
 
-export module helios.core.container.buffer.concepts.IsTypeIndexerLike;
+export module helios.engine.core.container.buffer.concepts.IsTypeIndexerLike;
 
-export namespace helios::core::container::buffer::concepts {
+export namespace helios::engine::core::container::buffer::concepts {
 
     /**
      * @brief Constrains types that expose `typeIndex<T>() -> size_t`.

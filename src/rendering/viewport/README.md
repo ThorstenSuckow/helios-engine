@@ -1,4 +1,4 @@
-# helios::rendering::viewport
+# helios::engine::rendering::viewport
 
 Viewport abstractions and state-based viewport management for render target regions.
 
@@ -56,9 +56,9 @@ pause, game viewport during play).
 ## Usage
 
 ```cpp
-import helios.rendering.viewport;
+import helios.engine.rendering.viewport;
 
-using namespace helios::rendering::viewport::types;
+using namespace helios::engine::rendering::viewport::types;
 
 // Configure viewport policy
 StateToViewportPolicy policy;
@@ -78,14 +78,14 @@ systemRegistry.add<StateToViewportPolicyUpdateSystem>(
 
 | Module | Purpose |
 |--------|---------|
-| `helios.gameplay.gamestate` | Game state management |
+| `helios.engine.runtime.enginestate` | Game state management |
 | `helios.gameplay.matchstate` | Match state management |
-| `helios.runtime.world.Session` | Session state storage |
+| `helios.engine.runtime.world.Session` | Session state storage |
 
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::rendering::viewport
+@namespace helios::engine::rendering::viewport
 @brief Viewport abstractions and state-based viewport management for render target regions.
 @details Provides viewport runtime objects, snapshots, entity-manager aliases, and a policy-driven system for determining which viewports should be rendered based on the current game and match state. StateToViewportPolicy maps state combinations to viewport lists, and StateToViewportPolicyUpdateSystem updates the session each frame.
 </p></details>

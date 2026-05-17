@@ -5,22 +5,22 @@
 module;
 
 
-export module helios.rendering.common.types.RenderPassContext;
+export module helios.engine.rendering.common.types.RenderPassContext;
 
 
-import helios.rendering.common.types.ClearFlags;
+import helios.engine.rendering.common.types.ClearFlags;
 
 import helios.math;
 
-import helios.rendering.framebuffer.types.FramebufferHandle;
-import helios.rendering.viewport.types.ViewportHandle;
+import helios.engine.rendering.framebuffer.types.FramebufferHandle;
+import helios.engine.rendering.viewport.types.ViewportHandle;
 
-import helios.rendering.common.types.ClearFlags;
+import helios.engine.rendering.common.types.ClearFlags;
 
-using namespace helios::rendering::framebuffer::types;
-using namespace helios::rendering::viewport::types;
-using namespace helios::rendering::common::types;
-export namespace helios::rendering::common::types {
+using namespace helios::engine::rendering::framebuffer::types;
+using namespace helios::engine::rendering::viewport::types;
+using namespace helios::engine::rendering::common::types;
+export namespace helios::engine::rendering::common::types {
 
     /**
      * @brief Groups the target handles used for a render pass.

@@ -9,21 +9,21 @@ module;
 #include <cassert>
 #include <cmath>
 
-export module helios.input.InputManager;
+export module helios.engine.input.InputManager;
 
-import helios.input.types.Gamepad;
-import helios.input.gamepad.GamepadState;
-import helios.input.InputAdapter;
-import helios.input.types.Key;
-import helios.util.log.Logger;
-import helios.util.log.LogManager;
+import helios.engine.input.types.Gamepad;
+import helios.engine.input.gamepad.GamepadState;
+import helios.engine.input.InputAdapter;
+import helios.engine.input.types.Key;
+import helios.engine.util.log.Logger;
+import helios.engine.util.log.LogManager;
 
 namespace helios::window {
     class Window;
 }
 
-#define HELIOS_LOG_SCOPE "helios::input::InputManager"
-export namespace helios::input {
+#define HELIOS_LOG_SCOPE "helios::engine::input::InputManager"
+export namespace helios::engine::input {
 
     /**
      * @brief InputManager providing access to various input states.
@@ -49,7 +49,7 @@ export namespace helios::input {
         /**
          * @brief The InputAdapter owned by this InputManager.
          */
-        std::unique_ptr<helios::input::InputAdapter> input_;
+        std::unique_ptr<helios::engine::input::InputAdapter> input_;
 
         /**
          * @brief A bitmask used for registering the gamepads that should be polled for inputs.
@@ -60,7 +60,7 @@ export namespace helios::input {
         /**
          * @brief Shared logger instance for all InputManager objects.
          */
-        inline static const helios::util::log::Logger& logger_ = helios::util::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
+        inline static const helios::engine::util::log::Logger& logger_ = helios::engine::util::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
 
 
         public:
@@ -71,7 +71,7 @@ export namespace helios::input {
          *
          * @param input The InputAdapter used with this InputManager.
          */
-        explicit InputManager(std::unique_ptr<helios::input::InputAdapter> input)
+        explicit InputManager(std::unique_ptr<helios::engine::input::InputAdapter> input)
             : input_(std::move(input)) {}
 
 
@@ -133,7 +133,7 @@ export namespace helios::input {
          *
          * @return True if the key is pressed; returns false if the observed window is not set.
          */
-        [[nodiscard]] bool isKeyPressed(const helios::input::types::Key& key) const noexcept {
+        [[nodiscard]] bool isKeyPressed(const helios::engine::input::types::Key& key) const noexcept {
            /* if (observedWin_ == nullptr) {
                 logger_.warn("No window to observe.");
                 return false;
@@ -154,7 +154,7 @@ export namespace helios::input {
          *
          * @return True if the key is released; returns false if the observed window is not set.
          */
-        [[nodiscard]] bool isKeyReleased(const helios::input::types::Key& key) const noexcept {
+        [[nodiscard]] bool isKeyReleased(const helios::engine::input::types::Key& key) const noexcept {
           /*  if (observedWin_ == nullptr) {
                 logger_.warn("No window to observe.");
                 return false;
@@ -177,7 +177,7 @@ export namespace helios::input {
          */
         unsigned int registerGamepads(unsigned int mask) noexcept {
             const unsigned int maxMask = static_cast<int>(std::pow(
-                helios::input::types::Gamepad::size_,
+                helios::engine::input::types::Gamepad::size_,
                 2.0f
             ) - 1);
             assert(mask <= maxMask && "mask out of bounds");
@@ -210,7 +210,7 @@ export namespace helios::input {
          * @see isConnected()
          * @see poll()
          */
-        [[nodiscard]] const helios::input::gamepad::GamepadState& gamepadState(const helios::input::types::Gamepad gamepadId) const noexcept {
+        [[nodiscard]] const helios::engine::input::gamepad::GamepadState& gamepadState(const helios::engine::input::types::Gamepad gamepadId) const noexcept {
             return input_->gamepadState(gamepadId);
         }
 
@@ -221,7 +221,7 @@ export namespace helios::input {
          *
          * @return True if a gamepad was found for the specified `gamepadId`, otherwise false.
          */
-        [[nodiscard]] bool isConnected(helios::input::types::Gamepad gamepadId) const noexcept {
+        [[nodiscard]] bool isConnected(helios::engine::input::types::Gamepad gamepadId) const noexcept {
             return input_->isConnected(gamepadId);
         }
 
@@ -231,7 +231,7 @@ export namespace helios::input {
          *
          * @return A reference to the InputAdapter associated with this InputManager.
          */
-        [[nodiscard]] const helios::input::InputAdapter& inputAdapter() const noexcept {
+        [[nodiscard]] const helios::engine::input::InputAdapter& inputAdapter() const noexcept {
             return *input_;
         }
 
@@ -243,7 +243,7 @@ export namespace helios::input {
          *
          * @return A reference to the InputAdapter associated with this InputManager.
          */
-        [[nodiscard]] helios::input::InputAdapter& inputAdapter() noexcept {
+        [[nodiscard]] helios::engine::input::InputAdapter& inputAdapter() noexcept {
             return *input_;
         }
 
@@ -251,4 +251,4 @@ export namespace helios::input {
 
 
 
-} // namespace helios::input
+} // namespace helios::engine::input

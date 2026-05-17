@@ -8,16 +8,16 @@ module;
 #include <vector>
 #include <cassert>
 
-export module helios.runtime.messaging.command.CommandHandlerRegistry;
+export module helios.engine.runtime.messaging.command.CommandHandlerRegistry;
 
 import helios.ecs.types.ComponentTypeId;
-import helios.runtime.messaging.command.types;
+import helios.engine.runtime.messaging.command.types;
 
 using namespace helios::ecs::types;
-using namespace helios::runtime::messaging::command::types;
+using namespace helios::engine::runtime::messaging::command::types;
 
 
-export namespace helios::runtime::messaging::command {
+export namespace helios::engine::runtime::messaging::command {
 
     /**
      * @brief Type-erased storage entry for a registered command handler.

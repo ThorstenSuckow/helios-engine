@@ -4,14 +4,14 @@
  */
 module;
 
-export module helios.runtime.messaging.command.NullCommandBuffer;
+export module helios.engine.runtime.messaging.command.NullCommandBuffer;
 
-import helios.runtime.messaging.command.tags.CommandBufferRole;
-import helios.runtime.world.UpdateContext;
+import helios.engine.runtime.messaging.command.tags.CommandBufferRole;
+import helios.engine.runtime.world.UpdateContext;
 
-using namespace helios::runtime::world::tags;
-using namespace helios::runtime::world;
-export namespace helios::runtime::messaging::command {
+using namespace helios::engine::runtime::world::tags;
+using namespace helios::engine::runtime::world;
+export namespace helios::engine::runtime::messaging::command {
 
     /**
      * @brief Command buffer implementation that intentionally performs no work.

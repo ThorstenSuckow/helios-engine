@@ -1,10 +1,10 @@
 /**
  * @file _module.ixx
- * @brief Aggregate module for helios::tooling namespace.
+ * @brief Aggregate module for helios::engine::tooling namespace.
  */
 
-export module helios.tooling;
+export module helios.engine.tooling;
 
-export import helios.tooling.FpsMetrics;
-export import helios.tooling.FramePacer;
-export import helios.tooling.FrameStats;
+export import helios.engine.tooling.FpsMetrics;
+export import helios.engine.tooling.FramePacer;
+export import helios.engine.tooling.FrameStats;

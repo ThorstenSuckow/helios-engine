@@ -11,10 +11,10 @@ module;
 #include <cstddef>
 
 
-export module helios.core.container.ConceptModelRegistry;
+export module helios.engine.core.container.ConceptModelRegistry;
 
 
-export namespace helios::core::container {
+export namespace helios::engine::core::container {
 
     /**
      * @brief Generic type-indexed registry for type-erased wrapper instances.

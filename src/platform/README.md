@@ -1,10 +1,10 @@
-# helios::platform
+# helios::engine::platform
 
 Platform abstraction layer for window/runtime integration.
 
 ## Overview
 
-`helios::platform` provides platform-facing modules used to bootstrap and drive
+`helios::engine::platform` provides platform-facing modules used to bootstrap and drive
 application runtime behavior (window creation, event polling, context lifecycle,
 and backend-specific integration).
 
@@ -28,7 +28,7 @@ and backend-specific integration).
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::platform
+@namespace helios::engine::platform
 @brief Platform abstraction layer for runtime and window integration.
 </p></details>
 

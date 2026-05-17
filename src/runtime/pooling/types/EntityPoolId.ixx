@@ -7,13 +7,13 @@ module;
 #include <string_view>
 #include <cstddef>
 
-export module helios.runtime.pooling.types.EntityPoolId;
+export module helios.engine.runtime.pooling.types.EntityPoolId;
 
-import helios.core.types.FuncDefs;
-import helios.core.types;
+import helios.engine.core.types.FuncDefs;
+import helios.engine.core.types;
 import helios.ecs.types.StrongId;
 
-export namespace helios::runtime::pooling::types {
+export namespace helios::engine::runtime::pooling::types {
 
     /**
      * @brief Tag type for EntityPoolId.
@@ -38,8 +38,8 @@ export namespace helios::runtime::pooling::types {
  * @brief Hash specialization for EntityPoolId.
  */
 template<>
-struct std::hash<helios::runtime::pooling::types::EntityPoolId> {
-    std::size_t operator()(const helios::runtime::pooling::types::EntityPoolId& id) const noexcept {
+struct std::hash<helios::engine::runtime::pooling::types::EntityPoolId> {
+    std::size_t operator()(const helios::engine::runtime::pooling::types::EntityPoolId& id) const noexcept {
         return id.value();
     }
 };

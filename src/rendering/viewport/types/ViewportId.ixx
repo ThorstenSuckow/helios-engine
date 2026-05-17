@@ -4,12 +4,12 @@
  */
 module;
 
-export module helios.rendering.viewport.types.ViewportId;
+export module helios.engine.rendering.viewport.types.ViewportId;
 
 import helios.ecs.types.StrongId;
-import helios.rendering.viewport.types.ViewportDomainTag;
+import helios.engine.rendering.viewport.types.ViewportDomainTag;
 
-export namespace helios::rendering::viewport::types {
+export namespace helios::engine::rendering::viewport::types {
 
     /**
      * @brief Strongly-typed identifier for viewport resources.

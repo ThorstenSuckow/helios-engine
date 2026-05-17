@@ -1,4 +1,4 @@
-# helios::core::types
+# helios::engine::core::types
 
 Foundational type and id utilities shared across the engine.
 
@@ -32,7 +32,7 @@ minimal and are used by ECS, rendering, runtime, and platform code.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::core::types
+@namespace helios::engine::core::types
 @brief Foundational type and id utilities shared across the engine.
 </p></details>
 

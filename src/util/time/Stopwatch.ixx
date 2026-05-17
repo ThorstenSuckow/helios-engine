@@ -7,9 +7,9 @@ module;
 
 #include <chrono>
 
-export module helios.util.time.Stopwatch;
+export module helios.engine.util.time.Stopwatch;
 
-export namespace helios::util::time {
+export namespace helios::engine::util::time {
 
     /**
      * @brief A high-resolution timer based on std::chrono::steady_clock.

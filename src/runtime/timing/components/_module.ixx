@@ -2,6 +2,6 @@
  * @file _module.ixx
  * @brief Aggregator for timer components.
  */
-export module helios.runtime.timing.components;
+export module helios.engine.runtime.timing.components;
 
-export import helios.runtime.timing.components.TimerBindingComponent;
+export import helios.engine.runtime.timing.components.TimerBindingComponent;

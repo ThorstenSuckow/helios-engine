@@ -6,12 +6,12 @@ module;
 
 #include <concepts>
 
-export module helios.scene.concepts.IsSceneHandle;
+export module helios.engine.scene.concepts.IsSceneHandle;
 
-import helios.scene.types.SceneHandle;
+import helios.engine.scene.types.SceneHandle;
 
-using namespace helios::scene::types;
-export namespace helios::scene::concepts {
+using namespace helios::engine::scene::types;
+export namespace helios::engine::scene::concepts {
 
     /**
      * @brief Constrains a type to the scene handle alias.

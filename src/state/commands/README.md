@@ -1,4 +1,4 @@
-# helios::state::commands
+# helios::engine::state::commands
 
 Commands for requesting state transitions.
 
@@ -11,8 +11,8 @@ Commands for requesting state transitions.
 ## Usage
 
 ```cpp
-using namespace helios::state::commands;
-using namespace helios::state::types;
+using namespace helios::engine::state::commands;
+using namespace helios::engine::state::types;
 
 // Request a state transition
 updateContext.queueCommand<EngineCommandBuffer, StateCommand<GameState>>(
@@ -26,7 +26,7 @@ updateContext.queueCommand<EngineCommandBuffer, StateCommand<GameState>>(
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::state::commands
+@namespace helios::engine::state::commands
 @brief State transition commands.
 @details Provides command types for requesting state transitions through the command buffer.
 </p></details>

@@ -4,12 +4,12 @@
  */
 module;
 
-export module helios.spatial.components.LocalPositionStateComponent;
+export module helios.engine.spatial.components.LocalPositionStateComponent;
 
-import helios.core.components.Vec3Component;
+import helios.engine.core.components.Vec3Component;
 
-using namespace helios::core::components;
-export namespace helios::spatial::components {
+using namespace helios::engine::core::components;
+export namespace helios::engine::spatial::components {
 
     /**
      * @brief Domain tag for local position state.

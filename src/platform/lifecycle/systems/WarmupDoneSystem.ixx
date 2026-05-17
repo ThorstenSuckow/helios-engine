@@ -6,38 +6,40 @@ module;
 
 #include <concepts>
 
-export module helios.platform.lifecycle.systems.WarmupDoneSystem;
+export module helios.engine.platform.lifecycle.systems.WarmupDoneSystem;
 
 
-import helios.runtime.world.UpdateContext;
+import helios.engine.runtime.world.UpdateContext;
 
-import helios.runtime.world.tags.SystemRole;
+import helios.engine.runtime.world.tags.SystemRole;
 
-import helios.runtime.messaging.command;
+import helios.engine.runtime.messaging.command;
 
-import helios.runtime.concepts;
+import helios.engine.runtime.concepts;
 
-import helios.runtime.world;
+import helios.engine.runtime.world;
 import helios.ecs.components.Active;
-import helios.rendering.shader.concepts;
+import helios.engine.rendering.shader.concepts;
 
-import helios.rendering.shader.components;
+import helios.engine.rendering.shader.components;
 
-import helios.state.commands;
-import helios.state.types;
-import helios.gameplay.gamestate.types;
+import helios.engine.state.commands;
+import helios.engine.state.types;
 
-using namespace helios::rendering::shader::concepts;
-using namespace helios::runtime::messaging::command::concepts;
+import helios.engine.runtime.enginestate;
+
+using namespace helios::engine::runtime::enginestate::types;
+using namespace helios::engine::rendering::shader::concepts;
+using namespace helios::engine::runtime::messaging::command::concepts;
 using namespace helios::ecs::components;
-using namespace helios::rendering::shader::components;
-using namespace helios::runtime::world::tags;
-using namespace helios::runtime::world;
-using namespace helios::runtime::messaging::command;
-using namespace helios::state::types;
-using namespace helios::state::commands;
-using namespace helios::gameplay::gamestate::types;
-export namespace helios::platform::lifecycle::systems {
+using namespace helios::engine::rendering::shader::components;
+using namespace helios::engine::runtime::world::tags;
+using namespace helios::engine::runtime::world;
+using namespace helios::engine::runtime::messaging::command;
+using namespace helios::engine::state::types;
+using namespace helios::engine::state::commands;
+
+export namespace helios::engine::platform::lifecycle::systems {
 
     /**
      * @brief Signals warmup completion through a typed state command buffer.
@@ -61,7 +63,7 @@ export namespace helios::platform::lifecycle::systems {
         using EngineRoleTag = SystemRole;
 
         /**
-         * @brief Queues `StateCommand<GameState>` with `WarmupDoneSignal` when warmup resources are consumed.
+         * @brief Queues `StateCommand<EngineState>` with `WarmupDoneSignal` when warmup resources are consumed.
          *
          * @param updateContext Frame-local update context.
          */
@@ -73,10 +75,10 @@ export namespace helios::platform::lifecycle::systems {
                 Active<THandle>
                 >().whereEnabled().empty()) {
 
-                cmdBuffer.template add<StateCommand<GameState>>(
-                    StateTransitionRequest<GameState>(
-                        updateContext.session().state<GameState>(),
-                        GameStateTransitionId::WarmupDoneSignal
+                cmdBuffer.template add<StateCommand<EngineState>>(
+                    StateTransitionRequest<EngineState>(
+                        updateContext.session().state<EngineState>(),
+                        EngineStateTransitionId::WarmupDone
                     )
                 );
 

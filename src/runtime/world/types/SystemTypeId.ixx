@@ -7,12 +7,12 @@ module;
 #include <functional>
 #include <cstddef>
 
-export module helios.runtime.world.types.SystemTypeId;
+export module helios.engine.runtime.world.types.SystemTypeId;
 
 import helios.ecs.TypeIndexer;
 import helios.ecs.types;
 
-export namespace helios::runtime::world::types {
+export namespace helios::engine::runtime::world::types {
 
     /**
      * @brief Unique type identifier for system types.
@@ -96,8 +96,8 @@ export namespace helios::runtime::world::types {
  * @brief Hash specialization for SystemTypeId.
  */
 template<>
-struct std::hash<helios::runtime::world::types::SystemTypeId> {
-   std::size_t operator()(const helios::runtime::world::types::SystemTypeId& id) const noexcept {
+struct std::hash<helios::engine::runtime::world::types::SystemTypeId> {
+   std::size_t operator()(const helios::engine::runtime::world::types::SystemTypeId& id) const noexcept {
         return id.value();
     }
 

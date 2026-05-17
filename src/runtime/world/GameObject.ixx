@@ -9,13 +9,13 @@ module;
 #include <typeindex>
 
 
-export module helios.runtime.world.GameObject;
+export module helios.engine.runtime.world.GameObject;
 
-import helios.runtime.world.GameObjectEntityManager;
+import helios.engine.runtime.world.GameObjectEntityManager;
 import helios.ecs.Entity;
 
 using namespace helios::ecs;
-export namespace helios::runtime::world {
+export namespace helios::engine::runtime::world {
 
     /**
      * @brief Alias for an entity facade backed by `GameObjectEntityManager`.

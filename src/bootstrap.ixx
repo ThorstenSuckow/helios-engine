@@ -10,7 +10,7 @@ module;
 #include <memory>
 #include <utility>
 
-export module helios.bootstrap;
+export module helios.engine.bootstrap;
 
 import helios.engine.runtime.gameloop;
 import helios.engine.runtime.world;
@@ -43,7 +43,7 @@ using namespace helios::engine::runtime::world::types;
 using namespace helios::engine::runtime::gameloop;
 using namespace helios::engine::runtime::messaging::command;
 
-export namespace helios::bootstrap {
+export namespace helios::engine::bootstrap {
 
     template<typename... Tuple>
     struct ComponentRegistrar;

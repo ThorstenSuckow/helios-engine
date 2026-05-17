@@ -16,4 +16,5 @@ export import helios.engine.spatial.components.LocalToWorldBoundsComponent;
 export import helios.engine.spatial.components.LocalPositionStateComponent;
 export import helios.engine.spatial.components.Size2DComponent;
 export import helios.engine.spatial.components.Scale2DComponent;
+export import helios.engine.spatial.components.Direction3DComponent;
 export import helios.engine.spatial.components.BoundsComponent;

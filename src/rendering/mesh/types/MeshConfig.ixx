@@ -1,6 +1,6 @@
 /**
  * @file MeshConfig.ixx
- * @brief Mesh configuration including primitive type.
+ * @brief Rendering configuration for mesh draw interpretation.
  */
 module;
 
@@ -12,15 +12,12 @@ import helios.engine.rendering.mesh.types.PrimitiveType;
 export namespace helios::engine::rendering::mesh::types {
 
     /**
-     * @brief Configuration for how a Mesh's data should be interpreted and rendered.
-     *
-     * This struct defines rendering-specific properties for meshes, for example
-     * the primitive topology used by draw calls.
+     * @brief Rendering metadata that defines how mesh buffers are interpreted.
      */
     struct MeshConfig {
 
         /**
-         * @brief Topology config for the draw call, e.g. setting the draw mode.
+         * @brief Primitive topology used by draw calls.
          */
         PrimitiveType primitiveType = PrimitiveType::Triangles;
 

@@ -4,7 +4,7 @@
  */
 export module helios.engine.rendering;
 
-export import helios.engine.rendering.Vertex;
+
 export import helios.engine.rendering.RenderManager;
 
 export import helios.engine.rendering.FramebufferToViewportMap;

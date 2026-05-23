@@ -6,3 +6,4 @@ export module helios.engine.rendering.common.types;
 
 export import helios.engine.rendering.common.types.ClearFlags;
 export import helios.engine.rendering.common.types.RenderPassContext;
+export import helios.engine.rendering.common.types.Vertex;

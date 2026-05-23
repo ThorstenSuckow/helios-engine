@@ -7,14 +7,14 @@ module;
 
 #include <vector>
 
-export module helios.engine.rendering.assets:Cube;
+export module helios.engine.rendering.mesh.assets:Cube;
 
 import helios.engine.rendering.Vertex;
 import helios.engine.rendering.mesh.types.PrimitiveType;
 
 using namespace helios::engine::rendering;
 
-export namespace helios::engine::rendering::assets {
+export namespace helios::engine::rendering::mesh::assets {
 
     /**
      * @brief Basic Cube Shape.

@@ -6,6 +6,7 @@ export module helios.engine.rendering.mesh;
 
 
 export import helios.engine.rendering.mesh.types;
+export import helios.engine.rendering.mesh.assets;
 
 export import helios.engine.rendering.mesh.MeshEntityManager;
 export import helios.engine.rendering.mesh.MeshEntity;

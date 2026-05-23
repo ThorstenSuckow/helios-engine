@@ -3,6 +3,6 @@
  * @brief Module exports for rendering model assets.
  */
 
-export module helios.engine.rendering.assets;
+export module helios.engine.rendering.mesh.assets;
 
 export import :Cube;

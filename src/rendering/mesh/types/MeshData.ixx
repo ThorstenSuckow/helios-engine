@@ -34,25 +34,25 @@ export namespace helios::engine::rendering::mesh::types {
         /**
          * @brief Primitive topology used to interpret the index buffer.
          */
-        PrimitiveType primitiveTyp;
+        PrimitiveType primitiveType;
 
         /**
          * @brief Constructs mesh data from owned vertex/index vectors.
          * @param vertices Vertex buffer payload.
          * @param indices Index buffer payload.
-         * @param primitiveTyp Primitive topology for draw interpretation.
+         * @param primitiveType Primitive topology for draw interpretation.
          */
-        explicit MeshData(std::vector<Vertex> vertices, std::vector<unsigned int> indices, PrimitiveType primitiveTyp)
-        : vertices(std::move(vertices)), indices(std::move(indices)), primitiveTyp(primitiveTyp) {};
+        explicit MeshData(std::vector<Vertex> vertices, std::vector<unsigned int> indices, PrimitiveType primitiveType)
+        : vertices(std::move(vertices)), indices(std::move(indices)), primitiveType(primitiveType) {};
 
         /**
          * @brief Constructs mesh data by copying from non-owning spans.
          * @param vertices Vertex buffer view.
          * @param indices Index buffer view.
-         * @param primitiveTyp Primitive topology for draw interpretation.
+         * @param primitiveType Primitive topology for draw interpretation.
          */
-        explicit MeshData(std::span<const Vertex> vertices, std::span<const unsigned int> indices, PrimitiveType primitiveTyp)
-        : vertices(vertices.begin(), vertices.end()), indices(indices.begin(), indices.end()), primitiveTyp(primitiveTyp) {};
+        explicit MeshData(std::span<const Vertex> vertices, std::span<const unsigned int> indices, PrimitiveType primitiveType)
+        : vertices(vertices.begin(), vertices.end()), indices(indices.begin(), indices.end()), primitiveType(primitiveType) {};
 
 
     };

@@ -110,7 +110,7 @@ export namespace helios::engine::rendering {
 
 
                     for (auto renderContext : sceneMemberRenderContexts) {
-
+                        renderBackend_.doRender(renderContext);
                     }
 
 

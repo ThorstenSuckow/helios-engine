@@ -6,3 +6,5 @@
 export module helios.engine.rendering.mesh.components;
 
 export import helios.engine.rendering.mesh.components.MeshDataComponent;
+export import helios.engine.rendering.mesh.components.MeshUploadRequestComponent;
+export import helios.engine.rendering.mesh.components.MeshDataIndexComponent;

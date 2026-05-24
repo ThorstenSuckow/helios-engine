@@ -6,3 +6,4 @@
 export module helios.engine.rendering.mesh.assets;
 
 export import :Cube;
+export import :Triangle;

@@ -5,3 +5,4 @@
 export module helios.engine.rendering.shader.concepts;
 
 export import helios.engine.rendering.shader.concepts.IsShaderHandle;
+export import helios.engine.rendering.shader.concepts.IsUniformCacheStrategyLike;

@@ -4,10 +4,10 @@
  */
 module;
 
-export module helios.engine.rendering.shader.UniformSemantics;
+export module helios.engine.rendering.shader.types.UniformSemantics;
 
 
-export namespace helios::engine::rendering::shader {
+export namespace helios::engine::rendering::shader::types {
 
     /**
      * @brief Enumeration of semantic identifiers for shader uniform variables.

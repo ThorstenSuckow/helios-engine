@@ -11,10 +11,11 @@ module;
 
 export module helios.engine.rendering.shader.UniformValueMap;
 
-import helios.engine.rendering.shader.UniformSemantics;
+import helios.engine.rendering.shader.types.UniformSemantics;
 
 import helios.math.types;
 
+using namespace helios::engine::rendering::shader::types;
 export namespace helios::engine::rendering::shader {
 
     /**

@@ -33,6 +33,12 @@ export namespace helios::engine::rendering::common::types {
         /** @brief Target viewport handle. */
         ViewportHandle viewportHandle{};
 
+        /** @brief View Matrix used for rendering the scene. */
+        helios::math::mat4f viewMatrix{};
+
+        /** @brief Projection Matrix used for rendering the scene. */
+        helios::math::mat4f projectionMatrix{};
+
     };
 
 

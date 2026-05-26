@@ -1,3 +1,7 @@
+/**
+ * @file Mat4Component.ixx
+ * @brief Generic 4x4 matrix ECS component with dirty-state tracking.
+ */
 module;
 
 #include <cassert>
@@ -34,17 +38,24 @@ export namespace helios::engine::core::components {
         /**
          * @brief Constructs the component with an initial value.
          *
-         * @param value Initial value vector.
+         * @param value Initial matrix value.
          */
         explicit Mat4Component(const mat4<TNumericType>& value) : value_(value){}
 
         /**
+         * @brief Constructs the component with a scalar-filled matrix.
+         *
+         * @param value Scalar used to initialize all matrix elements.
+         */
+        explicit Mat4Component(const TNumericType value) : value_(mat4<TNumericType>{value}){}
+
+        /**
          * @brief Copy constructor.
+         *
+         * @param other The component to copy from.
          *
          * @details Copies the value and forces the copied component into a
          * dirty state to ensure dependent systems refresh cached data.
-         *
-         * @param other The component to copy from.
          */
         Mat4Component(const Mat4Component& other) :
             value_(other.value_),
@@ -92,14 +103,19 @@ export namespace helios::engine::core::components {
         }
 
         /**
-         * @brief Returns the current value.
+         * @brief Returns the current value for in-place modification.
          *
-         * @return Current 4x4 matrix value.
+         * @return Mutable reference to the current 4x4 matrix value.
          */
         [[nodiscard]] mat4<TNumericType>& value() noexcept {
             return value_;
         }
 
+        /**
+         * @brief Returns the current value.
+         *
+         * @return Current 4x4 matrix value.
+         */
         [[nodiscard]] const mat4<TNumericType>& value() const noexcept {
             return value_;
         }
@@ -107,7 +123,7 @@ export namespace helios::engine::core::components {
         /**
          * @brief Updates the value and marks the component dirty on change.
          *
-         * @param value New value vector.
+         * @param value New matrix value.
          */
         void setValue(const mat4<TNumericType> value) noexcept {
 

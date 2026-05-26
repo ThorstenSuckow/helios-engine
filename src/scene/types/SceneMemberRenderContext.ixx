@@ -57,7 +57,8 @@ export namespace helios::engine::scene::types {
         ShaderHandle shaderHandle;
 
         /** @brief World transform used for rendering the scene member. */
-        helios::math::mat4f worldTransform;
+        helios::math::mat4f worldMatrix;
+
     };
 
 }

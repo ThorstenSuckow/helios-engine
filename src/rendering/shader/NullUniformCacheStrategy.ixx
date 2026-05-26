@@ -34,6 +34,7 @@ export namespace helios::opengl {
          * @param updateContext Frame-local update context.
          * @return Always returns `true`.
          */
+        template<typename TUniformScope>
         [[nodiscard]] bool cacheUniforms(
             TMemberHandle memberHandle,
             RenderResourceWorld& renderResourceWorld,

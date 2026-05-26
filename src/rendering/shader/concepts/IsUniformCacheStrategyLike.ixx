@@ -24,12 +24,15 @@ export namespace helios::engine::rendering::shader::concepts {
      * @details  Requires `bool cacheUniforms(TMemberHandle, RenderResourceWorld&, UpdateContext&)`
      * and a valid shader handle type via `IsShaderHandle<TMemberHandle>`.
      */
-    template<typename T, typename TMemberHandle>
-    concept IsUniformCacheStrategyLike = requires(
+    template<typename T, typename TMemberHandle, typename... TUniformScopes>
+    concept IsUniformCacheStrategyLike =
+        IsShaderHandle<TMemberHandle> && (
+
+        requires(
         T& t, TMemberHandle entityHandle, RenderResourceWorld& renderResourceWorld, UpdateContext& updateContext
     ) {
-        {t.cacheUniforms(entityHandle, renderResourceWorld, updateContext)} -> std::same_as<bool>;
-    } && IsShaderHandle<TMemberHandle>;
+        {t.template cacheUniforms<TUniformScopes>(entityHandle, renderResourceWorld, updateContext)} -> std::same_as<bool>;
+    } &&  ...);
 
 
 };

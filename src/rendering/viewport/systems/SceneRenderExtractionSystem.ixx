@@ -20,6 +20,7 @@ import helios.engine.rendering.common.commands.RenderCommand;
 
 import helios.engine.rendering.framebuffer.components.FramebufferBindingComponent;
 
+import helios.engine.spatial.components;
 
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.messaging.command.NullCommandBuffer;
@@ -28,8 +29,6 @@ import helios.engine.runtime.world.tags.SystemRole;
 
 import helios.ecs.components.Active;
 
-import helios.engine.spatial.components.LocalToWorldBoundsComponent;
-import helios.engine.spatial.components.LocalToWorldMatrixComponent;
 
 import helios.engine.util.log;
 
@@ -140,20 +139,20 @@ export namespace helios::engine::rendering::viewport::systems {
                     memberEntity,
                     smc,
                     rpc,
-                    clwbc,
-                    clwmc,
+                    wmc,
+                    wbc,
                     memberActive
                     ] : updateContext.view<
                     TMemberHandle,
                     SceneMemberComponent<TMemberHandle>,
                     RenderPrototypeComponent<TMemberHandle>,
-                    LocalToWorldBoundsComponent<TMemberHandle>,
-                    LocalToWorldMatrixComponent<TMemberHandle>,
+                    WorldMatrixComponent<TMemberHandle>,
+                    WorldBoundsComponent<TMemberHandle>,
                     Active<TMemberHandle>
                 >().whereEnabled()) {
 
                     if (smc->targetHandle() == sceneHandle && cullingStrategy_.shouldRender(
-                            CullingContext{pcc->value(), lac->value(), clwbc->value(), memberEntity.handle()}
+                            CullingContext{pcc->value(), lac->value(), wbc->value(), memberEntity.handle()}
                         )
                     ) {
 
@@ -166,8 +165,8 @@ export namespace helios::engine::rendering::viewport::systems {
                                 rpc->meshHandle(),
                                 rpc->materialHandle(),
                                 rpc->shaderHandle(),
-                                clwmc->value()
-                        });
+                                wmc->value()
+                            });
 
 
                     }

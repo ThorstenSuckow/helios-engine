@@ -43,6 +43,18 @@ export namespace helios::engine::core::components {
         explicit Vec4Component(const vec4<TNumericType> value) : value_(value){}
 
         /**
+         * @brief Constructs the component from scalar vector coordinates.
+         *
+         * @param x X component.
+         * @param y Y component.
+         * @param z Z component.
+         * @param w W component.
+         */
+        explicit Vec4Component(
+        const TNumericType x, const TNumericType y, const TNumericType z, const TNumericType w)
+        : value_(x, y, z, w){}
+
+        /**
          * @brief Copy constructor.
          *
          * @details Copies the value and forces the copied component into a
@@ -104,6 +116,11 @@ export namespace helios::engine::core::components {
             return value_;
         }
 
+        /**
+         * @brief Returns the current value.
+         *
+         * @return Current 4D vector value.
+         */
         [[nodiscard]] vec4<TNumericType> value() noexcept {
             return value_;
         }
@@ -111,7 +128,7 @@ export namespace helios::engine::core::components {
         /**
          * @brief Updates the value and marks the component dirty on change.
          *
-         * @param value New value vector.
+         * @param value New vector value.
          */
         void setValue(const vec4<TNumericType> value) noexcept {
 

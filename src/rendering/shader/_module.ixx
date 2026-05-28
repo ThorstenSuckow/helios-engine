@@ -12,4 +12,4 @@ export import helios.engine.rendering.shader.systems;
 
 export import helios.engine.rendering.shader.ShaderEntityManager;
 export import helios.engine.rendering.shader.ShaderEntity;
-export import helios.engine.rendering.shader.UniformValueMap;
+export import helios.engine.rendering.shader.UniformValueBag;

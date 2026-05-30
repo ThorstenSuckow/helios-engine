@@ -9,10 +9,10 @@ module;
 export module helios.engine.rendering.common.concepts.IsRenderTargetHandle;
 
 import helios.engine.rendering.viewport.types.ViewportHandle;
-import helios.engine.rendering.framebuffer.types.FramebufferHandle;
+import helios.engine.rendering.renderTarget.types.RenderTargetHandle;
 
 using namespace helios::engine::rendering::viewport::types;
-using namespace helios::engine::rendering::framebuffer::types;
+using namespace helios::engine::rendering::renderTarget::types;
 export namespace helios::engine::rendering::common::concepts {
 
     /**
@@ -22,6 +22,6 @@ export namespace helios::engine::rendering::common::concepts {
      */
     template<typename T>
     concept IsRenderTargetHandle = std::is_same_v<T, ViewportHandle> ||
-                                     std::is_same_v<T, FramebufferHandle>;
+                                     std::is_same_v<T, RenderTargetHandle>;
 
 }

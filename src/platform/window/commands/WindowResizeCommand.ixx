@@ -7,14 +7,14 @@ module;
 export module helios.engine.platform.window.commands.WindowResizeCommand;
 
 
-import helios.engine.rendering.framebuffer.types.FramebufferSize;
+import helios.engine.rendering.renderTarget.types.RenderTargetSize;
 
 import helios.engine.platform.window.types.WindowHandle;
 import helios.engine.platform.window.types.WindowSize;
 import helios.engine.platform.window.concepts.IsWindowHandle;
 
 using namespace helios::engine::platform::window::types;
-using namespace helios::engine::rendering::framebuffer::types;
+using namespace helios::engine::rendering::renderTarget::types;
 using namespace helios::engine::platform::window::concepts;
 export namespace helios::engine::platform::window::commands {
 
@@ -33,8 +33,8 @@ export namespace helios::engine::platform::window::commands {
         /** @brief New window size in pixels. */
         WindowSize windowSize;
 
-        /** @brief the underlying framebuffer size */
-        FramebufferSize framebufferSize;
+        /** @brief the underlying renderTarget size */
+        RenderTargetSize renderTargetSize;
 
     };
 

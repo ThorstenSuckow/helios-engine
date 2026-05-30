@@ -13,7 +13,7 @@ export module helios.engine.rendering.RenderManager;
 
 import helios.engine.runtime.world.tags.ManagerRole;
 
-import helios.engine.rendering.framebuffer.types.FramebufferHandle;
+import helios.engine.rendering.renderTarget.types.RenderTargetHandle;
 import helios.engine.rendering.viewport.types.ViewportHandle;
 import helios.engine.scene.types.SceneHandle;
 
@@ -24,7 +24,7 @@ import helios.engine.rendering.common.types.RenderPassContext;
 import helios.engine.scene.types.SceneMemberRenderContext;
 import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
 
-import helios.ecs.types.TypeDefs;
+import helios.ecs.types;
 
 import helios.engine.util.log;
 import helios.engine.runtime.world.UpdateContext;
@@ -35,6 +35,10 @@ import helios.engine.core.container.HandleMultiMap;
 
 import helios.math;
 
+import helios.engine.rendering.mesh.types;
+import helios.engine.rendering.material.types;
+import helios.engine.rendering.shader.types;
+
 using namespace helios::engine::scene::components;
 using namespace helios::engine::core::container;
 using namespace helios::engine::runtime::world;
@@ -42,11 +46,15 @@ using namespace helios::engine::runtime::world::tags;
 using namespace helios::engine::runtime::messaging::command;
 using namespace helios::engine::rendering::common::commands;
 using namespace helios::engine::rendering::common::types;
+using namespace helios::engine::rendering::mesh::types;
+using namespace helios::engine::rendering::material::types;
+using namespace helios::engine::rendering::shader::types;
+using namespace helios::engine::rendering::viewport::types;
 
-using namespace helios::engine::rendering::framebuffer::types;
+using namespace helios::engine::rendering::renderTarget::types;
 using namespace helios::engine::rendering::viewport::types;
 using namespace helios::engine::scene::types;
-
+using namespace helios::ecs::types;
 using namespace helios::engine::scene::types;
 using namespace helios::engine::util::log;
 using namespace helios::engine::rendering::common::concepts;
@@ -54,9 +62,12 @@ using namespace helios::engine::rendering::common::concepts;
 #define HELIOS_LOG_SCOPE "helios::engine::rendering::RenderManager"
 export namespace helios::engine::rendering {
 
-
     /**
-     * @brief Draft manager that collects render commands and drives render passes.
+     * @brief Collects render commands into hierarchical batches and forwards them to the backend.
+     *
+     * @details
+     * Commands are grouped by render-target, viewport, shader, material, and mesh.
+     * `flush(...)` iterates this hierarchy and calls the corresponding backend batch hooks.
      *
      * @tparam TRenderBackend Rendering backend type.
      * @tparam TMemberHandle Renderable scene member handle type.
@@ -66,70 +77,161 @@ export namespace helios::engine::rendering {
     class RenderManager {
 
         /**
-         * @brief Per-viewport camera matrices used for a render pass.
+         * @brief Clears active child batches and resets the parent batch active flag.
+         *
+         * @tparam TBatch Parent batch type.
+         * @tparam TChildHandle Child batch element type.
+         * @param batch Parent batch to reset.
+         * @param activeIndices Active child indices to clear.
+         * @param batches Child batch storage.
          */
-        struct ViewProjection {
-            helios::math::mat4f viewMatrix;
-            helios::math::mat4f projectionMatrix;
+        template<typename TBatch, typename TChildHandle>
+        static void clearActive(TBatch* batch, std::vector<EntityId>& activeIndices, std::vector<TChildHandle>& batches) {
+            batch->isActive = false;
+            for (auto idx: activeIndices) {
+                batches[idx].clear();
+            }
+            activeIndices.clear();
+        }
+
+        /**
+         * @brief Returns the existing child batch for a handle or activates a new one.
+         *
+         * @tparam THandle Handle type used as index source.
+         * @tparam TChildBatch Child batch type.
+         * @param handle Handle selecting the batch slot.
+         * @param batches Child batch storage.
+         * @param activeIndices Active child indices list.
+         * @return Reference to the active child batch.
+         */
+        template<typename THandle, typename TChildBatch>
+        static TChildBatch& addToBatch(const THandle handle, std::vector<TChildBatch>& batches, std::vector<EntityId>& activeIndices) {
+            if (handle.entityId >= batches.size()) {
+                batches.resize(handle.entityId + 1);
+            }
+            auto& batch = batches[handle.entityId];
+
+            if (!batches[handle.entityId].isActive) {
+                batch.handle = handle;
+                batches[handle.entityId].isActive = true;
+                activeIndices.push_back(handle.entityId);
+            }
+
+            return batch;
+        }
+
+        /**
+         * @brief Lowest-level batch collecting draw contexts for one mesh.
+         *
+         * @tparam TDrawMemberHandle Draw/member handle type.
+         */
+        template<typename TDrawMemberHandle>
+        struct MeshBatch {
+            bool isActive{false};
+            MeshHandle handle;
+            std::vector<SceneMemberRenderContext<TDrawMemberHandle>> drawContexts;
+            MeshBatch(){drawContexts.reserve(DEFAULT_GAMEOBJECT_CAPACITY);}
+            void clear() {
+                isActive = false;
+                drawContexts.clear();
+            }
         };
+
+        /**
+         * @brief Groups mesh batches for one material.
+         *
+         * @tparam TDrawMemberHandle Draw/member handle type.
+         */
+        template<typename TDrawMemberHandle>
+        struct MaterialBatch {
+            bool isActive{false};
+            MaterialHandle handle;
+            std::vector<MeshBatch<TDrawMemberHandle>> batches;
+            std::vector<EntityId> activeIndices;
+            MaterialBatch(){batches.reserve(DEFAULT_MESH_POOL_CAPACITY);}
+            [[nodiscard]] MeshBatch<TDrawMemberHandle>& getOrAdd(MeshHandle handle) {
+                return addToBatch(handle, batches, activeIndices);
+            }
+            void clear() {
+                clearActive(this, activeIndices, batches);
+            }
+        };
+
+        /**
+         * @brief Groups material batches for one shader.
+         *
+         * @tparam TDrawMemberHandle Draw/member handle type.
+         */
+        template<typename TDrawMemberHandle>
+        struct ShaderBatch {
+            bool isActive{false};
+            ShaderHandle handle;
+            std::vector<MaterialBatch<TDrawMemberHandle>> batches;
+            std::vector<EntityId> activeIndices;
+            ShaderBatch(){batches.reserve(DEFAULT_MATERIAL_POOL_CAPACITY);}
+            [[nodiscard]] MaterialBatch<TDrawMemberHandle>& getOrAdd(MaterialHandle handle) {
+                return addToBatch(handle, batches, activeIndices);
+            }
+            void clear() {
+                clearActive(this, activeIndices, batches);
+            }
+        };
+
+        /**
+         * @brief Groups shader batches for one viewport.
+         *
+         * @tparam TDrawMemberHandle Draw/member handle type.
+         */
+        template<typename TDrawMemberHandle>
+        struct ViewportBatch {
+            bool isActive{false};
+            ViewportHandle handle;
+            std::vector<ShaderBatch<TDrawMemberHandle>> batches;
+            std::vector<EntityId> activeIndices;
+            [[nodiscard]] ShaderBatch<TDrawMemberHandle>& getOrAdd(ShaderHandle handle) {
+                return addToBatch(handle, batches, activeIndices);
+            }
+            ViewportBatch(){batches.reserve(DEFAULT_SHADER_POOL_CAPACITY);}
+            void clear() {
+                clearActive(this, activeIndices, batches);
+            }
+        };
+
+        /**
+         * @brief Top-level batch grouping viewport batches per render target.
+         *
+         * @tparam TDrawMemberHandle Draw/member handle type.
+         */
+        template<typename TDrawMemberHandle>
+        struct RenderTargetBatch {
+            bool isActive{false};
+            RenderTargetHandle handle;
+            std::vector<ViewportBatch<TDrawMemberHandle>> batches;
+            std::vector<EntityId> activeIndices;
+            [[nodiscard]] ViewportBatch<TDrawMemberHandle>& getOrAdd(ViewportHandle handle) {
+                return addToBatch(handle, batches, activeIndices);
+            }
+            RenderTargetBatch(){batches.reserve(DEFAULT_VIEWPORT_POOL_CAPACITY);}
+            void clear() {
+                clearActive(this, activeIndices, batches);
+            }
+        };
+
 
         inline static auto& logger_ = LogManager::loggerForScope(HELIOS_LOG_SCOPE);
 
 
-        HandleMultiMap<FramebufferHandle, ViewportHandle> framebufferToViewport_;
-        HandleMultiMap<SceneHandle, ViewportHandle> sceneToViewport_;
-        std::vector<std::vector<SceneMemberRenderContext<TMemberHandle>>> sceneMemberRenderContexts_;
+        std::vector<RenderTargetBatch<TMemberHandle>> renderTargetBatches_;
+        std::vector<EntityId> activeRenderTargetIndices_;
 
         TRenderBackend& renderBackend_;
 
-        /**
-         * @brief Resolves view and projection matrices for a viewport's bound camera.
-         *
-         * @param updateContext Current frame update context.
-         * @param viewportHandle Viewport to resolve camera matrices for.
-         * @return View/projection pair on success, otherwise `std::nullopt`.
-         */
-        [[nodiscard]] std::optional<ViewProjection> viewProjection(
-            UpdateContext& updateContext, ViewportHandle viewportHandle
-        ) const noexcept {
-            auto viewport = updateContext.find(viewportHandle);
-
-            if (!viewport) {
-                logger_.error("Expected ViewportEntity, but couldn't find any.");
-                return std::nullopt;
-            }
-            auto* cbc = viewport->get<CameraBindingComponent<ViewportHandle>>();
-            if (!cbc) {
-                logger_.error("Expected CameraBindingComponent on ViewportEntity, but couldn't find any.");
-                return std::nullopt;
-            }
-            auto camera = updateContext.find(cbc->targetHandle());
-            if (!camera) {
-                logger_.error("Expected CameraEntity, but couldn't find any.");
-                return std::nullopt;
-            }
-            using CameryHandleType = std::remove_cvref_t<decltype(cbc->targetHandle())>;
-            auto* vm = camera->get<ViewMatrixComponent<CameryHandleType>>();
-            if (!vm) {
-                logger_.error("Expected ViewMatrixComponent, but couldn't find any.");
-                return std::nullopt;
-            }
-
-            auto* pm = camera->get<ProjectionMatrixComponent<CameryHandleType>>();
-            if (!pm) {
-                logger_.error("Expected ProjectionMatrixComponent, but couldn't find any.");
-                return std::nullopt;
-            }
-
-            return ViewProjection{
-                vm->value(), pm->value()
-            };
-
-        }
 
     public:
 
-        /** @brief Runtime role tag used for engine manager registration. */
+        /**
+         * @brief Runtime role tag used for engine manager registration.
+         */
         using EngineRoleTag = ManagerRole;
 
         /**
@@ -139,107 +241,117 @@ export namespace helios::engine::rendering {
          */
         explicit RenderManager(TRenderBackend& renderBackend) : renderBackend_(renderBackend) {
 
-            framebufferToViewport_.reserve(DEFAULT_FRAMEBUFFER_POOL_CAPACITY, DEFAULT_VIEWPORT_POOL_CAPACITY);
-            sceneToViewport_.reserve(DEFAULT_SCENE_POOL_CAPACITY, DEFAULT_VIEWPORT_POOL_CAPACITY);
-            sceneMemberRenderContexts_.reserve(DEFAULT_SCENE_POOL_CAPACITY);
+            renderTargetBatches_.reserve(DEFAULT_FRAMEBUFFER_POOL_CAPACITY);
 
         }
 
 
         /**
-         * @brief Flushes queued render work to the backend.
+         * @brief Flushes all active render-target batches to the backend.
          *
-         * @details Iterates framebuffer/viewport bindings, prepares one render-pass context
-         * per pair, dispatches all queued member render contexts for the associated
-         * scene, then clears all internal queues.
+         * @details Traverses active render targets and nested viewport/shader/material/mesh batches,
+         * executes backend begin/end hooks for each level, renders queued draw contexts,
+         * and clears all active batch indices afterwards.
          *
          * @param updateContext Current frame update context.
          */
         void flush(UpdateContext& updateContext) {
 
-            auto prevViewportHandle = ViewportHandle{};
+            for (auto renderTargetIdx : activeRenderTargetIndices_) {
+                auto& renderTargetBatch = renderTargetBatches_[renderTargetIdx];
 
-            auto renderPassContext = RenderPassContext{};
+                renderBackend_.beginRenderTargetBatch(renderTargetBatch.handle);
 
-            for (auto [framebufferHandle, viewportHandle]: framebufferToViewport_) {
+                for (auto viewportIdx : renderTargetBatch.activeIndices) {
+                    auto& viewportBatch = renderTargetBatch.batches[viewportIdx];
 
-                    renderPassContext.framebufferHandle = framebufferHandle;
-                    renderPassContext.viewportHandle    = viewportHandle;
+                    renderBackend_.beginViewportBatch(viewportBatch.handle);
 
-                    if (viewportHandle != prevViewportHandle) {
+                    for (auto shaderIdx : viewportBatch.activeIndices ) {
+                        auto& shaderBatch = viewportBatch.batches[shaderIdx];
 
-                        auto vp = viewProjection(updateContext, viewportHandle);
-                        if (!vp) {
-                            logger_.warn("Could not determine View/Projection-matrices for RenderPass");
-                            renderPassContext.viewMatrix       = helios::math::mat4f{1.0f};
-                            renderPassContext.projectionMatrix = helios::math::mat4f{1.0f};
-                            continue;
+                        renderBackend_.beginShaderBatch(shaderBatch.handle);
 
-                        }
-                        renderPassContext.viewMatrix       = vp->viewMatrix;
-                        renderPassContext.projectionMatrix = vp->projectionMatrix;
+                        for (auto materialIdx : shaderBatch.activeIndices) {
+                            auto& materialBatch = shaderBatch.batches[materialIdx];
 
-                        prevViewportHandle = viewportHandle;
-                    }
+                            renderBackend_.beginMaterialBatch(materialBatch.handle);
 
+                            for (auto meshIdx : materialBatch.activeIndices) {
+                                auto& meshBatch = materialBatch.batches[meshIdx];
 
-                    renderBackend_.beginRenderPass(renderPassContext);
+                                renderBackend_.beginMeshBatch(meshBatch.handle);
 
-                    auto sceneHandle = sceneToViewport_.key(viewportHandle);
+                                renderBackend_.template renderBatch<TMemberHandle>(meshBatch.drawContexts);
 
-                    auto& sceneMemberRenderContexts = sceneMemberRenderContexts_[sceneHandle.entityId];
+                                renderBackend_.endMeshBatch(meshBatch.handle);
+                            } // materialBatch
 
+                            renderBackend_.endMaterialBatch(materialBatch.handle);
+                        } //shaderBatch
 
-                    for (auto renderContext : sceneMemberRenderContexts) {
-                        renderBackend_.doRender(renderContext);
-                    }
+                        renderBackend_.endShaderBatch(shaderBatch.handle);
+                    } // viewportBatch
 
+                    renderBackend_.endViewportBatch(viewportBatch.handle);
+                } //renderTargetBatch
 
-                   renderBackend_.endRenderPass(renderPassContext);
-
-
+                renderBackend_.endRenderTargetBatch(renderTargetBatch.handle);
             }
 
-            framebufferToViewport_.clear();
-            sceneToViewport_.clear();
-            sceneMemberRenderContexts_.clear();
+            for (auto idx : activeRenderTargetIndices_ ) {
+                renderTargetBatches_[idx].clear();
+            }
+            activeRenderTargetIndices_.clear();
+
+
         }
 
         /**
-         * @brief Queues a render command for later execution.
+         * @brief Queues one draw context into the hierarchical batch structure.
          *
-         * @details Stores framebuffer/viewport and scene/viewport bindings and appends the
-         * member render context to the scene bucket addressed by `sceneHandle`.
+         * @details
+         * Activates missing nodes for render target, viewport, shader, material, and mesh,
+         * then appends the draw context to the mesh batch for later rendering in `flush(...)`.
          *
          * @param renderCommand Command containing per-member render context.
          * @return `true` if the command was accepted.
          */
         bool submit(RenderCommand<TMemberHandle> renderCommand) noexcept {
 
-            const auto& sceneMemberRenderContext = renderCommand.sceneMemberRenderContext;
-            const auto sceneIdx = sceneMemberRenderContext.sceneHandle.entityId;
+            auto& sceneMemberRenderContext = std::move(renderCommand.sceneMemberRenderContext);
 
-            framebufferToViewport_.bind(
-                sceneMemberRenderContext.framebufferHandle,
-                sceneMemberRenderContext.viewportHandle
-            );
+            auto& viewportHandle = sceneMemberRenderContext.viewportHandle;
+            auto& materialHandle = sceneMemberRenderContext.materialHandle;
+            auto& meshHandle     = sceneMemberRenderContext.meshHandle;
+            auto& shaderHandle   = sceneMemberRenderContext.shaderHandle;
 
-            sceneToViewport_.bind(
-                sceneMemberRenderContext.sceneHandle,
-                sceneMemberRenderContext.viewportHandle
-            );
+            auto renderTargetId = sceneMemberRenderContext.renderTargetHandle.entityId;
 
-            if (sceneMemberRenderContexts_.size() <= sceneIdx) {
-                sceneMemberRenderContexts_.resize(sceneIdx + 1);
+            if (renderTargetBatches_.size() <= sceneMemberRenderContext.renderTargetHandle.entityId) {
+                renderTargetBatches_.resize(renderTargetId + 1);
             }
 
-            sceneMemberRenderContexts_[sceneIdx].push_back(std::move(renderCommand.sceneMemberRenderContext));
+            auto& renderTargetBatch = renderTargetBatches_[renderTargetId];
+
+            if (!renderTargetBatch.isActive) {
+                renderTargetBatch.isActive = true;
+                renderTargetBatch.handle = sceneMemberRenderContext.renderTargetHandle;
+                activeRenderTargetIndices_.push_back(renderTargetId);
+            }
+
+            auto& viewportBatch = renderTargetBatch.getOrAdd(viewportHandle);
+            auto& shaderBatch = viewportBatch.getOrAdd(shaderHandle);
+            auto& materialBatch = shaderBatch.getOrAdd(materialHandle);
+            auto& meshBatch = materialBatch.getOrAdd(meshHandle);
+
+            meshBatch.drawContexts.push_back(std::move(sceneMemberRenderContext));
 
             return true;
         }
 
         /**
-         * @brief Registers this manager as a render command handler.
+         * @brief Registers this manager as handler for render commands.
          *
          * @param commandHandlerRegistry Command handler registry used at runtime.
          */

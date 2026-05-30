@@ -1,12 +1,12 @@
-# helios::engine::rendering::framebuffer
+# helios::engine::rendering::renderTarget
 
-Framebuffer abstractions and resource aliases.
+RenderTarget abstractions and resource aliases.
 
 | Item | Description |
 |------|-------------|
-| `Framebuffer` | Render target state object (size, viewport references, dirty flag) |
-| `FramebufferHandleRegistry<TLookupStrategy>` | Registry alias for framebuffer ids |
-| `FramebufferEntityManager` | ECS manager alias for framebuffer resources |
+| `RenderTarget` | Render target state object (size, viewport references, dirty flag) |
+| `RenderTargetHandleRegistry<TLookupStrategy>` | Registry alias for renderTarget ids |
+| `RenderTargetEntityManager` | ECS manager alias for renderTarget resources |
 
 ## Subdirectories
 
@@ -17,8 +17,8 @@ Framebuffer abstractions and resource aliases.
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::engine::rendering::framebuffer
-@brief Framebuffer abstractions and resource aliases.
-@details Provides framebuffer runtime representation and ECS-oriented registry/manager aliases.
+@namespace helios::engine::rendering::renderTarget
+@brief RenderTarget abstractions and resource aliases.
+@details Provides renderTarget runtime representation and ECS-oriented registry/manager aliases.
 </p></details>
 

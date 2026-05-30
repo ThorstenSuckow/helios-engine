@@ -40,7 +40,7 @@ import helios.engine.scene.SceneEntityManager;
 import helios.engine.scene.concepts;
 
 import helios.engine.rendering.viewport.ViewportEntityManager;
-import helios.engine.rendering.framebuffer.FramebufferEntityManager;
+import helios.engine.rendering.renderTarget.RenderTargetEntityManager;
 
 import helios.engine.core.TypedTupleCat;
 
@@ -57,7 +57,7 @@ using namespace helios::engine::rendering::shader;
 using namespace helios::engine::rendering::material;
 using namespace helios::engine::rendering::mesh;
 using namespace helios::engine::rendering::common::concepts;
-using namespace helios::engine::rendering::framebuffer;
+using namespace helios::engine::rendering::renderTarget;
 using namespace helios::engine::rendering::viewport;
 using namespace helios::engine::scene;
 using namespace helios::engine::scene::concepts;
@@ -88,7 +88,7 @@ export namespace helios::engine::runtime::world {
     /**
      * @brief Typed world containing render-target entity managers.
      */
-    using RenderTargetWorld = TypedHandleWorld<FramebufferEntityManager, ViewportEntityManager>;
+    using RenderTargetWorld = TypedHandleWorld<RenderTargetEntityManager, ViewportEntityManager>;
 
     /**
      * @brief Concatenated tuple of all entity-manager types used by `EngineWorld`.

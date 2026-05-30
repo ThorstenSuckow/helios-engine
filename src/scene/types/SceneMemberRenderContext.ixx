@@ -13,12 +13,12 @@ import helios.engine.rendering.mesh.types;
 import helios.engine.rendering.material.types;
 import helios.engine.rendering.shader.types;
 import helios.engine.rendering.viewport.types;
-import helios.engine.rendering.framebuffer.types;
+import helios.engine.rendering.renderTarget.types;
 import helios.math.types;
 
 using namespace helios::ecs::types;
 using namespace helios::engine::rendering::viewport::types;
-using namespace helios::engine::rendering::framebuffer::types;
+using namespace helios::engine::rendering::renderTarget::types;
 using namespace helios::engine::rendering::mesh::types;
 using namespace helios::engine::rendering::material::types;
 using namespace helios::engine::rendering::shader::types;
@@ -39,7 +39,7 @@ export namespace helios::engine::scene::types {
         TMemberHandle memberHandle;
 
         /** @brief Target viewport for rendering. */
-        FramebufferHandle framebufferHandle;
+        RenderTargetHandle renderTargetHandle;
 
         /** @brief Target viewport for rendering. */
         ViewportHandle viewportHandle;

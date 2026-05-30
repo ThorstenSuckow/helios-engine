@@ -1,19 +1,19 @@
-# helios::engine::rendering::framebuffer::types
+# helios::engine::rendering::renderTarget::types
 
-Strong ID and handle aliases for framebuffer resources.
+Strong ID and handle aliases for renderTarget resources.
 
 | Type | Description |
 |------|-------------|
-| `FramebufferDomainTag` | Domain tag used for framebuffer IDs and handles |
-| `FramebufferId` | Strong id for framebuffer resources |
-| `FramebufferHandle` | ECS entity handle bound to `FramebufferDomainTag` |
+| `RenderTargetDomainTag` | Domain tag used for renderTarget IDs and handles |
+| `RenderTargetId` | Strong id for renderTarget resources |
+| `RenderTargetHandle` | ECS entity handle bound to `RenderTargetDomainTag` |
 
 ---
 <details>
 <summary>Doxygen</summary><p>
-@namespace helios::engine::rendering::framebuffer::types
-@brief Strong ID and handle aliases for framebuffer resources.
+@namespace helios::engine::rendering::renderTarget::types
+@brief Strong ID and handle aliases for renderTarget resources.
 @details Defines a shared domain tag used by both StrongId and EntityHandle
-for framebuffer ECS registries and managers.
+for renderTarget ECS registries and managers.
 </p></details>
 

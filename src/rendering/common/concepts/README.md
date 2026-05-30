@@ -13,7 +13,7 @@ rendering handle categories used across the rendering layer.
 |---------|-------------|
 | `IsRenderBackendLike<T, THandle>` | Constrains backend API shape (`beginRenderPass`, `doRender`, `endRenderPass`) |
 | `IsRenderResourceHandle<T>` | Constrains resource handles (`ShaderHandle`, `MaterialHandle`, `MeshHandle`) |
-| `IsRenderTargetHandle<T>` | Constrains target handles (`ViewportHandle`, `FramebufferHandle`) |
+| `IsRenderTargetHandle<T>` | Constrains target handles (`ViewportHandle`, `RenderTargetHandle`) |
 
 ---
 <details>

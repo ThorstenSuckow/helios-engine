@@ -1,11 +1,11 @@
 /**
  * @file _module.ixx
- * @brief Aggregate module for `helios::engine::rendering::framebuffer::types`.
+ * @brief Aggregate module for `helios::engine::rendering::renderTarget::types`.
  */
-export module helios.engine.rendering.framebuffer.types;
+export module helios.engine.rendering.renderTarget.types;
 
 
-export import helios.engine.rendering.framebuffer.types.FramebufferDomainTag;
-export import helios.engine.rendering.framebuffer.types.FramebufferHandle;
-export import helios.engine.rendering.framebuffer.types.FramebufferId;
-export import helios.engine.rendering.framebuffer.types.FramebufferSize;
+export import helios.engine.rendering.renderTarget.types.RenderTargetDomainTag;
+export import helios.engine.rendering.renderTarget.types.RenderTargetHandle;
+export import helios.engine.rendering.renderTarget.types.RenderTargetId;
+export import helios.engine.rendering.renderTarget.types.RenderTargetSize;

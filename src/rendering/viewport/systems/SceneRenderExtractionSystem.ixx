@@ -18,7 +18,7 @@ import helios.engine.scene.concepts.IsFrustumCullerLike;
 import helios.engine.rendering.common.components;
 import helios.engine.rendering.common.commands.RenderCommand;
 
-import helios.engine.rendering.framebuffer.components.FramebufferBindingComponent;
+import helios.engine.rendering.renderTarget.components.RenderTargetBindingComponent;
 
 import helios.engine.spatial.components;
 
@@ -39,7 +39,7 @@ using namespace helios::engine::scene::components;
 using namespace helios::ecs::components;
 using namespace helios::engine::rendering::common::components;
 using namespace helios::engine::rendering::viewport::concepts;
-using namespace helios::engine::rendering::framebuffer::components;
+using namespace helios::engine::rendering::renderTarget::components;
 using namespace helios::engine::scene::types;
 using namespace helios::engine::runtime::messaging::command::concepts;
 using namespace helios::engine::spatial::components;
@@ -107,7 +107,7 @@ export namespace helios::engine::rendering::viewport::systems {
 
             for (auto [viewportEntity, fbc, sbc, cbc, viewportActive] : updateContext.view<
                 TOwnerHandle,
-                FramebufferBindingComponent<TOwnerHandle>,
+                RenderTargetBindingComponent<TOwnerHandle>,
                 SceneBindingComponent<TOwnerHandle>,
                 CameraBindingComponent<TOwnerHandle>,
                 Active<TOwnerHandle>

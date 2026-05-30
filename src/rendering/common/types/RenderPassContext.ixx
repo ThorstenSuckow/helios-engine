@@ -12,12 +12,12 @@ import helios.engine.rendering.common.types.ClearFlags;
 
 import helios.math;
 
-import helios.engine.rendering.framebuffer.types.FramebufferHandle;
+import helios.engine.rendering.renderTarget.types.RenderTargetHandle;
 import helios.engine.rendering.viewport.types.ViewportHandle;
 
 import helios.engine.rendering.common.types.ClearFlags;
 
-using namespace helios::engine::rendering::framebuffer::types;
+using namespace helios::engine::rendering::renderTarget::types;
 using namespace helios::engine::rendering::viewport::types;
 using namespace helios::engine::rendering::common::types;
 export namespace helios::engine::rendering::common::types {
@@ -27,8 +27,8 @@ export namespace helios::engine::rendering::common::types {
      */
     struct RenderPassContext {
 
-        /** @brief Target framebuffer handle. */
-        FramebufferHandle framebufferHandle{};
+        /** @brief Target renderTarget handle. */
+        RenderTargetHandle renderTargetHandle{};
 
         /** @brief Target viewport handle. */
         ViewportHandle viewportHandle{};

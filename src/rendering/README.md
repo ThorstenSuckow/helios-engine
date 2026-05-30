@@ -23,8 +23,8 @@ various graphics APIs (OpenGL, Vulkan, DirectX).
 | `RenderPrototype` | Prototype for render configurations |
 | `Renderable` | Visual representation of a renderable object |
 | `Vertex` | Vertex data definition |
-| `ClearFlags` | Framebuffer clear flag configuration |
-| `FramebufferToViewportMap` | Maps framebuffers to viewport regions |
+| `ClearFlags` | RenderTarget clear flag configuration |
+| `RenderTargetToViewportMap` | Maps renderTargets to viewport regions |
 | `RenderableComponent` | Links a GameObject to a Renderable for visual output |
 | `ModelAabbComponent` | Stores the model-space AABB for the entity's mesh |
 
@@ -36,7 +36,7 @@ various graphics APIs (OpenGL, Vulkan, DirectX).
 | `commands/` | Render command abstractions |
 | `components/` | Rendering-related ECS components |
 | `concepts/` | C++ concepts for rendering types |
-| `framebuffer/` | Framebuffer management |
+| `renderTarget/` | RenderTarget management |
 | `material/` | Material definitions and types |
 | `mesh/` | Mesh data and mesh commands |
 | `model/` | Model-space components (AABB in model space) |

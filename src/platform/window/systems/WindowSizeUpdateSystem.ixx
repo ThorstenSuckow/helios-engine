@@ -1,6 +1,6 @@
 /**
  * @file WindowSizeUpdateSystem.ixx
- * @brief Updates framebuffer-related state after window size changes.
+ * @brief Updates renderTarget-related state after window size changes.
  */
 module;
 
@@ -15,15 +15,15 @@ import helios.engine.platform.window.components;
 import helios.ecs.components.Active;
 import helios.engine.platform.window.concepts.IsWindowHandle;
 
-import helios.engine.rendering.framebuffer;
+import helios.engine.rendering.renderTarget;
 
 import helios.engine.util.log;
 
 import helios.engine.spatial.components.Size2DComponent;
 
 using namespace helios::engine::spatial::components;
-using namespace helios::engine::rendering::framebuffer::components;
-using namespace helios::engine::rendering::framebuffer::types;
+using namespace helios::engine::rendering::renderTarget::components;
+using namespace helios::engine::rendering::renderTarget::types;
 using namespace helios::engine::runtime::world::tags;
 using namespace helios::engine::platform::window::concepts;
 using namespace helios::engine::runtime::world;
@@ -59,7 +59,7 @@ export namespace helios::engine::platform::window::systems {
                 TMemberHandle,
                 WindowComponent<TMemberHandle>,
                 Size2DComponent<TMemberHandle>,
-                FramebufferBindingComponent<TMemberHandle>,
+                RenderTargetBindingComponent<TMemberHandle>,
                 Active<TMemberHandle>
             >().whereEnabled()) {
                 if (wsc->isDirty()) {

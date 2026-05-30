@@ -12,12 +12,12 @@ render extraction, render pass setup, and backend execution code.
 | Type | Description |
 |------|-------------|
 | `ClearFlags` | Bitmask enum for color, depth, and stencil clear operations |
-| `RenderPassContext` | Small context object that groups framebuffer and viewport handles for a render pass |
+| `RenderPassContext` | Small context object that groups renderTarget and viewport handles for a render pass |
 
 ## Notes
 
 - `ClearFlags` starts with `ClearFlags::None` and is intended to be combined as a bitmask.
-- `RenderPassContext` currently stores `FramebufferHandle` and `ViewportHandle`.
+- `RenderPassContext` currently stores `RenderTargetHandle` and `ViewportHandle`.
 
 ---
 <details>

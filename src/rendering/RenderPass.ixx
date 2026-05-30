@@ -9,17 +9,17 @@ module;
 export module helios.engine.rendering.RenderPass;
 
 import helios.engine.rendering.viewport.types.ViewportHandle;
-import helios.engine.rendering.framebuffer.types.FramebufferHandle;
+import helios.engine.rendering.renderTarget.types.RenderTargetHandle;
 import helios.engine.scene.types.SceneMemberRenderContext;
 
 using helios::engine::rendering::viewport::types::ViewportHandle;
-using helios::engine::rendering::framebuffer::types::FramebufferHandle;
+using helios::engine::rendering::renderTarget::types::RenderTargetHandle;
 using namespace helios::engine::scene::types;
 
 export namespace helios::engine::rendering {
 
     /**
-     * @brief DTO representing one render pass for a framebuffer/viewport pair.
+     * @brief DTO representing one render pass for a renderTarget/viewport pair.
      *
      * @tparam THandle Entity handle type used by scene member render contexts.
      */
@@ -32,9 +32,9 @@ export namespace helios::engine::rendering {
         ViewportHandle viewportHandle;
 
         /**
-         * @brief Target framebuffer for this pass.
+         * @brief Target renderTarget for this pass.
          */
-        FramebufferHandle framebufferHandle;
+        RenderTargetHandle renderTargetHandle;
 
         /**
          * @brief Scene members to render in this pass.

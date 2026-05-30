@@ -49,8 +49,11 @@ export namespace helios::engine::scene::components {
          * Defaults to 90 degrees (converted to radians).
          */
         float fovY_ = radians(90);
-    
 
+        /**
+         * @brief Dirty flag used to signal projection updates.
+         */
+        bool isDirty_ = true;
     public:
 
 
@@ -61,8 +64,6 @@ export namespace helios::engine::scene::components {
          * @param aspectRatio The aspect ratio (width/height).
          * @param zNear The near clipping plane distance.
          * @param zFar The far clipping plane distance.
-         *
-         * @return A reference to this camera instance.
          */
         void setPerspective(float fovY, float aspectRatio, float zNear, float zFar) noexcept {
             assert(zNear > 0 && "zNear must be positive");
@@ -71,49 +72,46 @@ export namespace helios::engine::scene::components {
             aspectRatio_ = aspectRatio;
             zNear_ = zNear;
             zFar_ = zFar;
+            isDirty_ = true;
         }
 
         /**
          * @brief Sets the near clipping plane distance.
          *
          * @param zNear The new near clipping plane distance.
-         *
-         * @return A reference to this camera instance.
          */
         void setZNear(const float zNear) noexcept {
             assert(zNear > 0 && "zNear must be positive");
             zNear_ = zNear;
+
+            isDirty_ = true;
         }
 
         /**
          * @brief Sets the far clipping plane distance.
          *
          * @param zFar The new far clipping plane distance.
-         *
-         * @return A reference to this camera instance.
          */
         void setZFar(const float zFar) noexcept {
             assert(zFar > 0 && "zFar must be positive and greater than zNear");
             zFar_ = zFar;
+            isDirty_ = true;
         }
 
         /**
          * @brief Sets the vertical field of view.
          *
          * @param fovY The new vertical field of view in radians.
-         *
-         * @return A reference to this camera instance.
          */
         void setFovY(const float fovY) noexcept {
             fovY_ = fovY;
+            isDirty_ = true;
         }
 
         /**
          * @brief Sets the aspect ratio used by the camera.
          *
          * @param aspectRatio The new aspect ratio (width/height).
-         *
-         * @return A reference to this camera instance.
          */
         void setAspectRatio(const float aspectRatio) noexcept {
            aspectRatio_ = aspectRatio;
@@ -156,7 +154,21 @@ export namespace helios::engine::scene::components {
             return zFar_;
         }
 
+        /**
+         * @brief Returns whether the component requires projection recomputation.
+         *
+         * @return `true` when values were changed and not yet consumed.
+         */
+        [[nodiscard]] bool isDirty() const noexcept {
+            return isDirty_;
+        }
 
+        /**
+         * @brief Clears the dirty flag after dependent systems consumed updates.
+         */
+        void clearDirty() noexcept {
+            isDirty_ = false;
+        }
 
     };
 

@@ -8,7 +8,6 @@ export module helios.engine.scene.components;
 
 export import helios.engine.scene.components.SceneMemberComponent;
 export import helios.engine.scene.components.PerspectiveCameraComponent;
-export import helios.engine.scene.components.LookAtComponent;
 export import helios.engine.scene.components.ViewportComponent;
 export import helios.engine.scene.components.SceneBindingComponent;
 export import helios.engine.scene.components.CameraBindingComponent;

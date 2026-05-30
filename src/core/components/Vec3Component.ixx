@@ -39,6 +39,17 @@ export namespace helios::engine::core::components {
         explicit Vec3Component(const vec3<TNumericType> value) : value_(value){}
 
         /**
+         * @brief Constructs the component from scalar vector coordinates.
+         *
+         * @param x X component.
+         * @param y Y component.
+         * @param z Z component.
+         */
+        explicit Vec3Component(
+        const TNumericType x, const TNumericType y, const TNumericType z)
+        : value_(x, y, z){}
+
+        /**
          * @brief Copy constructor.
          *
          * @details Copies the value and forces the copied component into a

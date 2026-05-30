@@ -49,20 +49,19 @@ export namespace helios::engine::scene::systems {
         void update(UpdateContext& updateContext) noexcept {
 
 
-            for (auto [entity, p3c, u3c, tp3c, pcc, active] : updateContext.view<
+            for (auto [entity, p3c, u3c, tp3c, pcc, pmc, vmc, active] : updateContext.view<
                 TMemberHandle,
                 Position3DComponent<TMemberHandle>,
                 UpVector3DComponent<TMemberHandle>,
                 TargetPosition3DComponent<TMemberHandle>,
                 PerspectiveCameraComponent<TMemberHandle>,
+                ProjectionMatrixComponent<TMemberHandle>,
+                ViewMatrixComponent<TMemberHandle>,
                 Active<TMemberHandle>
             >().whereEnabled()) {
 
-                auto& pmc = entity.template getOrAdd<ProjectionMatrixComponent<TMemberHandle>>();
-                auto& vmc = entity.template getOrAdd<ViewMatrixComponent<TMemberHandle>>();
-
-                if (vmc.isDirty()) {
-                    vmc.setValue(helios::math::lookAt(
+                if (p3c->isDirty() || tp3c->isDirty() || u3c->isDirty()) {
+                    vmc->setValue(helios::math::lookAt(
                         p3c->value(),
                         tp3c->value(),
                         u3c->value()
@@ -70,8 +69,8 @@ export namespace helios::engine::scene::systems {
                 }
 
 
-                if (pmc.isDirty()) {
-                    pmc.setValue(helios::math::perspective(
+                if (pcc->isDirty()) {
+                    pmc->setValue(helios::math::perspective(
                         pcc->fovY(),
                         pcc->aspectRatio(),
                         pcc->zNear(),

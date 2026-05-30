@@ -8,6 +8,7 @@ export module helios.engine.scene;
 export import helios.engine.scene.components;
 export import helios.engine.scene.concepts;
 export import helios.engine.scene.types;
+export import helios.engine.scene.systems;
 
 export import helios.engine.scene.NoCullingStrategy;
 export import helios.engine.scene.SceneEntityManager;

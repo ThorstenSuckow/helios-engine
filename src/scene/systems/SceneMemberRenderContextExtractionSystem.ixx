@@ -1,5 +1,5 @@
 /**
- * @file SceneRenderExtractionSystem.ixx
+ * @file SceneMemberRenderContextExtractionSystem.ixx
  * @brief Extracts visible scene members into render commands per viewport.
  */
 module;
@@ -7,7 +7,7 @@ module;
 #include <concepts>
 #include <cassert>
 
-export module helios.engine.rendering.viewport.systems.SceneRenderExtractionSystem;
+export module helios.engine.scene.systems.SceneMemberRenderContextExtractionSystem;
 
 import helios.engine.rendering.viewport.concepts.IsViewportHandle;
 
@@ -47,8 +47,8 @@ using namespace helios::engine::rendering::common::commands;
 using namespace helios::engine::rendering::common::components;
 using namespace helios::engine::runtime::messaging::command;
 
-#define HELIOS_LOG_SCOPE "helios::engine::rendering::viewport::systems::SceneRenderExtractionSystem"
-export namespace helios::engine::rendering::viewport::systems {
+#define HELIOS_LOG_SCOPE "helios::engine::scene::systems::SceneMemberRenderContextExtractionSystem"
+export namespace helios::engine::scene::systems {
 
     /**
      * @brief System that extracts per-member render contexts for active viewports.
@@ -73,7 +73,7 @@ export namespace helios::engine::rendering::viewport::systems {
              IsFrustumCullerLike<TCullingStrategy, typename TCullingStrategy::MemberHandle_type> &&
              std::same_as<typename TCullingStrategy::MemberHandle_type, TMemberHandle> &&
              IsCommandBufferLike<TCommandBuffer>
-    class SceneRenderExtractionSystem {
+    class SceneMemberRenderContextExtractionSystem {
 
         TCullingStrategy cullingStrategy_;
 
@@ -93,7 +93,7 @@ export namespace helios::engine::rendering::viewport::systems {
          * @param cullingStrategy Strategy used to decide whether a scene member
          * should produce render work.
          */
-        explicit SceneRenderExtractionSystem(TCullingStrategy cullingStrategy = TCullingStrategy())
+        explicit SceneMemberRenderContextExtractionSystem(TCullingStrategy cullingStrategy = TCullingStrategy())
         : cullingStrategy_(std::move(cullingStrategy)) {}
 
         /**
@@ -124,8 +124,8 @@ export namespace helios::engine::rendering::viewport::systems {
                 }
                 auto* pcc = camera->template get<ProjectionMatrixComponent<TMemberHandle>>();
                 if (!pcc) {
-                    assert(pcc && "Camera had no PerspectiveCameraComponent");
-                    logger_.error("Camera had no PerspectiveCameraComponent");
+                    assert(pcc && "Camera had no ProjectionMatrixComponent");
+                    logger_.error("Camera had no ProjectionMatrixComponent");
                     continue;
                 }
                 auto* lac = camera->template get<ViewMatrixComponent<TMemberHandle>>();

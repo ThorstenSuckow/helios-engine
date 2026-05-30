@@ -18,7 +18,6 @@ export namespace helios::engine::scene {
     inline void registerComponents() {
         using R = helios::ecs::ComponentReflector<TEntityManager>;
 
-        R::template registerType<components::LookAtComponent<typename TEntityManager::Handle_type>>();
         R::template registerType<components::PerspectiveCameraComponent<typename TEntityManager::Handle_type>>();
         R::template registerType<components::SceneMemberComponent<typename TEntityManager::Handle_type>>();
         R::template registerType<components::ViewportComponent<typename TEntityManager::Handle_type>>();

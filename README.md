@@ -1,6 +1,46 @@
-# helios-engine
+# helios::engine
 
-## CMake package usage
+Runtime and integration layer for the helios C++23 engine modules.
+
+## Overview
+
+`helios::engine` provides the core runtime, world orchestration, messaging,
+state, rendering abstractions, platform contracts, and utility infrastructure
+used by the split helios repositories.
+
+The former monorepo [`thorstensuckow/helios`](https://github.com/thorstensuckow/helios)
+is kept as a legacy reference. Active development happens in the split repositories.
+
+## Features
+
+- Phase/pass based game loop orchestration
+- Typed command buffers and command-handler routing
+- Type-indexed event buses for pass, phase, and frame communication
+- Resource and manager registries for runtime services
+- Generic state-management utilities
+- Engine-level rendering, scene, platform, spatial, input, tooling, and utility modules
+
+## Module surface
+
+| Area | Public modules / APIs |
+|------|------------------------|
+| Runtime | `helios.engine.runtime`, `GameLoop`, `UpdateContext`, `GameWorld`, `ResourceRegistry` |
+| Messaging | `TypedCommandBuffer`, `CommandHandlerRegistry`, `GameLoopEventBus` |
+| State | `StateManager`, `StateCommand`, state listeners, state-to-ID maps |
+| Rendering | `helios.engine.rendering`, render targets, viewports, meshes, shaders, materials |
+| Platform | `helios.engine.platform`, environment/window/lifecycle contracts |
+| Scene/spatial | `helios.engine.scene`, `helios.engine.spatial` |
+| Utilities | `helios.engine.core`, `helios.engine.input`, `helios.engine.util`, `helios.engine.tooling` |
+
+## Usage
+
+### C++ module
+
+```cpp
+import helios.engine;
+```
+
+### CMake
 
 Build and install:
 
@@ -24,4 +64,18 @@ cmake -S . -B build -DCMAKE_PREFIX_PATH="/path/to/helios-prefix"
 cmake --build build
 ```
 
+## Development
 
+Run the regular CMake build from the repository root:
+
+```bash
+cmake -S . -B build
+cmake --build build
+```
+
+## Related repositories
+
+- [`helios-ecs`](https://github.com/thorstensuckow/helios-ecs)
+- [`helios-math`](https://github.com/thorstensuckow/helios-math)
+- [`helios-opengl`](https://github.com/thorstensuckow/helios-opengl)
+- [`helios-glfw`](https://github.com/thorstensuckow/helios-glfw)

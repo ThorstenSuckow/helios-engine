@@ -323,6 +323,24 @@ export namespace helios::engine::util::log {
         }
 
         /**
+         * @brief Enables a sink by its typename.
+         *
+         * @details Enables a sink by its typename, constructing a new shared instance and delegating
+         * tp enableSink().
+         *
+         * @tparam TSink
+         * @tparam Args
+         * @param args
+         *
+         * @see enableSink
+         */
+        template<typename TSink, typename ...Args>
+        void enableSink(Args&& ...args) requires std::derived_from<TSink, LogSink>{
+            auto snk = std::make_shared<TSink>(std::forward<Args>(args)...);
+            enableSink(std::move(snk));
+        }
+
+        /**
          * @brief Enables a sink, registering it first if necessary.
          *
          * If the sink is not yet registered, it will be added to the pool.

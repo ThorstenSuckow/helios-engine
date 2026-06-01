@@ -12,3 +12,6 @@ export import helios.engine.core.components.Mat4Component;
 export import helios.engine.core.components.AABBComponent;
 export import helios.engine.core.components.ColorComponent;
 export import helios.engine.core.components.NumericValueComponent;
+export import helios.engine.core.components.StringComponent;
+export import helios.engine.core.components.NameComponent;
+export import helios.engine.core.components.DebugNameComponent;

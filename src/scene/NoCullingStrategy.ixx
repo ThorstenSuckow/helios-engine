@@ -35,7 +35,7 @@ export namespace helios::engine::scene {
         /**
          * @brief Executes no culling for the provided entity.
          *
-         * @param ctx Perspective camera context.
+         * @param ctx Culling context.
          * @param handle Scene member handle that would be tested by culling strategies.
          *
          */

@@ -1,12 +1,12 @@
 /**
- * @file RenderCommand.ixx
+ * @file RenderSceneMemberCommand.ixx
  * @brief Command wrapper for extracted scene member render work.
  */
 module;
 
 
 
-export module helios.engine.rendering.common.commands.RenderCommand;
+export module helios.engine.rendering.common.commands.RenderSceneMemberCommand;
 
 import helios.engine.scene.types.SceneMemberRenderContext;
 
@@ -20,7 +20,7 @@ export namespace helios::engine::rendering::common::commands {
      * @tparam THandle Scene member handle type.
      */
     template<typename THandle>
-    struct RenderCommand {
+    struct RenderSceneMemberCommand {
 
         /** @brief Render context for the submitted scene member. */
         const SceneMemberRenderContext<THandle> sceneMemberRenderContext;

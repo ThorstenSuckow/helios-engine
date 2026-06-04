@@ -9,3 +9,4 @@ export import helios.engine.core.container.buffer;
 
 export import helios.engine.core.container.ConceptModelRegistry;
 export import helios.engine.core.container.HandleMultiMap;
+export import helios.engine.core.container.HandleManyToManyMap;

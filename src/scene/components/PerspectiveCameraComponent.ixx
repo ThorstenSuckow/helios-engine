@@ -57,6 +57,10 @@ export namespace helios::engine::scene::components {
     public:
 
 
+        explicit PerspectiveCameraComponent(const float fovY, const float aspectRatio, const float zNear = 0.1f, const float zFar = 1000.0f) {
+            setPerspective(fovY, aspectRatio, zNear, zFar);
+        }
+
         /**
          * @brief Sets the perspective projection parameters.
          *
@@ -65,7 +69,7 @@ export namespace helios::engine::scene::components {
          * @param zNear The near clipping plane distance.
          * @param zFar The far clipping plane distance.
          */
-        void setPerspective(float fovY, float aspectRatio, float zNear, float zFar) noexcept {
+        void setPerspective(const float fovY, const float aspectRatio, const float zNear, const float zFar) noexcept {
             assert(zNear > 0 && "zNear must be positive");
             assert(zFar > 0 && zFar > zNear && "zFar must be positive and greater than zNear");
             fovY_ = fovY;

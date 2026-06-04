@@ -6,12 +6,14 @@ module;
 
 #include <concepts>
 #include <cassert>
+#include <tuple>
 #include "helios-engine-config.h"
 
 export module helios.engine.scene.systems.SceneRenderSystem;
 
 import helios.engine.rendering.viewport.concepts.IsViewportHandle;
 
+import helios.engine.scene.SceneMemberVisibilityRegistry;
 import helios.engine.scene.types;
 import helios.engine.scene.components;
 import helios.engine.scene.concepts.IsFrustumCullerLike;
@@ -82,6 +84,7 @@ export namespace helios::engine::scene::systems {
 
         static inline auto& logger_ = helios::engine::util::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
 
+        SceneMemberVisibilityRegistry<TMemberHandle>& visibilityRegistry_;
     public:
 
         /** @brief Runtime role tag used for engine system registration. */
@@ -95,9 +98,10 @@ export namespace helios::engine::scene::systems {
          *
          * @param cullingStrategy Strategy used to decide whether a scene member
          * should produce render work.
+         * @param visibilityRegistry Registry for tracking culled and visible handles per viewport.
          */
-        explicit SceneRenderSystem(TCullingStrategy cullingStrategy = TCullingStrategy())
-        : cullingStrategy_(std::move(cullingStrategy)) {}
+        explicit SceneRenderSystem(TCullingStrategy cullingStrategy, SceneMemberVisibilityRegistry<TMemberHandle>& visibilityRegistry)
+        : cullingStrategy_(std::move(cullingStrategy)), visibilityRegistry_(visibilityRegistry) {}
 
         /**
          * @brief Extracts render commands for active viewports.
@@ -185,7 +189,7 @@ export namespace helios::engine::scene::systems {
 #if HELIOS_DEBUG
                         used++;
 #endif
-
+                        std::ignore = visibilityRegistry_.addVisibleMember(viewportEntity.handle(), memberEntity.handle());
                         cmdBuffer.template add<RenderSceneMemberCommand<TMemberHandle>>(
                             SceneMemberRenderContext<TMemberHandle>{
                                 memberEntity.handle(),
@@ -199,6 +203,8 @@ export namespace helios::engine::scene::systems {
                             });
 
 
+                    } else {
+                        std::ignore = visibilityRegistry_.addCulledMember(viewportEntity.handle(), memberEntity.handle());
                     }
                 }
 

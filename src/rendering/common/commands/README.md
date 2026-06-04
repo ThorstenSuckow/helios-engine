@@ -11,7 +11,7 @@ render work between runtime systems and rendering managers/backends.
 
 | Command | Description |
 |---------|-------------|
-| `RenderCommand<THandle>` | Wraps one `SceneMemberRenderContext<THandle>` for queued render submission |
+| `RenderSceneMemberCommand<THandle>` | Wraps one `SceneMemberRenderContext<THandle>` for queued render submission |
 
 ---
 <details>

@@ -4,5 +4,6 @@
  */
 export module helios.engine.rendering.common.commands;
 
-export import helios.engine.rendering.common.commands.RenderCommand;
+export import helios.engine.rendering.common.commands.RenderSceneMemberCommand;
+export import helios.engine.rendering.common.commands.RenderSceneCommand;
 

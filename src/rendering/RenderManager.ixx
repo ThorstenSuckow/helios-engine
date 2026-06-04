@@ -19,9 +19,9 @@ import helios.engine.scene.types.SceneHandle;
 
 import helios.engine.scene.components;
 
-import helios.engine.rendering.common.commands.RenderCommand;
+import helios.engine.rendering.common.commands;
 import helios.engine.rendering.common.types.RenderPassContext;
-import helios.engine.scene.types.SceneMemberRenderContext;
+import helios.engine.scene.types;
 import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
 
 import helios.ecs.types;
@@ -226,6 +226,33 @@ export namespace helios::engine::rendering {
 
         TRenderBackend& renderBackend_;
 
+        /**
+         * @brief makes sure a ViewportBatch is available for the specified RenderTargetHandle and
+         * ViewportHandle.
+         *
+         * @param renderTargetHandle
+         * @param viewportHandle
+         * @return
+         */
+        [[nodiscard]] ViewportBatch<TMemberHandle>& ensureViewportBatch(
+            RenderTargetHandle renderTargetHandle, ViewportHandle viewportHandle) {
+
+            auto renderTargetId = renderTargetHandle.entityId;
+
+            if (renderTargetBatches_.size() <= renderTargetHandle.entityId) {
+                renderTargetBatches_.resize(renderTargetId + 1);
+            }
+
+            auto& renderTargetBatch = renderTargetBatches_[renderTargetId];
+
+            if (!renderTargetBatch.isActive) {
+                renderTargetBatch.isActive = true;
+                renderTargetBatch.handle = renderTargetHandle;
+                activeRenderTargetIndices_.push_back(renderTargetId);
+            }
+
+            return renderTargetBatch.getOrAdd(viewportHandle);
+        };
 
     public:
 
@@ -307,40 +334,49 @@ export namespace helios::engine::rendering {
 
         }
 
+
+        /**
+         * @brief Queues one scene render context into the batch structure.
+         *
+         * @details Ensure that the ViewportBatch is available for the next flush().
+         * In case all Scene Members where culled, i.e. the shader/material/mesh batches
+         * are empty, viewport batches are sent to the graphics backend for making sure no
+         * artifacts are left in the viewport from the previous render operation, if any.
+         *
+         * @param renderSceneCommand
+         * @return
+         */
+        bool submit(RenderSceneCommand<TMemberHandle> renderSceneCommand) noexcept {
+
+            std::ignore = ensureViewportBatch(
+                renderSceneCommand.sceneRenderContext.renderTargetHandle,
+                renderSceneCommand.sceneRenderContext.viewportHandle
+            );
+
+            return true;
+        }
+
+
         /**
          * @brief Queues one draw context into the hierarchical batch structure.
          *
-         * @details
-         * Activates missing nodes for render target, viewport, shader, material, and mesh,
+         * @details Activates missing nodes for render target, viewport, shader, material, and mesh,
          * then appends the draw context to the mesh batch for later rendering in `flush(...)`.
          *
          * @param renderCommand Command containing per-member render context.
          * @return `true` if the command was accepted.
          */
-        bool submit(RenderCommand<TMemberHandle> renderCommand) noexcept {
+        bool submit(RenderSceneMemberCommand<TMemberHandle> renderCommand) noexcept {
 
             auto& sceneMemberRenderContext = std::move(renderCommand.sceneMemberRenderContext);
 
+            auto& renderTargetHandle = sceneMemberRenderContext.renderTargetHandle;
             auto& viewportHandle = sceneMemberRenderContext.viewportHandle;
             auto& materialHandle = sceneMemberRenderContext.materialHandle;
             auto& meshHandle     = sceneMemberRenderContext.meshHandle;
             auto& shaderHandle   = sceneMemberRenderContext.shaderHandle;
 
-            auto renderTargetId = sceneMemberRenderContext.renderTargetHandle.entityId;
-
-            if (renderTargetBatches_.size() <= sceneMemberRenderContext.renderTargetHandle.entityId) {
-                renderTargetBatches_.resize(renderTargetId + 1);
-            }
-
-            auto& renderTargetBatch = renderTargetBatches_[renderTargetId];
-
-            if (!renderTargetBatch.isActive) {
-                renderTargetBatch.isActive = true;
-                renderTargetBatch.handle = sceneMemberRenderContext.renderTargetHandle;
-                activeRenderTargetIndices_.push_back(renderTargetId);
-            }
-
-            auto& viewportBatch = renderTargetBatch.getOrAdd(viewportHandle);
+            auto& viewportBatch = ensureViewportBatch(renderTargetHandle, viewportHandle);
             auto& shaderBatch = viewportBatch.getOrAdd(shaderHandle);
             auto& materialBatch = shaderBatch.getOrAdd(materialHandle);
             auto& meshBatch = materialBatch.getOrAdd(meshHandle);
@@ -350,6 +386,7 @@ export namespace helios::engine::rendering {
             return true;
         }
 
+
         /**
          * @brief Registers this manager as handler for render commands.
          *
@@ -358,7 +395,8 @@ export namespace helios::engine::rendering {
         void init(CommandHandlerRegistry& commandHandlerRegistry) noexcept {
 
             commandHandlerRegistry.handleCommands<
-                RenderCommand<TMemberHandle>
+                RenderSceneMemberCommand<TMemberHandle>,
+                RenderSceneCommand<TMemberHandle>
             >(*this);
 
 

@@ -26,9 +26,9 @@ export namespace helios::engine::rendering::mesh::assets {
          * @brief Interleaved vertex data (position, normal, UV).
          */
         static constexpr std::array<Vertex, 3> vertices{{
-            {{-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},
-            {{ 1.0f, -1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}},
-            {{ 0.0f,  1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.5f, 1.0f}}
+            {{-.5f, -.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},
+            {{ .5f, -.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}},
+            {{ 0.0f,  .5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.5f, 1.0f}}
         }};
 
         /**

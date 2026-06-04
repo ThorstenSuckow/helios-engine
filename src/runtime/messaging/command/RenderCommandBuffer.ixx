@@ -27,7 +27,8 @@ using namespace helios::engine::runtime::world::types;
 export namespace helios::engine::runtime::messaging::command {
 
     using RenderCommandBuffer  = helios::engine::runtime::messaging::command::TypedCommandBuffer<
-        helios::engine::rendering::common::commands::RenderCommand<GameObjectHandle>,
+        helios::engine::rendering::common::commands::RenderSceneCommand<GameObjectHandle>,
+        helios::engine::rendering::common::commands::RenderSceneMemberCommand<GameObjectHandle>,
         helios::engine::rendering::shader::commands::ShaderCompileCommand<ShaderHandle>,
         helios::engine::rendering::shader::commands::ShaderBatchCompileCommand<ShaderHandle>,
         helios::engine::rendering::mesh::commands::MeshBatchUploadCommand<MeshHandle>

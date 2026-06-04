@@ -1,13 +1,14 @@
 /**
- * @file SceneMemberRenderContextExtractionSystem.ixx
+ * @file SceneRenderSystem.ixx
  * @brief Extracts visible scene members into render commands per viewport.
  */
 module;
 
 #include <concepts>
 #include <cassert>
+#include "helios-engine-config.h"
 
-export module helios.engine.scene.systems.SceneMemberRenderContextExtractionSystem;
+export module helios.engine.scene.systems.SceneRenderSystem;
 
 import helios.engine.rendering.viewport.concepts.IsViewportHandle;
 
@@ -16,7 +17,7 @@ import helios.engine.scene.components;
 import helios.engine.scene.concepts.IsFrustumCullerLike;
 
 import helios.engine.rendering.common.components;
-import helios.engine.rendering.common.commands.RenderCommand;
+import helios.engine.rendering.common.commands;
 
 import helios.engine.rendering.renderTarget.components.RenderTargetBindingComponent;
 
@@ -31,6 +32,8 @@ import helios.ecs.components.Active;
 
 
 import helios.engine.util.log;
+
+import helios.math;
 
 using namespace helios::engine::scene;
 using namespace helios::engine::scene::types;
@@ -47,7 +50,7 @@ using namespace helios::engine::rendering::common::commands;
 using namespace helios::engine::rendering::common::components;
 using namespace helios::engine::runtime::messaging::command;
 
-#define HELIOS_LOG_SCOPE "helios::engine::scene::systems::SceneMemberRenderContextExtractionSystem"
+#define HELIOS_LOG_SCOPE "helios::engine::scene::systems::SceneRenderSystem"
 export namespace helios::engine::scene::systems {
 
     /**
@@ -55,7 +58,7 @@ export namespace helios::engine::scene::systems {
      *
      * @details For each active viewport binding, the system resolves the bound
      * scene and camera, evaluates the configured culling strategy for scene
-     * members, and writes accepted members as `RenderCommand`s into the target
+     * members, and writes accepted members as `RenderSceneMemberCommand`s into the target
      * command buffer.
      *
      * @tparam TOwnerHandle Viewport entity handle type.
@@ -73,7 +76,7 @@ export namespace helios::engine::scene::systems {
              IsFrustumCullerLike<TCullingStrategy, typename TCullingStrategy::MemberHandle_type> &&
              std::same_as<typename TCullingStrategy::MemberHandle_type, TMemberHandle> &&
              IsCommandBufferLike<TCommandBuffer>
-    class SceneMemberRenderContextExtractionSystem {
+    class SceneRenderSystem {
 
         TCullingStrategy cullingStrategy_;
 
@@ -93,7 +96,7 @@ export namespace helios::engine::scene::systems {
          * @param cullingStrategy Strategy used to decide whether a scene member
          * should produce render work.
          */
-        explicit SceneMemberRenderContextExtractionSystem(TCullingStrategy cullingStrategy = TCullingStrategy())
+        explicit SceneRenderSystem(TCullingStrategy cullingStrategy = TCullingStrategy())
         : cullingStrategy_(std::move(cullingStrategy)) {}
 
         /**
@@ -122,9 +125,9 @@ export namespace helios::engine::scene::systems {
                     logger_.error("Camera not found");
                     continue;
                 }
-                auto* pcc = camera->template get<ProjectionMatrixComponent<TMemberHandle>>();
-                if (!pcc) {
-                    assert(pcc && "Camera had no ProjectionMatrixComponent");
+                auto* pmc = camera->template get<ProjectionMatrixComponent<TMemberHandle>>();
+                if (!pmc) {
+                    assert(pmc && "Camera had no ProjectionMatrixComponent");
                     logger_.error("Camera had no ProjectionMatrixComponent");
                     continue;
                 }
@@ -134,6 +137,27 @@ export namespace helios::engine::scene::systems {
                     logger_.error("Camera had no ViewMatrixComponent");
                     continue;
                 }
+
+                auto* pcc = camera->template get<PerspectiveCameraComponent<TMemberHandle>>();
+                auto frustumPlanes = helios::math::frustumPlanes(
+                    pcc->fovY(), pcc->aspectRatio(), pcc->zNear(), pcc->zFar(), lac->value()
+                );
+
+                auto cullingContext = CullingContext<TMemberHandle>{frustumPlanes, pmc->value(), lac->value()};
+
+                cmdBuffer.template add<RenderSceneCommand<TMemberHandle>>(
+                   SceneRenderContext<TMemberHandle>{
+                       fbc->targetHandle(),
+                       viewportEntity.handle(),
+                       sceneHandle
+                   });
+
+
+
+#if HELIOS_DEBUG
+                std::size_t available = 0;
+                std::size_t used      = 0;
+#endif
 
                 for (auto [
                     memberEntity,
@@ -151,12 +175,18 @@ export namespace helios::engine::scene::systems {
                     Active<TMemberHandle>
                 >().whereEnabled()) {
 
-                    if (smc->targetHandle() == sceneHandle && cullingStrategy_.shouldRender(
-                            CullingContext{pcc->value(), lac->value(), wbc->value(), memberEntity.handle()}
-                        )
-                    ) {
+                    cullingContext.bounds = wbc->value();
+                    cullingContext.handle = memberEntity.handle();
 
-                        cmdBuffer.template add<RenderCommand<TMemberHandle>>(
+#if HELIOS_DEBUG
+                    available++;
+#endif
+                    if (smc->targetHandle() == sceneHandle && cullingStrategy_.shouldRender(cullingContext)) {
+#if HELIOS_DEBUG
+                        used++;
+#endif
+
+                        cmdBuffer.template add<RenderSceneMemberCommand<TMemberHandle>>(
                             SceneMemberRenderContext<TMemberHandle>{
                                 memberEntity.handle(),
                                 fbc->targetHandle(),
@@ -171,6 +201,11 @@ export namespace helios::engine::scene::systems {
 
                     }
                 }
+
+#if HELIOS_DEBUG
+                logger_.debug("Available {0}, culled in {1}, used {2} scene members for viewport {3}.", available, available - used, used, viewportEntity.handle().entityId);
+#endif
+
             }
 
         }

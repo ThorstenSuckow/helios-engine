@@ -4,9 +4,7 @@ module;
 
 export module helios.engine.core.components.AABBComponent;
 
-import helios.math.types;
-
-import helios.math.concepts;
+import helios.math;
 
 using namespace helios::math;
 using namespace helios::math::concepts;
@@ -110,11 +108,6 @@ export namespace helios::engine::core::components {
          * @param value New value vector.
          */
         void setValue(const aabb<TNumericType> value) noexcept {
-
-            if (value_.same(value)) {
-                return;
-            }
-
             value_ = value;
             isDirty_ = true;
         };

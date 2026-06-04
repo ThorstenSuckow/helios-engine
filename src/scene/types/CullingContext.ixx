@@ -5,7 +5,7 @@
 
 module;
 
-
+#include <array>
 
 export module helios.engine.scene.types.CullingContext;
 
@@ -23,6 +23,9 @@ export namespace helios::engine::scene::types {
     template<typename TMemberHandle>
     struct CullingContext {
 
+        /** @brief Frustum planes based on the projection and view matrix, in world space. */
+        std::array<FrustumPlane, 6> frustumPlanes{};
+
         /** @brief Projection matrix used for the culling pass. */
         mat4f projectionMatrix{1.0f};
 
@@ -30,7 +33,7 @@ export namespace helios::engine::scene::types {
         mat4f viewMatrix{1.0f};
 
         /** @brief World-space bounds of the tested scene member. */
-        aabbf worldBounds{};
+        aabbf bounds{};
 
         /** @brief Handle of the tested scene member. */
         TMemberHandle handle;

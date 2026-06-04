@@ -131,11 +131,6 @@ export namespace helios::engine::core::components {
          * @param value New vector value.
          */
         void setValue(const vec4<TNumericType> value) noexcept {
-
-            if (value_.same(value)) {
-                return;
-            }
-
             value_ = value;
             isDirty_ = true;
         };

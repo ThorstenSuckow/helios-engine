@@ -67,21 +67,59 @@ export namespace helios::engine::rendering::common::components {
               materialHandle_(material.handle()),
               meshHandle_(mesh.handle()) {}
 
-        /** @brief Returns the mesh handle. */
+        /**
+         * @brief Returns the mesh handle.
+         *
+         * @return Mesh resource handle.
+         */
         [[nodiscard]] MeshHandle meshHandle() const noexcept {
             return meshHandle_;
         }
 
-        /** @brief Returns the shader handle. */
+        /**
+         * @brief Returns the shader handle.
+         *
+         * @return Shader resource handle.
+         */
         [[nodiscard]] ShaderHandle shaderHandle() const noexcept {
             return shaderHandle_;
         }
 
-        /** @brief Returns the material handle. */
+        /**
+         * @brief Returns the material handle.
+         *
+         * @return Material resource handle.
+         */
         [[nodiscard]] MaterialHandle materialHandle() const noexcept {
             return materialHandle_;
         }
 
+        /**
+         * @brief Sets the mesh handle.
+         *
+         * @param meshHandle Mesh resource handle.
+         */
+        void setMeshHandle(const MeshHandle meshHandle) noexcept {
+            meshHandle_ = meshHandle;
+        }
+
+        /**
+         * @brief Sets the shader handle.
+         *
+         * @param shaderHandle Shader resource handle.
+         */
+        void setShaderHandle(const ShaderHandle shaderHandle) noexcept {
+            shaderHandle_ = shaderHandle;
+        }
+
+        /**
+         * @brief Sets the material handle.
+         *
+         * @param materialHandle Material resource handle.
+         */
+        void setMaterialHandle(const MaterialHandle materialHandle) noexcept {
+            materialHandle_ = materialHandle;
+        }
 
     };
 }

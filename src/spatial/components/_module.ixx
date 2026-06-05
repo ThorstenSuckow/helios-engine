@@ -11,7 +11,6 @@ export import helios.engine.spatial.components.Scale2DComponent;
 export import helios.engine.spatial.components.Direction3DComponent;
 export import helios.engine.spatial.components.Position3DComponent;
 export import helios.engine.spatial.components.TargetPosition3DComponent;
-export import helios.engine.spatial.components.UpVector3DComponent;
 export import helios.engine.spatial.components.RectComponent;
 export import helios.engine.spatial.components.BoundsComponent;
 export import helios.engine.spatial.components.TransformComponent;

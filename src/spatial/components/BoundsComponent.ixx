@@ -1,24 +1,26 @@
 /**
  * @file BoundsComponent.ixx
- * @brief Alias for 4D bounds data.
+ * @brief space axis-aligned bounds component alias.
  */
 module;
 
-
 export module helios.engine.spatial.components.BoundsComponent;
 
-import helios.engine.core.components.Vec4Component;
+import helios.engine.core.components.AABBComponent;
 
+using namespace helios::engine::core::components;
 export namespace helios::engine::spatial::components {
 
-    /** @brief Domain tag for bounds values. */
-    struct BoundsComponentDomain {};
+    /**
+     * @brief Domain marker for -space bounds.
+     */
+    struct BoundsDomain{};
 
     /**
-     * @brief Stores bounds data in a `vec4<float>` component.
-     *
-     * @tparam THandle Owning entity handle type.
+     * @brief AABB component describing an entity's bounds in  space.
+     * @tparam TOwnerHandler Owner/entity handle type.
      */
-    template<typename THandle>
-    using BoundsComponent = helios::engine::core::components::Vec4Component<BoundsComponentDomain, THandle, float>;
+    template<typename ... Args>
+    using BoundsComponent = AABBComponent<BoundsDomain, float, Args...>;
+
 }

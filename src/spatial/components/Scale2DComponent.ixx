@@ -20,5 +20,5 @@ export namespace helios::engine::spatial::components {
      * @tparam THandle Owning entity handle type.
      */
     template<typename THandle>
-    using Scale2DComponent = helios::engine::core::components::Vec2Component<Scale2DComponentDomain, THandle, float>;
+    using Scale2DComponent = helios::engine::core::components::Vec2Component<Scale2DComponentDomain, float, THandle>;
 }

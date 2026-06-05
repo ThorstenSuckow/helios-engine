@@ -10,7 +10,7 @@ bounds, and 2D size/scale data.
 
 | Component | Description |
 |-----------|-------------|
-| `BoundsComponent` | Stores 4D bounds data. |
+| `RectComponent` | Stores 4D bounds data. |
 | `ComposeTransformComponent` | Local/world transform matrices with dirty tracking. |
 | `DimensionComponent` | Physical dimensions with unit metadata. |
 | `LocalPositionStateComponent` | Local-space position vector. |

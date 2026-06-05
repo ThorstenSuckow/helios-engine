@@ -20,5 +20,5 @@ export namespace helios::engine::spatial::components {
      * @tparam THandle Owning entity handle type.
      */
     template<typename THandle>
-    using UpVector3DComponent = helios::engine::core::components::Vec3Component<UpVector3DComponentDomain, THandle, float>;
+    using UpVector3DComponent = helios::engine::core::components::Vec3Component<UpVector3DComponentDomain, float, THandle>;
 }

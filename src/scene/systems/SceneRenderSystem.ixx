@@ -36,7 +36,9 @@ import helios.ecs.components.Active;
 import helios.engine.util.log;
 
 import helios.math;
+import helios.engine.core.types.ComponentTypeTags;
 
+using namespace helios::engine::core::types;
 using namespace helios::engine::scene;
 using namespace helios::engine::scene::types;
 using namespace helios::engine::scene::concepts;
@@ -167,19 +169,19 @@ export namespace helios::engine::scene::systems {
                     memberEntity,
                     smc,
                     rpc,
-                    wmc,
-                    wbc,
+                    transformWorld,
+                    boundsWorld,
                     memberActive
                     ] : updateContext.view<
                     TMemberHandle,
                     SceneMemberComponent<TMemberHandle>,
                     RenderPrototypeComponent<TMemberHandle>,
-                    WorldMatrixComponent<TMemberHandle>,
-                    WorldBoundsComponent<TMemberHandle>,
+                    TransformComponent<TMemberHandle, World>,
+                    BoundsComponent<TMemberHandle, World>,
                     Active<TMemberHandle>
                 >().whereEnabled()) {
 
-                    cullingContext.bounds = wbc->value();
+                    cullingContext.bounds = boundsWorld->value();
                     cullingContext.handle = memberEntity.handle();
 
 #if HELIOS_DEBUG
@@ -196,10 +198,10 @@ export namespace helios::engine::scene::systems {
                                 fbc->targetHandle(),
                                 viewportEntity.handle(),
                                 sceneHandle,
-                                rpc->meshHandle(),
-                                rpc->materialHandle(),
-                                rpc->shaderHandle(),
-                                wmc->value()
+                                rpc->meshHandle,
+                                rpc->materialHandle,
+                                rpc->shaderHandle,
+                                transformWorld->value()
                             });
 
 

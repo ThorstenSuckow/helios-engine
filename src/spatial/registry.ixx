@@ -8,7 +8,9 @@ export module helios.engine.spatial.registry;
 
 import helios.ecs.ComponentReflector;
 import helios.engine.spatial.components;
+import helios.engine.core.types.ComponentTypeTags;
 
+using namespace helios::engine::core::types;
 export namespace helios::engine::spatial {
 
     /**
@@ -19,7 +21,8 @@ export namespace helios::engine::spatial {
         using R = helios::ecs::ComponentReflector<TEntityManager>;
 
         R::template registerType<components::DimensionComponent<typename TEntityManager::Handle_type>>();
-        R::template registerType<components::WorldMatrixComponent<typename TEntityManager::Handle_type>>();
+        R::template registerType<components::TransformComponent<typename TEntityManager::Handle_type, Local>>();
+        R::template registerType<components::TransformComponent<typename TEntityManager::Handle_type, World>>();
 
     }
 

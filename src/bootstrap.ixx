@@ -23,6 +23,7 @@ import helios.engine.runtime.world.types.GameObjectHandle;
 import helios.engine.platform;
 
 import helios.engine.scene.registry;
+import helios.engine.core.registry;
 import helios.engine.spatial.registry;
 import helios.engine.scene.registry;
 
@@ -55,6 +56,7 @@ export namespace helios::engine::bootstrap {
             (helios::engine::runtime::registerComponents<TEntityManagers>(), ...);
             (helios::engine::scene::registerComponents<TEntityManagers>(), ...);
             (helios::engine::spatial::registerComponents<TEntityManagers>(), ...);
+            (helios::engine::core::registerComponents<TEntityManagers>(), ...);
         }
 
     };

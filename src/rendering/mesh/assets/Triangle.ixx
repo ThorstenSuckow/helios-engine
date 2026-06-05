@@ -12,6 +12,7 @@ export module helios.engine.rendering.mesh.assets:Triangle;
 import helios.engine.rendering.common.types.Vertex;
 import helios.engine.rendering.mesh.types.MeshData;
 import helios.engine.rendering.mesh.types.PrimitiveType;
+import helios.math;
 
 using namespace helios::engine::rendering::common::types;
 using namespace helios::engine::rendering::mesh::types;
@@ -52,6 +53,16 @@ export namespace helios::engine::rendering::mesh::assets {
                 std::span{vertices},
                 std::span{indices},
                 primitiveType
+            };
+        }
+
+        /**
+         * @brief Returns the local bounds of this mesh.
+         * @return local bounds as aabb
+         */
+        static helios::math::aabbf boundsData() {
+            return helios::math::aabbf{
+                -0.5f, -0.5f, 0.0f, 0.5f, 0.5f, 0.0f
             };
         }
 

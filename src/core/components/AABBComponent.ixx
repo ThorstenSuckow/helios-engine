@@ -17,7 +17,7 @@ export namespace helios::engine::core::components {
      * @tparam THandle Owning entity handle type.
      * @tparam TNumericType Scalar type for AABB values.
      */
-    template<typename TDomainTag, typename THandle, typename TNumericType>
+    template<typename TDomainTag, typename TNumericType, typename ... Args>
     requires IsNumeric<TNumericType>
     class AABBComponent  {
 

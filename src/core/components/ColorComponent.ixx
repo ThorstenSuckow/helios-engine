@@ -22,6 +22,6 @@ export namespace helios::engine::core::components {
      * typically interpreted as RGBA.
      */
     template<typename THandle>
-    using ColorComponent = helios::engine::core::components::Vec4Component<ColorDomainTag, THandle, float>;
+    using ColorComponent = helios::engine::core::components::Vec4Component<ColorDomainTag, float, THandle>;
 
 }

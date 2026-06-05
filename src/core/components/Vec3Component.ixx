@@ -19,7 +19,7 @@ export namespace helios::engine::core::components {
      * @tparam THandle Owning entity handle type.
      * @tparam TNumericType Scalar type for vector values.
      */
-    template<typename TDomainTag, typename THandle, typename TNumericType>
+    template<typename TDomainTag, typename TNumericType, typename ... Args>
     requires IsNumeric<TNumericType>
     class Vec3Component  {
 
@@ -121,11 +121,6 @@ export namespace helios::engine::core::components {
          * @param value New value vector.
          */
         void setValue(const vec3<TNumericType> value) noexcept {
-
-            if (value_.same(value)) {
-                return;
-            }
-
             value_ = value;
             isDirty_ = true;
         };

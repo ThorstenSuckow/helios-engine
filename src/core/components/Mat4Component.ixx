@@ -23,7 +23,7 @@ export namespace helios::engine::core::components {
      * @tparam THandle Owning entity handle type.
      * @tparam TNumericType Scalar type for matrix values.
      */
-    template<typename TDomainTag, typename THandle, typename TNumericType>
+    template<typename TDomainTag, typename TNumericType, typename ... Args>
     requires IsNumeric<TNumericType>
     class Mat4Component  {
 
@@ -126,11 +126,6 @@ export namespace helios::engine::core::components {
          * @param value New matrix value.
          */
         void setValue(const mat4<TNumericType> value) noexcept {
-
-            if (value_.same(value)) {
-                return;
-            }
-
             value_ = value;
             isDirty_ = true;
         };

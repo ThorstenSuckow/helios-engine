@@ -15,7 +15,9 @@ import helios.engine.scene.components;
 import helios.engine.spatial.components;
 
 import helios.math;
+import helios.engine.core.types.ComponentTypeTags;
 
+using namespace helios::engine::core::types;
 using namespace helios::ecs::components;
 using namespace helios::engine::scene::components;
 using namespace helios::engine::spatial::components;
@@ -49,22 +51,21 @@ export namespace helios::engine::scene::systems {
         void update(UpdateContext& updateContext) noexcept {
 
 
-            for (auto [entity, p3c, u3c, tp3c, pcc, pmc, vmc, active] : updateContext.view<
+            for (auto [entity, tcw, tp3c, pcc, pmc, vmc, active] : updateContext.view<
                 TMemberHandle,
-                Position3DComponent<TMemberHandle>,
-                UpVector3DComponent<TMemberHandle>,
-                TargetPosition3DComponent<TMemberHandle>,
+                TransformComponent<TMemberHandle, World>,
+                TargetPosition3DComponent<TMemberHandle, World>,
                 PerspectiveCameraComponent<TMemberHandle>,
                 ProjectionMatrixComponent<TMemberHandle>,
                 ViewMatrixComponent<TMemberHandle>,
                 Active<TMemberHandle>
             >().whereEnabled()) {
 
-                if (p3c->isDirty() || tp3c->isDirty() || u3c->isDirty()) {
+                if (tcw->isDirty() || tp3c->isDirty()) {
                     vmc->setValue(helios::math::lookAt(
-                        p3c->value(),
+                        tcw->value().translation(),
                         tp3c->value(),
-                        u3c->value()
+                        tcw->value().column(1).toVec3().normalize()
                     ));
                 }
 
@@ -76,7 +77,7 @@ export namespace helios::engine::scene::systems {
                         pcc->zNear(),
                         pcc->zFar()
                     ));
-                }
+               }
 
             }
 

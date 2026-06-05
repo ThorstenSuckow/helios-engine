@@ -7,5 +7,7 @@ export module helios.engine.core.types;
 
 export import helios.engine.core.types.FuncDefs;
 export import helios.engine.core.types.TypeDefs;
+export import helios.engine.core.types.ComponentTypeTags;
+export import helios.engine.core.types.ComponentTypeSpecs;
 
 

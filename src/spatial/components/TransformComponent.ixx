@@ -1,10 +1,10 @@
 /**
- * @file WorldMatrixComponent.ixx
+ * @file TransformComponent.ixx
  * @brief World-space transform matrix component alias.
  */
 module;
 
-export module helios.engine.spatial.components.WorldMatrixComponent;
+export module helios.engine.spatial.components.TransformComponent;
 
 import helios.engine.core.components.Mat4Component;
 
@@ -20,7 +20,7 @@ export namespace helios::engine::spatial::components {
      * @brief 4x4 matrix component representing an entity transform in world space.
      * @tparam TOwnerHandler Owner/entity handle type.
      */
-    template<typename TOwnerHandler>
-    using WorldMatrixComponent = Mat4Component<WorldMatrixDomain, TOwnerHandler, float>;
+    template<typename ... Args>
+    using TransformComponent = Mat4Component<WorldMatrixDomain, float, Args...>;
 
 }

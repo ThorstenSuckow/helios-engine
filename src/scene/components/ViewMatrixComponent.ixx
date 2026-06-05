@@ -20,7 +20,7 @@ export namespace helios::engine::scene::components {
      * @tparam TOwnerHandle Owning entity handle type.
      */
     template<typename TOwnerHandle>
-    using ViewMatrixComponent = Mat4Component<ViewMatrixTag, TOwnerHandle, float>;
+    using ViewMatrixComponent = Mat4Component<ViewMatrixTag, float, TOwnerHandle>;
 
 
 }

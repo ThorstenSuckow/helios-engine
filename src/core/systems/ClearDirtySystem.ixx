@@ -1,6 +1,6 @@
 /**
  * @file ClearDirtySystem.ixx
- * @brief Generic system that clears dirty flags on configured active components.
+ * @brief System template that clears dirty flags on active dirty-tracker components.
  */
 module;
 
@@ -18,61 +18,56 @@ using namespace helios::engine::runtime::world;
 using namespace helios::engine::core::concepts;
 using namespace helios::engine::runtime::world::tags;
 export namespace helios::engine::core::systems {
+
     /**
-     * @brief Clears dirty flags for configured component templates on active entities.
+     * @brief Generic ECS system that resets dirty state for configured component types.
      *
-     * @details Iterates active entities for each configured component type and calls
-     * `clearDirty()` on matching components.
+     * @tparam TMemberHandle Member/registry handle type used to access ECS components.
+     * @tparam TComponentSpecs Component type specifications resolved via
+     * `TComponentSpec::type<TMemberHandle>`.
      *
-     * @tparam TMemberHandle Entity handle type.
-     * @tparam TComponents Component templates that satisfy `IsDirtyTrackerLike`.
+     * @details For each configured component type, the system iterates all entities with
+     * `Active<TMemberHandle>` enabled and calls `clearDirty()` on the component instance.
      */
-    template<typename TMemberHandle, template<typename> typename ... TComponents>
-    requires (IsDirtyTrackerLike<TComponents<TMemberHandle>> && ...)
+    template<typename TMemberHandle, typename ... TComponentSpecs>
+    requires (IsDirtyTrackerLike<typename TComponentSpecs::template type<TMemberHandle>> && ...)
     class ClearDirtySystem {
 
         /**
-         * @brief Clears the dirty flag for one component type.
+         * @brief Clears the dirty flag for one configured component specification.
          *
-         * @tparam TComponent Component template to process.
-         * @param updateContext Frame-local update context.
+         * @tparam TComponentSpec Component specification type.
+         * @param updateContext Frame-local update context providing ECS view access.
          */
-        template<template<typename> typename TComponent>
+        template<typename TComponentSpec>
         void clearDirtyFor(UpdateContext& updateContext) {
+
+            using Component = typename TComponentSpec::template type<TMemberHandle>;
+
             for (auto [entity, cmp, active] : updateContext.view<
                 TMemberHandle,
-                TComponent<TMemberHandle>,
+                Component,
                 Active<TMemberHandle>>().whereEnabled()) {
                 cmp->clearDirty();
                 }
         }
 
-        /**
-         * @brief Clears dirty flags for all configured component types.
-         *
-         * @tparam Args Component templates to process.
-         * @param updateContext Frame-local update context.
-         */
-        template<template<typename> typename... Args>
-        void clearDirtyForAll(UpdateContext& updateContext) {
-            (clearDirtyFor<Args>(updateContext), ...);
-        }
 
 
     public:
 
         /**
-         * @brief Role tag used for runtime registration as a system.
+         * @brief Runtime role tag used for system registration.
          */
         using EngineRoleTag = SystemRole;
 
         /**
-         * @brief Executes the dirty-clear pass for all configured component types.
+         * @brief Executes one dirty-clear pass for all configured component specifications.
          *
          * @param updateContext Frame-local update context with ECS access.
          */
         void update(UpdateContext& updateContext) noexcept {
-            clearDirtyForAll<TComponents...>(updateContext);
+            (clearDirtyFor<TComponentSpecs>(updateContext), ...);
         }
     };
 }

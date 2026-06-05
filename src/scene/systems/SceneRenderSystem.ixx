@@ -198,9 +198,9 @@ export namespace helios::engine::scene::systems {
                                 fbc->targetHandle(),
                                 viewportEntity.handle(),
                                 sceneHandle,
-                                rpc->meshHandle,
-                                rpc->materialHandle,
-                                rpc->shaderHandle,
+                                rpc->meshHandle(),
+                                rpc->materialHandle(),
+                                rpc->shaderHandle(),
                                 transformWorld->value()
                             });
 

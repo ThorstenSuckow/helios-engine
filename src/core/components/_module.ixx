@@ -9,6 +9,7 @@ export import helios.engine.core.components.Vec2Component;
 export import helios.engine.core.components.Vec3Component;
 export import helios.engine.core.components.Vec4Component;
 export import helios.engine.core.components.Mat4Component;
+export import helios.engine.core.components.QuaternionComponent;
 export import helios.engine.core.components.AABBComponent;
 export import helios.engine.core.components.ColorComponent;
 export import helios.engine.core.components.NumericValueComponent;

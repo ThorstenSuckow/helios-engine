@@ -50,15 +50,18 @@ export namespace helios::engine::scene::systems {
         void update(UpdateContext& updateContext) noexcept {
 
 
-            for (auto [entity, localPosition, worldTransform, active] : updateContext.view<
+            for (auto [entity, localPosition, localRotation, worldTransform, active] : updateContext.view<
                 TMemberHandle,
                 Position3DComponent<TMemberHandle, Local>,
+                Rotation3DComponent<TMemberHandle, Local>,
                 TransformComponent<TMemberHandle, World>,
                 Active<TMemberHandle>
             >().whereEnabled()) {
 
-                if (localPosition->isDirty()) {
-                    worldTransform->setValue(worldTransform->value().withTranslation(localPosition->value()));
+                if (localPosition->isDirty() || localRotation->isDirty()) {
+                    worldTransform->setValue(
+                         localRotation->value().rotationMatrix().withTranslation(localPosition->value())
+                    );
                 }
 
             }

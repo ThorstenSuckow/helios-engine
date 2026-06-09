@@ -15,3 +15,4 @@ export import helios.engine.spatial.components.RectComponent;
 export import helios.engine.spatial.components.BoundsComponent;
 export import helios.engine.spatial.components.TransformComponent;
 export import helios.engine.spatial.components.Rotation3DComponent;
+export import helios.engine.spatial.components.YawPitchRollComponent;

@@ -44,7 +44,7 @@ export namespace helios::engine::core::components {
          *
          * @param value New quaternion value.
          */
-        void set(const helios::math::quat<TNumericType>& value) noexcept {
+        void setValue(const helios::math::quat<TNumericType>& value) noexcept {
             quat = value;
             isDirty_ = true;
         }

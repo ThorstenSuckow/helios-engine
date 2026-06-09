@@ -51,22 +51,24 @@ export namespace helios::engine::scene::systems {
         void update(UpdateContext& updateContext) noexcept {
 
 
-            for (auto [entity, tcw, tp3c, pcc, pmc, vmc, active] : updateContext.view<
+            for (auto [entity, tcw, pcc, pmc, vmc, active] : updateContext.view<
                 TMemberHandle,
                 TransformComponent<TMemberHandle, World>,
-                TargetPosition3DComponent<TMemberHandle, World>,
                 PerspectiveCameraComponent<TMemberHandle>,
                 ProjectionMatrixComponent<TMemberHandle>,
                 ViewMatrixComponent<TMemberHandle>,
                 Active<TMemberHandle>
             >().whereEnabled()) {
 
-                if (tcw->isDirty() || tp3c->isDirty()) {
-                    vmc->setValue(helios::math::lookAt(
-                        tcw->value().translation(),
-                        tp3c->value(),
-                        tcw->value().column(1).toVec3().normalize()
-                    ));
+                if (tcw->isDirty()) {
+
+                    const auto mat = tcw->value();
+
+                    const auto eye = tcw->value().translation();
+                    const auto center = eye + mat.column(2).toVec3().normalize();
+                    const auto up =  mat.column(1).toVec3().normalize();
+
+                    vmc->setValue(helios::math::lookAt(eye, center, up));
                 }
 
 

@@ -32,6 +32,8 @@ export namespace helios::engine::rendering::shader {
         helios::math::mat4f viewMatrix;
         helios::math::vec4f materialBaseColor;
 
+        bool isInstanced;
+
         helios::math::vec4f textColor;
 
         int textTexture;
@@ -63,6 +65,8 @@ export namespace helios::engine::rendering::shader {
             textColor = helios::math::vec4f();
 
             textTexture = 0;
+
+            isInstanced = false;
 
             materialRoughness = 0.0f;
             deltaTime = 0.0f;
@@ -103,6 +107,8 @@ export namespace helios::engine::rendering::shader {
                 return projectionMatrix;
             } else if constexpr (std::same_as<TUniform, MaterialBaseColorUniform>) {
                 return materialBaseColor;
+            } else if constexpr (std::same_as<TUniform, IsInstancedUniform>) {
+                return isInstanced;
             } else {
                 assert(false && "Unsupported uniform type in UniformValueBag::value");
             }
@@ -125,6 +131,8 @@ export namespace helios::engine::rendering::shader {
                 projectionMatrix = value;
             } else if constexpr (std::same_as<TUniform, MaterialBaseColorUniform>) {
                 materialBaseColor = value;
+            } else if constexpr (std::same_as<TUniform, IsInstancedUniform>) {
+                isInstanced = value;
             } else {
                 assert(false && "Unsupported uniform type in UniformValueBag::value");
             }
@@ -149,6 +157,27 @@ export namespace helios::engine::rendering::shader {
                     return &viewMatrix;
                 case UniformSemantics::ProjectionMatrix:
                     return &projectionMatrix;
+                default:
+                    assert(false && "Unsupported uniform type in UniformValueBag::value");
+            }
+        }
+
+        /**
+         * @brief Returns a bool for a boolean semantic.
+         *
+         * @details Returns true or false for the semantic. Returns
+         * false if the semantic is not available.
+         * @param semantics Semantic slot to query.
+         * @return true or false for the semantics.
+         */
+        [[nodiscard]] bool boolean(const UniformSemantics semantics) const noexcept {
+            if (!has(semantics)) {
+                return false;
+            }
+
+            switch (semantics) {
+                case UniformSemantics::IsInstanced:
+                    return isInstanced;
                 default:
                     assert(false && "Unsupported uniform type in UniformValueBag::value");
             }

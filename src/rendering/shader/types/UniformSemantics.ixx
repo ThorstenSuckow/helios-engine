@@ -81,6 +81,11 @@ export namespace helios::engine::rendering::shader::types {
         totalTime,
 
         /**
+         * @brief Uniform value indicating that the operation is part of an instanced draw.
+         */
+        IsInstanced,
+
+        /**
          * @brief Number of entries in this enum.
          */
         size_

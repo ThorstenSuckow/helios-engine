@@ -21,8 +21,4 @@ export namespace helios::engine::rendering::shader::types::UniformScope {
      */
     struct Draw{};
 
-    /**
-     * @brief Uniform value can change per shader call, e.g. instancing support.
-     */
-    struct Shader{};
 }

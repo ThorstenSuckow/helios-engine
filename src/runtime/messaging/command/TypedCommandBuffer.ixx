@@ -79,7 +79,7 @@ export namespace helios::engine::runtime::messaging::command {
      * ## Flush Routing
      *
      * For each command type in the parameter pack:
-     * 1. If a handler for `Cmd` is registered → `handler.submit(cmd)`
+     * 1. If a handler for `Cmd` is registered → `handler.submit(std::move(cmd))`
      * 2. Else if `Cmd` satisfies `ExecutableCommand` → `cmd.execute(ctx)`
      * 3. Else → assertion failure (misconfiguration)
      *
@@ -180,7 +180,8 @@ export namespace helios::engine::runtime::messaging::command {
          * handler is registered for `CommandType`:
          *
          * **Handler registered** (`CommandHandlerRegistry::has<CommandType>()`):
-         * - Each command is forwarded via `commandHandlerRegistry.submit<CommandType>(cmd)`.
+         * - Each command is forwarded via
+         *   `commandHandlerRegistry.submit<CommandType>(std::move(cmd))`.
          *
          * **No handler registered** (fallback):
          * - The command must satisfy `ExecutableCommand`; otherwise an
@@ -230,19 +231,19 @@ export namespace helios::engine::runtime::messaging::command {
                         auto* timer = timerManager_->getTimer(cmd.timerId());
                         if (!timer) {
                             assert(timer && "Unexpected null game timer");
-                            commandHandlerRegistry_->submit<CommandType>(cmd);
+                            commandHandlerRegistry_->submit<CommandType>(std::move(cmd));
                             continue;
                         }
 
                         if (shouldDelayCommand(timer->state())) {
                             delayed.push_back(std::move(cmd));
                         } else if (isDelayedCommandReady(timer->state())) {
-                            commandHandlerRegistry_->submit<CommandType>(cmd);
+                            commandHandlerRegistry_->submit<CommandType>(std::move(cmd));
                         } else if (shouldDiscardCommand(timer->state())) {
                             // cancelled? Discard! intentionally noop
                         }
                     } else {
-                        commandHandlerRegistry_->submit<CommandType>(cmd);
+                        commandHandlerRegistry_->submit<CommandType>(std::move(cmd));
                     }
                 }
 
@@ -295,6 +296,9 @@ export namespace helios::engine::runtime::messaging::command {
          * @tparam Args Constructor argument types.
          *
          * @param args Arguments forwarded to the command constructor.
+         *
+         * @note Commands are consumed during `flush(...)` when dispatched to
+         * handlers, i.e. they are forwarded as rvalues.
          */
         template<typename T, typename... Args>
         void add(Args&&... args) {
@@ -302,6 +306,12 @@ export namespace helios::engine::runtime::messaging::command {
             queue.emplace_back(std::forward<Args>(args)...);
         }
 
+        /**
+         * @brief Binds external services required for command dispatch.
+         *
+         * @param commandHandlerRegistry Registry used for handler-based command routing.
+         * @param timerManager Timer manager used for delayed-command gating.
+         */
         void init(CommandHandlerRegistry& commandHandlerRegistry, TimerManager& timerManager) noexcept {
             commandHandlerRegistry_ = &commandHandlerRegistry;
             timerManager_           = &timerManager;

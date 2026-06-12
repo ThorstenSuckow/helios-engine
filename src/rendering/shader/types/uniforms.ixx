@@ -47,13 +47,4 @@ export namespace helios::engine::rendering::shader::types {
         static constexpr UniformSemantics semantics  = UniformSemantics::MaterialBaseColor;
     };
 
-    /**
-     * @brief Tag for the material base-color uniform.
-     */
-    struct IsInstancedUniform {
-        using value_type = bool;
-        static constexpr UniformSemantics semantics  = UniformSemantics::IsInstanced;
-    };
-
-
 }

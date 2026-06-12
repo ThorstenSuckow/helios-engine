@@ -26,11 +26,6 @@ export namespace helios::engine::rendering::mesh::types {
         VertexAttributeSemantics semantics;
 
         /**
-         * @brief Number of scalar components (for example 3 for vec3).
-         */
-        std::uint32_t size;
-
-        /**
          * @brief Scalar storage type of each component.
          */
         VertexAttributeType type;

@@ -7,4 +7,3 @@ export module helios.engine.rendering.shader.components;
 
 export import helios.engine.rendering.shader.components.ShaderSourceComponent;
 export import helios.engine.rendering.shader.components.UniformMappingsComponent;
-export import helios.engine.rendering.shader.components.ShaderSupportsInstancingComponent;

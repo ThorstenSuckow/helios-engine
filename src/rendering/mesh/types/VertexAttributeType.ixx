@@ -16,7 +16,22 @@ export namespace helios::engine::rendering::mesh::types {
         /**
          * @brief 32-bit floating-point component.
          */
-        Float
+        Float,
+
+        /**
+         * @brief 3-component float vector (`vec3`).
+         */
+        Vec3f,
+
+        /**
+         * @brief 4-component float vector (`vec4`).
+         */
+        Vec4f,
+
+        /**
+         * @brief 4x4 float matrix (`mat4`).
+         */
+        Mat4f
     };
 
 

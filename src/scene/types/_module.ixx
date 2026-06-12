@@ -12,3 +12,4 @@ export import helios.engine.scene.types.SceneRenderContext;
 export import helios.engine.scene.types.SceneDomainTag;
 export import helios.engine.scene.types.SceneHandle;
 export import helios.engine.scene.types.SceneId;
+export import helios.engine.scene.types.InstanceRenderBatchContext;

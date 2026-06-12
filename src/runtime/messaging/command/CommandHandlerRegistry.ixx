@@ -1,12 +1,14 @@
 /**
  * @file CommandHandlerRegistry.ixx
- * @brief Registry for mapping command types to their handlers.
+ * @brief Registry for mapping command types to move-consuming handlers.
  */
 module;
 
 #include <concepts>
 #include <vector>
 #include <cassert>
+#include <type_traits>
+#include <utility>
 
 export module helios.engine.runtime.messaging.command.CommandHandlerRegistry;
 
@@ -31,7 +33,7 @@ export namespace helios::engine::runtime::messaging::command {
         /**
          * @brief Type-erased static trampoline function that casts owner and command to concrete types.
          */
-        bool (*submitFn)(void*, const void*) noexcept = nullptr;
+        bool (*submitFn)(void*, void*) noexcept = nullptr;
     };
 
     /**
@@ -50,7 +52,7 @@ export namespace helios::engine::runtime::messaging::command {
         /**
          * @brief Type-erased trampoline for command dispatch.
          */
-        bool (*submitFn)(void*, const void*) noexcept = nullptr;
+        bool (*submitFn)(void*, void*) noexcept = nullptr;
 
         /**
          * @brief Checks if this reference points to a valid handler.
@@ -62,12 +64,12 @@ export namespace helios::engine::runtime::messaging::command {
         }
 
         /**
-         * @brief Submits a command to the referenced handler.
+         * @brief Submits (and consumes) a command via the referenced handler.
          *
-         * @param cmd The command instance to submit.
+         * @param cmd The command instance to forward.
          * @return True if the command was accepted/handled.
          */
-        bool submit(const CommandType& cmd) const noexcept {
+        bool submit(CommandType&& cmd) const noexcept {
             return submitFn(owner, &cmd);
         }
 
@@ -78,7 +80,7 @@ export namespace helios::engine::runtime::messaging::command {
      *
      * @details The CommandHandlerRegistry provides a mechanism to decouple command producers (systems)
      * from command consumers (managers). Handlers are registered by reference, and the registry
-     * stores a type-erased "trampoline" function that allows invoking the handler's `submit(const Cmd&)`
+     * stores a type-erased "trampoline" function that allows invoking the handler's `submit(Cmd&&)`
      * method without knowing the concrete handler type at the call site.
      *
      * This avoids virtual inheritance (TypedCommandHandler) and allows any class with a matching
@@ -99,7 +101,7 @@ export namespace helios::engine::runtime::messaging::command {
          * @brief Registers an object as the handler for a specific command type.
          *
          * @details The handler object must provide a method:
-         * `bool submit(const CommandType&) noexcept`.
+         * `bool submit(CommandType&&) noexcept`.
          * Upon registration, a static lambda (trampoline) is generated to handle type
          * erasure and casting.
          *
@@ -112,8 +114,8 @@ export namespace helios::engine::runtime::messaging::command {
          */
         template<typename CommandType, typename OwningT>
         void registerHandler(OwningT& owner) {
-            static_assert(requires(OwningT& x, const CommandType& c) {
-                { x.submit(c) } noexcept -> std::same_as<bool>;
+            static_assert(requires(OwningT& x, CommandType&& c) {
+                { x.submit(std::move(c)) } noexcept -> std::same_as<bool>;
             });
 
             const auto idx = CommandTypeId::id<CommandType>().value();
@@ -126,12 +128,21 @@ export namespace helios::engine::runtime::messaging::command {
 
             entries_[idx] = CommandHandlerEntry{
                 &owner,
-                +[](void* owner, const void* cmd) noexcept -> bool {
-                    return static_cast<OwningT*>(owner)->submit(*static_cast<const CommandType*>(cmd));
+                +[](void* owner, void* cmd) noexcept -> bool {
+                    return static_cast<OwningT*>(owner)->submit(
+                        std::move(*static_cast<CommandType*>(cmd))
+                    );
                 }
             };
         }
 
+        /**
+         * @brief Registers one owner as handler for multiple command types.
+         *
+         * @tparam CommandType Command types to register.
+         * @tparam OwningT Concrete owner type implementing matching `submit(...)` overloads.
+         * @param owner Handler owner instance.
+         */
         template<typename... CommandType, typename OwningT>
         void handleCommands(OwningT& owner) {
             (registerHandler<CommandType>(owner), ...);
@@ -181,18 +192,20 @@ export namespace helios::engine::runtime::messaging::command {
         }
 
         /**
-         * @brief Directly submits a command to its registered handler.
+         * @brief Directly submits and consumes a command via its registered handler.
          *
          * @tparam CommandType The command type.
          *
-         * @param cmd The command instance.
+         * @param cmd The command instance to forward.
          *
          * @return True if a handler was found and it returned true; false otherwise.
          */
         template<typename CommandType>
-        bool submit(const CommandType& cmd) const noexcept {
-            if (auto handler = tryHandler<CommandType>()) {
-                return handler.submit(cmd);
+        bool submit(CommandType&& cmd) const noexcept {
+            using Cmd = std::remove_cvref_t<CommandType>;
+
+            if (auto handler = tryHandler<Cmd>()) {
+                return handler.submit(std::move(cmd));
             }
             return false;
         }

@@ -31,17 +31,29 @@ export namespace helios::engine::rendering::mesh::components {
     template<typename TOwnerHandle, typename TVertexInput>
     class VertexAttributeLayoutComponent {
 
-
+        /**
+         * @brief Number of semantic slots available in the layout table.
+         */
         static constexpr auto VertexAttributeSemanticsCount = static_cast<std::size_t>(
             std::to_underlying(VertexAttributeSemantics::size_)
         );
 
-
+        /**
+         * @brief Semantic-indexed storage for attribute layouts.
+         */
         std::array<VertexAttributeLayout, VertexAttributeSemanticsCount> layouts_{};
 
+        /**
+         * @brief Activity mask indicating which semantic slots are populated.
+         */
         std::bitset<VertexAttributeSemanticsCount> active_;
 
-        void set(VertexAttributeLayout&& layout) {
+        /**
+         * @brief Registers or replaces one layout entry and marks it active.
+         *
+         * @param layout Layout descriptor to store.
+         */
+        void set(VertexAttributeLayout layout) {
 #if HELIOS_DEBUG
             assert(std::to_underlying(layout.attribute.semantics) < VertexAttributeSemanticsCount
                 && "VertexAttributeSemantics value out of range in VertexAttributeLayoutComponent constructor");
@@ -65,7 +77,7 @@ export namespace helios::engine::rendering::mesh::components {
         requires (std::same_as<std::remove_cvref_t<TAttributes>, VertexAttributeLayout> && ...)
         explicit VertexAttributeLayoutComponent(TAttributes&& ... layout)
         {
-            (set(std::forward<TAttributes>(std::move(layout))), ...);
+            (set(std::forward<TAttributes>(layout)), ...);
         }
 
 
@@ -95,13 +107,12 @@ export namespace helios::engine::rendering::mesh::components {
         }
 
         /**
-         * @brief Checks whether a layout semantic is currently active.
+         * @brief Returns the semantic activity mask.
          *
-         * @param attributeLayout Layout whose semantic is tested.
-         * @return `true` if the semantic is present; otherwise `false`.
+         * @return Bitset with one bit per `VertexAttributeSemantics` slot.
          */
-        [[nodiscard]] bool isActive(const VertexAttributeLayout& attributeLayout) const noexcept {
-            return layout(attributeLayout.attribute.semantics) != nullptr;
+        [[nodiscard]] const auto& active() const noexcept {
+            return active_;
         }
 
     };

@@ -9,6 +9,7 @@ module;
 #include <cstddef>
 #include <utility>
 #include <cassert>
+#include "helios-engine-config.h"
 
 export module helios.engine.rendering.shader.components.UniformMappingsComponent;
 
@@ -50,8 +51,10 @@ export namespace helios::engine::rendering::shader::components {
         requires (std::same_as<std::remove_cvref_t<TMappings>, UniformMapping> && ...)
         explicit UniformMappingsComponent(TMappings&& ... mapping)
         {
+#if HELIOS_DEBUG
             (assert(std::to_underlying(mapping.semantics) < UniformSemanticsCount
                 && "UniformSemantics value out of range in UniformMappingsComponent constructor"), ...);
+#endif
 
             ((mappings[std::to_underlying(mapping.semantics)] = std::move(mapping.name)), ...);
         }

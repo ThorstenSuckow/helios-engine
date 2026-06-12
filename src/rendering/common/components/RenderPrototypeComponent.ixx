@@ -24,7 +24,7 @@ export namespace helios::engine::rendering::common::components {
      *
      * @tparam TOwnerHandle Owning entity handle type.
      */
-    template<typename TOwnerHandle>
+    template<typename TOwnerHandle, typename TRenderMode>
     class RenderPrototypeComponent {
 
         ShaderHandle shaderHandle_;

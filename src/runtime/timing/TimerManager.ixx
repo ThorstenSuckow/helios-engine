@@ -161,7 +161,7 @@ export namespace helios::engine::runtime::timing {
          *
          * @return True if the command was accepted.
          */
-        bool submit(const TimerControlCommand timerControlCommand) noexcept {
+        bool submit(TimerControlCommand timerControlCommand) noexcept {
             pendingControlContexts_.push_back(timerControlCommand.timerControlContext());
             return true;
         };

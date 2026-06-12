@@ -23,8 +23,8 @@ export namespace helios::engine::runtime::concepts {
      * @see CommandHandlerRegistry
      */
     template<typename OwningT, typename CommandType>
-    concept HasSubmit = requires(OwningT& owner, const CommandType& cmd) {
-            { owner.submit(cmd) } noexcept -> std::same_as<bool>;
+    concept HasSubmit = requires(OwningT& owner, CommandType&& cmd) {
+            { owner.submit(std::move(cmd)) } noexcept -> std::same_as<bool>;
         };
 
 }

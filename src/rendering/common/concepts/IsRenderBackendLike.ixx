@@ -19,6 +19,7 @@ import helios.engine.scene.types.SceneMemberRenderContext;
 import helios.engine.rendering.renderTarget.types;
 import helios.engine.rendering.viewport.types;
 import helios.engine.rendering.shader.types;
+import helios.engine.rendering.common.types;
 import helios.engine.rendering.material.types;
 import helios.engine.rendering.mesh.types;
 
@@ -51,7 +52,8 @@ export namespace helios::engine::rendering::common::concepts {
             const ShaderHandle shaderHandle,
             const MaterialHandle materialHandle,
             const MeshHandle meshHandle,
-            std::span<SceneMemberRenderContext<THandle>> sceneMemberRenderContexts
+            std::span<SceneMemberRenderContext<THandle>> sceneMemberRenderContexts,
+            std::span<InstanceData> instanceData
            )
         {
         {t.beginRenderTargetBatch(renderTargetHandle)}->std::same_as<void>;
@@ -64,7 +66,7 @@ export namespace helios::engine::rendering::common::concepts {
         {t.endMaterialBatch(materialHandle)}->std::same_as<void>;
         {t.beginMeshBatch(meshHandle)}->std::same_as<void>;
         {t.endMeshBatch(meshHandle)}->std::same_as<void>;
-        {t.renderBatch(sceneMemberRenderContexts)}->std::same_as<void>;
+        {t.renderBatch(sceneMemberRenderContexts, instanceData)}->std::same_as<void>;
     };
 
 

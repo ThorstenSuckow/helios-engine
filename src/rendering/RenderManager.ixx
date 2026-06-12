@@ -1,6 +1,6 @@
 /**
  * @file RenderManager.ixx
- * @brief Draft render manager that batches render commands per scene and target.
+ * @brief Batches render commands by target/viewport/material state and flushes them to the backend.
  */
 module;
 
@@ -8,6 +8,8 @@ module;
 #include <format>
 #include "helios-engine-config.h"
 #include <optional>
+#include <algorithm>
+#include <iterator>
 
 export module helios.engine.rendering.RenderManager;
 
@@ -20,7 +22,7 @@ import helios.engine.scene.types.SceneHandle;
 import helios.engine.scene.components;
 
 import helios.engine.rendering.common.commands;
-import helios.engine.rendering.common.types.RenderPassContext;
+import helios.engine.rendering.common.types;
 import helios.engine.scene.types;
 import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
 
@@ -130,10 +132,15 @@ export namespace helios::engine::rendering {
             bool isActive{false};
             MeshHandle handle;
             std::vector<SceneMemberRenderContext<TDrawMemberHandle>> drawContexts;
-            MeshBatch(){drawContexts.reserve(DEFAULT_GAMEOBJECT_CAPACITY);}
+            std::vector<InstanceData> instanceData;
+            MeshBatch() {
+                drawContexts.reserve(DEFAULT_GAMEOBJECT_CAPACITY);
+                instanceData.reserve(DEFAULT_INSTANCE_DATA_CAPACITY);
+            }
             void clear() {
                 isActive = false;
                 drawContexts.clear();
+                instanceData.clear();
             }
         };
 
@@ -218,21 +225,33 @@ export namespace helios::engine::rendering {
         };
 
 
+        /**
+         * @brief Scoped logger used for debug and diagnostics output.
+         */
         inline static auto& logger_ = LogManager::loggerForScope(HELIOS_LOG_SCOPE);
 
 
+        /**
+         * @brief Top-level render-target batch storage indexed by handle entity id.
+         */
         std::vector<RenderTargetBatch<TMemberHandle>> renderTargetBatches_;
+
+        /**
+         * @brief Active render-target indices used for frame-local flush traversal.
+         */
         std::vector<EntityId> activeRenderTargetIndices_;
 
+        /**
+         * @brief Backend instance that receives begin/end hooks and draw submissions.
+         */
         TRenderBackend& renderBackend_;
 
         /**
-         * @brief makes sure a ViewportBatch is available for the specified RenderTargetHandle and
-         * ViewportHandle.
+         * @brief Ensures that the render-target and viewport batch nodes exist and are active.
          *
-         * @param renderTargetHandle
-         * @param viewportHandle
-         * @return
+         * @param renderTargetHandle Render target used as top-level batch key.
+         * @param viewportHandle Viewport used as second-level batch key.
+         * @return Active viewport batch for the given handles.
          */
         [[nodiscard]] ViewportBatch<TMemberHandle>& ensureViewportBatch(
             RenderTargetHandle renderTargetHandle, ViewportHandle viewportHandle) {
@@ -253,6 +272,25 @@ export namespace helios::engine::rendering {
 
             return renderTargetBatch.getOrAdd(viewportHandle);
         };
+
+        /**
+         * @brief Resolves the mesh batch for a render context and activates missing hierarchy nodes.
+         *
+         * @tparam TContextType Context type exposing render target, viewport, shader,
+         * material, and mesh handles.
+         * @param renderContext Render context used as batch key source.
+         * @return Reference to the resolved mesh batch.
+         */
+        template<typename TContextType>
+        auto& meshBatchFor(TContextType& renderContext) noexcept {
+
+            auto& viewportBatch = ensureViewportBatch(renderContext.renderTargetHandle, renderContext.viewportHandle);
+            auto& shaderBatch = viewportBatch.getOrAdd(renderContext.shaderHandle);
+            auto& materialBatch = shaderBatch.getOrAdd(renderContext.materialHandle);
+            auto& meshBatch = materialBatch.getOrAdd(renderContext.meshHandle);
+
+            return meshBatch;
+        }
 
     public:
 
@@ -309,7 +347,7 @@ export namespace helios::engine::rendering {
 
                                 renderBackend_.beginMeshBatch(meshBatch.handle);
 
-                                renderBackend_.template renderBatch<TMemberHandle>(meshBatch.drawContexts);
+                                renderBackend_.template renderBatch<TMemberHandle>(meshBatch.drawContexts, meshBatch.instanceData);
 
                                 renderBackend_.endMeshBatch(meshBatch.handle);
                             } // materialBatch
@@ -339,12 +377,12 @@ export namespace helios::engine::rendering {
          * @brief Queues one scene render context into the batch structure.
          *
          * @details Ensure that the ViewportBatch is available for the next flush().
-         * In case all Scene Members where culled, i.e. the shader/material/mesh batches
+         * In case all scene members were culled, i.e. the shader/material/mesh batches
          * are empty, viewport batches are sent to the graphics backend for making sure no
          * artifacts are left in the viewport from the previous render operation, if any.
          *
-         * @param renderSceneCommand
-         * @return
+         * @param renderSceneCommand Command containing scene-level render context.
+         * @return `true` if the command was accepted.
          */
         bool submit(RenderSceneCommand<TMemberHandle> renderSceneCommand) noexcept {
 
@@ -368,20 +406,36 @@ export namespace helios::engine::rendering {
          */
         bool submit(RenderSceneMemberCommand<TMemberHandle> renderCommand) noexcept {
 
-            auto& sceneMemberRenderContext = std::move(renderCommand.sceneMemberRenderContext);
+            auto renderContext = std::move(renderCommand.sceneMemberRenderContext);
 
-            auto& renderTargetHandle = sceneMemberRenderContext.renderTargetHandle;
-            auto& viewportHandle = sceneMemberRenderContext.viewportHandle;
-            auto& materialHandle = sceneMemberRenderContext.materialHandle;
-            auto& meshHandle     = sceneMemberRenderContext.meshHandle;
-            auto& shaderHandle   = sceneMemberRenderContext.shaderHandle;
+            auto& meshBatch = meshBatchFor(renderContext);
 
-            auto& viewportBatch = ensureViewportBatch(renderTargetHandle, viewportHandle);
-            auto& shaderBatch = viewportBatch.getOrAdd(shaderHandle);
-            auto& materialBatch = shaderBatch.getOrAdd(materialHandle);
-            auto& meshBatch = materialBatch.getOrAdd(meshHandle);
+            meshBatch.drawContexts.push_back(std::move(renderContext));
 
-            meshBatch.drawContexts.push_back(std::move(sceneMemberRenderContext));
+            return true;
+        }
+
+        /**
+         * @brief Queues an instanced draw batch into the hierarchical batch structure.
+         *
+         * @details Activates missing nodes for render target, viewport, shader, material, and mesh,
+         * then appends or moves instance payload into the mesh batch for later rendering in `flush(...)`.
+         *
+         * @param renderCommand Command containing instance batch context.
+         * @return `true` if the command was accepted.
+         */
+        bool submit(RenderInstanceBatchCommand<TMemberHandle> renderCommand) noexcept {
+
+            auto renderContext = std::move(renderCommand.instanceRenderBatchContext);
+
+            auto& meshBatch = meshBatchFor(renderContext);
+
+            if (meshBatch.instanceData.empty()) {
+                meshBatch.instanceData = std::move(renderContext.instanceData);
+            } else {
+                meshBatch.instanceData.reserve(meshBatch.instanceData.size() + renderContext.instanceData.size());
+                std::ranges::move(renderContext.instanceData, std::back_inserter(meshBatch.instanceData));
+            }
 
             return true;
         }
@@ -396,6 +450,7 @@ export namespace helios::engine::rendering {
 
             commandHandlerRegistry.handleCommands<
                 RenderSceneMemberCommand<TMemberHandle>,
+                RenderInstanceBatchCommand<TMemberHandle>,
                 RenderSceneCommand<TMemberHandle>
             >(*this);
 

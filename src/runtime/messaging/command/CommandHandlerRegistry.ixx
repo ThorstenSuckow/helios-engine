@@ -9,6 +9,7 @@ module;
 #include <cassert>
 #include <type_traits>
 #include <utility>
+#include <memory>
 
 export module helios.engine.runtime.messaging.command.CommandHandlerRegistry;
 
@@ -70,7 +71,7 @@ export namespace helios::engine::runtime::messaging::command {
          * @return True if the command was accepted/handled.
          */
         bool submit(CommandType&& cmd) const noexcept {
-            return submitFn(owner, &cmd);
+            return submitFn(owner, std::addressof(cmd));
         }
 
     };

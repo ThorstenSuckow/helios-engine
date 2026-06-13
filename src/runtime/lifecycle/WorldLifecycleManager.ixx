@@ -57,8 +57,8 @@ export namespace helios::engine::runtime::lifecycle {
          *
          * @return True if the command was accepted.
          */
-        bool submit(WorldLifecycleCommand cmd) noexcept {
-            pending_.push_back(cmd);
+        bool submit(WorldLifecycleCommand&& cmd) noexcept {
+            pending_.push_back(std::move(cmd));
             return true;
         }
 

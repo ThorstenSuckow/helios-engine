@@ -384,7 +384,7 @@ export namespace helios::engine::rendering {
          * @param renderSceneCommand Command containing scene-level render context.
          * @return `true` if the command was accepted.
          */
-        bool submit(RenderSceneCommand<TMemberHandle> renderSceneCommand) noexcept {
+        bool submit(RenderSceneCommand<TMemberHandle>&& renderSceneCommand) noexcept {
 
             std::ignore = ensureViewportBatch(
                 renderSceneCommand.sceneRenderContext.renderTargetHandle,
@@ -404,7 +404,7 @@ export namespace helios::engine::rendering {
          * @param renderCommand Command containing per-member render context.
          * @return `true` if the command was accepted.
          */
-        bool submit(RenderSceneMemberCommand<TMemberHandle> renderCommand) noexcept {
+        bool submit(RenderSceneMemberCommand<TMemberHandle>&& renderCommand) noexcept {
 
             auto renderContext = std::move(renderCommand.sceneMemberRenderContext);
 
@@ -424,7 +424,7 @@ export namespace helios::engine::rendering {
          * @param renderCommand Command containing instance batch context.
          * @return `true` if the command was accepted.
          */
-        bool submit(RenderInstanceBatchCommand<TMemberHandle> renderCommand) noexcept {
+        bool submit(RenderInstanceBatchCommand<TMemberHandle>&&renderCommand) noexcept {
 
             auto renderContext = std::move(renderCommand.instanceRenderBatchContext);
 

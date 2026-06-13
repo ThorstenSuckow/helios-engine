@@ -228,9 +228,9 @@ export namespace helios::engine::state {
          * @return True (always accepts commands).
          */
         bool submit(
-            const StateCommand<StateType> stateCommand
+            StateCommand<StateType>&& stateCommand
         ) noexcept {
-            pending_.push_back(stateCommand);
+            pending_.push_back(std::move(stateCommand));
             return true;
         };
 
@@ -248,9 +248,9 @@ export namespace helios::engine::state {
          * @return True (always accepts commands).
          */
         bool submit(
-            const DelayedStateCommand<StateType> stateCommand
+            DelayedStateCommand<StateType>&& stateCommand
         ) noexcept {
-            pending_.push_back(StateCommand<StateType>(stateCommand.transitionRequest()));
+            pending_.push_back(StateCommand<StateType>(std::move(stateCommand.transitionRequest())));
             return true;
         };
 

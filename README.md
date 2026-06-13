@@ -14,10 +14,11 @@ is kept as a legacy reference. Active development happens in the split repositor
 ## Features
 
 - Phase/pass based game loop orchestration
-- Typed command buffers and command-handler routing
+- Typed command buffers and command-handler routing with move-consuming submit semantics
 - Type-indexed event buses for pass, phase, and frame communication
 - Resource and manager registries for runtime services
 - Generic state-management utilities
+- Scene extraction and rendering support explicit instancing flow via `RenderInstanceBatchCommand` and `InstanceRenderBatchContext`
 - Engine-level rendering, scene, platform, spatial, input, tooling, and utility modules
 
 ## Module surface

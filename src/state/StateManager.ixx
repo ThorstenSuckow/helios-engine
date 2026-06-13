@@ -12,7 +12,6 @@ module;
 export module helios.engine.state.StateManager;
 
 
-import helios.engine.state.TypedStateCommandHandler;
 import helios.engine.state.StateTransitionListener;
 import helios.engine.state.types.StateTransitionRule;
 

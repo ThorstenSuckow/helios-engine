@@ -16,5 +16,4 @@ export import helios.engine.state.StateToIdMapPair;
 export import helios.engine.state.CombinedStateToIdMapPair;
 export import helios.engine.state.StateTransitionListener;
 export import helios.engine.state.StateCommandHandler;
-export import helios.engine.state.TypedStateCommandHandler;
 export import helios.engine.state.StateManager;

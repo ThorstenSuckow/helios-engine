@@ -17,6 +17,11 @@ export namespace helios::engine::rendering::shader::types::UniformScope {
     struct Pass{};
 
     /**
+     * @brief Uniform value can change per material batch call.
+     */
+    struct Material{};
+
+    /**
      * @brief Uniform value can change per draw call.
      */
     struct Draw{};

@@ -132,7 +132,7 @@ export namespace helios::engine::rendering {
             bool isActive{false};
             MeshHandle handle;
             std::vector<SceneMemberRenderContext<TDrawMemberHandle>> drawContexts;
-            std::vector<InstanceData> instanceData;
+            std::vector<InstanceData<TDrawMemberHandle>> instanceData;
             MeshBatch() {
                 drawContexts.reserve(DEFAULT_GAMEOBJECT_CAPACITY);
                 instanceData.reserve(DEFAULT_INSTANCE_DATA_CAPACITY);
@@ -276,6 +276,10 @@ export namespace helios::engine::rendering {
         /**
          * @brief Resolves the mesh batch for a render context and activates missing hierarchy nodes.
          *
+         * @details Batches are scoped by render target and viewport.
+         * A viewport is bound to exactly one scene, so sceneHandle is not required
+         * as part of the batch key.
+         *
          * @tparam TContextType Context type exposing render target, viewport, shader,
          * material, and mesh handles.
          * @param renderContext Render context used as batch key source.
@@ -347,7 +351,8 @@ export namespace helios::engine::rendering {
 
                                 renderBackend_.beginMeshBatch(meshBatch.handle);
 
-                                renderBackend_.template renderBatch<TMemberHandle>(meshBatch.drawContexts, meshBatch.instanceData);
+                                renderBackend_.template renderBatch<TMemberHandle>(meshBatch.drawContexts);
+                                renderBackend_.template renderBatch<TMemberHandle>(meshBatch.instanceData);
 
                                 renderBackend_.endMeshBatch(meshBatch.handle);
                             } // materialBatch

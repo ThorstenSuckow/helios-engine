@@ -13,6 +13,21 @@ system for visual representation.
 Provides a platform-independent rendering abstraction that can be implemented by
 various graphics APIs (OpenGL, Vulkan, DirectX).
 
+## Scene Visibility Integration
+
+`SceneMemberVisibilityRegistry` (declared in `helios.engine.scene.SceneMemberVisibilityRegistry`)
+acts as the central, frame-local storage consumed by the `SceneRenderSystem`.
+
+Per frame, the `SceneMemberVisibilitySystem` creates and fills this registry so
+subsequent render operations can query precomputed visibility results:
+
+- visible members per viewport and submission mode (`Instanced` / `NonInstanced`)
+- culled members per viewport and submission mode
+- scene render contexts used for submission
+
+This decouples visibility determination from render submission and ensures the
+render stage works on a deterministic visibility snapshot for the current frame.
+
 ## Key Types
 
 | Item | Description |

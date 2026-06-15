@@ -33,6 +33,12 @@ is kept as a legacy reference. Active development happens in the split repositor
 | Scene/spatial | `helios.engine.scene`, `helios.engine.spatial` |
 | Utilities | `helios.engine.core`, `helios.engine.input`, `helios.engine.util`, `helios.engine.tooling` |
 
+## Additional documentation
+
+- Rendering details: `src/rendering/README.md`
+  - includes the frame-flow contract for `SceneMemberVisibilityRegistry`
+    (created each frame by `SceneMemberVisibilitySystem`, consumed by `SceneRenderSystem` as central visible/culled storage)
+
 ## Usage
 
 ### C++ module

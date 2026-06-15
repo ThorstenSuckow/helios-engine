@@ -4,7 +4,7 @@
  */
 export module helios.engine.rendering.common.types;
 
-export import helios.engine.rendering.common.types.renderModes;
+export import helios.engine.rendering.common.types.submissionModes;
 
 export import helios.engine.rendering.common.types.ClearFlags;
 export import helios.engine.rendering.common.types.RenderPassContext;

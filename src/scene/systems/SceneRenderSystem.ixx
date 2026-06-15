@@ -1,6 +1,6 @@
 /**
  * @file SceneRenderSystem.ixx
- * @brief Extracts visible scene members into render commands per viewport.
+ * @brief Emits scene render commands from per-frame visibility snapshots.
  */
 module;
 
@@ -9,6 +9,7 @@ module;
 #include <optional>
 #include <tuple>
 #include <vector>
+#include <cstdint>
 
 #include "helios-engine-config.h"
 
@@ -24,6 +25,9 @@ import helios.engine.scene.concepts.IsFrustumCullerLike;
 import helios.engine.rendering.common.components;
 import helios.engine.rendering.common.commands;
 import helios.engine.rendering.common.types;
+
+import helios.engine.rendering.renderTarget.types;
+import helios.engine.rendering.viewport.types;
 
 import helios.engine.rendering.renderTarget.components.RenderTargetBindingComponent;
 
@@ -62,152 +66,103 @@ using namespace helios::engine::rendering::common::types;
 using namespace helios::engine::rendering::common::components;
 using namespace helios::engine::runtime::messaging::command;
 using namespace helios::engine::runtime::world;
+using namespace helios::engine::rendering::renderTarget::types;
+using namespace helios::engine::rendering::viewport::types;
 
 #define HELIOS_LOG_SCOPE "helios::engine::scene::systems::SceneRenderSystem"
 export namespace helios::engine::scene::systems {
 
     /**
-     * @brief System that extracts per-member render contexts for active viewports.
+     * @brief System that dispatches render commands from visibility results.
      *
-     * @details For each active viewport binding, the system resolves the bound
-     * scene and camera, evaluates the configured culling strategy for scene
-     * members, and writes accepted members as `RenderSceneMemberCommand`s into the target
-     * command buffer.
+     * @details This system consumes the frame-local `SceneMemberVisibilityRegistry`
+     * produced earlier by `SceneMemberVisibilitySystem`. It emits scene-level
+     * render commands and member-level commands for both instanced and
+     * non-instanced submission paths.
      *
      * @tparam TOwnerHandle Viewport entity handle type.
      * @tparam TMemberHandle Scene member handle type.
-     * @tparam TCullingStrategy Frustum-culling strategy type.
      * @tparam TCommandBuffer Command buffer used for extracted render commands.
      */
     template<
         typename TOwnerHandle,
         typename TMemberHandle,
-        typename TCullingStrategy,
         typename TCommandBuffer = NullCommandBuffer
     >
     requires IsViewportHandle<TOwnerHandle> &&
-             IsFrustumCullerLike<TCullingStrategy, typename TCullingStrategy::MemberHandle_type> &&
-             std::same_as<typename TCullingStrategy::MemberHandle_type, TMemberHandle> &&
              IsCommandBufferLike<TCommandBuffer>
     class SceneRenderSystem {
-
-        /**
-         * @brief Culling strategy used to decide member visibility per viewport.
-         */
-        TCullingStrategy cullingStrategy_;
 
         static inline auto& logger_ = helios::engine::util::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
 
         /**
-         * @brief Tracks visible and culled members per viewport for diagnostics/debugging.
+         * @brief Central per-frame visibility snapshot consumed by this system.
+         *
+         * Filled by `SceneMemberVisibilitySystem` and read-only in this stage.
          */
         SceneMemberVisibilityRegistry<TMemberHandle>& visibilityRegistry_;
 
+
         /**
-         * @brief Emits non-instanced render commands for visible scene members.
+         * @brief Dispatches non-instanced member render commands.
+         *
+         * Iterates visible non-instanced member contexts and emits one
+         * `RenderSceneMemberCommand` per member.
          *
          * @param updateContext Current frame update context.
+         * @param visibilityContexts Visible non-instanced members grouped by viewport.
          * @param cmdBuffer Command buffer receiving render commands.
-         * @param cullingContext Culling input shared across member checks.
-         * @param sceneHandle Active scene handle bound to the viewport.
-         * @param renderTargetBindingComponent Render-target binding of the viewport entity.
-         * @param viewportEntity Active viewport entity.
          */
         void dispatchNonInstancedRenderCommands(
             UpdateContext& updateContext,
-            TCommandBuffer& cmdBuffer,
-            CullingContext<TMemberHandle>& cullingContext,
-            const SceneHandle sceneHandle,
-            const RenderTargetBindingComponent<TOwnerHandle>& renderTargetBindingComponent,
-            const ViewportEntity viewportEntity
-            ) {
+             std::span<const std::vector<SceneMemberVisibilityContext<TMemberHandle, NonInstanced>>> visibilityContexts,
+             TCommandBuffer& cmdBuffer) {
 
 
+            for (const auto& viewportContexts : visibilityContexts) {
 
-#if HELIOS_DEBUG
-                std::size_t available = 0;
-                std::size_t used      = 0;
-#endif
+                for (const auto& memberContext : viewportContexts) {
+                    const auto sceneHandle = memberContext.sceneHandle;
+                    const auto renderTargetHandle = memberContext.renderTargetHandle;
+                    const auto viewportHandle = memberContext.viewportHandle;
 
-                for (auto [
-                    memberEntity,
-                    smc,
-                    rpc,
-                    transformWorld,
-                    boundsWorld,
-                    memberActive
-                    ] : updateContext.view<
-                    TMemberHandle,
-                    SceneMemberComponent<TMemberHandle>,
-                    RenderPrototypeComponent<TMemberHandle, NonInstanced>,
-                    TransformComponent<TMemberHandle, World>,
-                    BoundsComponent<TMemberHandle, World>,
-                    Active<TMemberHandle>
-                >().whereEnabled()) {
+                    const auto entity = updateContext.find<TMemberHandle>(memberContext.memberHandle);
+                    assert(entity && "Unexpected missing entity");
 
-                    cullingContext.bounds = boundsWorld->value();
-                    cullingContext.handle = memberEntity.handle();
+                    const auto* renderPrototype = entity->template get<RenderPrototypeComponent<TMemberHandle, Instanced>>();
+                    assert(renderPrototype && "Unexpected missing RenderPrototypeComponent");
 
-                    #if HELIOS_DEBUG
-                    available++;
-                    #endif
-
-                    if (smc->targetHandle() == sceneHandle && cullingStrategy_.shouldRender(cullingContext)) {
-
-                        #if HELIOS_DEBUG
-                        used++;
-                        #endif
-
-                        std::ignore = visibilityRegistry_.addVisibleMember(viewportEntity.handle(), memberEntity.handle());
-                        cmdBuffer.template add<RenderSceneMemberCommand<TMemberHandle>>(
-                            SceneMemberRenderContext<TMemberHandle>{
-                                memberEntity.handle(),
-                                renderTargetBindingComponent.targetHandle(),
-                                viewportEntity.handle(),
-                                sceneHandle,
-                                rpc->meshHandle(),
-                                rpc->materialHandle(),
-                                rpc->shaderHandle(),
-                                transformWorld->value()
-                            });
-
-
-                    } else {
-                        std::ignore = visibilityRegistry_.addCulledMember(viewportEntity.handle(), memberEntity.handle());
-                    }
+                    cmdBuffer.template add<RenderSceneMemberCommand<TMemberHandle>>(SceneMemberRenderContext<TMemberHandle>{
+                        memberContext.memberHandle,
+                        renderTargetHandle,
+                        viewportHandle,
+                        sceneHandle,
+                        renderPrototype->meshHandle(),
+                        renderPrototype->materialHandle(),
+                        renderPrototype->shaderHandle(),
+                        memberContext.worldMatrix
+                    });
                 }
-
-                #if HELIOS_DEBUG
-                logger_.debug("Available {0}, culled in {1}, used {2} scene members for viewport {3}.", available, available - used, used, viewportEntity.handle().entityId);
-                #endif
-
+            }
         }
 
+
         /**
-         * @brief Emits instanced render batch commands for visible scene members.
+         * @brief Dispatches instanced member render commands in batches.
          *
-         * @details Consecutive visible members with identical render state
-         * (target/viewport/scene/mesh/material/shader) are grouped into one
-         * `InstanceRenderBatchContext` before submission.
+         * Builds `InstanceRenderBatchContext` groups with matching render state
+         * and emits `RenderInstanceBatchCommand` whenever a batch boundary is hit.
          *
          * @param updateContext Current frame update context.
+         * @param visibilityContexts Visible instanced members grouped by viewport.
          * @param cmdBuffer Command buffer receiving render commands.
-         * @param cullingContext Culling input shared across member checks.
-         * @param sceneHandle Active scene handle bound to the viewport.
-         * @param renderTargetBindingComponent Render-target binding of the viewport entity.
-         * @param viewportEntity Active viewport entity.
          */
         void dispatchInstancedRenderCommands(
             UpdateContext& updateContext,
-            TCommandBuffer& cmdBuffer,
-            CullingContext<TMemberHandle>& cullingContext,
-            const SceneHandle sceneHandle,
-            const RenderTargetBindingComponent<TOwnerHandle>& renderTargetBindingComponent,
-            const ViewportEntity viewportEntity
-            ) {
+            std::span<const std::vector<SceneMemberVisibilityContext<TMemberHandle, Instanced>>> visibilityContexts,
+            TCommandBuffer& cmdBuffer) {
 
             std::optional<InstanceRenderBatchContext<TMemberHandle>> renderBatchContext;
-
 
             auto flushCurrentBatch = [&]() {
                 if (!renderBatchContext || renderBatchContext->memberHandles.empty()) {
@@ -222,60 +177,47 @@ export namespace helios::engine::scene::systems {
                 renderBatchContext.reset();
             };
 
-            for (auto [
-                memberEntity,
-                smc,
-                rpc,
-                transformWorld,
-                boundsWorld,
-                memberActive
-                ] : updateContext.view<
-                TMemberHandle,
-                SceneMemberComponent<TMemberHandle>,
-                RenderPrototypeComponent<TMemberHandle, Instanced>,
-                TransformComponent<TMemberHandle, World>,
-                BoundsComponent<TMemberHandle, World>,
-                Active<TMemberHandle>
-            >().whereEnabled()) {
+            for (const auto& viewportContexts : visibilityContexts) {
 
-                cullingContext.bounds = boundsWorld->value();
-                cullingContext.handle = memberEntity.handle();
+                for (const auto& memberContext : viewportContexts) {
+                    const auto sceneHandle = memberContext.sceneHandle;
+                    const auto renderTargetHandle = memberContext.renderTargetHandle;
+                    const auto viewportHandle = memberContext.viewportHandle;
 
-                if (smc->targetHandle() == sceneHandle && cullingStrategy_.shouldRender(cullingContext)) {
+                    const auto entity = updateContext.find<TMemberHandle>(memberContext.memberHandle);
+                    assert(entity && "Unexpected missing entity");
+
+                    const auto* renderPrototype = entity->template get<RenderPrototypeComponent<TMemberHandle, Instanced>>();
+                    assert(renderPrototype && "Unexpected missing RenderPrototypeComponent");
 
                     if (!renderBatchContext ||
-                        renderTargetBindingComponent.targetHandle() != renderBatchContext->renderTargetHandle ||
-                        viewportEntity.handle() != renderBatchContext->viewportHandle ||
+                        memberContext.renderTargetHandle != renderBatchContext->renderTargetHandle ||
+                        memberContext.viewportHandle != renderBatchContext->viewportHandle ||
                         sceneHandle != renderBatchContext->sceneHandle ||
-                        rpc->meshHandle() != renderBatchContext->meshHandle ||
-                        rpc->materialHandle() != renderBatchContext->materialHandle ||
-                        rpc->shaderHandle() != renderBatchContext->shaderHandle) {
+                        renderPrototype->meshHandle() != renderBatchContext->meshHandle ||
+                        renderPrototype->materialHandle() != renderBatchContext->materialHandle ||
+                        renderPrototype->shaderHandle() != renderBatchContext->shaderHandle) {
 
-                        flushCurrentBatch();
+                            flushCurrentBatch();
 
-                        renderBatchContext.emplace(
-                            renderTargetBindingComponent.targetHandle(),
-                            viewportEntity.handle(),
-                            sceneHandle,
-                            rpc->meshHandle(),
-                            rpc->materialHandle(),
-                            rpc->shaderHandle()
-                        );
-                    }
+                            renderBatchContext.emplace(
+                                memberContext.renderTargetHandle,
+                                viewportHandle,
+                                sceneHandle,
+                                renderPrototype->meshHandle(),
+                                renderPrototype->materialHandle(),
+                                renderPrototype->shaderHandle()
+                            );
+                        }
 
-
-                    std::ignore = visibilityRegistry_.addVisibleMember(viewportEntity.handle(), memberEntity.handle());
-
-                    renderBatchContext->memberHandles.push_back(memberEntity.handle());
-                    renderBatchContext->instanceData.push_back({transformWorld->value()});
-
-                } else {
-                    std::ignore = visibilityRegistry_.addCulledMember(viewportEntity.handle(), memberEntity.handle());
+                    renderBatchContext->memberHandles.push_back(memberContext.memberHandle);
+                    renderBatchContext->instanceData.push_back({memberContext.worldMatrix});
                 }
             }
 
             flushCurrentBatch();
         }
+
 
 
     public:
@@ -291,73 +233,38 @@ export namespace helios::engine::scene::systems {
         using CommandBuffer_type = TCommandBuffer;
 
         /**
-         * @brief Constructs the system with a culling strategy instance.
+         * @brief Constructs the system with the visibility snapshot registry.
          *
-         * @param cullingStrategy Strategy used to decide whether a scene member
-         * should produce render work.
-         * @param visibilityRegistry Registry for tracking culled and visible handles per viewport.
+         * @param visibilityRegistry Registry containing per-frame visible/culled members.
          */
-        explicit SceneRenderSystem(TCullingStrategy cullingStrategy, SceneMemberVisibilityRegistry<TMemberHandle>& visibilityRegistry)
-        : cullingStrategy_(std::move(cullingStrategy)), visibilityRegistry_(visibilityRegistry) {
+        explicit SceneRenderSystem(SceneMemberVisibilityRegistry<TMemberHandle>& visibilityRegistry)
+        : visibilityRegistry_(visibilityRegistry) {
         }
 
         /**
-         * @brief Extracts render commands for active viewports.
+         * @brief Dispatches render commands from the current visibility snapshot.
+         *
+         * Emits one `RenderSceneCommand` per scene/render-target/viewport context,
+         * then emits member commands for instanced and non-instanced visible
+         * members stored in `SceneMemberVisibilityRegistry`.
          *
          * @param updateContext Current frame update context.
          * @param cmdBuffer Command buffer receiving extracted render commands.
          */
         void update(UpdateContext& updateContext, TCommandBuffer& cmdBuffer) noexcept {
 
-            for (auto [viewportEntity, renderTargetBindingComponent, sbc, cbc, viewportActive] : updateContext.view<
-                TOwnerHandle,
-                RenderTargetBindingComponent<TOwnerHandle>,
-                SceneBindingComponent<TOwnerHandle>,
-                CameraBindingComponent<TOwnerHandle>,
-                Active<TOwnerHandle>
-            >().whereEnabled()) {
+            auto sceneRenderContexts = visibilityRegistry_.sceneRenderContexts();
 
-                const auto sceneHandle  = sbc->targetHandle();
-                const auto cameraHandle = cbc->targetHandle();
-
-                const auto camera = updateContext.find<TMemberHandle>(cameraHandle);
-                if (!camera) {
-                    assert(false && "Camera not found");
-                    logger_.error("Camera not found");
-                    continue;
-                }
-                auto* pmc = camera->template get<ProjectionMatrixComponent<TMemberHandle>>();
-                if (!pmc) {
-                    assert(pmc && "Camera had no ProjectionMatrixComponent");
-                    logger_.error("Camera had no ProjectionMatrixComponent");
-                    continue;
-                }
-                auto* lac = camera->template get<ViewMatrixComponent<TMemberHandle>>();
-                if (!lac) {
-                    assert(lac && "Camera had no ViewMatrixComponent");
-                    logger_.error("Camera had no ViewMatrixComponent");
-                    continue;
-                }
-
-                auto* pcc = camera->template get<PerspectiveCameraComponent<TMemberHandle>>();
-                auto frustumPlanes = helios::math::frustumPlanes(
-                    pcc->fovY(), pcc->aspectRatio(), pcc->zNear(), pcc->zFar(), lac->value()
-                );
-
-                auto cullingContext = CullingContext<TMemberHandle>{frustumPlanes, pmc->value(), lac->value()};
-
-                cmdBuffer.template add<RenderSceneCommand<TMemberHandle>>(
-                   SceneRenderContext<TMemberHandle>{
-                       renderTargetBindingComponent->targetHandle(),
-                       viewportEntity.handle(),
-                       sceneHandle
-                   });
-
-                dispatchNonInstancedRenderCommands(
-                    updateContext, cmdBuffer, cullingContext, sceneHandle, *renderTargetBindingComponent, viewportEntity);
-                dispatchInstancedRenderCommands(
-                    updateContext, cmdBuffer, cullingContext, sceneHandle, *renderTargetBindingComponent, viewportEntity);
+            for (auto& sceneRenderContext : sceneRenderContexts) {
+                cmdBuffer.template add<RenderSceneCommand<TMemberHandle>>(sceneRenderContext);
             }
+
+            const auto instancedMembers = visibilityRegistry_.template visibleMembers<Instanced>();
+            dispatchInstancedRenderCommands(updateContext, instancedMembers, cmdBuffer);
+
+            const auto nonInstancedMembers = visibilityRegistry_.template visibleMembers<NonInstanced>();
+            dispatchNonInstancedRenderCommands(updateContext, nonInstancedMembers, cmdBuffer);
+
 
         }
 

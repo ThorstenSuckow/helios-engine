@@ -77,7 +77,7 @@ export namespace helios::engine::scene::types {
         /**
          * @brief Per-instance payload (for example model matrices) for draw submission.
          */
-        std::vector<InstanceData> instanceData;
+        std::vector<InstanceData<TMemberHandle>> instanceData;
 
         /**
          * @brief Constructs an instance batch context for a fixed render state tuple.

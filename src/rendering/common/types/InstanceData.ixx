@@ -14,6 +14,7 @@ export namespace helios::engine::rendering::common::types {
     /**
      * @brief Instance payload transferred to the render backend.
      */
+    template<typename TOwnerHandle>
     struct InstanceData {
         /**
          * @brief Model transform matrix for one rendered instance.

@@ -28,7 +28,7 @@ export namespace helios::engine::scene::types {
     template<typename TMemberHandle>
     struct SceneRenderContext {
 
-        /** @brief Target viewport for rendering. */
+        /** @brief Render target for rendering. */
         RenderTargetHandle renderTargetHandle;
 
         /** @brief Target viewport for rendering. */
@@ -37,7 +37,7 @@ export namespace helios::engine::scene::types {
         /** @brief Owning scene handle. */
         SceneHandle sceneHandle;
 
-
+        friend bool operator==(const SceneRenderContext<TMemberHandle>&, const SceneRenderContext<TMemberHandle>&) = default;
     };
 
 }

@@ -53,7 +53,7 @@ export namespace helios::engine::rendering::common::concepts {
             const MaterialHandle materialHandle,
             const MeshHandle meshHandle,
             std::span<const SceneMemberRenderContext<THandle>> sceneMemberRenderContexts,
-            std::span<const InstanceData> instanceData
+            std::span<const InstanceData<THandle>> instanceData
            )
         {
         {t.beginRenderTargetBatch(renderTargetHandle)}->std::same_as<void>;
@@ -66,7 +66,8 @@ export namespace helios::engine::rendering::common::concepts {
         {t.endMaterialBatch(materialHandle)}->std::same_as<void>;
         {t.beginMeshBatch(meshHandle)}->std::same_as<void>;
         {t.endMeshBatch(meshHandle)}->std::same_as<void>;
-        {t.renderBatch(sceneMemberRenderContexts, instanceData)}->std::same_as<void>;
+        {t.renderBatch(sceneMemberRenderContexts)}->std::same_as<void>;
+        {t.renderBatch(instanceData)}->std::same_as<void>;
     };
 
 

@@ -6,4 +6,4 @@
 export module helios.engine.core.systems;
 
 export import helios.engine.core.systems.ClearDirtySystem;
-export import helios.engine.core.systems.LambdaSystem;
+export import helios.engine.core.systems.CallableSystem;

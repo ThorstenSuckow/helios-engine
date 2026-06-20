@@ -11,12 +11,24 @@ export namespace helios::engine::runtime::world::tags {
     /**
      * @brief Compile-time tag identifying a class as a System.
      *
-     * @details Declare `using EngineRoleTag = SystemRole;` inside a class
+     * @details Declare `using EngineRoleTag = TypedSystemRole;` inside a class
      * to make it satisfy the `IsSystemLike` concept. This enables registration
      * via `SystemRegistry::add<T>()`.
      *
-     * @see IsSystemLike
+     * @see IsRuntimeSystemLike
      * @see HasTag
      */
-    struct SystemRole{};
+    struct TypedSystemRole{};
+
+    /**
+     * @brief Compile-time tag identifying a class as a CallableSystem.
+     *
+     * @details Declare `using EngineRoleTag = CallableSystemRole;` inside a class
+     * to make it satisfy the `IsCallableSystemLike` concept. This enables registration
+     * via `SystemRegistry::add<T>()`.
+     *
+     * @see IsRuntimeSystemLike
+     * @see HasTag
+     */
+    struct CallableSystemRole{};
 }

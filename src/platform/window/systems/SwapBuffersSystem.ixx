@@ -51,7 +51,7 @@ export namespace helios::engine::platform::window::systems {
         /**
          * @brief Engine role marker used by runtime registries.
          */
-        using EngineRoleTag = SystemRole;
+        using EngineRoleTag = TypedSystemRole;
 
         /**
          * @brief Enqueues swap-buffer commands for the current frame.

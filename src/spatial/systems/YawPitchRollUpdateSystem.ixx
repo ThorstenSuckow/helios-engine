@@ -52,7 +52,7 @@ export namespace helios::engine::scene::systems {
         /**
          * @brief Runtime role tag used for system registration.
          */
-        using EngineRoleTag = SystemRole;
+        using EngineRoleTag = TypedSystemRole;
 
         /**
          * @brief Executes one update pass for active entities.

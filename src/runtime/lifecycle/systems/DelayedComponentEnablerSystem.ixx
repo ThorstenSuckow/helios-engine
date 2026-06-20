@@ -51,7 +51,8 @@ export namespace helios::engine::runtime::lifecycle::systems {
 
     public:
 
-        using EngineRoleTag = helios::engine::runtime::world::tags::SystemRole;
+        using EngineRoleTag = helios::engine::runtime::world::tags::TypedSystemRole;
+
         /**
          * @brief Processes all deferred components and activates expired ones.
          *

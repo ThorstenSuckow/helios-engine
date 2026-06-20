@@ -36,7 +36,7 @@ export namespace helios::engine::platform::environment::systems {
         /**
          * @brief Engine role marker used by runtime system registries.
          */
-        using EngineRoleTag = SystemRole;
+        using EngineRoleTag = TypedSystemRole;
 
         /**
          * @brief Enqueues polling of native platform/window events.

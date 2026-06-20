@@ -47,7 +47,7 @@ export namespace helios::engine::platform::window::systems {
         /**
          * @brief Engine role marker used by runtime registries.
          */
-        using EngineRoleTag = SystemRole;
+        using EngineRoleTag = TypedSystemRole;
 
         /**
          * @brief Scans create requests and submits create commands.

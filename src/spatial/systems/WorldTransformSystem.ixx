@@ -37,7 +37,7 @@ export namespace helios::engine::scene::systems {
         /**
          * @brief Runtime role tag used for system registration.
          */
-        using EngineRoleTag = SystemRole;
+        using EngineRoleTag = TypedSystemRole;
 
         /**
          * @brief Executes one update pass over active transform tuples.
@@ -50,7 +50,12 @@ export namespace helios::engine::scene::systems {
         void update(UpdateContext& updateContext) noexcept {
 
 
-            for (auto [entity, localPosition, localRotation, worldTransform, active] : updateContext.view<
+            for (auto [
+                entity,
+                localPosition,
+                localRotation,
+                worldTransform,
+                active] : updateContext.view<
                 TMemberHandle,
                 Position3DComponent<TMemberHandle, Local>,
                 Rotation3DComponent<TMemberHandle, Local>,

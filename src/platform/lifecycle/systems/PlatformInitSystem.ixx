@@ -43,7 +43,7 @@ export namespace helios::engine::platform::lifecycle::systems {
         /**
          * @brief Engine role marker used by runtime system registries.
          */
-        using EngineRoleTag = SystemRole;
+        using EngineRoleTag = TypedSystemRole;
 
         /**
          * @brief Queues platform initialization command when required.

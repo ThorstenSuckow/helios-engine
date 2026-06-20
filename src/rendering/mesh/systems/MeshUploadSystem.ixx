@@ -41,7 +41,7 @@ export namespace helios::engine::rendering::mesh::systems {
 
     public:
 
-        using EngineRoleTag = SystemRole;
+        using EngineRoleTag = TypedSystemRole;
         using CommandBuffer_type = TCommandBuffer;
 
         explicit MeshUploadSystem(size_t capacity = TCapacity) : capacity_(capacity) {

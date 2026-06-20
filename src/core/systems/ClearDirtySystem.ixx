@@ -59,7 +59,7 @@ export namespace helios::engine::core::systems {
         /**
          * @brief Runtime role tag used for system registration.
          */
-        using EngineRoleTag = SystemRole;
+        using EngineRoleTag = TypedSystemRole;
 
         /**
          * @brief Executes one dirty-clear pass for all configured component specifications.

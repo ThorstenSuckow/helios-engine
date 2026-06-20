@@ -62,7 +62,7 @@ export namespace helios::engine::rendering::viewport::systems {
 
     public:
 
-        using EngineRoleTag = helios::engine::runtime::world::tags::SystemRole;
+        using EngineRoleTag = helios::engine::runtime::world::tags::TypedSystemRole;
 
         /**
          * @brief Constructs the system with a state-to-ID map pair.

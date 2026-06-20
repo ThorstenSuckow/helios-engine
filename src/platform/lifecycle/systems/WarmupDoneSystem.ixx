@@ -60,7 +60,7 @@ export namespace helios::engine::platform::lifecycle::systems {
         /**
          * @brief Engine role marker used by runtime registries.
          */
-        using EngineRoleTag = SystemRole;
+        using EngineRoleTag = TypedSystemRole;
 
         /**
          * @brief Queues `StateCommand<EngineState>` with `WarmupDoneSignal` when warmup resources are consumed.

@@ -28,7 +28,7 @@ export namespace helios::engine::platform::lifecycle::systems {
         /**
          * @brief Engine role marker used by runtime system registries.
          */
-        using EngineRoleTag = helios::engine::runtime::world::tags::SystemRole;
+        using EngineRoleTag = helios::engine::runtime::world::tags::TypedSystemRole;
 
         /**
          * @brief Destroys the active session in the current update context.

@@ -53,7 +53,7 @@ export namespace helios::engine::rendering::shader::systems {
 
     public:
 
-        using EngineRoleTag = SystemRole;
+        using EngineRoleTag = TypedSystemRole;
         using CommandBuffer_type = TCommandBuffer;
 
         explicit ShaderCompileSystem(size_t capacity = TCapacity) : capacity_(capacity) {

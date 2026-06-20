@@ -28,7 +28,7 @@ export namespace helios::engine::platform::window::systems {
 
     public:
 
-        using EngineRoleTag = SystemRole;
+        using EngineRoleTag = TypedSystemRole;
 
         void update(UpdateContext& updateContext) noexcept {
             for (auto [entity, wc, wsc, active] : updateContext.view<

@@ -47,7 +47,7 @@ export namespace helios::engine::platform::window::systems {
     public:
 
         /** @brief Runtime role tag used for engine system registration. */
-        using EngineRoleTag = SystemRole;
+        using EngineRoleTag = TypedSystemRole;
 
         /**
          * @brief Processes active windows with dirty size state.

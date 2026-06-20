@@ -100,14 +100,14 @@ export namespace helios::engine::runtime::world {
         /**
          * @brief Wraps a concrete system in a type-erased System.
          *
-         * @tparam T The concrete system type, must satisfy `IsSystemLike<T>`.
+         * @tparam T The concrete system type, must satisfy `IsRuntimeSystemLike<T>`.
          *
          * @param system The concrete system instance to wrap (moved into internal storage).
          * @param buffer Optional pointer to the concrete `T::CommandBuffer_type`
          *        instance used for systems with two-parameter update signatures.
          */
         template<typename T>
-        requires IsSystemLike<T>
+        requires IsRuntimeSystemLike<T>
         explicit System(T system, void* buffer = nullptr)
             : pimpl_(std::make_unique<Model<T>>(std::move(system), buffer))
         {}

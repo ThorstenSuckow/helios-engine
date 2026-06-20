@@ -85,7 +85,9 @@ export namespace helios::engine::util {
         [[nodiscard]] float randomFloat(float a, float b) noexcept {
 
             if (b < a) {
-                auto tmp = a; a = b; b = tmp;
+                const auto tmp = a;
+                a = b;
+                b = tmp;
             }
 
             if (a == b) {

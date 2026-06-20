@@ -39,6 +39,12 @@ if(HELIOS_ENGINE_ENABLE_PACKAGE)
     include(cmake/Install.cmake)
 endif()
 
-if(BUILD_TESTING)
+set(HELIOS_ENGINE_BUILD_TESTS_DEFAULT OFF)
+if(PROJECT_IS_TOP_LEVEL)
+    set(HELIOS_ENGINE_BUILD_TESTS_DEFAULT ON)
+endif()
+option(HELIOS_ENGINE_BUILD_TESTS "Build helios-engine tests" ${HELIOS_ENGINE_BUILD_TESTS_DEFAULT})
+
+if(HELIOS_ENGINE_BUILD_TESTS AND BUILD_TESTING)
     add_subdirectory(tests)
 endif()

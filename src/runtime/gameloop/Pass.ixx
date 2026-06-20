@@ -127,7 +127,7 @@ export namespace helios::engine::runtime::gameloop {
          * @return Reference to this Pass for method chaining.
          */
         template<typename T, typename... Args>
-        requires helios::engine::runtime::world::concepts::IsSystemLike<T>
+        requires helios::engine::runtime::world::concepts::IsTypedSystemLike<T>
         Pass& addSystem(Args&&... args) {
 
             T concreteSystem(std::forward<Args>(args)...);
@@ -141,6 +141,39 @@ export namespace helios::engine::runtime::gameloop {
 
             systemRegistry_.template add<T>(
                 System(std::move(concreteSystem), bufferPtr)
+            );
+
+            return *this;
+        }
+
+        /**
+         * @brief Adds a system of type TSystem to this pass.
+         *
+         * @tparam TSystem The system type to add.
+         *
+         * @param system System forwarded to the system constructor.
+         *
+         * @details If `TSystem` defines `CommandBuffer_type`, the buffer is resolved
+         * from the bound `GameWorld` and injected into the wrapped
+         * `helios::engine::runtime::world::System`.
+         *
+         * @return Reference to this Pass for method chaining.
+         */
+        template<typename TSystem>
+        requires helios::engine::runtime::world::concepts::IsCallableSystemLike<std::remove_cvref_t<TSystem>>
+        Pass& addSystem(TSystem&& system) {
+
+            using SystemType = std::remove_cvref_t<TSystem>;
+
+            void* bufferPtr = nullptr;
+            if constexpr (requires { typename SystemType::CommandBuffer_type; }) {
+                using TCommandBuffer = typename TSystem::CommandBuffer_type;
+                bufferPtr = gameWorld_.tryCommandBuffer<TCommandBuffer>();
+                assert(bufferPtr && "Command buffer not found for system's CommandBuffer_type");
+            }
+
+            systemRegistry_.template add<SystemType>(
+                System(std::forward<TSystem>(system), bufferPtr)
             );
 
             return *this;

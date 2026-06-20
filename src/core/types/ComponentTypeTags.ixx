@@ -28,4 +28,9 @@ export namespace helios::engine::core::types {
      */
     struct Canonical {};
 
+    /**
+     * @brief Marks a component as intended data, e.g. from input.
+     */
+    struct Intent {};
+
 }

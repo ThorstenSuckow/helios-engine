@@ -38,7 +38,14 @@ export namespace helios::engine::util {
          *
          * @see https://en.cppreference.com/w/cpp/numeric/random/uniform_real_distribution
          */
-        std::uniform_real_distribution<float> uniformDist_;
+        std::uniform_real_distribution<float> uniformDistFloat_;
+
+        /**
+         * @brief Uniform int distribution for generating integers.
+         *
+         * @see https://en.cppreference.com/w/cpp/numeric/random/uniform_int_distribution
+         */
+        std::uniform_int_distribution<int> uniformDistInt_;
 
         /**
          * @brief The initial seed used to initialize the generator.
@@ -66,7 +73,8 @@ export namespace helios::engine::util {
         void reset() {
             gen_.seed(initialSeed_);
 
-            uniformDist_.reset();
+            uniformDistFloat_.reset();
+            uniformDistInt_.reset();
         }
 
         /**
@@ -94,9 +102,40 @@ export namespace helios::engine::util {
                 return a;
             }
 
-            return uniformDist_(
+            return uniformDistFloat_(
                 gen_,
                 std::uniform_real_distribution<float>::param_type{a, b}
+            );
+        }
+
+        /**
+         * @brief Generates a pseudo-random integer in the range [a, b].
+         *
+         * @details Uses `std::uniform_int_distribution` to generate a uniformly
+         * distributed integer value.
+         *
+         * @param a The lower bound of the range (inclusive).
+         * @param b The upper bound of the range (inclusive).
+         *
+         * @return A random integer value in the range [a, b].
+         *
+         * @see https://en.cppreference.com/w/cpp/numeric/random/uniform_int_distribution
+         */
+        [[nodiscard]] int randomInt(int a, int b) noexcept {
+
+            if (b < a) {
+                const auto tmp = a;
+                a = b;
+                b = tmp;
+            }
+
+            if (a == b) {
+                return a;
+            }
+
+            return uniformDistInt_(
+                gen_,
+                std::uniform_int_distribution<int>::param_type{a, b}
             );
         }
 

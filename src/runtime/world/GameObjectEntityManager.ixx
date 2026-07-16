@@ -25,7 +25,7 @@ export namespace helios::engine::runtime::world {
     /**
      * @brief Entity registry configuration used for game objects.
      */
-    using GameObjectEntityRegistry = EntityRegistry<GameObjectDomainTag, HashedLookupStrategy, false, GAMEOBJECT_SIZE>;
+    using GameObjectEntityRegistry = EntityRegistry<GameObjectDomainTag, HashedLookupStrategy, true, GAMEOBJECT_SIZE>;
 
     /**
      * @brief Entity manager alias for game-object handles.

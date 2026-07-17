@@ -45,11 +45,9 @@ export namespace helios::engine::core::systems {
 
             using Component = typename TComponentSpec::template type<TMemberHandle>;
 
-
-
             for (auto [entity, cmp] : updateContext.view<
                 TMemberHandle,
-                Component>().withActive().whereAllEnabled()) {
+                Component>().withActive().whereAllEnabled().whereAnyChanged()) {
                     cmp->commit();
                 }
         }

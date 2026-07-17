@@ -1,6 +1,6 @@
 module;
 
-#include <cassert>
+#include <cstddef>
 
 export module helios.engine.core.components.AABBComponent;
 
@@ -23,7 +23,8 @@ export namespace helios::engine::core::components {
 
         helios::math::aabb<TNumericType> value_{};
 
-        bool isDirty_ = true;
+        size_t previousVersion_ = 0;
+        size_t currentVersion_ = 0;
 
     public:
 
@@ -34,7 +35,7 @@ export namespace helios::engine::core::components {
          *
          * @param value Initial value vector.
          */
-        explicit AABBComponent(const aabb<TNumericType>& value) : value_(value){}
+        explicit AABBComponent(const aabb<TNumericType>& value) : value_(value), currentVersion_(1) {}
 
         /**
          * @brief Copy constructor.
@@ -46,7 +47,8 @@ export namespace helios::engine::core::components {
          */
         AABBComponent(const AABBComponent& other) :
             value_(other.value_),
-            isDirty_(true) {}
+            previousVersion_(0),
+            currentVersion_(1) {}
 
         /** @brief Default copy assignment. */
         AABBComponent& operator=(const AABBComponent&) = default;
@@ -61,7 +63,7 @@ export namespace helios::engine::core::components {
          * @details Marks the component dirty to trigger downstream recomputation.
          */
         void onAcquire() noexcept {
-            isDirty_ = true;
+            currentVersion_++;
         }
 
         /**
@@ -70,14 +72,14 @@ export namespace helios::engine::core::components {
          * @details Marks the component dirty to trigger downstream recomputation.
          */
         void onRelease() noexcept {
-            isDirty_ = true;
+            currentVersion_++;
         }
 
         /**
          * @brief Clears the dirty flag after dependent systems consumed updates.
          */
-        void clearDirty() noexcept {
-            isDirty_ = false;
+        void commit() noexcept {
+            previousVersion_ = currentVersion_;
         }
 
         /**
@@ -85,8 +87,8 @@ export namespace helios::engine::core::components {
          *
          * @return `true` if value changed or lifecycle hooks marked dirty.
          */
-        [[nodiscard]] bool isDirty() const noexcept {
-            return isDirty_;
+        [[nodiscard]] bool hasChanges() const noexcept {
+            return previousVersion_ != currentVersion_;
         }
 
         /**
@@ -109,10 +111,12 @@ export namespace helios::engine::core::components {
          */
         void setValue(const aabb<TNumericType> value) noexcept {
             value_ = value;
-            isDirty_ = true;
+            currentVersion_++;
         };
 
 
     };
 
 }
+
+

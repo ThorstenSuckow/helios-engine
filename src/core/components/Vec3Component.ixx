@@ -1,6 +1,6 @@
 module;
 
-#include <cassert>
+#include <cstddef>
 
 export module helios.engine.core.components.Vec3Component;
 
@@ -25,7 +25,8 @@ export namespace helios::engine::core::components {
 
         helios::math::vec3<TNumericType> value_{};
 
-        bool isDirty_ = true;
+        size_t previousVersion_ = 0;
+        size_t currentVersion_ = 0;
 
     public:
 
@@ -59,7 +60,7 @@ export namespace helios::engine::core::components {
          */
         Vec3Component(const Vec3Component& other) :
             value_(other.value_),
-            isDirty_(true) {}
+            previousVersion_(0), currentVersion_(1) {}
 
         /** @brief Default copy assignment. */
         Vec3Component& operator=(const Vec3Component&) = default;
@@ -74,7 +75,7 @@ export namespace helios::engine::core::components {
          * @details Marks the component dirty to trigger downstream recomputation.
          */
         void onAcquire() noexcept {
-            isDirty_ = true;
+             currentVersion_++;
         }
 
         /**
@@ -83,14 +84,14 @@ export namespace helios::engine::core::components {
          * @details Marks the component dirty to trigger downstream recomputation.
          */
         void onRelease() noexcept {
-            isDirty_ = true;
+            currentVersion_++;
         }
 
         /**
          * @brief Clears the dirty flag after dependent systems consumed updates.
          */
-        void clearDirty() noexcept {
-            isDirty_ = false;
+        void commit() noexcept {
+            previousVersion_ = currentVersion_;
         }
 
         /**
@@ -98,8 +99,8 @@ export namespace helios::engine::core::components {
          *
          * @return `true` if value changed or lifecycle hooks marked dirty.
          */
-        [[nodiscard]] bool isDirty() const noexcept {
-            return isDirty_;
+        [[nodiscard]] bool hasChanges() const noexcept {
+            return currentVersion_ != previousVersion_;
         }
 
         /**
@@ -122,7 +123,7 @@ export namespace helios::engine::core::components {
          */
         void setValue(const vec3<TNumericType> value) noexcept {
             value_ = value;
-            isDirty_ = true;
+            currentVersion_++;
         };
 
 

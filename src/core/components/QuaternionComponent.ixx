@@ -5,6 +5,7 @@
 module;
 
 #include <concepts>
+#include <cstddef>
 
 export module helios.engine.core.components.QuaternionComponent;
 
@@ -26,7 +27,8 @@ export namespace helios::engine::core::components {
 
         helios::math::quat<TNumericType> quat = helios::math::quat<TNumericType>::identity();
 
-        bool isDirty_ = true;
+        size_t previousVersion_ = 0;
+        size_t currentVersion_ = 0;
 
     public:
 
@@ -46,7 +48,7 @@ export namespace helios::engine::core::components {
          */
         void setValue(const helios::math::quat<TNumericType>& value) noexcept {
             quat = value;
-            isDirty_ = true;
+            currentVersion_++;
         }
 
         /**
@@ -54,16 +56,16 @@ export namespace helios::engine::core::components {
          *
          * @return `true` if dirty; otherwise `false`.
          */
-        [[nodiscard]] bool isDirty() const noexcept {
-            return isDirty_;
+        [[nodiscard]] bool hasChanges() const noexcept {
+            return previousVersion_ != currentVersion_;
         }
 
 
         /**
          * @brief Clears the dirty flag.
          */
-        void clearDirty() noexcept {
-            isDirty_ = false;
+        void commit() noexcept {
+            previousVersion_ = currentVersion_;
         }
 
     };

@@ -5,6 +5,7 @@
 module;
 
 #include <cassert>
+#include <cstddef>
 
 export module helios.engine.scene.components.PerspectiveCameraComponent;
 
@@ -50,12 +51,13 @@ export namespace helios::engine::scene::components {
          */
         float fovY_ = radians(90);
 
-        /**
-         * @brief Dirty flag used to signal projection updates.
-         */
-        bool isDirty_ = true;
-    public:
+        size_t previousVersion_ = 0;
+        size_t currentVersion_ = 0;
 
+
+
+
+    public:
 
         explicit PerspectiveCameraComponent(const float fovY, const float aspectRatio, const float zNear = 0.1f, const float zFar = 1000.0f) {
             setPerspective(fovY, aspectRatio, zNear, zFar);
@@ -76,7 +78,7 @@ export namespace helios::engine::scene::components {
             aspectRatio_ = aspectRatio;
             zNear_ = zNear;
             zFar_ = zFar;
-            isDirty_ = true;
+            currentVersion_++;
         }
 
         /**
@@ -87,8 +89,7 @@ export namespace helios::engine::scene::components {
         void setZNear(const float zNear) noexcept {
             assert(zNear > 0 && "zNear must be positive");
             zNear_ = zNear;
-
-            isDirty_ = true;
+            currentVersion_++;
         }
 
         /**
@@ -97,9 +98,9 @@ export namespace helios::engine::scene::components {
          * @param zFar The new far clipping plane distance.
          */
         void setZFar(const float zFar) noexcept {
-            assert(zFar > 0 && "zFar must be positive and greater than zNear");
+            assert(zFar > 0 && zFar > zNear_ && "zFar must be positive and greater than zNear");
             zFar_ = zFar;
-            isDirty_ = true;
+            currentVersion_++;
         }
 
         /**
@@ -109,7 +110,7 @@ export namespace helios::engine::scene::components {
          */
         void setFovY(const float fovY) noexcept {
             fovY_ = fovY;
-            isDirty_ = true;
+            currentVersion_++;
         }
 
         /**
@@ -119,6 +120,7 @@ export namespace helios::engine::scene::components {
          */
         void setAspectRatio(const float aspectRatio) noexcept {
            aspectRatio_ = aspectRatio;
+           currentVersion_++;
         }
 
 
@@ -163,17 +165,20 @@ export namespace helios::engine::scene::components {
          *
          * @return `true` when values were changed and not yet consumed.
          */
-        [[nodiscard]] bool isDirty() const noexcept {
-            return isDirty_;
+        [[nodiscard]] bool hasChanges() const noexcept {
+            return currentVersion_ != previousVersion_;
         }
 
         /**
          * @brief Clears the dirty flag after dependent systems consumed updates.
          */
-        void clearDirty() noexcept {
-            isDirty_ = false;
+        void commit() noexcept {
+            previousVersion_ = currentVersion_;
         }
 
     };
 
 }
+
+
+

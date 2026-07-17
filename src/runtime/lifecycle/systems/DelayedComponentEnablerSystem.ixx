@@ -67,11 +67,10 @@ export namespace helios::engine::runtime::lifecycle::systems {
 
             const float delta = updateContext.deltaTime();
 
-            for (auto [entity, dce, active] : updateContext.view<
+            for (auto [entity, dce] : updateContext.view<
                 THandle,
-                helios::engine::runtime::lifecycle::components::DelayedComponentEnabler<THandle>,
-                helios::ecs::components::Active<THandle>
-            >().whereEnabled()) {
+                helios::engine::runtime::lifecycle::components::DelayedComponentEnabler<THandle>
+            >().withActive().whereAllEnabled()) {
 
                 sync_.clear();
 

@@ -64,7 +64,7 @@ export namespace helios::engine::platform::lifecycle::systems {
          */
         void update(UpdateContext& updateContext, TCommandBuffer& cmdBuffer) noexcept {
 
-            if (updateContext.view<THandle, WindowComponent<THandle>, Active<THandle>>().whereEnabled().empty()) {
+            if (updateContext.view<THandle, WindowComponent<THandle>>().withActive().whereAllEnabled().empty()) {
                cmdBuffer.template add<ShutdownCommand>();
             }
 

@@ -51,13 +51,12 @@ export namespace helios::engine::scene::systems {
         void update(UpdateContext& updateContext) noexcept {
 
 
-            for (auto [entity, boundsLocal, boundsWorld, worldTransform, active] : updateContext.view<
+            for (auto [entity, boundsLocal, boundsWorld, worldTransform] : updateContext.view<
                 TMemberHandle,
                 BoundsComponent<TMemberHandle, Local>,
                 BoundsComponent<TMemberHandle, World>,
-                TransformComponent<TMemberHandle, World>,
-                Active<TMemberHandle>
-            >().whereEnabled().whereAnyChanged()) {
+                TransformComponent<TMemberHandle, World>
+            >().withActive().whereAllEnabled().whereAnyChanged()) {
 
                 boundsWorld->setValue(boundsLocal->value().applyTransform(worldTransform->value()));
 

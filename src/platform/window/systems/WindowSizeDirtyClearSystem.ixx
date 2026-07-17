@@ -31,12 +31,11 @@ export namespace helios::engine::platform::window::systems {
         using EngineRoleTag = TypedSystemRole;
 
         void update(UpdateContext& updateContext) noexcept {
-            for (auto [entity, wc, wsc, active] : updateContext.view<
+            for (auto [entity, wc, wsc] : updateContext.view<
                 TMemberHandle,
                 WindowComponent<TMemberHandle>,
-                Size2DComponent<TMemberHandle>,
-                Active<TMemberHandle>
-            >().whereEnabled()) {
+                Size2DComponent<TMemberHandle>
+            >().withActive().whereAllEnabled()) {
                 wsc->clearDirty();
             }
         };

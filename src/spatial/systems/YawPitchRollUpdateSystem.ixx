@@ -65,12 +65,11 @@ export namespace helios::engine::scene::systems {
         void update(UpdateContext& updateContext) noexcept {
 
 
-            for (auto [entity, yawPitchRoll, localRotation, active] : updateContext.view<
+            for (auto [entity, yawPitchRoll, localRotation] : updateContext.view<
                 TMemberHandle,
                 YawPitchRollComponent<TMemberHandle>,
-                Rotation3DComponent<TMemberHandle, Local>,
-                Active<TMemberHandle>
-            >().whereEnabled()) {
+                Rotation3DComponent<TMemberHandle, Local>
+            >().withActive().whereAllEnabled()) {
                 constexpr auto x = helios::math::X_AXISf;
                 constexpr auto y = helios::math::Y_AXISf;
                 constexpr auto z = helios::math::Z_AXISf;

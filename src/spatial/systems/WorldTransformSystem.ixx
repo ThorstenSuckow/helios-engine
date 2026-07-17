@@ -54,14 +54,13 @@ export namespace helios::engine::scene::systems {
                 entity,
                 localPosition,
                 localRotation,
-                worldTransform,
-                active] : updateContext.view<
+                worldTransform
+                ] : updateContext.view<
                 TMemberHandle,
                 Position3DComponent<TMemberHandle, Local>,
                 Rotation3DComponent<TMemberHandle, Local>,
-                TransformComponent<TMemberHandle, World>,
-                Active<TMemberHandle>
-            >().whereEnabled().whereAnyChanged()) {
+                TransformComponent<TMemberHandle, World>
+            >().withActive().whereAllEnabled().whereAnyChanged()) {
 
                 worldTransform->setValue(
                      localRotation->value().rotationMatrix().withTranslation(localPosition->value())

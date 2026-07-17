@@ -55,12 +55,11 @@ export namespace helios::engine::rendering::mesh::systems {
          */
         void update(UpdateContext& updateContext, TCommandBuffer& cmdBuffer) noexcept {
 
-            for (auto [entity, mdc, murc, ac] : updateContext.view<
+            for (auto [entity, mdc, murc] : updateContext.view<
                 THandle,
                 MeshDataComponent<THandle>,
-                MeshUploadRequestComponent<THandle>,
-                Active<THandle>
-            >().whereEnabled()) {
+                MeshUploadRequestComponent<THandle>
+            >().withActive().whereAllEnabled()) {
                 meshHandles_.push_back(entity.handle());
             }
 

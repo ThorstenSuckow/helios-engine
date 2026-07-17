@@ -129,16 +129,14 @@ export namespace helios::engine::scene::systems {
                 smc,
                 rpc,
                 transformWorld,
-                boundsWorld,
-                memberActive
+                boundsWorld
                 ] : updateContext.view<
                 TMemberHandle,
                 SceneMemberComponent<TMemberHandle>,
                 RenderPrototypeComponent<TMemberHandle, TSubmissionMode>,
                 TransformComponent<TMemberHandle, World>,
-                BoundsComponent<TMemberHandle, World>,
-                Active<TMemberHandle>
-            >().whereEnabled()) {
+                BoundsComponent<TMemberHandle, World>
+            >().withActive().whereAllEnabled()) {
 
                 cullingContext.bounds = boundsWorld->value();
                 cullingContext.handle = memberEntity.handle();
@@ -197,13 +195,12 @@ export namespace helios::engine::scene::systems {
 
             visibilityRegistry_.clear();
 
-            for (auto [viewportEntity, renderTargetBindingComponent, sbc, cbc, viewportActive] : updateContext.view<
+            for (auto [viewportEntity, renderTargetBindingComponent, sbc, cbc] : updateContext.view<
                 TOwnerHandle,
                 RenderTargetBindingComponent<TOwnerHandle>,
                 SceneBindingComponent<TOwnerHandle>,
-                CameraBindingComponent<TOwnerHandle>,
-                Active<TOwnerHandle>
-            >().whereEnabled()) {
+                CameraBindingComponent<TOwnerHandle>
+            >().withActive().whereAllEnabled()) {
 
                 const auto sceneHandle  = sbc->targetHandle();
                 const auto cameraHandle = cbc->targetHandle();

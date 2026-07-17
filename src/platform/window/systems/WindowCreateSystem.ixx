@@ -56,10 +56,10 @@ export namespace helios::engine::platform::window::systems {
          */
         void update(UpdateContext& updateContext, TCommandBuffer& cmdBuffer) noexcept {
 
-            for (auto [entity, win, active]: updateContext.view<
+            for (auto [entity, win]: updateContext.view<
                 THandle,
-                WindowCreateRequestComponent<THandle>, Active<THandle>
-                >().whereEnabled()) {
+                WindowCreateRequestComponent<THandle>
+                >().withActive().whereAllEnabled()) {
 
                 cmdBuffer.template add<WindowCreateCommand<THandle>>(
                     entity.handle(),

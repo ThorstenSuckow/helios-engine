@@ -47,10 +47,9 @@ export namespace helios::engine::core::systems {
 
 
 
-            for (auto [entity, cmp, active] : updateContext.view<
+            for (auto [entity, cmp] : updateContext.view<
                 TMemberHandle,
-                Component,
-                Active<TMemberHandle>>().whereEnabled()) {
+                Component>().withActive().whereAllEnabled()) {
                     cmp->commit();
                 }
         }

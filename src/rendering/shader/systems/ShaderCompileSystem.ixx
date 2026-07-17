@@ -67,11 +67,10 @@ export namespace helios::engine::rendering::shader::systems {
          */
         void update(UpdateContext& updateContext, TCommandBuffer& cmdBuffer) noexcept {
 
-            for (auto [entity, scc, ac] : updateContext.view<
+            for (auto [entity, scc] : updateContext.view<
                 THandle,
-                ShaderSourceComponent<THandle>,
-                Active<THandle>
-            >().whereEnabled()) {
+                ShaderSourceComponent<THandle>
+            >().withActive().whereAllEnabled()) {
                 shaderHandles_.push_back(entity.handle());
             }
 

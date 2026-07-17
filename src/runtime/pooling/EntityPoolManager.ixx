@@ -321,7 +321,7 @@ export namespace helios::engine::runtime::pooling {
 
                 for (auto [entity, pic] : engineWorld_->view<
                     Handle_type,
-                    helios::engine::runtime::pooling::components::PrefabIdComponent<Handle_type>>().whereEnabled()) {
+                    helios::engine::runtime::pooling::components::PrefabIdComponent<Handle_type>>().whereAllEnabled()) {
                     if (pic->prefabId() == poolConfig->prefabId) {
                         fillPool(entityPoolId, entity);
                         break;

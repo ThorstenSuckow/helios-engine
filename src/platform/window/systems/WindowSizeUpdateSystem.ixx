@@ -55,13 +55,12 @@ export namespace helios::engine::platform::window::systems {
          * @param updateContext Frame update context.
          */
         void update(UpdateContext& updateContext) noexcept {
-            for (auto [entity, wc, wsc, fbc, active] : updateContext.view<
+            for (auto [entity, wc, wsc, fbc] : updateContext.view<
                 TMemberHandle,
                 WindowComponent<TMemberHandle>,
                 Size2DComponent<TMemberHandle>,
-                RenderTargetBindingComponent<TMemberHandle>,
-                Active<TMemberHandle>
-            >().whereEnabled().whereAnyChanged()) {
+                RenderTargetBindingComponent<TMemberHandle>
+            >().withActive().whereAllEnabled().whereAnyChanged()) {
 
                 // c'mon now do something
 

@@ -54,12 +54,11 @@ export namespace helios::engine::scene::systems {
         void update(UpdateContext& updateContext) noexcept {
 
 
-            for (auto [entity, tcw, vmc, active] : updateContext.view<
+            for (auto [entity, tcw, vmc] : updateContext.view<
                 TMemberHandle,
                 TransformComponent<TMemberHandle, World>,
-                ViewMatrixComponent<TMemberHandle>,
-                Active<TMemberHandle>
-            >().whereEnabled().whereAnyChanged()) {
+                ViewMatrixComponent<TMemberHandle>
+            >().withActive().whereAllEnabled().whereAnyChanged()) {
 
                 const auto mat = tcw->value();
 
@@ -70,12 +69,11 @@ export namespace helios::engine::scene::systems {
                 vmc->setValue(helios::math::lookAt(eye, center, up));
             }
 
-            for (auto [entity, pcc, pmc, active] : updateContext.view<
+            for (auto [entity, pcc, pmc] : updateContext.view<
                 TMemberHandle,
                 PerspectiveCameraComponent<TMemberHandle>,
-                ProjectionMatrixComponent<TMemberHandle>,
-                Active<TMemberHandle>
-            >().whereEnabled().whereAnyChanged()) {
+                ProjectionMatrixComponent<TMemberHandle>
+            >().withActive().whereAllEnabled().whereAnyChanged()) {
 
                 pmc->setValue(helios::math::perspective(
                     pcc->fovY(),

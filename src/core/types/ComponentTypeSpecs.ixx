@@ -24,9 +24,9 @@ export namespace helios::engine::core::types {
     };
 
     /**
-     * @brief Semantic alias for mutable-component specifications.
+     * @brief Semantic alias for versioned-component specifications.
      */
     template<template<typename, typename...> typename TComponent, typename... TArgs>
-    using DirtyComponentSpec = ComponentTypeSpec<TComponent, TArgs...>;
+    using VersionedComponentSpec = ComponentTypeSpec<TComponent, TArgs...>;
 
 }

@@ -32,6 +32,9 @@ export namespace helios::engine::scene::systems {
      * target components are marked as dirty.
      *
      * @tparam TMemberHandle Camera entity handle type.
+     *
+     * @note Although this system could be separated into to concurrently running systems,
+     * the regular use case for this system is that it only has to consider few camera entities per frames.
      */
     template<typename TMemberHandle>
     class PerspectiveCameraUpdateSystem {
@@ -51,37 +54,37 @@ export namespace helios::engine::scene::systems {
         void update(UpdateContext& updateContext) noexcept {
 
 
-            for (auto [entity, tcw, pcc, pmc, vmc, active] : updateContext.view<
+            for (auto [entity, tcw, vmc, active] : updateContext.view<
                 TMemberHandle,
                 TransformComponent<TMemberHandle, World>,
-                PerspectiveCameraComponent<TMemberHandle>,
-                ProjectionMatrixComponent<TMemberHandle>,
                 ViewMatrixComponent<TMemberHandle>,
                 Active<TMemberHandle>
-            >().whereEnabled()) {
+            >().whereEnabled().whereAnyChanged()) {
 
-                if (tcw->isDirty()) {
+                const auto mat = tcw->value();
 
-                    const auto mat = tcw->value();
+                const auto eye = tcw->value().translation();
+                const auto center = eye + mat.column(2).toVec3().normalize();
+                const auto up =  mat.column(1).toVec3().normalize();
 
-                    const auto eye = tcw->value().translation();
-                    const auto center = eye + mat.column(2).toVec3().normalize();
-                    const auto up =  mat.column(1).toVec3().normalize();
-
-                    vmc->setValue(helios::math::lookAt(eye, center, up));
-                }
-
-
-                if (pcc->isDirty()) {
-                    pmc->setValue(helios::math::perspective(
-                        pcc->fovY(),
-                        pcc->aspectRatio(),
-                        pcc->zNear(),
-                        pcc->zFar()
-                    ));
-               }
-
+                vmc->setValue(helios::math::lookAt(eye, center, up));
             }
+
+            for (auto [entity, pcc, pmc, active] : updateContext.view<
+                TMemberHandle,
+                PerspectiveCameraComponent<TMemberHandle>,
+                ProjectionMatrixComponent<TMemberHandle>,
+                Active<TMemberHandle>
+            >().whereEnabled().whereAnyChanged()) {
+
+                pmc->setValue(helios::math::perspective(
+                    pcc->fovY(),
+                    pcc->aspectRatio(),
+                    pcc->zNear(),
+                    pcc->zFar()
+                ));
+            }
+
 
         }
 

@@ -57,11 +57,9 @@ export namespace helios::engine::scene::systems {
                 BoundsComponent<TMemberHandle, World>,
                 TransformComponent<TMemberHandle, World>,
                 Active<TMemberHandle>
-            >().whereEnabled()) {
+            >().whereEnabled().whereAnyChanged()) {
 
-                if (worldTransform->isDirty()) {
-                    boundsWorld->setValue(boundsLocal->value().applyTransform(worldTransform->value()));
-                }
+                boundsWorld->setValue(boundsLocal->value().applyTransform(worldTransform->value()));
 
             }
 

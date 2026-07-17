@@ -61,10 +61,10 @@ export namespace helios::engine::platform::window::systems {
                 Size2DComponent<TMemberHandle>,
                 RenderTargetBindingComponent<TMemberHandle>,
                 Active<TMemberHandle>
-            >().whereEnabled()) {
-                if (wsc->isDirty()) {
-                    // c'mon now do something
-                }
+            >().whereEnabled().whereAnyChanged()) {
+
+                // c'mon now do something
+
             }
         };
 

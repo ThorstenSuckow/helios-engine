@@ -1,21 +1,22 @@
 /**
- * @file ClearDirtySystem.ixx
+ * @file VersioningCommitSystem.ixx
  * @brief System template that clears dirty flags on active dirty-tracker components.
  */
 module;
 
-export module helios.engine.core.systems.ClearDirtySystem;
+export module helios.engine.core.systems.VersioningCommitSystem;
 
 import helios.engine.runtime.world.tags.SystemRole;
 import helios.engine.runtime.world.UpdateContext;
 
 import helios.ecs.components;
 
-import helios.engine.core.concepts.IsDirtyTrackerLike;
+import helios.ecs.concepts.Traits;
 
+
+using namespace helios::ecs::concepts::traits;
 using namespace helios::ecs::components;
 using namespace helios::engine::runtime::world;
-using namespace helios::engine::core::concepts;
 using namespace helios::engine::runtime::world::tags;
 export namespace helios::engine::core::systems {
 
@@ -30,8 +31,8 @@ export namespace helios::engine::core::systems {
      * `Active<TMemberHandle>` enabled and calls `clearDirty()` on the component instance.
      */
     template<typename TMemberHandle, typename ... TComponentSpecs>
-    requires (IsDirtyTrackerLike<typename TComponentSpecs::template type<TMemberHandle>> && ...)
-    class ClearDirtySystem {
+    requires (HasVersioning<typename TComponentSpecs::template type<TMemberHandle>> && ...)
+    class VersioningCommitSystem {
 
         /**
          * @brief Clears the dirty flag for one configured component specification.
@@ -44,11 +45,13 @@ export namespace helios::engine::core::systems {
 
             using Component = typename TComponentSpec::template type<TMemberHandle>;
 
+
+
             for (auto [entity, cmp, active] : updateContext.view<
                 TMemberHandle,
                 Component,
                 Active<TMemberHandle>>().whereEnabled()) {
-                cmp->clearDirty();
+                    cmp->commit();
                 }
         }
 

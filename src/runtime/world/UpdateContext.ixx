@@ -405,7 +405,18 @@ export namespace helios::engine::runtime::world {
             return engineWorld_.view<THandle, Components...>();
         }
 
-
+        /**
+         * @brief Clears the specified dirty components for a handle domain and component set.
+         *
+         * @tparam THandle Handle domain type.
+         * @tparam Components Component types to include.
+         *
+         * @return Domain-specific view.
+         */
+        template <typename THandle, typename... Components>
+        void clearDirtySets() {
+            engineWorld_.clearDirtySets<THandle, Components...>();
+        }
 
     };
 }

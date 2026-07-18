@@ -69,7 +69,12 @@ export namespace helios::engine::scene::systems {
                 TMemberHandle,
                 YawPitchRollComponent<TMemberHandle>,
                 Rotation3DComponent<TMemberHandle, Local>
-            >().withActive().whereAllEnabled()) {
+            >().withActive()
+               .whereAllEnabled()
+               .template whereAnyDirty<
+               YawPitchRollComponent<TMemberHandle>,
+               Active<TMemberHandle>
+            >()) {
                 constexpr auto x = helios::math::X_AXISf;
                 constexpr auto y = helios::math::Y_AXISf;
                 constexpr auto z = helios::math::Z_AXISf;
@@ -83,7 +88,7 @@ export namespace helios::engine::scene::systems {
                 const auto qRoll = helios::math::quatf::fromAxisAngle(z, roll);
 
                 localRotation->setValue(qYaw * qPitch * qRoll);
-
+                entity.template markDirty<Rotation3DComponent<TMemberHandle, Local>>();
             }
 
         }

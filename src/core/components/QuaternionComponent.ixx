@@ -27,9 +27,6 @@ export namespace helios::engine::core::components {
 
         helios::math::quat<TNumericType> quat = helios::math::quat<TNumericType>::identity();
 
-        size_t previousVersion_ = 0;
-        size_t currentVersion_ = 0;
-
     public:
 
         /**
@@ -48,25 +45,8 @@ export namespace helios::engine::core::components {
          */
         void setValue(const helios::math::quat<TNumericType>& value) noexcept {
             quat = value;
-            currentVersion_++;
         }
 
-        /**
-         * @brief Returns whether the component value changed since last clear.
-         *
-         * @return `true` if dirty; otherwise `false`.
-         */
-        [[nodiscard]] bool hasChanges() const noexcept {
-            return previousVersion_ != currentVersion_;
-        }
-
-
-        /**
-         * @brief Clears the dirty flag.
-         */
-        void commit() noexcept {
-            previousVersion_ = currentVersion_;
-        }
 
     };
 

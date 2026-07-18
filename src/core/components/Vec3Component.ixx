@@ -25,9 +25,6 @@ export namespace helios::engine::core::components {
 
         helios::math::vec3<TNumericType> value_{};
 
-        size_t previousVersion_ = 0;
-        size_t currentVersion_ = 0;
-
     public:
 
         Vec3Component() = default;
@@ -59,8 +56,7 @@ export namespace helios::engine::core::components {
          * @param other The component to copy from.
          */
         Vec3Component(const Vec3Component& other) :
-            value_(other.value_),
-            previousVersion_(0), currentVersion_(1) {}
+            value_(other.value_) {}
 
         /** @brief Default copy assignment. */
         Vec3Component& operator=(const Vec3Component&) = default;
@@ -69,39 +65,6 @@ export namespace helios::engine::core::components {
         /** @brief Default move assignment. */
         Vec3Component& operator=(Vec3Component&&) noexcept = default;
 
-        /**
-         * @brief Lifecycle hook called when the component is acquired.
-         *
-         * @details Marks the component dirty to trigger downstream recomputation.
-         */
-        void onAcquire() noexcept {
-             currentVersion_++;
-        }
-
-        /**
-         * @brief Lifecycle hook called when the component is released.
-         *
-         * @details Marks the component dirty to trigger downstream recomputation.
-         */
-        void onRelease() noexcept {
-            currentVersion_++;
-        }
-
-        /**
-         * @brief Clears the dirty flag after dependent systems consumed updates.
-         */
-        void commit() noexcept {
-            previousVersion_ = currentVersion_;
-        }
-
-        /**
-         * @brief Returns whether the component requires a refresh pass.
-         *
-         * @return `true` if value changed or lifecycle hooks marked dirty.
-         */
-        [[nodiscard]] bool hasChanges() const noexcept {
-            return currentVersion_ != previousVersion_;
-        }
 
         /**
          * @brief Returns the current value.
@@ -123,7 +86,6 @@ export namespace helios::engine::core::components {
          */
         void setValue(const vec3<TNumericType> value) noexcept {
             value_ = value;
-            currentVersion_++;
         };
 
 

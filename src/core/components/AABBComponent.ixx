@@ -23,9 +23,6 @@ export namespace helios::engine::core::components {
 
         helios::math::aabb<TNumericType> value_{};
 
-        size_t previousVersion_ = 0;
-        size_t currentVersion_ = 0;
-
     public:
 
         AABBComponent() = default;
@@ -35,7 +32,7 @@ export namespace helios::engine::core::components {
          *
          * @param value Initial value vector.
          */
-        explicit AABBComponent(const aabb<TNumericType>& value) : value_(value), currentVersion_(1) {}
+        explicit AABBComponent(const aabb<TNumericType>& value) : value_(value) {}
 
         /**
          * @brief Copy constructor.
@@ -46,9 +43,7 @@ export namespace helios::engine::core::components {
          * @param other The component to copy from.
          */
         AABBComponent(const AABBComponent& other) :
-            value_(other.value_),
-            previousVersion_(0),
-            currentVersion_(1) {}
+            value_(other.value_) {}
 
         /** @brief Default copy assignment. */
         AABBComponent& operator=(const AABBComponent&) = default;
@@ -57,39 +52,6 @@ export namespace helios::engine::core::components {
         /** @brief Default move assignment. */
         AABBComponent& operator=(AABBComponent&&) noexcept = default;
 
-        /**
-         * @brief Lifecycle hook called when the component is acquired.
-         *
-         * @details Marks the component dirty to trigger downstream recomputation.
-         */
-        void onAcquire() noexcept {
-            currentVersion_++;
-        }
-
-        /**
-         * @brief Lifecycle hook called when the component is released.
-         *
-         * @details Marks the component dirty to trigger downstream recomputation.
-         */
-        void onRelease() noexcept {
-            currentVersion_++;
-        }
-
-        /**
-         * @brief Clears the dirty flag after dependent systems consumed updates.
-         */
-        void commit() noexcept {
-            previousVersion_ = currentVersion_;
-        }
-
-        /**
-         * @brief Returns whether the component requires a refresh pass.
-         *
-         * @return `true` if value changed or lifecycle hooks marked dirty.
-         */
-        [[nodiscard]] bool hasChanges() const noexcept {
-            return previousVersion_ != currentVersion_;
-        }
 
         /**
          * @brief Returns the current value.
@@ -111,7 +73,6 @@ export namespace helios::engine::core::components {
          */
         void setValue(const aabb<TNumericType> value) noexcept {
             value_ = value;
-            currentVersion_++;
         };
 
 

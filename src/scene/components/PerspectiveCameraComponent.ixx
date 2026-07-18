@@ -51,12 +51,6 @@ export namespace helios::engine::scene::components {
          */
         float fovY_ = radians(90);
 
-        size_t previousVersion_ = 0;
-        size_t currentVersion_ = 0;
-
-
-
-
     public:
 
         explicit PerspectiveCameraComponent(const float fovY, const float aspectRatio, const float zNear = 0.1f, const float zFar = 1000.0f) {
@@ -78,7 +72,6 @@ export namespace helios::engine::scene::components {
             aspectRatio_ = aspectRatio;
             zNear_ = zNear;
             zFar_ = zFar;
-            currentVersion_++;
         }
 
         /**
@@ -89,7 +82,6 @@ export namespace helios::engine::scene::components {
         void setZNear(const float zNear) noexcept {
             assert(zNear > 0 && "zNear must be positive");
             zNear_ = zNear;
-            currentVersion_++;
         }
 
         /**
@@ -100,7 +92,6 @@ export namespace helios::engine::scene::components {
         void setZFar(const float zFar) noexcept {
             assert(zFar > 0 && zFar > zNear_ && "zFar must be positive and greater than zNear");
             zFar_ = zFar;
-            currentVersion_++;
         }
 
         /**
@@ -110,7 +101,6 @@ export namespace helios::engine::scene::components {
          */
         void setFovY(const float fovY) noexcept {
             fovY_ = fovY;
-            currentVersion_++;
         }
 
         /**
@@ -120,7 +110,6 @@ export namespace helios::engine::scene::components {
          */
         void setAspectRatio(const float aspectRatio) noexcept {
            aspectRatio_ = aspectRatio;
-           currentVersion_++;
         }
 
 
@@ -158,22 +147,6 @@ export namespace helios::engine::scene::components {
          */
         [[nodiscard]] float zFar() const noexcept {
             return zFar_;
-        }
-
-        /**
-         * @brief Returns whether the component requires projection recomputation.
-         *
-         * @return `true` when values were changed and not yet consumed.
-         */
-        [[nodiscard]] bool hasChanges() const noexcept {
-            return currentVersion_ != previousVersion_;
-        }
-
-        /**
-         * @brief Clears the dirty flag after dependent systems consumed updates.
-         */
-        void commit() noexcept {
-            previousVersion_ = currentVersion_;
         }
 
     };

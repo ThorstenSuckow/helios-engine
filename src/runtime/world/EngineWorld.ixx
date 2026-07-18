@@ -205,6 +205,21 @@ export namespace helios::engine::runtime::world {
             } else {
                 static_assert(typed_false<THandle>, "Unsupported handle type for destroying");
             }
+        }
+
+        template<typename THandle, typename... TComponents>
+         [[nodiscard]] auto clearDirtySets() {
+            if constexpr(IsGameplaySystemHandle<THandle>) {
+                return gameObjectWorld_.template clearDirtySets<THandle, TComponents...>();
+            } else if constexpr(IsAnyPlatformHandle<THandle>) {
+                return platformWorld_.template clearDirtySets<THandle, TComponents...>();
+            } else if constexpr(IsRenderResourceHandle<THandle>) {
+                return renderResourceWorld_.template clearDirtySets<THandle, TComponents...>();
+            } else if constexpr(IsRenderTargetHandle<THandle>) {
+                return renderTargetWorld_.template clearDirtySets<THandle, TComponents...>();
+            } else {
+                static_assert(typed_false<THandle>, "Unsupported handle type for clearDirtySets()");
+            }
 
         }
 

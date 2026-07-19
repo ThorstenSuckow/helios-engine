@@ -70,7 +70,6 @@ export namespace helios::engine::scene::systems {
                 YawPitchRollComponent<TMemberHandle>,
                 Rotation3DComponent<TMemberHandle, Local>
             >().withActive()
-               .whereAllEnabled()
                .template whereAnyDirty<
                YawPitchRollComponent<TMemberHandle>,
                Active<TMemberHandle>

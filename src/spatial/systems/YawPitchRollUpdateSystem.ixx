@@ -86,8 +86,7 @@ export namespace helios::engine::scene::systems {
                 const auto qPitch = helios::math::quatf::fromAxisAngle(x, pitch);
                 const auto qRoll = helios::math::quatf::fromAxisAngle(z, roll);
 
-                localRotation->setValue(qYaw * qPitch * qRoll);
-                entity.template markDirty<Rotation3DComponent<TMemberHandle, Local>>();
+                entity.setTrackedValue(localRotation, qYaw * qPitch * qRoll);
             }
 
         }

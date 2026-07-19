@@ -71,8 +71,7 @@ export namespace helios::engine::scene::systems {
                 const auto center = eye + mat.column(2).toVec3().normalize();
                 const auto up =  mat.column(1).toVec3().normalize();
 
-                vmc->setValue(helios::math::lookAt(eye, center, up));
-                entity.template markDirty<ViewMatrixComponent<TMemberHandle>>();
+                entity.setTrackedValue(vmc, helios::math::lookAt(eye, center, up));
             }
 
             for (auto [entity, pcc, pmc] : updateContext.view<
@@ -80,19 +79,17 @@ export namespace helios::engine::scene::systems {
                 PerspectiveCameraComponent<TMemberHandle>,
                 ProjectionMatrixComponent<TMemberHandle>
             >().withActive()
-
                .template whereAnyDirty<
                     PerspectiveCameraComponent<TMemberHandle>,
                     Active<TMemberHandle>
                 >()) {
 
-                pmc->setValue(helios::math::perspective(
+                entity.setTrackedValue(pmc, helios::math::perspective(
                     pcc->fovY(),
                     pcc->aspectRatio(),
                     pcc->zNear(),
                     pcc->zFar()
                 ));
-                entity.template markDirty<ProjectionMatrixComponent<TMemberHandle>>();
             }
 
 

@@ -64,8 +64,7 @@ export namespace helios::engine::scene::systems {
                 >()
                ) {
 
-                boundsWorld->setValue(boundsLocal->value().applyTransform(worldTransform->value()));
-                entity.template markDirty<BoundsComponent<TMemberHandle, World>>();
+                entity.setTrackedValue(boundsWorld, boundsLocal->value().applyTransform(worldTransform->value()));
 
             }
 

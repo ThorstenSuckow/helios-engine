@@ -41,14 +41,14 @@ export namespace helios::engine::core::components {
          *
          * @param value Initial matrix value.
          */
-        explicit Mat4Component(const mat4<TNumericType>& value) : value_(value) { }
+        explicit Mat4Component(const Value_type& value) : value_(value) { }
 
         /**
          * @brief Constructs the component with a scalar-filled matrix.
          *
          * @param value Scalar used to initialize all matrix elements.
          */
-        explicit Mat4Component(const TNumericType value) : value_(mat4<TNumericType>{value}) {}
+        explicit Mat4Component(const TNumericType value) : value_(Value_type{value}) {}
 
         /**
          * @brief Copy constructor.
@@ -74,7 +74,7 @@ export namespace helios::engine::core::components {
          *
          * @return Mutable reference to the current 4x4 matrix value.
          */
-        [[nodiscard]] mat4<TNumericType>& value() noexcept {
+        [[nodiscard]] Value_type& value() noexcept {
             return value_;
         }
 
@@ -83,7 +83,7 @@ export namespace helios::engine::core::components {
          *
          * @return Current 4x4 matrix value.
          */
-        [[nodiscard]] const mat4<TNumericType>& value() const noexcept {
+        [[nodiscard]] const Value_type& value() const noexcept {
             return value_;
         }
 
@@ -92,7 +92,7 @@ export namespace helios::engine::core::components {
          *
          * @param value New matrix value.
          */
-        void setValue(const mat4<TNumericType> value) noexcept {
+        void setValue(const Value_type& value) noexcept {
             value_ = value;
         };
 

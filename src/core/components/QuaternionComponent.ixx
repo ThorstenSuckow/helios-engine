@@ -36,7 +36,7 @@ export namespace helios::engine::core::components {
          *
          * @return Const reference to the stored quaternion.
          */
-        [[nodiscard]] const helios::math::quat<TNumericType>& value() const noexcept {
+        [[nodiscard]] const Value_type& value() const noexcept {
             return quat;
         }
 
@@ -45,7 +45,7 @@ export namespace helios::engine::core::components {
          *
          * @param value New quaternion value.
          */
-        void setValue(const helios::math::quat<TNumericType>& value) noexcept {
+        void setValue(const Value_type& value) noexcept {
             quat = value;
         }
 

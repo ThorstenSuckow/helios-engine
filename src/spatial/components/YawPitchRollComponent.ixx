@@ -22,6 +22,8 @@ export namespace helios::engine::spatial::components {
     template<typename THandle>
     struct YawPitchRollComponent {
 
+        using Value_type = helios::math::vec3f;
+
         /** @brief Rotation around up axis in radians. */
         float yaw = 0;
 
@@ -30,6 +32,12 @@ export namespace helios::engine::spatial::components {
 
         /** @brief Rotation around forward axis in radians. */
         float roll = 0;
+
+        void setValue(const Value_type value) noexcept {
+            yaw = value[0];
+            pitch = value[1];
+            roll = value[2];
+        }
 
     };
 

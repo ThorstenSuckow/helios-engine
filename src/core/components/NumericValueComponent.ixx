@@ -41,7 +41,7 @@ export namespace helios::engine::core::components {
          *
          * @param value Initial numeric value.
          */
-        explicit NumericValueComponent(const TNumericType value) : value_(value){}
+        explicit NumericValueComponent(const Value_type value) : value_(value){}
 
         /**
          * @brief Copy constructor.
@@ -64,7 +64,7 @@ export namespace helios::engine::core::components {
          *
          * @return Current value.
          */
-        [[nodiscard]] TNumericType value() noexcept {
+        [[nodiscard]] Value_type value() noexcept {
             return value_;
         }
 
@@ -73,7 +73,7 @@ export namespace helios::engine::core::components {
          *
          * @return Current value.
          */
-        [[nodiscard]] TNumericType value() const noexcept {
+        [[nodiscard]] Value_type value() const noexcept {
             return value_;
         }
 

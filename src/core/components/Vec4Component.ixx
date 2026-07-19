@@ -39,7 +39,7 @@ export namespace helios::engine::core::components {
          *
          * @param value Initial value vector.
          */
-        explicit Vec4Component(const vec4<TNumericType> value) : value_(value){}
+        explicit Vec4Component(const Value_type value) : value_(value){}
 
         /**
          * @brief Constructs the component from scalar vector coordinates.
@@ -75,7 +75,7 @@ export namespace helios::engine::core::components {
          *
          * @return Current 4D vector value.
          */
-        [[nodiscard]] vec4<TNumericType> value() const noexcept {
+        [[nodiscard]] Value_type value() const noexcept {
             return value_;
         }
 
@@ -84,7 +84,7 @@ export namespace helios::engine::core::components {
          *
          * @return Current 4D vector value.
          */
-        [[nodiscard]] vec4<TNumericType> value() noexcept {
+        [[nodiscard]] Value_type value() noexcept {
             return value_;
         }
 
@@ -93,7 +93,7 @@ export namespace helios::engine::core::components {
          *
          * @param value New vector value.
          */
-        void setValue(const vec4<TNumericType> value) noexcept {
+        void setValue(const Value_type value) noexcept {
             value_ = value;
         };
 

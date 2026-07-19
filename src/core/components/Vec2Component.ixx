@@ -36,7 +36,7 @@ export namespace helios::engine::core::components {
          *
          * @param value Initial value vector.
          */
-        explicit Vec2Component(const vec2<TNumericType> value) : value_(value){}
+        explicit Vec2Component(const Value_type value) : value_(value){}
 
         /**
          * @brief Copy constructor.
@@ -58,11 +58,11 @@ export namespace helios::engine::core::components {
          *
          * @return Current 2D vector value.
          */
-        [[nodiscard]] vec2<TNumericType> value()  noexcept {
+        [[nodiscard]] Value_type value()  noexcept {
             return value_;
         }
 
-        [[nodiscard]] vec2<TNumericType> value() const noexcept {
+        [[nodiscard]] Value_type value() const noexcept {
             return value_;
         }
 
@@ -71,7 +71,7 @@ export namespace helios::engine::core::components {
          *
          * @param value New value vector.
          */
-        void setValue(const vec2<TNumericType> value) noexcept {
+        void setValue(const Value_type value) noexcept {
             value_ = value;
         };
 

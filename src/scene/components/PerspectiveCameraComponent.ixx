@@ -5,7 +5,6 @@
 module;
 
 #include <cassert>
-#include <cstddef>
 
 export module helios.engine.scene.components.PerspectiveCameraComponent;
 
@@ -53,6 +52,8 @@ export namespace helios::engine::scene::components {
 
     public:
 
+        using Value_type = helios::math::vec4f;
+
         explicit PerspectiveCameraComponent(const float fovY, const float aspectRatio, const float zNear = 0.1f, const float zFar = 1000.0f) {
             setPerspective(fovY, aspectRatio, zNear, zFar);
         }
@@ -72,6 +73,17 @@ export namespace helios::engine::scene::components {
             aspectRatio_ = aspectRatio;
             zNear_ = zNear;
             zFar_ = zFar;
+        }
+
+        /**
+         * @brief Sets the value of the perspective camera component as a vec4f.
+         *
+         * @param value
+         *
+         * @see setPerspective
+         */
+        void setValue(const Value_type& value) noexcept {
+            setPerspective(value[0], value[1], value[2], value[3]);
         }
 
         /**

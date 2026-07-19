@@ -34,7 +34,7 @@ export namespace helios::engine::core::components {
          *
          * @param value Initial value vector.
          */
-        explicit AABBComponent(const aabb<TNumericType>& value) : value_(value) {}
+        explicit AABBComponent(const Value_type& value) : value_(value) {}
 
         /**
          * @brief Copy constructor.
@@ -60,11 +60,11 @@ export namespace helios::engine::core::components {
          *
          * @return Current axis-aligned bounding box value.
          */
-        [[nodiscard]] aabb<TNumericType>& value() noexcept {
+        [[nodiscard]] Value_type& value() noexcept {
             return value_;
         }
 
-        [[nodiscard]] const aabb<TNumericType>& value() const noexcept {
+        [[nodiscard]] const Value_type& value() const noexcept {
             return value_;
         }
 
@@ -73,7 +73,7 @@ export namespace helios::engine::core::components {
          *
          * @param value New value vector.
          */
-        void setValue(const aabb<TNumericType> value) noexcept {
+        void setValue(const Value_type& value) noexcept {
             value_ = value;
         };
 

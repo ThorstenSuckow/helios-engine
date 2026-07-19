@@ -1,10 +1,12 @@
 /**
- * @file ClearDirtySetsSystem.ixx
+ * @file ClearAllDirtySetsSystem.ixx
  * @brief System template that clears dirty sets.
  */
 module;
 
-export module helios.engine.core.systems.ClearDirtySetsSystem;
+#include <concepts>
+
+export module helios.engine.core.systems.ClearAllDirtySetsSystem;
 
 import helios.engine.runtime.world.tags.SystemRole;
 import helios.engine.runtime.world.UpdateContext;
@@ -21,13 +23,10 @@ using namespace helios::engine::runtime::world::tags;
 export namespace helios::engine::core::systems {
 
     /**
-     * @brief Generic ECS system that clears dirty sets.
-     *
-     * @tparam TMemberHandle Member/registry handle type used to access ECS components.
-     * @tparam TComponents Components which dirty set should be cleared.
+     * @brief Generic ECS system that clears engine wide dirty sets.
      */
-    template<typename TMemberHandle, typename ... TComponents>
-    class ClearDirtySetsSystem {
+
+    class ClearAllDirtySetsSystem {
 
     public:
 
@@ -42,7 +41,7 @@ export namespace helios::engine::core::systems {
          * @param updateContext Frame-local update context with ECS access.
          */
         void update(UpdateContext& updateContext) noexcept {
-            updateContext.clearDirtySets<TMemberHandle, TComponents...>();
+            updateContext.clearDirtySets();
         }
     };
 }

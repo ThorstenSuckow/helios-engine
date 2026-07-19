@@ -20,7 +20,6 @@ export namespace helios::engine::spatial {
     inline void registerComponents() {
         using R = helios::ecs::ComponentReflector<TEntityManager>;
 
-        R::template registerType<components::DimensionComponent<typename TEntityManager::Handle_type>>();
         R::template registerType<components::TransformComponent<typename TEntityManager::Handle_type, Local>>();
         R::template registerType<components::TransformComponent<typename TEntityManager::Handle_type, World>>();
 

@@ -136,7 +136,7 @@ export namespace helios::engine::scene::systems {
                 RenderPrototypeComponent<TMemberHandle, TSubmissionMode>,
                 TransformComponent<TMemberHandle, World>,
                 BoundsComponent<TMemberHandle, World>
-            >().withActive().whereAllEnabled()) {
+            >().withActive()) {
 
                 cullingContext.bounds = boundsWorld->value();
                 cullingContext.handle = memberEntity.handle();
@@ -200,7 +200,7 @@ export namespace helios::engine::scene::systems {
                 RenderTargetBindingComponent<TOwnerHandle>,
                 SceneBindingComponent<TOwnerHandle>,
                 CameraBindingComponent<TOwnerHandle>
-            >().withActive().whereAllEnabled()) {
+            >().withActive()) {
 
                 const auto sceneHandle  = sbc->targetHandle();
                 const auto cameraHandle = cbc->targetHandle();

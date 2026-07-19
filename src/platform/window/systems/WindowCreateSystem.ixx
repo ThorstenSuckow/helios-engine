@@ -59,7 +59,7 @@ export namespace helios::engine::platform::window::systems {
             for (auto [entity, win]: updateContext.view<
                 THandle,
                 WindowCreateRequestComponent<THandle>
-                >().withActive().whereAllEnabled()) {
+                >().withActive()) {
 
                 cmdBuffer.template add<WindowCreateCommand<THandle>>(
                     entity.handle(),

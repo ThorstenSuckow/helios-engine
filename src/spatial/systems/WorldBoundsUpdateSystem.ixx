@@ -57,7 +57,6 @@ export namespace helios::engine::scene::systems {
                 BoundsComponent<TMemberHandle, World>,
                 TransformComponent<TMemberHandle, World>
             >().withActive()
-               .whereAllEnabled()
                .template whereAnyDirty<
                     BoundsComponent<TMemberHandle, Local>,
                     TransformComponent<TMemberHandle, World>,

@@ -60,7 +60,7 @@ export namespace helios::engine::platform::window::systems {
                 WindowComponent<TMemberHandle>,
                 Size2DComponent<TMemberHandle>,
                 RenderTargetBindingComponent<TMemberHandle>
-            >().withActive().whereAllEnabled().template whereAnyDirty<Size2DComponent<TMemberHandle>>()) {
+            >().withActive().template whereAnyDirty<Size2DComponent<TMemberHandle>>()) {
 
                 // c'mon now do something
 

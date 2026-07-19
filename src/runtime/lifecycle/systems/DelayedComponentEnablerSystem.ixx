@@ -70,7 +70,7 @@ export namespace helios::engine::runtime::lifecycle::systems {
             for (auto [entity, dce] : updateContext.view<
                 THandle,
                 helios::engine::runtime::lifecycle::components::DelayedComponentEnabler<THandle>
-            >().withActive().whereAllEnabled()) {
+            >().withActive()) {
 
                 sync_.clear();
 

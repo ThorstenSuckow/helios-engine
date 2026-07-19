@@ -28,35 +28,7 @@ export namespace helios::engine::rendering::model::components {
          */
         helios::math::aabbf aabb_{};
 
-        /**
-         * @brief Whether this component is enabled.
-         */
-        bool isEnabled_ = true;
-
     public:
-
-        /**
-         * @brief Checks whether this component is enabled.
-         *
-         * @return True if enabled, false otherwise.
-         */
-        [[nodiscard]] bool isEnabled() const noexcept {
-            return isEnabled_;
-        }
-
-        /**
-         * @brief Enables this component.
-         */
-        void enable() noexcept {
-            isEnabled_ = true;
-        }
-
-        /**
-         * @brief Disables this component.
-         */
-        void disable() noexcept {
-            isEnabled_ = false;
-        }
 
         /**
          * @brief Default constructor.

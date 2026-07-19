@@ -59,7 +59,7 @@ export namespace helios::engine::rendering::mesh::systems {
                 THandle,
                 MeshDataComponent<THandle>,
                 MeshUploadRequestComponent<THandle>
-            >().withActive().whereAllEnabled()) {
+            >().withActive()) {
                 meshHandles_.push_back(entity.handle());
             }
 

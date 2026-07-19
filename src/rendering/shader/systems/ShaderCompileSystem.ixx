@@ -70,7 +70,7 @@ export namespace helios::engine::rendering::shader::systems {
             for (auto [entity, scc] : updateContext.view<
                 THandle,
                 ShaderSourceComponent<THandle>
-            >().withActive().whereAllEnabled()) {
+            >().withActive()) {
                 shaderHandles_.push_back(entity.handle());
             }
 

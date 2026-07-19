@@ -59,7 +59,7 @@ export namespace helios::engine::scene::systems {
                 TransformComponent<TMemberHandle, World>,
                 ViewMatrixComponent<TMemberHandle>
             >().withActive()
-               .whereAllEnabled()
+
                .template whereAnyDirty<
                     TransformComponent<TMemberHandle, World>,
                     Active<TMemberHandle>
@@ -80,7 +80,7 @@ export namespace helios::engine::scene::systems {
                 PerspectiveCameraComponent<TMemberHandle>,
                 ProjectionMatrixComponent<TMemberHandle>
             >().withActive()
-               .whereAllEnabled()
+
                .template whereAnyDirty<
                     PerspectiveCameraComponent<TMemberHandle>,
                     Active<TMemberHandle>

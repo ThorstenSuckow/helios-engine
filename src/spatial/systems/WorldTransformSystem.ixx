@@ -61,13 +61,16 @@ export namespace helios::engine::scene::systems {
                 Rotation3DComponent<TMemberHandle, Local>,
                 TransformComponent<TMemberHandle, World>
             >().withActive()
-                .whereAllEnabled()
                 .template whereAnyDirty<
                 Active<TMemberHandle>,
                 Position3DComponent<TMemberHandle, Local>,
                 Rotation3DComponent<TMemberHandle, Local>
             >()) {
 
+               /* entity->setTrackedValue(
+                    worldTransform,
+                    localRotation->value().rotationMatrix().withTranslation(localPosition->value())
+                );*/
                 worldTransform->setValue(
                      localRotation->value().rotationMatrix().withTranslation(localPosition->value())
                 );

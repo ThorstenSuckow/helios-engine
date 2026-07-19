@@ -64,7 +64,7 @@ export namespace helios::engine::platform::window::systems {
                 THandle,
                 WindowComponent<THandle>,
                 WindowShownComponent<THandle>
-                >().withActive().whereAllEnabled()) {
+                >().withActive()) {
 
                 cmdBuffer.template add<SwapBuffersCommand<THandle>>(entity.handle());
             }

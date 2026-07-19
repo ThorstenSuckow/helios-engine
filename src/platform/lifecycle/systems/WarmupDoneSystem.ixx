@@ -72,7 +72,7 @@ export namespace helios::engine::platform::lifecycle::systems {
             if (updateContext.view<
                 THandle,
                 ShaderSourceComponent<THandle>
-                >().withActive().whereAllEnabled().empty()) {
+                >().withActive().empty()) {
 
                 cmdBuffer.template add<StateCommand<EngineState>>(
                     StateTransitionRequest<EngineState>(

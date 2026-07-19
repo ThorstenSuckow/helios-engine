@@ -100,6 +100,18 @@ export namespace helios::engine::runtime::world {
         RenderTargetWorld::EntityManager_types
     >::type;
 
+    template<typename... Ts> struct type_list {};
+
+    template<typename TManagerTuple>
+    struct HandlesOf;
+    template<typename... TManagers>
+    struct HandlesOf<std::tuple<TManagers...>> {
+        using type = type_list<typename TManagers::Handle_type...>;
+    };
+    template<typename TWorld>
+    using WorldHandles = typename HandlesOf<typename TWorld::EntityManager_types>::type;
+
+
     /**
      * @brief Aggregate runtime world for game objects, platform entities, and rendering domains.
      */
@@ -109,6 +121,11 @@ export namespace helios::engine::runtime::world {
         RenderResourceWorld renderResourceWorld_{};
         PlatformWorld platformWorld_{};
         RenderTargetWorld renderTargetWorld_{};
+
+        template<typename TWorld, typename... TComponents, typename... THandles>
+        void clearDirtySetsForHandles(TWorld& world, type_list<THandles...>) {
+            (world.template clearDirtySets<THandles, TComponents...>(), ...);
+        }
 
     public:
 
@@ -207,9 +224,17 @@ export namespace helios::engine::runtime::world {
             }
         }
 
-        template<typename THandle, typename... TComponents>
+        template<typename THandle = void, typename... TComponents>
         void clearDirtySets() {
-            if constexpr(IsGameplaySystemHandle<THandle>) {
+
+            if constexpr (std::is_same_v<THandle, void>) {
+
+                clearDirtySetsForHandles<GameObjectWorld>(gameObjectWorld_, WorldHandles<GameObjectWorld>{});
+                clearDirtySetsForHandles<PlatformWorld>(platformWorld_, WorldHandles<PlatformWorld>{});
+                clearDirtySetsForHandles<RenderResourceWorld>(renderResourceWorld_, WorldHandles<RenderResourceWorld>{});
+                clearDirtySetsForHandles<RenderTargetWorld>(renderTargetWorld_, WorldHandles<RenderTargetWorld>{});
+
+            } else if constexpr(IsGameplaySystemHandle<THandle>) {
                 gameObjectWorld_.template clearDirtySets<THandle, TComponents...>();
             } else if constexpr(IsAnyPlatformHandle<THandle>) {
                 platformWorld_.template clearDirtySets<THandle, TComponents...>();

@@ -413,7 +413,7 @@ export namespace helios::engine::runtime::world {
          *
          * @return Domain-specific view.
          */
-        template <typename THandle, typename... Components>
+        template <typename THandle = void, typename... Components>
         void clearDirtySets() {
             engineWorld_.clearDirtySets<THandle, Components...>();
         }

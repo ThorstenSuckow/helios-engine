@@ -27,6 +27,8 @@ export namespace helios::engine::core::components {
 
     public:
 
+        using Value_type = helios::math::vec3<TNumericType>;
+
         Vec3Component() = default;
 
         /**

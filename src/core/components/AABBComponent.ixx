@@ -25,6 +25,8 @@ export namespace helios::engine::core::components {
 
     public:
 
+        using Value_type = helios::math::aabb<TNumericType>;
+
         AABBComponent() = default;
 
         /**

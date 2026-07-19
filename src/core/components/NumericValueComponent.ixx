@@ -1,6 +1,6 @@
 /**
  * @file NumericValueComponent.ixx
- * @brief Generic scalar component with dirty-state tracking.
+ * @brief Generic scalar component.
  */
 module;
 
@@ -17,7 +17,7 @@ using namespace helios::math::concepts;
 export namespace helios::engine::core::components {
 
     /**
-     * @brief Generic numeric value component with dirty-state tracking.
+     * @brief Generic numeric value component.
      *
      * @tparam TDomainTag Semantic domain tag.
      * @tparam THandle Owning entity handle type.
@@ -29,9 +29,9 @@ export namespace helios::engine::core::components {
 
         TNumericType value_{};
 
-        bool isDirty_ = true;
-
     public:
+
+        using Value_type = TNumericType;
 
         NumericValueComponent() = default;
 
@@ -46,14 +46,10 @@ export namespace helios::engine::core::components {
         /**
          * @brief Copy constructor.
          *
-         * @details Copies the value and forces the copied component into a
-         * dirty state to ensure dependent systems refresh cached data.
-         *
          * @param other The component to copy from.
          */
         NumericValueComponent(const NumericValueComponent& other) :
-            value_(other.value_),
-            isDirty_(true) {}
+            value_(other.value_){}
 
         /** @brief Default copy assignment. */
         NumericValueComponent& operator=(const NumericValueComponent&) = default;
@@ -62,39 +58,6 @@ export namespace helios::engine::core::components {
         /** @brief Default move assignment. */
         NumericValueComponent& operator=(NumericValueComponent&&) noexcept = default;
 
-        /**
-         * @brief Lifecycle hook called when the component is acquired.
-         *
-         * @details Marks the component dirty to trigger downstream recomputation.
-         */
-        void onAcquire() noexcept {
-            isDirty_ = true;
-        }
-
-        /**
-         * @brief Lifecycle hook called when the component is released.
-         *
-         * @details Marks the component dirty to trigger downstream recomputation.
-         */
-        void onRelease() noexcept {
-            isDirty_ = true;
-        }
-
-        /**
-         * @brief Clears the dirty flag after dependent systems consumed updates.
-         */
-        void clearDirty() noexcept {
-            isDirty_ = false;
-        }
-
-        /**
-         * @brief Returns whether the component requires a refresh pass.
-         *
-         * @return `true` if value changed or lifecycle hooks marked dirty.
-         */
-        [[nodiscard]] bool isDirty() const noexcept {
-            return isDirty_;
-        }
 
         /**
          * @brief Returns the current value.
@@ -105,33 +68,22 @@ export namespace helios::engine::core::components {
             return value_;
         }
 
+        /**
+         * @brief Returns the current value.
+         *
+         * @return Current value.
+         */
         [[nodiscard]] TNumericType value() const noexcept {
             return value_;
         }
 
         /**
-         * @brief Updates the value and marks the component dirty on change.
-         *
-         * @details Integral types use exact comparison. Floating-point types use
-         * `helios::math::EPSILON_LENGTH` to suppress insignificant updates.
+         * @brief Updates the value.
          *
          * @param value New scalar value.
          */
         void setValue(const TNumericType value) noexcept {
-
-            if constexpr (std::floating_point<TNumericType>) {
-                if (std::abs(value_ - value) <= static_cast<TNumericType>(helios::math::EPSILON_LENGTH)) {
-                    return;
-                }
-            } else {
-                if (value_ == value) {
-                    return;
-                }
-            }
-
-
             value_ = value;
-            isDirty_ = true;
         };
 
 

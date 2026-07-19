@@ -1,6 +1,6 @@
 /**
  * @file Vec4Component.ixx
- * @brief Generic 4D vector component with dirty-state tracking.
+ * @brief Generic 4D vector component.
  */
 module;
 
@@ -17,7 +17,7 @@ using namespace helios::math::concepts;
 export namespace helios::engine::core::components {
 
     /**
-     * @brief Generic 4D value component with dirty-state tracking.
+     * @brief Generic 4D value component.
      *
      * @tparam TDomainTag Semantic domain tag.
      * @tparam THandle Owning entity handle type.
@@ -28,10 +28,9 @@ export namespace helios::engine::core::components {
     class Vec4Component  {
 
         helios::math::vec4<TNumericType> value_{};
-
-        bool isDirty_ = true;
-
     public:
+
+        using Value_type = helios::math::vec4<TNumericType>;;
 
         Vec4Component() = default;
 
@@ -57,14 +56,12 @@ export namespace helios::engine::core::components {
         /**
          * @brief Copy constructor.
          *
-         * @details Copies the value and forces the copied component into a
-         * dirty state to ensure dependent systems refresh cached data.
+         * @details Copies the value.
          *
          * @param other The component to copy from.
          */
         Vec4Component(const Vec4Component& other) :
-            value_(other.value_),
-            isDirty_(true) {}
+            value_(other.value_) {}
 
         /** @brief Default copy assignment. */
         Vec4Component& operator=(const Vec4Component&) = default;
@@ -72,40 +69,6 @@ export namespace helios::engine::core::components {
         Vec4Component(Vec4Component&&) noexcept = default;
         /** @brief Default move assignment. */
         Vec4Component& operator=(Vec4Component&&) noexcept = default;
-
-        /**
-         * @brief Lifecycle hook called when the component is acquired.
-         *
-         * @details Marks the component dirty to trigger downstream recomputation.
-         */
-        void onAcquire() noexcept {
-            isDirty_ = true;
-        }
-
-        /**
-         * @brief Lifecycle hook called when the component is released.
-         *
-         * @details Marks the component dirty to trigger downstream recomputation.
-         */
-        void onRelease() noexcept {
-            isDirty_ = true;
-        }
-
-        /**
-         * @brief Clears the dirty flag after dependent systems consumed updates.
-         */
-        void clearDirty() noexcept {
-            isDirty_ = false;
-        }
-
-        /**
-         * @brief Returns whether the component requires a refresh pass.
-         *
-         * @return `true` if value changed or lifecycle hooks marked dirty.
-         */
-        [[nodiscard]] bool isDirty() const noexcept {
-            return isDirty_;
-        }
 
         /**
          * @brief Returns the current value.
@@ -126,13 +89,12 @@ export namespace helios::engine::core::components {
         }
 
         /**
-         * @brief Updates the value and marks the component dirty on change.
+         * @brief Updates the value.
          *
          * @param value New vector value.
          */
         void setValue(const vec4<TNumericType> value) noexcept {
             value_ = value;
-            isDirty_ = true;
         };
 
 

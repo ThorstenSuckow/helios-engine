@@ -28,9 +28,11 @@ export namespace helios::engine::core::components {
     class Mat4Component  {
 
         helios::math::mat4<TNumericType> value_{};
-    
+
 
     public:
+
+        using Value_type = helios::math::mat4<TNumericType>;
 
         Mat4Component() = default;
 

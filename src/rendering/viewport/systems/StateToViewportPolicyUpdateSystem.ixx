@@ -40,7 +40,7 @@ export namespace helios::engine::rendering::viewport::systems {
      * policy.freeze();
      *
      * gameLoop.phase(PhaseType::Pre)
-     *     .addPass<GameState>(GameState::Any)
+     *     .beginPass<GameState>(GameState::Any)
      *         .addSystem<StateToViewportPolicyUpdateSystem<GameState, MatchState>>(
      *             std::move(policy)
      *         );

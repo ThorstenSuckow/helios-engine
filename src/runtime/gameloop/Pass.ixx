@@ -60,6 +60,13 @@ export namespace helios::engine::runtime::gameloop {
         helios::engine::runtime::world::SystemRegistry systemRegistry_{};
 
         /**
+         * @brief Queue of system type IDs for execution order.
+         *
+         * Each entry holds a group of one or more SystemType-ids, whereas multiple ids indicate systems that can be executed in parallel.
+         */
+        std::vector<std::vector<SystemTypeId>> systemTypeIdQueue_;
+
+        /**
          * @brief Reference to the owning GameWorld.
          *
          * @details Used to resolve optional command buffer dependencies for
@@ -99,6 +106,33 @@ export namespace helios::engine::runtime::gameloop {
             T* manager = gameWorld_.tryManager<T>();
             assert(manager && "Manager buffer not found for system's manager");
             managerTypeIds_.push_back(ManagerTypeId::template id<T>());
+        }
+
+        /**
+         * @brief Registers a callable system for this pass.
+         *
+         * @tparam TSystem The type of the system to register.
+         * @param system The system instance to register.
+         * @return Reference to this pass.
+         */
+        template<typename TSystem>
+        requires helios::engine::runtime::world::concepts::IsCallableSystemLike<std::remove_cvref_t<TSystem>>
+        Pass& registerCallableSystem(TSystem&& system) {
+
+            using SystemType = std::remove_cvref_t<TSystem>;
+
+            void* bufferPtr = nullptr;
+            if constexpr (requires { typename SystemType::CommandBuffer_type; }) {
+                using TCommandBuffer = typename TSystem::CommandBuffer_type;
+                bufferPtr = gameWorld_.tryCommandBuffer<TCommandBuffer>();
+                assert(bufferPtr && "Command buffer not found for system's CommandBuffer_type");
+            }
+
+            systemRegistry_.template add<SystemType>(
+                System(std::forward<TSystem>(system), bufferPtr)
+            );
+
+            return *this;
         }
 
     public:
@@ -174,6 +208,8 @@ export namespace helios::engine::runtime::gameloop {
                 System(std::move(concreteSystem), bufferPtr)
             );
 
+            systemTypeIdQueue_.push_back({SystemTypeId::template id<T>()});
+
             return *this;
         }
 
@@ -194,19 +230,31 @@ export namespace helios::engine::runtime::gameloop {
         requires helios::engine::runtime::world::concepts::IsCallableSystemLike<std::remove_cvref_t<TSystem>>
         Pass& addSystem(TSystem&& system) {
 
-            using SystemType = std::remove_cvref_t<TSystem>;
+            registerCallableSystem(std::forward<TSystem>(system));
 
-            void* bufferPtr = nullptr;
-            if constexpr (requires { typename SystemType::CommandBuffer_type; }) {
-                using TCommandBuffer = typename TSystem::CommandBuffer_type;
-                bufferPtr = gameWorld_.tryCommandBuffer<TCommandBuffer>();
-                assert(bufferPtr && "Command buffer not found for system's CommandBuffer_type");
-            }
+            systemTypeIdQueue_.push_back({SystemTypeId::template id<TSystem>()});
 
-            systemRegistry_.template add<SystemType>(
-                System(std::forward<TSystem>(system), bufferPtr)
-            );
+            return *this;
+        }
 
+        /**
+         * @brief Adds multiple systems to this pass, allowing for parallel execution.
+         *
+         * @tparam TSystem The types of the systems to add.
+         * @param system The system instances to add.
+         * @return Reference to this pass.
+         */
+        template<typename ... TSystem>
+        requires (helios::engine::runtime::world::concepts::IsCallableSystemLike<std::remove_cvref_t<TSystem>> && ...)
+           && (sizeof...(TSystem) >= 2)
+        Pass& addSystems(TSystem&&... system) {
+
+            (registerCallableSystem(std::forward<TSystem>(system)), ...);
+
+            auto& group = systemTypeIdQueue_.emplace_back();
+            group.reserve(sizeof...(TSystem));
+            (group.push_back({SystemTypeId::template id<std::remove_cvref_t<TSystem>>()}), ...);
+            
             return *this;
         }
 

@@ -14,3 +14,4 @@ export import helios.engine.core.spatial;
 export import helios.engine.core.memory;
 export import helios.engine.core.units;
 export import helios.engine.core.systems;
+export import helios.engine.core.thread;

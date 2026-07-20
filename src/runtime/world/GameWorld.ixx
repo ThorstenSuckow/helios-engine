@@ -27,6 +27,7 @@ import helios.engine.platform.environment.types;
 import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
 import helios.engine.runtime.messaging.command.CommandBufferRegistry;
 
+import helios.engine.runtime.world.ManagerRegistry;
 import helios.engine.runtime.world.ResourceRegistry;
 
 import helios.engine.runtime.world.UpdateContext;
@@ -372,35 +373,6 @@ export namespace helios::engine::runtime::world {
             return commandHandlerRegistry_;
         }
 
-        /**
-         * @brief Flushes all registered Managers.
-         *
-         * @details Iterates over all Managers in registration order and invokes
-         * `flush(updateContext)` on each. Called by the GameLoop at commit points
-         * after the CommandBuffer has been flushed.
-         *
-         * @param updateContext The current frame's update context.
-         */
-        void flushManagers(UpdateContext& updateContext) {
-            for (auto& mgr : resourceRegistry_.managers()) {
-                mgr->flush(updateContext);
-            }
-        }
-
-        /**
-         * @brief Flushes all registered CommandBuffers.
-         *
-         * @details Iterates over all CommandBuffers in registration order and
-         * invokes `flush(updateContext)` on each. Called by the GameLoop at
-         * commit points before Managers are flushed.
-         *
-         * @param updateContext The current frame's update context.
-         */
-        void flushCommandBuffers(UpdateContext& updateContext) {
-            for (auto& buff : resourceRegistry_.commandBuffers()) {
-                buff->flush(updateContext);
-            }
-        }
 
         /**
          * @brief Resets all managers and the session to their initial state.
@@ -409,7 +381,6 @@ export namespace helios::engine::runtime::world {
          * accumulated state. Invokes reset() on all managers and the session.
          */
         void reset() {
-
             for (auto& mgr : resourceRegistry_.managers()) {
                 mgr->reset();
             }
@@ -547,6 +518,16 @@ export namespace helios::engine::runtime::world {
          */
         helios::engine::runtime::messaging::command::CommandBufferRegistry& commandBufferRegistry() noexcept {
             return resourceRegistry().commandBufferRegistry();
+        }
+
+
+        /**
+         * @brief Returns direct access to the manager registry.
+         *
+         * @return Reference to the internal ManagerRegistry.
+         */
+        ManagerRegistry& managerRegistry() noexcept {
+            return resourceRegistry().managerRegistry();
         }
 
     };

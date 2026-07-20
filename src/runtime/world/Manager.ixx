@@ -143,10 +143,6 @@ export namespace helios::engine::runtime::world {
         /**
          * @brief Delegates to the wrapped manager's `flush()` method.
          *
-         * @details Called by the GameLoop at each commit point after
-         * CommandBuffers have been flushed. Managers process their
-         * accumulated requests in batch.
-         *
          * @param updateContext The current frame's update context.
          *
          * @pre Manager must be initialized (pimpl_ != nullptr).

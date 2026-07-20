@@ -6,18 +6,20 @@ module;
 
 #include <type_traits>
 #include <utility>
+#include <cassert>
 
 export module helios.engine.runtime.gameloop:TypedPass;
 
 import :Pass;
 
 import helios.engine.runtime.world.SystemRegistry;
-
+import helios.engine.core.thread.JobSystem;
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.Session;
 
 import helios.engine.runtime.enginestate.types;
 
+using namespace helios::engine::core::thread;
 export namespace helios::engine::runtime::gameloop {
 
     class Phase;
@@ -66,14 +68,37 @@ export namespace helios::engine::runtime::gameloop {
         StateType mask_;
 
         /**
+         * @brief Pointer to the job system used for parallel execution.
+         */
+        JobSystem* jobSystem_;
+
+        /**
          * @brief Updates all systems registered in this pass.
          *
          * @param updateContext The current update context.
          */
         void update(helios::engine::runtime::world::UpdateContext& updateContext) override {
-            for (auto& sys : systemRegistry_.items()) {
-                sys->update(updateContext);
+
+            assert(jobSystem_ && "Job system not initialized");
+
+            for (auto typeIdQueue : systemTypeIdQueue_) {
+
+                assert(typeIdQueue.size() > 0 && "Type ID queue is empty");
+
+                if (typeIdQueue.size() == 1) {
+                    systemRegistry_.item(typeIdQueue[0])->update(updateContext);
+                    continue;
+                }
+
+                jobSystem_->runAndWait(
+                    typeIdQueue.size(),
+                    [&] (const std::size_t i) {
+                        const auto typeId = typeIdQueue[i];
+                        systemRegistry_.item(typeId)->update(updateContext);
+                });
+
             }
+
         }
 
 
@@ -83,7 +108,7 @@ export namespace helios::engine::runtime::gameloop {
          * @param gameWorld Reference to the game world.
          */
         void init(helios::engine::runtime::world::GameWorld& gameWorld) override {
-
+            jobSystem_ = &gameWorld.jobSystem();
         }
 
 
@@ -96,7 +121,10 @@ export namespace helios::engine::runtime::gameloop {
          * @param mask State mask controlling when this pass runs.
          * @param gameWorld GameWorld used by the base Pass for buffer injection.
          */
-        explicit TypedPass(Phase& owner, const StateType mask, helios::engine::runtime::world::GameWorld& gameWorld) : owner_(owner), mask_(mask), Pass(gameWorld) {}
+        explicit TypedPass(
+            Phase& owner, const StateType mask,
+            helios::engine::runtime::world::GameWorld& gameWorld
+        ) : owner_(owner), mask_(mask), Pass(gameWorld) {}
 
         /**
          * @copydoc Pass::endPass

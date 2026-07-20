@@ -8,22 +8,28 @@ module;
 #include <utility>
 #include <memory>
 #include <cassert>
+#include <vector>
 
 export module helios.engine.runtime.gameloop:Pass;
-
-import :CommitPoint;
 
 import helios.engine.runtime.world.GameWorld;
 import helios.engine.runtime.world.SystemRegistry;
 import helios.engine.runtime.world.System;
 import helios.engine.runtime.world.concepts;
+import helios.engine.runtime.world.types;
 
+import helios.engine.runtime.messaging.command.types;
+import helios.engine.runtime.messaging.command.concepts.IsCommandBufferLike;
 
 import helios.engine.runtime.world.UpdateContext;
 
 import helios.engine.runtime.enginestate.types;
 
+using namespace helios::engine::runtime::messaging::command::types;
+using namespace helios::engine::runtime::messaging::command::concepts;
 using namespace helios::engine::runtime::world;
+using namespace helios::engine::runtime::world::concepts;
+using namespace helios::engine::runtime::world::types;
 export namespace helios::engine::runtime::gameloop {
 
     class Phase;
@@ -61,6 +67,39 @@ export namespace helios::engine::runtime::gameloop {
          */
         GameWorld& gameWorld_;
 
+        /**
+         * @brief List of CommandBufferTypeIds.
+         */
+        std::vector<CommandBufferTypeId> commandBufferTypeIds_;
+
+        /**
+         * @brief List of ManagerTypeIds.
+         */
+        std::vector<ManagerTypeId> managerTypeIds_;
+
+        /**
+         * @brief Registers the CommandBufferTypeIds for the CommandBuffers this pass should submit.
+         *
+         * @tparam T The type of the command buffer to register.
+         */
+        template<typename T>
+        void registerCommandBufferSubmit() {
+            T* buffer = gameWorld_.tryCommandBuffer<T>();
+            assert(buffer && "Command buffer not found for system's CommandBuffer");
+            commandBufferTypeIds_.push_back(CommandBufferTypeId::template id<T>());
+        }
+
+        /**
+         * @brief Registers the ManagerTypeIds for the Managers this pass should flush.
+         *
+         * @tparam T The type of the manager to register.
+         */
+        template<typename T>
+        void registerManagerFlush() {
+            T* manager = gameWorld_.tryManager<T>();
+            assert(manager && "Manager buffer not found for system's manager");
+            managerTypeIds_.push_back(ManagerTypeId::template id<T>());
+        }
 
     public:
         virtual ~Pass() = default;
@@ -88,20 +127,12 @@ export namespace helios::engine::runtime::gameloop {
         virtual void init(helios::engine::runtime::world::GameWorld& gameWorld) = 0;
 
         /**
-         * @brief Adds a commit point and returns the owning Phase.
+         * @brief Ends this pass.
          *
-         * @param commitPoint The synchronization flags.
-         *
-         * @return Reference to the owning Phase.
+         * @return Reference to the owning phase.
          */
-        virtual Phase& addCommitPoint(const CommitPoint commitPoint = CommitPoint::PassEvents) = 0;
+        virtual Phase& endPass() = 0;
 
-        /**
-         * @brief Returns the configured commit point.
-         *
-         * @return The commit point flags for this pass.
-         */
-        virtual CommitPoint commitPoint() const noexcept = 0;
 
         /**
          * @brief Determines if this pass should execute.
@@ -178,6 +209,55 @@ export namespace helios::engine::runtime::gameloop {
 
             return *this;
         }
+
+        /**
+         * @brief Registers the CommandBuffers this pass should submit to.
+         *
+         * @tparam T The types of the CommandBuffers to submit.
+         * @return Reference to this Pass for method chaining.
+         */
+        template<typename... T>
+        requires (IsCommandBufferLike<T> && ...)
+        Pass& submit() {
+
+            (registerCommandBufferSubmit<T>(), ...);
+
+            return *this;
+        }
+
+        /**
+         * @brief Returns a span of the CommandBufferTypeIds this pass is submitting to.
+         *
+         * @return A span of CommandBufferTypeIds.
+         */
+        [[nodiscard]] std::span<const CommandBufferTypeId> commandBufferTypeIds() noexcept {
+            return commandBufferTypeIds_;
+        }
+
+        /**
+         * @brief  Registers the Managers this pass should flush.
+         *
+         * @tparam T The types of the Managers to flush.
+         * @return Reference to this Pass for method chaining.
+         */
+        template<typename... T>
+        requires (IsManagerLike<T> && ...)
+        Pass& flush() {
+
+            (registerManagerFlush<T>(), ...);
+
+            return *this;
+        }
+
+        /**
+         * @brief Returns a span of the ManagerTypeIds this pass is flushing.
+         *
+         * @return A span of ManagerTypeIds.
+         */
+        [[nodiscard]] std::span<const ManagerTypeId> managerTypeIds() noexcept {
+            return managerTypeIds_;
+        }
+
     };
 
 }

@@ -23,9 +23,9 @@ import helios.engine.runtime.messaging.event.GameLoopEventBus;
 
 import helios.engine.runtime.enginestate.types;
 
-import :CommitPoint;
+import :Pass;
 import :Phase;
-import :PassCommitListener;
+import :PassEndListener;
 
 import helios.engine.runtime.world.Manager;
 
@@ -41,10 +41,6 @@ export namespace helios::engine::runtime::gameloop {
     /**
      * @brief Central orchestrator for the game update cycle.
      *
-     * @details
-     * The GameLoop manages the execution of game systems across three distinct phases:
-     * Pre, Main, and Post. Each phase can contain multiple passes, and each pass can
-     * have a configurable commit point for fine-grained synchronization control.
      *
      * ## Ownership
      *
@@ -55,37 +51,14 @@ export namespace helios::engine::runtime::gameloop {
      *   - `passEventBus_`: Events readable in subsequent passes (within the same phase).
      *   - `frameEventBus_`: Events readable in the next frame.
      *
-     * The EngineCommandBuffer and Managers are owned by the GameWorld's
-     * ResourceRegistry and accessed via UpdateContext during commit points.
-     *
-     * ## Commit Points
-     *
-     * Commit points allow systems to specify when commands should be flushed, managers
-     * should process their requests, and pass-level events should be synchronized.
-     * This enables deterministic ordering and fine-grained control over the update cycle.
-     *
-     * ## Frame Lifecycle
-     *
-     * ```
-     * ┌─────────────────────────────────────────────────────────────┐
-     * │                        FRAME N                              │
-     * ├─────────────────┬─────────────────┬─────────────────────────┤
-     * │   PRE PHASE     │   MAIN PHASE    │      POST PHASE         │
-     * │  (Input, Cmd)   │ (Physics, AI)   │ (Cleanup, Sync)         │
-     * ├─────────────────┼─────────────────┼─────────────────────────┤
-     * │ phaseCommit()   │ phaseCommit()   │ phaseCommit()           │
-     * │                 │                 │ frameEventBus_.swap()   │
-     * └─────────────────┴─────────────────┴─────────────────────────┘
-     * ```
      *
      * @see Phase
      * @see Pass
-     * @see CommitPoint
      * @see ResourceRegistry
      * @see EngineCommandBuffer
-     * @see PassCommitListener
+     * @see PassEndListener
      */
-    class GameLoop : public helios::engine::runtime::gameloop::PassCommitListener {
+    class GameLoop : public helios::engine::runtime::gameloop::PassEndListener {
 
 
         /**
@@ -128,7 +101,7 @@ export namespace helios::engine::runtime::gameloop {
          *
          * Events pushed via `UpdateContext::pushPhase()` are buffered here
          * and become readable in the next phase via `UpdateContext::readPhase()`.
-         * The buffer swap occurs in phaseCommit().
+         * The buffer swap occurs in phaseEnd().
          *
          * @see UpdateContext::pushPhase()
          * @see UpdateContext::readPhase()
@@ -140,7 +113,6 @@ export namespace helios::engine::runtime::gameloop {
          *
          * Events pushed via `UpdateContext::pushPass()` are buffered here
          * and become readable in subsequent passes via `UpdateContext::readPass()`.
-         * The buffer swap occurs when a pass has a commit point.
          *
          * @see UpdateContext::pushPass()
          * @see UpdateContext::readPass()
@@ -169,53 +141,6 @@ export namespace helios::engine::runtime::gameloop {
          */
         float totalTime_ = 0.0f;
 
-
-
-        /**
-         * @brief Commits pass-level state based on the specified CommitPoint flags.
-         *
-         * @details Called after each pass that has a commit point configured. The
-         * CommitPoint flags determine which synchronization actions are performed:
-         *
-         * - **PassEvents:** Swaps pass event bus buffers, making events pushed via
-         *   `UpdateContext::pushPass()` readable in subsequent passes.
-         * - **FlushCommands:** Executes pending commands from the CommandBuffer.
-         * - **FlushManagers:** Processes manager requests (e.g., spawning from pools).
-         *
-         * The order is: FlushCommands → FlushManagers → PassEvents.
-         * Commands must be flushed before managers to ensure spawn requests are
-         * generated before being processed.
-         *
-         * @param commitPoint The flags specifying which actions to perform.
-         * @param gameWorld The game world where the commit occured.
-         * @param updateContext The current update context.
-         *
-         * @see CommitPoint
-         * @see Pass::addCommitPoint()
-         * @see UpdateContext::pushPass()
-         * @see UpdateContext::readPass()
-         */
-        void onPassCommit(
-            const CommitPoint commitPoint,
-            GameWorld& gameWorld,
-            UpdateContext& updateContext) noexcept {
-
-            // commands must be executed before Managers
-            if ((commitPoint & CommitPoint::FlushCommands) == CommitPoint::FlushCommands) {
-                gameWorld.flushCommandBuffers(updateContext);
-            }
-
-            if ((commitPoint & CommitPoint::FlushManagers) == CommitPoint::FlushManagers) {
-                gameWorld.flushManagers(updateContext);
-            }
-
-            // managers might create pass events
-            if ((commitPoint & CommitPoint::PassEvents) == CommitPoint::PassEvents)  {
-                passEventBus_.swapBuffers();
-            }
-
-        }
-
         /**
          * @brief Commits phase-level events and flushes commands and managers.
          *
@@ -232,17 +157,11 @@ export namespace helios::engine::runtime::gameloop {
          * @see UpdateContext::pushPhase()
          * @see UpdateContext::readPhase()
          */
-        void phaseCommit(
+        void phaseEnd(
             GameWorld& gameWorld,
             UpdateContext& updateContext) {
 
             passEventBus_.clearAll();
-
-            // command buffers generate requests for managers, so this comes first
-            gameWorld.flushCommandBuffers(updateContext);
-
-            // managers process requests
-            gameWorld.flushManagers(updateContext);
 
             // make sure flushed managers make their events available to the phase event bus
             phaseEventBus_.swapBuffers();
@@ -313,13 +232,13 @@ export namespace helios::engine::runtime::gameloop {
             assert(!initialized_ && "init() already called");
 
             prePhase_.init(gameWorld);
-            prePhase_.addPassCommitListener(this);
+            prePhase_.addPassEndListener(this);
 
             mainPhase_.init(gameWorld);
-            mainPhase_.addPassCommitListener(this);
+            mainPhase_.addPassEndListener(this);
 
             postPhase_.init(gameWorld);
-            postPhase_.addPassCommitListener(this);
+            postPhase_.addPassEndListener(this);
 
             initialized_ = true;
         }
@@ -331,31 +250,14 @@ export namespace helios::engine::runtime::gameloop {
         /**
          * @brief Executes one full frame update across all phases.
          *
-         * @details Iterates through Pre, Main, and Post phases, updating all registered
-         * systems and committing events and commands after each phase. The frame lifecycle:
-         *
-         * 1. **Pre Phase:** Input processing, command generation, preparation
-         * 2. **Main Phase:** Core gameplay logic, physics, collision detection
-         * 3. **Post Phase:** Cleanup, synchronization, rendering preparation
-         *
-         * After each phase, `phaseCommit()` is called to:
-         * - Swap phase event buffers (events become readable in next phase)
-         * - Clear pass event buffers
-         * - Flush command buffer
-         * - Flush managers
-         *
-         * After the Post phase, the frame event bus is swapped, making frame-level
-         * events readable in the next frame.
-         *
          * @param gameWorld Reference to the game world.
          * @param deltaTime Time elapsed since the last frame in seconds.
          * @param inputSnapshot Snapshot of the current input state.
-         * @param viewportSnapshots Snapshots of viewports registered with an id.
          *
          * @pre init() must have been called before the first update.
          *
          * @see Phase
-         * @see phaseCommit()
+         * @see phaseEnd()
          * @see UpdateContext
          */
         void update(
@@ -385,14 +287,44 @@ export namespace helios::engine::runtime::gameloop {
 
             // gameloop phases
             prePhase_.update(gameWorld, updateContext);
-            phaseCommit(gameWorld, updateContext);
+            phaseEnd(gameWorld, updateContext);
 
             mainPhase_.update(gameWorld, updateContext);
-            phaseCommit(gameWorld, updateContext);
+            phaseEnd(gameWorld, updateContext);
 
             postPhase_.update(gameWorld, updateContext);
-            phaseCommit(gameWorld, updateContext);
+            phaseEnd(gameWorld, updateContext);
             frameEventBus_.swapBuffers();
+        }
+
+        /**
+         * @brief Ends pass-level state.
+         *
+         * @param pass The pass that was finished.
+         * @param gameWorld The game world where the pass end occured.
+         * @param updateContext The current update context.
+         *
+         * @see CommitPoint
+         * @see Pass::addCommitPoint()
+         * @see UpdateContext::pushPass()
+         * @see UpdateContext::readPass()
+         */
+        void onPassEnd(
+            Pass& pass,
+            GameWorld& gameWorld,
+            UpdateContext& updateContext) noexcept override {
+
+
+            for (const auto typeId :pass.commandBufferTypeIds()) {
+                gameWorld.commandBufferRegistry().item(typeId)->flush(updateContext);
+            }
+
+            for (const auto typeId :pass.managerTypeIds()) {
+                gameWorld.managerRegistry().item(typeId)->flush(updateContext);
+            }
+
+
+            passEventBus_.swapBuffers();
         }
 
         [[nodiscard]] bool isRunning( GameWorld& gameWorld) const noexcept {

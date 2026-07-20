@@ -4,7 +4,6 @@
  */
 export module helios.engine.runtime.gameloop;
 
-export import :CommitPoint;
 export import :GameLoop;
 export import :Phase;
 export import :Pass;

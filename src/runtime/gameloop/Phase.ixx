@@ -9,10 +9,9 @@ module;
 
 export module helios.engine.runtime.gameloop:Phase;
 
-import :PassCommitListener;
+import :PassEndListener;
 import :Pass;
 import :TypedPass;
-import :CommitPoint;
 
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.GameWorld;
@@ -57,18 +56,7 @@ export namespace helios::engine::runtime::gameloop {
     /**
      * @brief Represents a phase in the game loop containing multiple passes.
      *
-     * A Phase groups related systems into passes that are executed sequentially.
-     * Each pass can contain multiple systems and may have a commit point for
-     * event synchronization.
-     *
-     * Commit points allow fine-grained control over when commands are flushed,
-     * managers are processed, and pass-level events are synchronized. See
-     * CommitPoint for available synchronization options.
-     *
-     * Phases are owned by the GameLoop and should not be created directly.
-     *
      * @see Pass
-     * @see CommitPoint
      * @see GameLoop
      */
     class Phase {
@@ -76,19 +64,12 @@ export namespace helios::engine::runtime::gameloop {
         friend class helios::engine::runtime::gameloop::GameLoop;
 
         /**
-         * @brief Collection of listeners to be notified when a pass commits.
+         * @brief Collection of listeners to be notified when a pass ends.
          *
-         * @details Listeners are notified after each pass completes, receiving the
-         * pass's configured CommitPoint flags. The GameLoop registers itself as a
-         * listener to handle event buffer swapping, command flushing, and manager
-         * processing based on the commit point configuration.
-         *
-         * @see PassCommitListener
-         * @see notifyPassCommitListeners()
+         * @see PassEndListener
+         * @see notifyPassEndListeners()
          */
-        std::vector<PassCommitListener*> passCommitListeners_;
-
-
+        std::vector<PassEndListener*> passEndListeners_;
 
         /**
          * @brief Initializes all passes within this phase.
@@ -105,14 +86,6 @@ export namespace helios::engine::runtime::gameloop {
         /**
          * @brief Updates all passes within this phase.
          *
-         * @details Iterates through all passes, updating their systems and then
-         * invoking the commit action based on the pass's configured CommitPoint.
-         * The commit point determines whether pass-level events are synchronized,
-         * the command buffer is flushed, or managers are processed.
-         *
-         * Passes are conditionally executed based on their configured game state.
-         * A pass is only updated if its `runsIn()` state matches the current game state.
-         *
          * @param gameWorld The game world where the update occurred.
          * @param updateContext The current update context.
          *
@@ -126,33 +99,28 @@ export namespace helios::engine::runtime::gameloop {
 
                 if (pass->shouldRun(updateContext)) {
                     pass->update(updateContext);
-                    notifyPassCommitListeners(pass->commitPoint(), gameWorld, updateContext);
+                    notifyPassEndListeners(*pass, gameWorld, updateContext);
                 }
 
             }
         };
 
         /**
-         * @brief Notifies all registered listeners about a pass commit.
+         * @brief Notifies all registered listeners about a pass reaching its end.
          *
-         * @details Called after each pass completes its update cycle. Each registered
-         * PassCommitListener receives the commit point flags, allowing it to perform
-         * the appropriate synchronization actions (event swapping, command flushing,
-         * manager processing).
-         *
-         * @param commitPoint The CommitPoint flags from the completed pass.
-         * @param gameWorld The game world where the commit occured.
+         * @param pass The pass that reached its end.
+         * @param gameWorld The game world where the pass end occured.
          * @param updateContext The current update context.
          *
          * @return Always returns true.
          *
-         * @see PassCommitListener::onPassCommit()
-         * @see addPassCommitListener()
+         * @see PassEndListener::onPassCommit()
+         * @see addPassEndListener()
          */
-        bool notifyPassCommitListeners(CommitPoint commitPoint, GameWorld& gameWorld, UpdateContext& updateContext) {
+        bool notifyPassEndListeners(Pass& pass, GameWorld& gameWorld, UpdateContext& updateContext) {
 
-            for (const auto& passCommitListener : passCommitListeners_) {
-                passCommitListener->onPassCommit(commitPoint, gameWorld, updateContext);
+            for (const auto& passEndListener : passEndListeners_) {
+                passEndListener->onPassEnd(pass, gameWorld, updateContext);
             }
             return true;
         }
@@ -183,32 +151,25 @@ export namespace helios::engine::runtime::gameloop {
 
 
         /**
-         * @brief Registers a listener to be notified when passes commit.
+         * @brief Registers a listener to be notified when passes end.
          *
-         * @details The listener will receive notifications for all passes within this phase.
-         * The GameLoop typically registers itself to handle event synchronization,
-         * command buffer flushing, and manager processing based on commit point flags.
-         *
-         * Duplicate registrations are prevented; attempting to add the same listener
-         * twice will return false and leave the listener list unchanged.
-         *
-         * @param passCommitListener Pointer to the listener to register. Must remain
+         * @param passEndListener Pointer to the listener to register. Must remain
          *        valid for the lifetime of this Phase or until removed.
          *
          * @return True if the listener was added, false if it was already registered.
          *
-         * @see PassCommitListener
-         * @see notifyPassCommitListeners()
+         * @see PassEndListener
+         * @see notifyPassEndListeners()
          */
-        bool addPassCommitListener(PassCommitListener* passCommitListener) {
+        bool addPassEndListener(PassEndListener* passEndListener) {
 
-            for (int i = 0; i < passCommitListeners_.size(); i++) {
-                if (passCommitListeners_[i] == passCommitListener) {
+            for (int i = 0; i < passEndListeners_.size(); i++) {
+                if (passEndListeners_[i] == passEndListener) {
                     return false;
                 }
             }
 
-            passCommitListeners_.emplace_back(passCommitListener);
+            passEndListeners_.emplace_back(passEndListener);
 
             return true;
         }
@@ -231,7 +192,7 @@ export namespace helios::engine::runtime::gameloop {
          * @see Session::state()
          */
         template<typename StateType>
-        Pass& addPass(const StateType t) {
+        Pass& beginPass(const StateType t) {
             auto entry = std::make_unique<TypedPass<StateType>>(*this, t, gameWorld_);
             auto* raw = entry.get();
             passEntries_.emplace_back(std::move(entry));

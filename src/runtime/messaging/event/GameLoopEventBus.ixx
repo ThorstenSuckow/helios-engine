@@ -95,7 +95,7 @@ export namespace helios::engine::runtime::messaging::event {
      *
      * @see helios::engine::core::container::buffer::TypeIndexedDoubleBuffer
      * @see UpdateContext - Provides access to the event bus in systems
-     * @see GameLoop - Manages event bus lifecycle and commit points
+     * @see GameLoop - Manages event bus lifecycle.
      */
     using GameLoopEventBus = helios::engine::core::container::buffer::TypeIndexedDoubleBuffer<
         helios::ecs::TypeIndexer<GameLoopEventBusGroup>

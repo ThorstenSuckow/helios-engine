@@ -247,7 +247,7 @@ export namespace helios::engine::runtime::gameloop {
         template<typename ... TSystem>
         requires (helios::engine::runtime::world::concepts::IsCallableSystemLike<std::remove_cvref_t<TSystem>> && ...)
            && (sizeof...(TSystem) >= 2)
-        Pass& addSystems(TSystem&&... system) {
+        Pass& addParallelSystems(TSystem&&... system) {
 
             (registerCallableSystem(std::forward<TSystem>(system)), ...);
 

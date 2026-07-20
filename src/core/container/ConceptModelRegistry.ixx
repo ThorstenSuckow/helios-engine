@@ -234,6 +234,18 @@ export namespace helios::engine::core::container {
             return underlyingAnyT_[idx] ? static_cast<T*>(underlyingAnyT_[idx]) : nullptr;
         }
 
+        /**
+         * @brief Returns the item registered with the typeId-value, if any.
+         *
+         * @param typeId The typeId of the component that should be returned.
+         *
+         * @return A pointer to the item identified by typeId, or nullptr if not found.
+         */
+        [[nodiscard]] AnyT* item(IdProvider typeId) noexcept {
+            const auto idx = typeId.value();
+            return items_.size() > idx && underlyingAnyT_[idx] ? &items_[idx] : nullptr;
+        }
+
     };
 
 

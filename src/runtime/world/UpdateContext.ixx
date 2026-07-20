@@ -87,8 +87,6 @@ export namespace helios::engine::runtime::world {
         /**
          * @brief Sink for pushing pass-level events during update.
          *
-         * Used by systems and components to publish events that will be processed
-         * in subsequent passes within the same phase, after a commit point.
          */
         helios::engine::runtime::messaging::event::GameLoopEventBus::WriteSink passEventSink_;
 
@@ -271,9 +269,6 @@ export namespace helios::engine::runtime::world {
         /**
          * @brief Pushes an event to the pass-level event bus.
          *
-         * Events pushed here become readable in subsequent passes within the same
-         * phase, after a commit point is reached.
-         *
          * @tparam E The event type to push.
          * @tparam Args Constructor argument types for the event.
          *
@@ -289,9 +284,6 @@ export namespace helios::engine::runtime::world {
 
         /**
          * @brief Pushes an event to the phase-level event bus.
-         *
-         * Events pushed here become readable in subsequent phases,
-         * after the current phase commits.
          *
          * @tparam E The event type to push.
          * @tparam Args Constructor argument types for the event.
@@ -311,7 +303,7 @@ export namespace helios::engine::runtime::world {
          *
          * Returns events that were pushed during the previous phase via
          * `pushPhase()`. The phase event bus is swapped at phase boundaries,
-         * configured in GameLoop::phaseCommit().
+         * configured in GameLoop::phaseEnd().
          *
          * @tparam E The event type to read.
          *
@@ -327,10 +319,6 @@ export namespace helios::engine::runtime::world {
 
         /**
          * @brief Reads events from the pass-level event bus.
-         *
-         * Returns events that were pushed during previous passes within the
-         * current phase via `pushPass()`. The pass event bus is swapped at
-         * commit points, configured via Pass::addCommitPoint().
          *
          * @tparam E The event type to read.
          *

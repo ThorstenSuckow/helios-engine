@@ -195,6 +195,15 @@ export namespace helios::engine::runtime::world {
        CommandBufferRegistry& commandBufferRegistry() noexcept {
             return commandBufferRegistry_;
         }
+
+       /**
+         * @brief Returns direct access to the underlying manager registry.
+         *
+         * @return Reference to the internal ManagerRegistry.
+         */
+       ManagerRegistry& managerRegistry() noexcept {
+            return managerRegistry_;
+        }
     };
 }
 

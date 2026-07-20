@@ -123,7 +123,7 @@ export namespace helios::engine::bootstrap {
      * // Application-specific setup
      * gameWorld.registerManager<SpawnManager<GameObjectHandle>>();
      * gameLoop.phase(PhaseType::Pre)
-     *     .addPass<GameState>(GameState::Any)
+     *     .beginPass<GameState>(GameState::Any)
      *         .addSystem<InputSystem>();
      *
      * gameWorld.init();

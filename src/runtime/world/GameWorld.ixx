@@ -8,15 +8,14 @@ module;
 #include <format>
 #include <helios-engine-config.h>
 #include <memory>
-#include <optional>
 #include <span>
 #include <string>
-#include <unordered_map>
-#include <cstddef>
 
 export module helios.engine.runtime.world.GameWorld;
 
 import helios.engine.runtime.world.Session;
+
+import helios.engine.core.thread.JobSystem;
 
 import helios.engine.runtime.timing.TimerManager;
 
@@ -51,6 +50,7 @@ import helios.engine.runtime.messaging.command.concepts;
 import helios.engine.runtime.world.EngineWorld;
 import helios.engine.runtime.world.concepts;
 
+using namespace helios::engine::core::thread;
 using namespace helios::engine::runtime::timing;
 using namespace helios::engine::runtime::messaging::command::concepts;
 using namespace helios::engine::runtime::messaging::command;
@@ -125,6 +125,10 @@ export namespace helios::engine::runtime::world {
          */
         RuntimeEnvironment runtimeEnvironment_;
 
+        /**
+         * @brief Reference to the job system used for parallel task execution.
+         */
+        JobSystem& jobSystem_;
 
     public:
 
@@ -134,9 +138,10 @@ export namespace helios::engine::runtime::world {
          * @details The constructor creates one game-object entity for `Session`
          * and one platform entity for `RuntimeEnvironment`.
          */
-        explicit GameWorld(const size_t capacity = ENTITY_MANAGER_DEFAULT_CAPACITY)
+        explicit GameWorld(JobSystem& jobSystem, const size_t capacity = ENTITY_MANAGER_DEFAULT_CAPACITY)
         : session_(Session(engineWorld_.add<GameObjectHandle>())),
-         runtimeEnvironment_(RuntimeEnvironment(engineWorld_.add<PlatformHandle>()))
+          runtimeEnvironment_(RuntimeEnvironment(engineWorld_.add<PlatformHandle>())),
+          jobSystem_(jobSystem)
         {};
 
         /**
@@ -154,6 +159,15 @@ export namespace helios::engine::runtime::world {
          */
         [[nodiscard]] Session& session() {
             return session_;
+        }
+
+        /**
+         * @brief Returns a reference to the job system used for parallel task execution.
+         *
+         * @return Reference to the JobSystem.
+         */
+        [[nodiscard]] JobSystem& jobSystem() {
+            return jobSystem_;
         }
 
         /**

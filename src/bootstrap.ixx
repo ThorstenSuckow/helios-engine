@@ -24,6 +24,7 @@ import helios.engine.platform;
 
 import helios.engine.scene.registry;
 import helios.engine.core.registry;
+import helios.engine.core.thread;
 import helios.engine.spatial.registry;
 import helios.engine.scene.registry;
 
@@ -35,6 +36,7 @@ import helios.engine.runtime.lifecycle;
 import helios.engine.runtime.timing;
 import helios.engine.runtime.enginestate;
 
+using namespace helios::engine::core::thread;
 using namespace helios::engine::state::types;
 using namespace helios::engine::runtime::enginestate::types;
 using namespace helios::engine::platform::environment;
@@ -133,6 +135,7 @@ export namespace helios::engine::bootstrap {
      * @note `registerAllComponents()` is called automatically — no separate
      *       call is required.
      *
+     * @param jobSystem Reference to the JobSystem used for parallel system execution.
      * @param capacity Initial capacity for the EntityManager's SparseSets.
      *                 Must be large enough to accommodate all entities including
      *                 pooled clones. Defaults to ENTITY_MANAGER_DEFAULT_CAPACITY.
@@ -146,9 +149,10 @@ export namespace helios::engine::bootstrap {
      * @see Session::trackState
      */
     inline std::pair<std::unique_ptr<GameWorld>, std::unique_ptr<GameLoop>> bootstrapGameWorld(
+        JobSystem& jobSystem,
         const size_t capacity = ENTITY_MANAGER_DEFAULT_CAPACITY
     ) {
-        auto gameWorld = std::make_unique<helios::engine::runtime::world::GameWorld>(capacity);
+        auto gameWorld = std::make_unique<helios::engine::runtime::world::GameWorld>(jobSystem, capacity);
 
         auto gameLoop = std::make_unique<helios::engine::runtime::gameloop::GameLoop>(*gameWorld);
 

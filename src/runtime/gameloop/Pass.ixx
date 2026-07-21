@@ -135,6 +135,35 @@ export namespace helios::engine::runtime::gameloop {
             return *this;
         }
 
+        /**
+         * @brief Registers a TypedSystem-like system with this pass.
+         *
+         * @tparam T The concrete system type to register.
+         * @tparam Args The constructor arg types, if any.
+         * @param args Concrete constructor args.
+         *
+         * @return This pass.
+         */
+        template<typename T, typename... Args>
+        requires helios::engine::runtime::world::concepts::IsTypedSystemLike<T>
+        Pass& registerTypedSystem(Args&&... args) {
+
+            T concreteSystem(std::forward<Args>(args)...);
+
+            void* bufferPtr = nullptr;
+            if constexpr (requires { typename T::CommandBuffer_type; }) {
+                using TCommandBuffer = typename T::CommandBuffer_type;
+                bufferPtr = gameWorld_.tryCommandBuffer<TCommandBuffer>();
+                assert(bufferPtr && "Command buffer not found for system's CommandBuffer_type");
+            }
+
+            systemRegistry_.template add<T>(
+                System(std::move(concreteSystem), bufferPtr)
+            );
+
+            return *this;
+        }
+
     public:
         virtual ~Pass() = default;
 
@@ -195,20 +224,30 @@ export namespace helios::engine::runtime::gameloop {
         requires helios::engine::runtime::world::concepts::IsTypedSystemLike<T>
         Pass& addSystem(Args&&... args) {
 
-            T concreteSystem(std::forward<Args>(args)...);
-
-            void* bufferPtr = nullptr;
-            if constexpr (requires { typename T::CommandBuffer_type; }) {
-                using TCommandBuffer = typename T::CommandBuffer_type;
-                bufferPtr = gameWorld_.tryCommandBuffer<TCommandBuffer>();
-                assert(bufferPtr && "Command buffer not found for system's CommandBuffer_type");
-            }
-
-            systemRegistry_.template add<T>(
-                System(std::move(concreteSystem), bufferPtr)
-            );
+            registerTypedSystem<T>(std::forward<Args>(args)...);
 
             systemTypeIdQueue_.push_back({SystemTypeId::template id<T>()});
+
+            return *this;
+        }
+
+        /**
+         * @brief Adds TypedSystem-like systems that should be executed parallel.
+         *
+         * @tparam TSystem The types of the systems to add.
+         *
+         * @return Reference to this Pass for method chaining.
+         */
+        template<typename ...TSystem>
+        requires (helios::engine::runtime::world::concepts::IsTypedSystemLike<TSystem> && ...)
+                && (sizeof...(TSystem) >= 2)
+        Pass& addParallelSystems() {
+
+            (registerTypedSystem<TSystem>(), ...);
+
+            auto& group = systemTypeIdQueue_.emplace_back();
+            group.reserve(sizeof...(TSystem));
+            (group.push_back({SystemTypeId::template id<TSystem>()}), ...);
 
             return *this;
         }
@@ -229,11 +268,8 @@ export namespace helios::engine::runtime::gameloop {
         template<typename TSystem>
         requires helios::engine::runtime::world::concepts::IsCallableSystemLike<std::remove_cvref_t<TSystem>>
         Pass& addSystem(TSystem&& system) {
-
             registerCallableSystem(std::forward<TSystem>(system));
-
             systemTypeIdQueue_.push_back({SystemTypeId::template id<TSystem>()});
-
             return *this;
         }
 

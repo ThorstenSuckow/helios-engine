@@ -164,6 +164,30 @@ export namespace helios::engine::runtime::gameloop {
             return *this;
         }
 
+        /**
+         * @brief Registers a system described by a `TypedSystemSpec` with this pass.
+         *
+         * Unpacks the argument tuple stored in `spec` and delegates to
+         * `registerTypedSystem<TSystem>(args...)`.
+         *
+         * @tparam T A `TypedSystemSpec` specialisation whose `System_type` satisfies
+         *           `IsTypedSystemLike`.
+         * @param spec Spec instance carrying the system type and its construction arguments.
+         * @return Reference to this pass.
+         */
+        template<typename T>
+        Pass& registerTypedSystemSpec(T&& spec) {
+
+            using Spec = std::remove_cvref_t<T>;
+            using TSystem = Spec::System_type;
+
+            std::apply([this](auto&... args) {
+                registerTypedSystem<TSystem>(args...);
+            }, spec.args);
+
+            return *this;
+        }
+
     public:
         virtual ~Pass() = default;
 
@@ -248,6 +272,41 @@ export namespace helios::engine::runtime::gameloop {
             auto& group = systemTypeIdQueue_.emplace_back();
             group.reserve(sizeof...(TSystem));
             (group.push_back({SystemTypeId::template id<TSystem>()}), ...);
+
+            return *this;
+        }
+
+        /**
+         * @brief Adds two or more `TypedSystemSpec`-wrapped systems that may execute in parallel.
+         *
+         * Each spec is unpacked via `registerTypedSystemSpec()` and all resulting
+         * system type IDs are placed in a single execution group, signalling to
+         * the scheduler that the systems are independent and can run concurrently.
+         *
+         * ```cpp
+         * pass.addParallelSystems(
+         *     TypedSystem<PhysicsSystem>(gravity),
+         *     TypedSystem<AudioSystem>(listener)
+         * );
+         * ```
+         *
+         * @tparam TSystem `TypedSystemSpec` specialisations whose `System_type` satisfies
+         *                 `IsTypedSystemLike`. At least two types are required.
+         * @param system   Spec instances forwarded to `registerTypedSystemSpec()`.
+         * @return Reference to this pass for method chaining.
+         */
+        template<typename ...TSystem>
+        requires (helios::engine::runtime::world::concepts::IsTypedSystemLike<
+                typename std::remove_cvref_t<TSystem>::System_type
+                > && ...)
+                && (sizeof...(TSystem) >= 2)
+        Pass& addParallelSystems(TSystem&&... system) {
+
+            (registerTypedSystemSpec<TSystem>(std::forward<TSystem>(system)), ...);
+
+            auto& group = systemTypeIdQueue_.emplace_back();
+            group.reserve(sizeof...(TSystem));
+            (group.push_back({SystemTypeId::template id<typename std::remove_cvref_t<TSystem>::System_type>()}), ...);
 
             return *this;
         }

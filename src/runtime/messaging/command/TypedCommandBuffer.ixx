@@ -330,7 +330,6 @@ export namespace helios::engine::runtime::messaging::command {
          * @details Iterates through each command type using a fold expression,
          * flushing queues in the order specified by the template parameters.
          *
-         * @param gameWorld The game world for which the queue should be flushed.
          * @param updateContext The current frame's update context.
          */
         void flush(UpdateContext& updateContext) noexcept {

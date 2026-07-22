@@ -86,16 +86,24 @@ export namespace helios::engine::runtime::gameloop {
                 assert(typeIdQueue.size() > 0 && "Type ID queue is empty");
 
                 if (typeIdQueue.size() == 1) {
-                    systemRegistry_.item(typeIdQueue[0])->update(updateContext);
+                    auto* sys = systemRegistry_.item(typeIdQueue[0]);
+                    // update, then immediately fllush the buffer contents
+                    sys->update(updateContext);
+                    sys->flush(updateContext);
                     continue;
                 }
 
+                // 1. update all
                 jobSystem_->runAndWait(
                     typeIdQueue.size(),
                     [&] (const std::size_t i) {
                         const auto typeId = typeIdQueue[i];
                         systemRegistry_.item(typeId)->update(updateContext);
                 });
+                // 2. flush all when all jobs have finished
+                for (const auto typeId : typeIdQueue) {
+                    systemRegistry_.item(typeId)->flush(updateContext);
+                }
 
             }
 
@@ -109,6 +117,10 @@ export namespace helios::engine::runtime::gameloop {
          */
         void init(helios::engine::runtime::world::GameWorld& gameWorld) override {
             jobSystem_ = &gameWorld.jobSystem();
+
+            for (auto* system : systemRegistry_.items()) {
+                system->init(gameWorld);
+            }
         }
 
 

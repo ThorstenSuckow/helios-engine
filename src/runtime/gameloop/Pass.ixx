@@ -75,26 +75,10 @@ export namespace helios::engine::runtime::gameloop {
         GameWorld& gameWorld_;
 
         /**
-         * @brief List of CommandBufferTypeIds.
-         */
-        std::vector<CommandBufferTypeId> commandBufferTypeIds_;
-
-        /**
          * @brief List of ManagerTypeIds.
          */
         std::vector<ManagerTypeId> managerTypeIds_;
 
-        /**
-         * @brief Registers the CommandBufferTypeIds for the CommandBuffers this pass should submit.
-         *
-         * @tparam T The type of the command buffer to register.
-         */
-        template<typename T>
-        void registerCommandBufferSubmit() {
-            T* buffer = gameWorld_.tryCommandBuffer<T>();
-            assert(buffer && "Command buffer not found for system's CommandBuffer");
-            commandBufferTypeIds_.push_back(CommandBufferTypeId::template id<T>());
-        }
 
         /**
          * @brief Registers the ManagerTypeIds for the Managers this pass should flush.
@@ -113,24 +97,60 @@ export namespace helios::engine::runtime::gameloop {
          *
          * @tparam TSystem The type of the system to register.
          * @param system The system instance to register.
+         * @param isParallel
          * @return Reference to this pass.
          */
         template<typename TSystem>
         requires helios::engine::runtime::world::concepts::IsCallableSystemLike<std::remove_cvref_t<TSystem>>
-        Pass& registerCallableSystem(TSystem&& system) {
+        Pass& registerCallableSystem(TSystem&& system, const bool isParallel = false) {
 
             using SystemType = std::remove_cvref_t<TSystem>;
 
-            void* bufferPtr = nullptr;
-            if constexpr (requires { typename SystemType::CommandBuffer_type; }) {
-                using TCommandBuffer = typename TSystem::CommandBuffer_type;
-                bufferPtr = gameWorld_.tryCommandBuffer<TCommandBuffer>();
-                assert(bufferPtr && "Command buffer not found for system's CommandBuffer_type");
+            if (!isParallel) {
+                void* bufferPtr = nullptr;
+                if constexpr (requires { typename SystemType::CommandBuffer_type; }) {
+                    using TCommandBuffer = typename TSystem::CommandBuffer_type;
+                    bufferPtr = gameWorld_.tryCommandBuffer<TCommandBuffer>();
+                    assert(bufferPtr && "Command buffer not found for system's CommandBuffer_type");
+                }
+
+                systemRegistry_.template add<SystemType>(
+                    System(std::forward<TSystem>(system), bufferPtr)
+                );
+
+            } else {
+                if constexpr (requires { typename SystemType::CommandBuffer_type; }) {
+                    using TCommandBuffer = typename TSystem::CommandBuffer_type;
+                    systemRegistry_.template add<SystemType>(
+                        System(std::forward<TSystem>(system), TCommandBuffer{})
+                    );
+                } else {
+                    systemRegistry_.template add<SystemType>(
+                        System(std::forward<TSystem>(system))
+                    );
+                }
+
             }
 
-            systemRegistry_.template add<SystemType>(
-                System(std::forward<TSystem>(system), bufferPtr)
-            );
+            return *this;
+        }
+
+        template<typename T, typename... Args>
+        requires helios::engine::runtime::world::concepts::IsTypedSystemLike<T>
+        Pass& registerParallelTypedSystem(Args&&... args) {
+
+            T concreteSystem(std::forward<Args>(args)...);
+
+            if constexpr (requires { typename T::CommandBuffer_type; }) {
+                using TCommandBuffer = typename T::CommandBuffer_type;
+                systemRegistry_.template add<T>(
+                    System(std::move(concreteSystem), TCommandBuffer())
+                );
+            } else {
+                systemRegistry_.template add<T>(
+                    System(std::move(concreteSystem))
+                );
+            }
 
             return *this;
         }
@@ -302,7 +322,7 @@ export namespace helios::engine::runtime::gameloop {
                 && (sizeof...(TSystem) >= 2)
         Pass& addParallelSystems(TSystem&&... system) {
 
-            (registerTypedSystemSpec<TSystem>(std::forward<TSystem>(system)), ...);
+            (registerParallelTypedSystemSpec<TSystem>(std::forward<TSystem>(system)), ...);
 
             auto& group = systemTypeIdQueue_.emplace_back();
             group.reserve(sizeof...(TSystem));
@@ -344,37 +364,13 @@ export namespace helios::engine::runtime::gameloop {
            && (sizeof...(TSystem) >= 2)
         Pass& addParallelSystems(TSystem&&... system) {
 
-            (registerCallableSystem(std::forward<TSystem>(system)), ...);
+            (registerCallableSystem(std::forward<TSystem>(system), true), ...);
 
             auto& group = systemTypeIdQueue_.emplace_back();
             group.reserve(sizeof...(TSystem));
             (group.push_back({SystemTypeId::template id<std::remove_cvref_t<TSystem>>()}), ...);
             
             return *this;
-        }
-
-        /**
-         * @brief Registers the CommandBuffers this pass should submit to.
-         *
-         * @tparam T The types of the CommandBuffers to submit.
-         * @return Reference to this Pass for method chaining.
-         */
-        template<typename... T>
-        requires (IsCommandBufferLike<T> && ...)
-        Pass& submit() {
-
-            (registerCommandBufferSubmit<T>(), ...);
-
-            return *this;
-        }
-
-        /**
-         * @brief Returns a span of the CommandBufferTypeIds this pass is submitting to.
-         *
-         * @return A span of CommandBufferTypeIds.
-         */
-        [[nodiscard]] std::span<const CommandBufferTypeId> commandBufferTypeIds() noexcept {
-            return commandBufferTypeIds_;
         }
 
         /**

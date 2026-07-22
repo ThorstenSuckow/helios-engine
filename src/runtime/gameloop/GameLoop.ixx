@@ -314,15 +314,9 @@ export namespace helios::engine::runtime::gameloop {
             GameWorld& gameWorld,
             UpdateContext& updateContext) noexcept override {
 
-
-            for (const auto typeId :pass.commandBufferTypeIds()) {
-                gameWorld.commandBufferRegistry().item(typeId)->flush(updateContext);
-            }
-
             for (const auto typeId :pass.managerTypeIds()) {
                 gameWorld.managerRegistry().item(typeId)->flush(updateContext);
             }
-
 
             passEventBus_.swapBuffers();
         }

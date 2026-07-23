@@ -13,6 +13,7 @@ export import helios.engine.runtime.world.EngineWorld;
 export import helios.engine.runtime.world.GameWorld;
 export import helios.engine.runtime.world.GameObject;
 export import helios.engine.runtime.world.GameObjectEntityManager;
+export import helios.engine.runtime.world.EntityMutationManager;
 export import helios.engine.runtime.world.Level;
 export import helios.engine.runtime.world.UpdateContext;
 export import helios.engine.runtime.world.SystemRegistry;
@@ -20,6 +21,7 @@ export import helios.engine.runtime.world.RuntimeEnvironment;
 export import helios.engine.runtime.world.Manager;
 export import helios.engine.runtime.world.Session;
 export import helios.engine.runtime.world.ResourceRegistry;
+export import helios.engine.runtime.world.ManagerRegistry;
 export import helios.engine.runtime.world.System;
 
 

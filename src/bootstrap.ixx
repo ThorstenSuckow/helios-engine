@@ -19,6 +19,7 @@ import helios.engine.state.types.StateTransitionContext;
 import helios.engine.runtime.messaging.command;
 
 import helios.engine.runtime.world.types.GameObjectHandle;
+import helios.engine.runtime.world.EntityMutationManager;
 
 import helios.engine.platform;
 
@@ -166,12 +167,14 @@ export namespace helios::engine::bootstrap {
             helios::engine::runtime::enginestate::rules::DefaultEngineStateTransitionRules::rules());
 
         gameWorld->registerManager<helios::engine::runtime::timing::TimerManager>();
+        gameWorld->registerManager<helios::engine::runtime::world::EntityMutationManager<GameObjectHandle>>();
 
         gameWorld->session().trackState<helios::engine::runtime::enginestate::types::EngineState>();
 
         gameWorld->registerCommandBuffer<RenderCommandBuffer>();
         gameWorld->registerCommandBuffer<PlatformCommandBuffer>();
         gameWorld->registerCommandBuffer<EngineCommandBuffer>();
+        gameWorld->registerCommandBuffer<EntityMutationCommandBuffer<GameObjectHandle>>();
 
         gameWorld->session().setStateFrom<EngineState>(
             StateTransitionContext<EngineState>(

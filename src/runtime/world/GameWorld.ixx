@@ -195,9 +195,8 @@ export namespace helios::engine::runtime::world {
                 mgr->init(commandHandlerRegistry_);
             }
 
-            assert(resourceRegistry_.tryGet<TimerManager>() && "TimerManager must be registered before initializing command buffers");
             for (auto& buff : resourceRegistry_.commandBuffers()) {
-                buff->init(commandHandlerRegistry_, resourceRegistry_.get<TimerManager>());
+                buff->init(commandHandlerRegistry_, resourceRegistry_.managerRegistry());
             }
 
             return *this;

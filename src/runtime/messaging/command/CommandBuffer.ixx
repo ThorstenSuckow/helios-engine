@@ -13,6 +13,7 @@ import helios.engine.runtime.world.UpdateContext;
 
 import helios.engine.runtime.messaging.command.concepts.IsCommandBufferLike;
 
+import helios.engine.runtime.world.ManagerRegistry;
 import helios.engine.runtime.timing.TimerManager;
 import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
 
@@ -59,7 +60,7 @@ export namespace helios::engine::runtime::messaging::command {
             virtual ~Concept() = default;
             virtual void flush(UpdateContext& updateContext) noexcept = 0;
             virtual void clear() noexcept = 0;
-            virtual void init(CommandHandlerRegistry& commandHandlerRegistry, TimerManager& timerManager) noexcept = 0;
+            virtual void init(CommandHandlerRegistry& commandHandlerRegistry, ManagerRegistry& managerRegistry) noexcept = 0;
 
             [[nodiscard]] virtual void* underlying() noexcept = 0;
             [[nodiscard]] virtual const void* underlying() const noexcept = 0;
@@ -86,8 +87,8 @@ export namespace helios::engine::runtime::messaging::command {
                 cmdBuffer_.flush(updateContext);
             }
 
-            void init(CommandHandlerRegistry& commandHandlerRegistry, TimerManager& timerManager) noexcept override {
-                cmdBuffer_.init(commandHandlerRegistry, timerManager);
+            void init(CommandHandlerRegistry& commandHandlerRegistry, ManagerRegistry& managerRegistry) noexcept override {
+                cmdBuffer_.init(commandHandlerRegistry, managerRegistry);
             }
 
             void clear() noexcept override {
@@ -159,9 +160,15 @@ export namespace helios::engine::runtime::messaging::command {
             pimpl_->clear();
         }
 
-        void init(CommandHandlerRegistry& commandHandlerRegistry, TimerManager& timerManager) noexcept {
+        /**
+         * @brief Initializes the command buffer with the given registries.
+         *
+         * @param commandHandlerRegistry Registry used for command-handler registration.
+         * @param managerRegistry Registry used for manager access.
+         */
+        void init(CommandHandlerRegistry& commandHandlerRegistry, ManagerRegistry& managerRegistry) noexcept {
             assert(pimpl_ && "CommandBuffer not initialized");
-            pimpl_->init(commandHandlerRegistry, timerManager);
+            pimpl_->init(commandHandlerRegistry, managerRegistry);
         }
 
         /**

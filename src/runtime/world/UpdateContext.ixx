@@ -208,35 +208,6 @@ export namespace helios::engine::runtime::world {
             return engineWorld_.template find<THandle>(handle);
         }
 
-        /**
-         * @brief Adds a new entity in the domain inferred from `THandle`.
-         *
-         * @tparam THandle Handle type.
-         *
-         * @param strongId Optional strong id value used by the handle domain.
-         *
-         * @return Domain-specific entity facade for the created entity.
-         */
-        template<typename THandle>
-        [[nodiscard]] auto add(const typename THandle::StrongId_type strongId = typename THandle::StrongId_type{}, const bool isActive = true) noexcept {
-            auto entity = engineWorld_.template add<THandle>(strongId);
-            entity.setActive(isActive);
-            return entity;
-        }
-
-        /**
-         * @brief Destroys an entity in the domain inferred from `THandle`.
-         *
-         * @tparam THandle Handle type.
-         *
-         * @param handle Entity handle to destroy.
-         *
-         * @return Domain-specific destroy result.
-         */
-        template<typename THandle>
-        [[nodiscard]] auto destroy(const THandle handle) noexcept {
-            return engineWorld_.template destroy<THandle>(handle);
-        }
 
         /**
          * @brief Returns the active Level.

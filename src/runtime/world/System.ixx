@@ -6,16 +6,23 @@ module;
 
 #include <cassert>
 #include <memory>
+#include <optional>
 
 export module helios.engine.runtime.world.System;
 
 
+import helios.engine.runtime.messaging.command.concepts.IsCommandBufferLike;
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.GameWorld;
+import helios.engine.runtime.timing.TimerManager;
 
 import helios.engine.runtime.world.concepts;
+import helios.engine.runtime.messaging.command.types.CommandBufferTypeId;
 
+using namespace helios::engine::runtime::timing;
+using namespace helios::engine::runtime::messaging::command::types;
 using namespace helios::engine::runtime::world;
+using namespace helios::engine::runtime::messaging::command::concepts;
 using namespace helios::engine::runtime::world::concepts;
 export namespace helios::engine::runtime::world {
 
@@ -52,8 +59,10 @@ export namespace helios::engine::runtime::world {
 
             virtual ~Concept() = default;
             virtual void update(UpdateContext& updateContext) noexcept = 0;
-            virtual void* underlying() noexcept = 0;
-            virtual const void* underlying() const noexcept = 0;
+            virtual void flush(UpdateContext& updateContext) noexcept = 0;
+            virtual void init(GameWorld& gameWorld) noexcept = 0;
+            [[nodiscard]] virtual void* underlying() noexcept = 0;
+            [[nodiscard]] virtual const void* underlying() const noexcept = 0;
         };
 
         /**
@@ -77,6 +86,49 @@ export namespace helios::engine::runtime::world {
                 } else {
                     system_.update(ctx);
                 }
+            }
+
+            void init(GameWorld& gameWorld) noexcept override {
+                // noop
+            }
+
+            void flush(UpdateContext& ctx) noexcept override {
+                if constexpr (requires { typename T::CommandBuffer_type; }) {
+                    static_cast<typename T::CommandBuffer_type*>(injectedBuffer_)->flush(ctx);
+                }
+            }
+
+            void* underlying() noexcept override {
+                return &system_;
+            }
+
+            const void* underlying() const noexcept override {
+                return &system_;
+            }
+        };
+
+        template<typename T, typename TCommandBuffer>
+        class ModelWithOwnedCommandBuffer final : public Concept {
+            T system_;
+            TCommandBuffer commandBuffer_;
+        public:
+
+            explicit ModelWithOwnedCommandBuffer(T sys, TCommandBuffer cb)
+                    : system_(std::move(sys)), commandBuffer_(std::move(cb)) {}
+
+            void update(UpdateContext& ctx) noexcept override {
+                system_.update(ctx, commandBuffer_);
+            }
+
+            void init (GameWorld& gameWorld) noexcept override {
+                commandBuffer_.init(
+                    gameWorld.commandHandlerRegistry(),
+                    gameWorld.managerRegistry()
+                );
+            }
+
+            void flush(UpdateContext& updateContext) noexcept override {
+                commandBuffer_.flush(updateContext);
             }
 
             void* underlying() noexcept override {
@@ -107,9 +159,34 @@ export namespace helios::engine::runtime::world {
          *        instance used for systems with two-parameter update signatures.
          */
         template<typename T>
-        requires IsRuntimeSystemLike<T>
-        explicit System(T system, void* buffer = nullptr)
-            : pimpl_(std::make_unique<Model<T>>(std::move(system), buffer))
+        requires IsRuntimeSystemLike<std::remove_cvref_t<T>>
+        explicit System(T&& system, void* buffer = nullptr)
+             : pimpl_(std::make_unique<Model<std::remove_cvref_t<T>>>(std::forward<T>(system), buffer)){}
+
+        /**
+         * @brief Wraps a concrete system in a type-erased System that also owns a CommandBuffer.
+         *
+         * @tparam T The concrete system type, must satisfy `IsRuntimeSystemLike<T>`.
+         * @tparam TCommandBuffer The concrete CommandBuffer-type, must satisfy `IsCommandBufferLike<TCommandBuffer>`.
+         *
+         * @param system The concrete system instance to wrap (moved into internal storage).
+         * @param commandBuffer The concrete command buffer instance to wrap (moved into internal storage).
+         */
+        template<typename T, typename TCommandBuffer>
+        requires IsRuntimeSystemLike<std::remove_cvref_t<T>>
+            && IsCommandBufferLike<std::remove_cvref_t<TCommandBuffer>>
+            && (!std::is_lvalue_reference_v<TCommandBuffer>)
+        explicit System(T&& system, TCommandBuffer&& commandBuffer)
+            : pimpl_(
+                std::make_unique<
+                    ModelWithOwnedCommandBuffer<
+                        std::remove_cvref_t<T>,
+                        std::remove_cvref_t<TCommandBuffer>
+                    >
+                >(
+                    std::forward<T>(system),
+                    std::forward<TCommandBuffer>(commandBuffer)
+                ))
         {}
 
         System(const System&) = delete;
@@ -117,8 +194,6 @@ export namespace helios::engine::runtime::world {
 
         System& operator=(System&&) = default;
         System(System&&) noexcept = default;
-
-
 
         /**
          * @brief Delegates to the wrapped system's `update()` method.
@@ -132,6 +207,25 @@ export namespace helios::engine::runtime::world {
             pimpl_->update(updateContext);
         }
 
+        /**
+         * @brief Flushes any outstanding changes, e.g. commands of the associated buffer.
+         *
+         * @param updateContext The current frame's update context.
+         */
+        void flush(UpdateContext& updateContext) noexcept {
+            assert(pimpl_ && "System not initialized");
+            pimpl_->flush(updateContext);
+        }
+
+        /**
+         * @brief Inits this system with the owning GameWorld.
+         *
+         * @param gameWorld The owning GameWorld.
+         */
+        void init(GameWorld& gameWorld) noexcept {
+            assert(pimpl_ && "System not initialized");
+            pimpl_->init(gameWorld);
+        }
 
         /**
          * @brief Returns a type-erased pointer to the wrapped system instance.

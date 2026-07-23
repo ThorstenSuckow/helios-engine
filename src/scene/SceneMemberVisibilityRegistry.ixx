@@ -7,6 +7,7 @@ module;
 #include "helios-engine-config.h"
 #include <span>
 #include <cstdint>
+#include <vector>
 
 export module helios.engine.scene.SceneMemberVisibilityRegistry;
 

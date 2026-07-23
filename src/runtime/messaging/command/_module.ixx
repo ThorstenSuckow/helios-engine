@@ -8,6 +8,7 @@ export import helios.engine.runtime.messaging.command.types;
 export import helios.engine.runtime.messaging.command.concepts;
 export import helios.engine.runtime.messaging.command.tags;
 
+export import helios.engine.runtime.messaging.command.EntityMutationCommandBuffer;
 export import helios.engine.runtime.messaging.command.EngineCommandBuffer;
 export import helios.engine.runtime.messaging.command.RenderCommandBuffer;
 export import helios.engine.runtime.messaging.command.PlatformCommandBuffer;

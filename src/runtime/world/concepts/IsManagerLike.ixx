@@ -10,7 +10,7 @@ export module helios.engine.runtime.world.concepts.IsManagerLike;
 
 import helios.engine.runtime.concepts.HasTag;
 import helios.engine.runtime.world.tags.ManagerRole;
-
+import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
 import helios.engine.runtime.world.UpdateContext;
 
 using namespace helios::engine::runtime::concepts;
@@ -33,7 +33,11 @@ export namespace helios::engine::runtime::world::concepts {
      * @see Manager
      */
     template<class T>
-    concept IsManagerLike = requires(T& t, helios::engine::runtime::world::UpdateContext& updateContext) {
+    concept IsManagerLike = requires(
+        T& t,
+        helios::engine::runtime::world::UpdateContext& updateContext,
+        helios::engine::runtime::messaging::command::CommandHandlerRegistry& commandHandlerRegistry) {
         {t.flush(updateContext) } -> std::same_as<void>;
+        {t.init(commandHandlerRegistry) } -> std::same_as<void>;
     } && HasTag<T, tags::ManagerRole>;
 }

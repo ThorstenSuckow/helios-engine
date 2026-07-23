@@ -7,9 +7,8 @@ module;
 #include <concepts>
 #include <cassert>
 #include <optional>
-#include <tuple>
+#include <span>
 #include <vector>
-#include <cstdint>
 
 #include "helios-engine-config.h"
 

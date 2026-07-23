@@ -12,6 +12,7 @@ import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.Session;
 import helios.engine.runtime.world.GameWorld;
 
+import helios.engine.runtime.enginestate.EngineStateBindings;
 import helios.engine.runtime.enginestate.types;
 import helios.engine.state.types;
 

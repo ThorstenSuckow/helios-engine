@@ -45,7 +45,8 @@ export namespace helios::engine::core::container {
      * @see ManagerRegistry
      *
      * @todo this impl needs to make sure that memory allocations / moves do not invalidate
-     * the fastAccess in ResourceRegistry
+     * the fastAccess in ResourceRegistry - we are using vector with fixed pointers for now to make sure
+     * reallocation does not invalidate addresses
      */
     template<typename AnyT, typename IdProvider>
     class ConceptModelRegistry {
@@ -53,7 +54,7 @@ export namespace helios::engine::core::container {
         /**
          * @brief Owning storage for wrapped AnyT instances, indexed by type ID.
          */
-        mutable std::vector<AnyT> items_;
+        mutable std::vector<std::unique_ptr<AnyT>> items_;
 
         /**
          * @brief Cached raw pointers to the underlying concrete instances.
@@ -88,7 +89,7 @@ export namespace helios::engine::core::container {
             itemView_.reserve(insertionOrder_.size());
 
             for (const auto insertionIndex : insertionOrder_) {
-                itemView_.push_back(const_cast<AnyT*>(&items_[insertionIndex]));
+                itemView_.push_back(items_[insertionIndex].get());
             }
 
             needsUpdate_ = false;
@@ -151,8 +152,8 @@ export namespace helios::engine::core::container {
                 underlyingAnyT_.resize(idx + 1);
             }
 
-            items_[idx] = std::move(wrapper);
-            void* rawUnderlying = items_[idx].underlying();
+            items_[idx] = std::make_unique<AnyT>(std::move(wrapper));
+            void* rawUnderlying = items_[idx]->underlying();
             underlyingAnyT_[idx] = rawUnderlying;
 
 
@@ -192,9 +193,9 @@ export namespace helios::engine::core::container {
                 underlyingAnyT_.resize(idx + 1);
             }
 
-            items_[idx] = std::move(wrapper);
+            items_[idx] = std::make_unique<AnyT>(std::move(wrapper));
 
-            void* rawUnderlying = items_[idx].underlying();
+            void* rawUnderlying = items_[idx]->underlying();
             underlyingAnyT_[idx] = rawUnderlying;
 
             insertionOrder_.push_back(idx);
@@ -227,11 +228,11 @@ export namespace helios::engine::core::container {
         [[nodiscard]] T* item() const {
 
             const auto idx = IdProvider::template id<T>().value();
-            if (items_.size() <= idx || underlyingAnyT_.size() <= idx) {
+            if (items_.size() <= idx || underlyingAnyT_.size() <= idx || !underlyingAnyT_[idx]) {
                 return nullptr;
             }
 
-            return underlyingAnyT_[idx] ? static_cast<T*>(underlyingAnyT_[idx]) : nullptr;
+            return static_cast<T*>(underlyingAnyT_[idx]);
         }
 
         /**
@@ -243,7 +244,7 @@ export namespace helios::engine::core::container {
          */
         [[nodiscard]] AnyT* item(IdProvider typeId) noexcept {
             const auto idx = typeId.value();
-            return items_.size() > idx && underlyingAnyT_[idx] ? &items_[idx] : nullptr;
+            return items_.size() > idx && underlyingAnyT_.size() > idx && underlyingAnyT_[idx] ? items_[idx].get() : nullptr;
         }
 
     };

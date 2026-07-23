@@ -97,8 +97,8 @@ export namespace helios::engine::util::log {
          * @param args Format arguments.
          */
         template<typename... TArgs>
-        void dispatchFormatted(LogLevel level, std::format_string<TArgs...> fmt, TArgs&&... args) const {
-            dispatch(level, std::format(fmt, std::forward<TArgs>(args)...));
+        void dispatchFormatted(LogLevel level, std::string_view fmt, TArgs&&... args) const {
+            dispatch(level, std::vformat(fmt, std::make_format_args(args...)));
         }
 
     public:
@@ -164,7 +164,7 @@ export namespace helios::engine::util::log {
          * @param args Format arguments.
          */
         template<typename... TArgs>
-        void warn(std::format_string<TArgs...> fmt, TArgs&&... args) const {
+        void warn(std::string_view fmt, TArgs&&... args) const {
             dispatchFormatted(LogLevel::Warn, fmt, std::forward<TArgs>(args)...);
         }
 
@@ -185,7 +185,7 @@ export namespace helios::engine::util::log {
          * @param args Format arguments.
          */
         template<typename... TArgs>
-        void debug(std::format_string<TArgs...> fmt, TArgs&&... args) const {
+        void debug(std::string_view fmt, TArgs&&... args) const {
             dispatchFormatted(LogLevel::Debug, fmt, std::forward<TArgs>(args)...);
         }
 
@@ -206,7 +206,7 @@ export namespace helios::engine::util::log {
          * @param args Format arguments.
          */
         template<typename... TArgs>
-        void info(std::format_string<TArgs...> fmt, TArgs&&... args) const {
+        void info(std::string_view fmt, TArgs&&... args) const {
             dispatchFormatted(LogLevel::Info, fmt, std::forward<TArgs>(args)...);
         }
 
@@ -227,7 +227,7 @@ export namespace helios::engine::util::log {
          * @param args Format arguments.
          */
         template<typename... TArgs>
-        void error(std::format_string<TArgs...> fmt, TArgs&&... args) const {
+        void error(std::string_view fmt, TArgs&&... args) const {
             dispatchFormatted(LogLevel::Error, fmt, std::forward<TArgs>(args)...);
         }
     };

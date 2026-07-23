@@ -112,6 +112,8 @@ export namespace helios::engine::runtime::messaging::command {
          * @param owner Reference to the handler instance. Must outlive the registry (usually Owned by GameWorld/ResourceRegistry).
          *
          * @pre No handler is currently registered for this command type.
+         *
+         * @note this method is not threadsafe and should not be called concurrently.
          */
         template<typename CommandType, typename OwningT>
         void registerHandler(OwningT& owner) {
@@ -125,7 +127,11 @@ export namespace helios::engine::runtime::messaging::command {
                 entries_.resize(idx + 1);
             }
 
-            assert(entries_[idx].owner == nullptr && "Handler already registered for this command type");
+            if (entries_[idx].owner != nullptr) {
+                auto* ownerPtr = static_cast<void*>(std::addressof(owner));
+                assert(entries_[idx].owner == ownerPtr && "Handler already registered for this command type for a different owner");
+                return;
+            }
 
             entries_[idx] = CommandHandlerEntry{
                 &owner,

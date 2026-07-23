@@ -68,6 +68,10 @@ export namespace helios::engine::runtime::messaging::command {
 
             CommandHandlerRegistry* commandHandlerRegistry_{nullptr};
 
+            ManagerRegistry* managerRegistry_{nullptr};
+
+            bool handlerRegistered_{false};
+
             EntityMutationManager<THandle>* entityMutationManager_{nullptr};
 
             std::vector<TCommandType> commands_;
@@ -84,9 +88,18 @@ export namespace helios::engine::runtime::messaging::command {
             /**
              * @brief Forwards all buffered commands to the handler registry and clears the buffer.
              *
+             * @note This method must not be called in parallel running tasks.
+             *
              * @param updateContext Frame-local update context (passed through to handlers).
              */
             void flush(UpdateContext& updateContext) {
+
+                if (!handlerRegistered_) {
+                    auto* entityMutationManager_ = managerRegistry_->item<EntityMutationManager<THandle>>();
+                    assert(entityMutationManager_ && "EntityMutationManager for the specified handle is not initialized.");
+                    commandHandlerRegistry_->handleCommands<TCommandType>(*entityMutationManager_);
+                    handlerRegistered_ = true;
+                }
 
                 for (auto& cmd : commands_) {
                     commandHandlerRegistry_->submit<TCommandType>(std::move(cmd));
@@ -103,21 +116,12 @@ export namespace helios::engine::runtime::messaging::command {
             /**
              * @brief Wires this buffer to the handler and manager registries.
              *
-             * Registers a handler for `TCommandType` on the `EntityMutationManager`
-             * bound to `THandle`. Must be called before the first `add()` or `flush()`.
-             *
              * @param commandHandlerRegistry Registry used to route commands to their handlers.
              * @param managerRegistry        Registry providing the `EntityMutationManager<THandle>`.
              */
             void init(CommandHandlerRegistry& commandHandlerRegistry, ManagerRegistry& managerRegistry) {
                 commandHandlerRegistry_ = &commandHandlerRegistry;
-
-                entityMutationManager_ = managerRegistry.item<EntityMutationManager<THandle>>();
-
-                assert(entityMutationManager_ && "EntityMutationManager for the specified handle is not initialized.");
-
-                commandHandlerRegistry.handleCommands<TCommandType>(*entityMutationManager_);
-
+                managerRegistry_ = &managerRegistry;
             }
 
             /**
@@ -154,8 +158,6 @@ export namespace helios::engine::runtime::messaging::command {
                     && managerRegistry_
                     && "CommandHandlerRegistry and ManagerRegistry must be initialized before adding commands.");
                 created.init(*commandHandlerRegistry_,*managerRegistry_);
-
-
 
                 return &created;
             }

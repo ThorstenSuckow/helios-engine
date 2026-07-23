@@ -17,6 +17,7 @@ export module helios.engine.runtime.messaging.command.TypedCommandBuffer;
 import helios.engine.state.components;
 
 import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.world.ManagerRegistry;
 import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
 
 import helios.engine.state.commands.DelayedStateCommand;
@@ -214,8 +215,6 @@ export namespace helios::engine::runtime::messaging::command {
         template<typename CommandType>
         void flushCommandQueue(UpdateContext& updateContext) noexcept {
 
-            //auto& timerManager = gameWorld.manager<TimerManager>();
-
             auto& queue = commandQueue<CommandType>();
             auto& delayed = delayedQueue<CommandType>();
             delayed.clear();
@@ -287,7 +286,7 @@ export namespace helios::engine::runtime::messaging::command {
 
     public:
 
-        using EngineRoleTag = helios::engine::runtime::world::tags::CommandBufferRole;
+        using EngineRoleTag = helios::engine::runtime::messaging::command::tags::CommandBufferRole;
 
         /**
          * @brief Enqueues a command of the specified type.
@@ -310,11 +309,13 @@ export namespace helios::engine::runtime::messaging::command {
          * @brief Binds external services required for command dispatch.
          *
          * @param commandHandlerRegistry Registry used for handler-based command routing.
-         * @param timerManager Timer manager used for delayed-command gating.
+         * @param managerRegistry Manager registry used for accessing various managers.
          */
-        void init(CommandHandlerRegistry& commandHandlerRegistry, TimerManager& timerManager) noexcept {
+        void init(CommandHandlerRegistry& commandHandlerRegistry, const ManagerRegistry& managerRegistry) noexcept {
             commandHandlerRegistry_ = &commandHandlerRegistry;
-            timerManager_           = &timerManager;
+
+            timerManager_ = managerRegistry.item<TimerManager>();
+            assert(timerManager_ && "TimerManager not found");
         }
 
         /**

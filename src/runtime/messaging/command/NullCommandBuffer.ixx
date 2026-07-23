@@ -6,10 +6,13 @@ module;
 
 export module helios.engine.runtime.messaging.command.NullCommandBuffer;
 
+import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
+import helios.engine.runtime.world.ManagerRegistry;
+
 import helios.engine.runtime.messaging.command.tags.CommandBufferRole;
 import helios.engine.runtime.world.UpdateContext;
 
-using namespace helios::engine::runtime::world::tags;
+using namespace helios::engine::runtime::messaging::command::tags;
 using namespace helios::engine::runtime::world;
 export namespace helios::engine::runtime::messaging::command {
 
@@ -30,6 +33,9 @@ export namespace helios::engine::runtime::messaging::command {
         void flush(UpdateContext& updateContext) noexcept {/*intentionally noop*/}
 
         void clear() noexcept {/*intentionally noop*/}
+
+        void init(CommandHandlerRegistry& commandHandlerRegistry, ManagerRegistry& managerRegistry) noexcept {/*intentionally noop*/}
+
     };
 
 

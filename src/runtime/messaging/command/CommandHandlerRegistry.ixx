@@ -116,7 +116,7 @@ export namespace helios::engine::runtime::messaging::command {
         template<typename CommandType, typename OwningT>
         void registerHandler(OwningT& owner) {
             static_assert(requires(OwningT& x, CommandType&& c) {
-                { x.submit(std::move(c)) } noexcept -> std::same_as<bool>;
+                { x.submit(std::move(c)) } -> std::same_as<bool>;
             });
 
             const auto idx = CommandTypeId::id<CommandType>().value();

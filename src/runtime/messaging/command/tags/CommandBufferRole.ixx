@@ -6,7 +6,7 @@ module;
 
 export module helios.engine.runtime.messaging.command.tags.CommandBufferRole;
 
-export namespace helios::engine::runtime::world::tags {
+export namespace helios::engine::runtime::messaging::command::tags {
 
     /**
      * @brief Compile-time tag identifying a class as a CommandBuffer.

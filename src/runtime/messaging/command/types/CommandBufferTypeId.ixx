@@ -32,9 +32,9 @@ export namespace helios::engine::runtime::messaging::command::types {
         /**
          * @brief Tag type for the TypeIndexer domain.
          */
-        struct helios_engine_common_tag_CommandTypes{};
+        struct helios_engine_common_tag_CommandBufferTypes{};
 
-        using ComponentType = helios_engine_common_tag_CommandTypes;
+        using CommandBufferType = helios_engine_common_tag_CommandBufferTypes;
 
         /**
          * @brief The underlying ID value.
@@ -83,7 +83,7 @@ export namespace helios::engine::runtime::messaging::command::types {
          */
         template <typename T>
         [[nodiscard]] static CommandBufferTypeId id() {
-            static const size_t tid = helios::ecs::TypeIndexer<ComponentType>::typeIndex<T>();
+            static const size_t tid = helios::ecs::TypeIndexer<CommandBufferType>::template typeIndex<T>();
             return CommandBufferTypeId(tid);
         }
 

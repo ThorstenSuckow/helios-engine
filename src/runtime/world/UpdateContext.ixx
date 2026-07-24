@@ -365,6 +365,30 @@ export namespace helios::engine::runtime::world {
         }
 
         /**
+         * @brief Returns the sparse set for a handle domain and component type.
+         *
+         * @tparam THandle Handle domain type.
+         * @tparam TComponent Component type.
+         *
+         * @return Pointer to the sparse set for the specified handle and component types.
+         */
+        template <typename THandle, typename TComponent>
+        [[nodiscard]] auto* sparseSet() const {
+            return engineWorld_.template sparseSet<THandle, TComponent>();
+        }
+
+        /**
+         * @brief Checks whether a handle refers to a valid entity in the appropriate sub-world.
+         * @tparam THandle Handle domain type.
+         * @param handle The handle to check.
+         * @return True if the handle is valid, false otherwise.
+         */
+        template <typename THandle>
+        [[nodiscard]] bool isValid(THandle handle) const {
+            return engineWorld_.template isValid<THandle>(handle);
+        }
+
+        /**
          * @brief Clears the specified dirty components for a handle domain and component set.
          *
          * @tparam THandle Handle domain type.

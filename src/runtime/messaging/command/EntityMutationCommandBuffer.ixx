@@ -1,5 +1,5 @@
 /**
- * @file EntityCommandBuffer.ixx
+ * @file EntityMutationCommandBuffer.ixx
  * @brief Deferred command buffer for structural entity mutations (add/remove components, activate/deactivate).
  */
 module;
@@ -43,15 +43,18 @@ export namespace helios::engine::runtime::messaging::command {
      * Each concrete command type gets its own `InternalBuffer`, created lazily
      * on first use and stored in an internal `CommandBufferRegistry`.
      *
-     * @tparam THandle Entity handle type that identifies the target registry.
+     * @tparam TEntityManager Entity manager type that identifies the target registry.
      */
-    template<typename THandle>
+    template<typename TEntityManager>
     class EntityMutationCommandBuffer {
 
+        /** @brief Registry of lazily created per-command-type `InternalBuffer` instances. */
         CommandBufferRegistry commandBufferRegistry_{};
 
+        /** @brief Registry used to route submitted commands to their handlers. */
         CommandHandlerRegistry* commandHandlerRegistry_{nullptr};
 
+        /** @brief Registry providing the `EntityMutationManager` during handler registration. */
         ManagerRegistry* managerRegistry_{nullptr};
 
         /**
@@ -66,13 +69,17 @@ export namespace helios::engine::runtime::messaging::command {
         template<typename TCommandType>
         class InternalBuffer {
 
+            /** @brief Registry used to submit commands to their handlers on first flush. */
             CommandHandlerRegistry* commandHandlerRegistry_{nullptr};
 
+            /** @brief Registry used to resolve the `EntityMutationManager` on first flush. */
             ManagerRegistry* managerRegistry_{nullptr};
 
+            /** @brief `true` once the handler for `TCommandType` has been registered. */
             bool handlerRegistered_{false};
 
-            EntityMutationManager<THandle>* entityMutationManager_{nullptr};
+            /** @brief Cached pointer to the `EntityMutationManager`; resolved lazily on first flush. */
+            EntityMutationManager<TEntityManager>* entityMutationManager_{nullptr};
 
             std::vector<TCommandType> commands_;
 
@@ -95,7 +102,7 @@ export namespace helios::engine::runtime::messaging::command {
             void flush(UpdateContext& updateContext) {
 
                 if (!handlerRegistered_) {
-                    auto* entityMutationManager_ = managerRegistry_->item<EntityMutationManager<THandle>>();
+                    auto* entityMutationManager_ = managerRegistry_->item<EntityMutationManager<TEntityManager>>();
                     assert(entityMutationManager_ && "EntityMutationManager for the specified handle is not initialized.");
                     commandHandlerRegistry_->handleCommands<TCommandType>(*entityMutationManager_);
                     handlerRegistered_ = true;
@@ -117,7 +124,7 @@ export namespace helios::engine::runtime::messaging::command {
              * @brief Wires this buffer to the handler and manager registries.
              *
              * @param commandHandlerRegistry Registry used to route commands to their handlers.
-             * @param managerRegistry        Registry providing the `EntityMutationManager<THandle>`.
+             * @param managerRegistry        Registry providing the `EntityMutationManager<>`.
              */
             void init(CommandHandlerRegistry& commandHandlerRegistry, ManagerRegistry& managerRegistry) {
                 commandHandlerRegistry_ = &commandHandlerRegistry;
@@ -168,7 +175,7 @@ export namespace helios::engine::runtime::messaging::command {
     public:
 
         /** @brief The entity handle type this buffer operates on. */
-        using Handle_type = THandle;
+        using Handle_type = typename TEntityManager::Handle_type;
 
         /** @brief Role tag marking this as a command buffer for the engine registry. */
         using EngineRoleTag = CommandBufferRole;
@@ -183,7 +190,7 @@ export namespace helios::engine::runtime::messaging::command {
          * @param  args     Arguments forwarded to the command constructor.
          */
         template<typename TCommand, typename... Args>
-        requires std::is_same_v<typename TCommand::Handle_type, THandle>
+        requires std::is_same_v<typename TCommand::Handle_type, Handle_type>
         void add(Args&&... args) {
 
             auto* model = modelFor<TCommand>();
@@ -210,7 +217,7 @@ export namespace helios::engine::runtime::messaging::command {
          * Must be called once before the first `add()` or `flush()`.
          *
          * @param commandHandlerRegistry Registry used to route commands to handlers.
-         * @param managerRegistry        Registry providing the `EntityMutationManager<THandle>`.
+         * @param managerRegistry        Registry providing the `EntityMutationManager<Handle_type>`.
          */
         void init(CommandHandlerRegistry& commandHandlerRegistry, ManagerRegistry& managerRegistry) {
 

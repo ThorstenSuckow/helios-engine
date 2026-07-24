@@ -20,7 +20,6 @@ import helios.engine.runtime.messaging.command.tags.CommandBufferRole;
 
 using namespace helios::engine::runtime::messaging::command::tags;
 using namespace helios::engine::runtime::world;
-using namespace helios::engine::runtime::world;
 using namespace helios::engine::runtime::concepts;
 export namespace helios::engine::runtime::messaging::command::concepts {
 

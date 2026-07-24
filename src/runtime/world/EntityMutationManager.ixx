@@ -58,9 +58,9 @@ export namespace helios::engine::runtime::world {
      * @brief Receives submitted ECS mutation commands and applies them during flush.
      *
      * Acts as the write-back stage for `EntityMutationCommandBuffer`: commands
-     * queued there are routed here via the `CommandHandlerRegistry` and buffered
-     * per command type. On `flush()` each command is resolved against the live
-     * `UpdateContext` and executed (add/remove component, activate/deactivate entity).
+     * are submitted directly via `submit()` or `submitBatch()` and buffered per
+     * command type. On `flush()` / `flushParallel()` each buffer applies its
+     * mutations to the entity manager.
      *
      * @tparam TEntityManager Entity manager type identifying the target ECS registry.
      */
@@ -107,10 +107,13 @@ export namespace helios::engine::runtime::world {
         template<typename TCommandType>
         class InternalBuffer {
 
+            /** @brief Unused; retained for interface uniformity. */
             CommandHandlerRegistry* commandHandlerRegistry_{nullptr};
 
+            /** @brief Buffered commands pending application. */
             std::vector<TCommandType> commands_;
 
+            /** @brief Reference to the entity manager mutations are applied to. */
             TEntityManager& entityManager_;
 
             public:
@@ -174,6 +177,30 @@ export namespace helios::engine::runtime::world {
                 commands_.emplace_back(std::forward<TCommandType>(commandType));
             }
 
+            /**
+             * @brief Moves all commands from `incoming` into this buffer.
+             *
+             * If the buffer is empty the vectors are swapped (zero-copy);
+             * otherwise `incoming` is appended via move iterators, the cleared.
+             *
+             *
+             * @param incoming Source vector; left in a valid but unspecified state after the call.
+             */
+            void add(std::vector<TCommandType>& incoming) {
+
+                if (commands_.empty()) {
+                     commands_.swap(incoming);
+                } else {
+                    commands_.reserve(incoming.size() + commands_.size());
+                    commands_.insert(
+                        commands_.end(),
+                        std::make_move_iterator(incoming.begin()),
+                        std::make_move_iterator(incoming.end())
+                    );
+                    incoming.clear();
+                }
+            }
+
         };
 
         /**
@@ -205,9 +232,6 @@ export namespace helios::engine::runtime::world {
                 }
                 componentToBufferGroups_[cv].push_back(CommandBufferTypeId::template id<InternalBuffer<TCommand>>());
 
-                if constexpr (IsDirtyComponentSpec_v<Component_type>) {
-                    entityManager_.template  trackDirty<typename Component_type::Component_type>();
-                }
                 std::ignore = entityManager_.template  ensureSparseSet<Component_type>();
 
                 return &created;
@@ -248,45 +272,29 @@ export namespace helios::engine::runtime::world {
 
             using Command_type = std::remove_cvref_t<TCommand>;
 
-            /**
-             * @note we remove this code for now since dirty tracking has non-threadsafe operations
-             * involved
-             */
-            if constexpr (IsActivateEntityCommand_v<Command_type> || IsDeactivateEntityCommand_v<Command_type>) {
-                using AddActive_type = AddComponentCommand<Active<typename Command_type::Handle_type>>;
-                using AddInactive_type = AddComponentCommand<Inactive<typename Command_type::Handle_type>>;
-                using RemoveActive_type = RemoveComponentCommand<Active<typename Command_type::Handle_type>>;
-                using RemoveInactive_type = RemoveComponentCommand<Inactive<typename Command_type::Handle_type>>;
-                using AddActiveDirty_type = AddComponentCommand<DirtyComponentSpec<Active<typename Command_type::Handle_type>>>;
-                using AddInactiveDirty_type = AddComponentCommand<DirtyComponentSpec<Inactive<typename Command_type::Handle_type>>>;
+            auto* model = modelFor<Command_type>();
+            model->add(std::forward<TCommand>(command));
 
+            return true;
+        }
 
-                if constexpr (IsActivateEntityCommand_v<Command_type>) {
-                    auto* modelAddAct = modelFor<AddActive_type>();
-                    auto* modelAddActiveDirty = modelFor<AddActiveDirty_type>();
-                    auto* modelRemoveInact = modelFor<RemoveInactive_type>();
+        /**
+         * @brief Accepts a batch of commands and enqueues them all at once.
+         *
+         * Delegates to `InternalBuffer::add(vector)` which swaps or appends
+         * depending on whether the buffer is currently empty. The origin vector is
+         * cleared afterwards.
+         *
+         * @tparam TCommand Deduced ECS command type. `TCommand::Handle_type` must match `THandle`.
+         * @param  commands Source vector forwarded to the internal buffer.
+         * @return `true` unconditionally (reserved for future error reporting).
+         */
+        template<typename TCommand>
+        requires std::is_same_v<typename TCommand::Handle_type, THandle>
+        bool submitBatch(std::vector<TCommand>& commands) {
 
-                    modelAddAct->add(AddActive_type(command.handle));
-                    modelAddActiveDirty->add(AddActiveDirty_type(command.handle));
-                    modelRemoveInact->add(RemoveInactive_type(command.handle));
-
-                } else {
-
-                    auto* modelAddInact = modelFor<AddInactive_type>();
-                    auto* modelRemoveAct = modelFor<RemoveActive_type>();
-                    auto* modelAddInactiveDirty = modelFor<AddInactiveDirty_type>();
-
-                    modelRemoveAct->add(RemoveActive_type(command.handle));
-                    modelAddInactiveDirty->add(AddInactiveDirty_type(command.handle));
-                    modelAddInact->add(AddInactive_type(command.handle));
-                }
-
-            } else {
-                auto* model = modelFor<Command_type>();
-                model->add(std::forward<TCommand>(command));
-            }
-
-
+            auto* model = modelFor<TCommand>();
+            model->add(commands);
 
             return true;
         }

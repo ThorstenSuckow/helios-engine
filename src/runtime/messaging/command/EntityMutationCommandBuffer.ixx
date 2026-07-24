@@ -81,6 +81,7 @@ export namespace helios::engine::runtime::messaging::command {
             /** @brief Cached pointer to the `EntityMutationManager`; resolved lazily on first flush. */
             EntityMutationManager<TEntityManager>* entityMutationManager_{nullptr};
 
+            /** @brief Buffered commands pending submission. */
             std::vector<TCommandType> commands_;
 
             public:
@@ -93,24 +94,25 @@ export namespace helios::engine::runtime::messaging::command {
             }
 
             /**
-             * @brief Forwards all buffered commands to the handler registry and clears the buffer.
+             * @brief Submits all buffered commands as a batch to the `EntityMutationManager` and clears the buffer.
              *
-             * @note This method must not be called in parallel running tasks.
+             * On first call, resolves the `EntityMutationManager` from the `ManagerRegistry`.
              *
-             * @param updateContext Frame-local update context (passed through to handlers).
+             * @note Must not be called from concurrently running tasks.
+             *
+             * @param updateContext Frame-local update context (currently unused; kept for interface uniformity).
              */
             void flush(UpdateContext& updateContext) {
 
                 if (!handlerRegistered_) {
-                    auto* entityMutationManager_ = managerRegistry_->item<EntityMutationManager<TEntityManager>>();
+                    entityMutationManager_ = managerRegistry_->item<EntityMutationManager<TEntityManager>>();
                     assert(entityMutationManager_ && "EntityMutationManager for the specified handle is not initialized.");
-                    commandHandlerRegistry_->handleCommands<TCommandType>(*entityMutationManager_);
+                    //    commandHandlerRegistry_->handleCommands<TCommandType>(*entityMutationManager_);
                     handlerRegistered_ = true;
                 }
 
-                for (auto& cmd : commands_) {
-                    commandHandlerRegistry_->submit<TCommandType>(std::move(cmd));
-                }
+
+                entityMutationManager_->template submitBatch<TCommandType>(commands_);
 
                 clear();
             }

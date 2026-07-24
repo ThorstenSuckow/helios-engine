@@ -10,6 +10,7 @@ module;
 export module helios.engine.runtime.world.Manager;
 
 import helios.engine.runtime.world.concepts.IsManagerLike;
+import helios.engine.runtime.world.concepts.HasFlushParallel;
 
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
@@ -38,15 +39,6 @@ export namespace helios::engine::runtime::world {
             {t.reset() } -> std::same_as<void>;
     };
 
-    /**
-     * @brief Concept detecting an optional `flushParallel(UpdateContext&)` method on a manager.
-     *
-     * @tparam T The manager type to inspect.
-     */
-    template<typename T>
-    concept HasFlushParallel = requires(T& t, UpdateContext& updateContext) {
-        {t.flushParallel(updateContext) } -> std::same_as<void>;
-    };
 
     /**
      * @brief Type-erased wrapper for game world managers.

@@ -40,9 +40,6 @@ import helios.engine.util.log.Logger;
 import helios.engine.util.log.LogManager;
 import helios.engine.runtime.world.Level;
 
-import helios.ecs.types.EntityHandle;
-import helios.ecs.EntityManager;
-import helios.ecs.EntityRegistry;
 import helios.ecs.View;
 
 import helios.engine.runtime.messaging.command.concepts;
@@ -541,6 +538,17 @@ export namespace helios::engine::runtime::world {
          */
         ManagerRegistry& managerRegistry() noexcept {
             return resourceRegistry().managerRegistry();
+        }
+
+        /**
+         * @brief Returns direct access to the entity manager for a specific handle type.
+         *
+         * @tparam THandle Handle type.
+         * @return Reference to the internal EntityManager for the specified handle type.
+         */
+        template<typename THandle>
+        auto& entityManager() noexcept {
+            return engineWorld_.template entityManager<THandle>();
         }
 
     };

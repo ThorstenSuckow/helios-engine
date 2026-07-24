@@ -318,6 +318,10 @@ export namespace helios::engine::runtime::gameloop {
                 gameWorld.managerRegistry().item(typeId)->flush(updateContext);
             }
 
+            for (const auto typeId :pass.parallelManagerTypeIds()) {
+                gameWorld.managerRegistry().item(typeId)->flushParallel(updateContext);
+            }
+
             passEventBus_.swapBuffers();
         }
 

@@ -15,9 +15,13 @@ module;
 export module helios.engine.runtime.world.EntityMutationManager;
 
 import helios.ecs.commands;
+import helios.ecs.types.ComponentTypeId;
+
+import helios.engine.core.thread.JobSystem;
 
 import helios.engine.runtime.world.tags.ManagerRole;
 import helios.engine.runtime.messaging.command.CommandBuffer;
+import helios.engine.runtime.messaging.command.types.CommandBufferTypeId;
 import helios.engine.runtime.messaging.command.CommandBufferRegistry;
 import helios.engine.runtime.messaging.command.tags.CommandBufferRole;
 
@@ -25,15 +29,21 @@ import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
 import helios.engine.runtime.world.ManagerRegistry;
 
 import helios.ecs.types;
+import helios.ecs.components;
+
 
 import helios.engine.util.log;
 import helios.engine.runtime.world.UpdateContext;
 
 import helios.ecs.concepts.Traits;
+import helios.engine.util.log;
 
+using namespace helios::ecs::components;
+using namespace helios::engine::core::thread;
 using namespace helios::engine::runtime::world;
 using namespace helios::engine::runtime::world::tags;
 using namespace helios::engine::runtime::messaging::command;
+using namespace helios::engine::runtime::messaging::command::types;
 using namespace helios::ecs::types;
 using namespace helios::ecs::concepts::traits;
 using namespace helios::ecs::commands;
@@ -52,15 +62,39 @@ export namespace helios::engine::runtime::world {
      * per command type. On `flush()` each command is resolved against the live
      * `UpdateContext` and executed (add/remove component, activate/deactivate entity).
      *
-     * @tparam THandle Entity handle type identifying the target ECS registry.
+     * @tparam TEntityManager Entity manager type identifying the target ECS registry.
      */
-    template<typename THandle>
+    template<typename TEntityManager>
     class EntityMutationManager {
 
+        /** @brief Shorthand for the entity handle type derived from `TEntityManager`. */
+        using THandle = typename TEntityManager::Handle_type;
+
+        /** @brief Reference to the entity manager mutations are applied to. */
+        TEntityManager& entityManager_;
+
+        /** @brief Registry of lazily created per-command-type `InternalBuffer` instances. */
         CommandBufferRegistry commandBufferRegistry_{};
 
+        /** @brief Unused; retained for interface uniformity. */
         CommandHandlerRegistry* commandHandlerRegistry_{nullptr};
 
+        /** @brief Job system used by `flushParallel()` for concurrent buffer execution. */
+        JobSystem& jobSystem_;
+
+        /**
+         * @brief Maps component type IDs to the `CommandBufferTypeId`s of their associated buffers.
+         *
+         * Indexed by component type ID; each slot holds one or more buffer IDs that can be
+         * flushed independently in parallel.
+         */
+        std::vector<std::vector<CommandBufferTypeId>> componentToBufferGroups_{};
+
+        /** @brief Ordered list of component type IDs that have at least one registered buffer. */
+        std::vector<std::size_t> bufferGroupIndices_;
+
+        /** @brief Module-scoped logger. */
+        static inline auto& logger_ = helios::engine::util::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
 
         /**
          * @brief Per-command-type buffer that applies mutations on flush.
@@ -77,68 +111,51 @@ export namespace helios::engine::runtime::world {
 
             std::vector<TCommandType> commands_;
 
+            TEntityManager& entityManager_;
+
             public:
             /** @brief Role tag identifying this as a command buffer in the engine registry. */
             using EngineRoleTag = CommandBufferRole;
 
+            /** @brief The command type stored in this buffer. */
+            using Command_type = TCommandType;
+
+            /** @brief Component type targeted by the buffered commands. */
+            using Component_type = typename TCommandType::Component_type;
+
             /** @brief Reserves default capacity for the command vector. */
-            InternalBuffer() {
+            InternalBuffer(TEntityManager& entityManager) : entityManager_(entityManager) {
                 commands_.reserve(DEFAULT_ENTITY_MUTATION_COMMAND_BUFFER_CAPACITY);
             }
 
             /**
-             * @brief Applies all buffered add/remove-component commands and clears the buffer.
+             * @brief Applies all buffered add/remove-component commands directly via the entity manager.
              *
-             * For each command the target entity is resolved via `updateContext.find()`.
-             * Missing entities are silently skipped.
+             * Invalid entity handles are silently skipped.
              *
-             * @param updateContext Frame-local ECS context used to resolve entity handles.
+             * @param updateContext Frame-local ECS context (currently unused; kept for interface uniformity).
              */
             void flush(UpdateContext& updateContext)
             requires IsAddComponentCommand_v<TCommandType> || IsRemoveComponentCommand_v<TCommandType> {
 
                 using Component_type = typename TCommandType::Component_type;
 
+                logger_.info("Processing {0} commands", commands_.size());
+
                 for (auto& command : commands_) {
-                    auto entity = updateContext.find<THandle>(command.handle);
-                    if (!entity) {
+                    if (!entityManager_.isValid(command.handle)) {
                         continue;
                     }
                     if constexpr (IsAddComponentCommand_v<TCommandType>) {
-                        entity->template add<Component_type>(std::move(command.component));
+                        entityManager_.template emplace<Component_type>(command.handle, std::move(command.component));
                     } else {
-                        entity->template remove<Component_type>();
+                        entityManager_.template remove<Component_type>(command.handle);
                     }
                 }
 
                 clear();
             }
 
-            /**
-             * @brief Applies all buffered activate/deactivate-entity commands and clears the buffer.
-             *
-             * For each command the target entity is resolved via `updateContext.find()`.
-             * Missing entities are silently skipped.
-             *
-             * @param updateContext Frame-local ECS context used to resolve entity handles.
-             */
-            void flush(UpdateContext& updateContext)
-            requires IsActivateEntityCommand_v<TCommandType> || IsDeactivateEntityCommand_v<TCommandType> {
-
-                for (auto& command : commands_) {
-                    auto entity = updateContext.find<THandle>(command.handle);
-                    if (!entity) {
-                        continue;
-                    }
-                    if constexpr (IsActivateEntityCommand_v<TCommandType>) {
-                        entity->setActive(true);
-                    } else {
-                        entity->setActive(false);
-                    }
-                }
-
-                clear();
-            }
 
             /** @brief Discards all buffered commands without applying them. */
             void clear() {
@@ -173,8 +190,25 @@ export namespace helios::engine::runtime::world {
             if (!model) {
                 auto& created   =
                     commandBufferRegistry_.add<InternalBuffer<TCommand>>(
-                        CommandBuffer(InternalBuffer<TCommand>{})
+                        CommandBuffer(InternalBuffer<TCommand>{entityManager_})
                     );
+
+                using Component_type = typename TCommand::Component_type;
+                const auto cv = ComponentTypeId<THandle>::template id<Component_type>().value();
+
+                if (componentToBufferGroups_.size() <= cv) {
+                    componentToBufferGroups_.resize(cv + 1);
+                }
+
+                if (componentToBufferGroups_[cv].empty()) {
+                    bufferGroupIndices_.push_back(cv);
+                }
+                componentToBufferGroups_[cv].push_back(CommandBufferTypeId::template id<InternalBuffer<TCommand>>());
+
+                if constexpr (IsDirtyComponentSpec_v<Component_type>) {
+                    entityManager_.template  trackDirty<typename Component_type::Component_type>();
+                }
+                std::ignore = entityManager_.template  ensureSparseSet<Component_type>();
 
                 return &created;
             }
@@ -191,6 +225,15 @@ export namespace helios::engine::runtime::world {
         using EngineRoleTag = ManagerRole;
 
         /**
+         * @brief Constructs the manager bound to `entityManager` and `jobSystem`.
+         *
+         * @param entity_manager Entity manager mutations are applied to.
+         * @param jobSystem      Job system used for parallel flush execution.
+         */
+        explicit EntityMutationManager(TEntityManager& entity_manager, JobSystem& jobSystem)
+        : entityManager_(entity_manager), jobSystem_(jobSystem) {}
+
+        /**
          * @brief Accepts a command from the `CommandHandlerRegistry` and enqueues it.
          *
          * `TCommand::Handle_type` must match `THandle`.
@@ -205,9 +248,45 @@ export namespace helios::engine::runtime::world {
 
             using Command_type = std::remove_cvref_t<TCommand>;
 
-            auto* model = modelFor<Command_type>();
+            /**
+             * @note we remove this code for now since dirty tracking has non-threadsafe operations
+             * involved
+             */
+            if constexpr (IsActivateEntityCommand_v<Command_type> || IsDeactivateEntityCommand_v<Command_type>) {
+                using AddActive_type = AddComponentCommand<Active<typename Command_type::Handle_type>>;
+                using AddInactive_type = AddComponentCommand<Inactive<typename Command_type::Handle_type>>;
+                using RemoveActive_type = RemoveComponentCommand<Active<typename Command_type::Handle_type>>;
+                using RemoveInactive_type = RemoveComponentCommand<Inactive<typename Command_type::Handle_type>>;
+                using AddActiveDirty_type = AddComponentCommand<DirtyComponentSpec<Active<typename Command_type::Handle_type>>>;
+                using AddInactiveDirty_type = AddComponentCommand<DirtyComponentSpec<Inactive<typename Command_type::Handle_type>>>;
 
-            model->add(std::forward<TCommand>(command));
+
+                if constexpr (IsActivateEntityCommand_v<Command_type>) {
+                    auto* modelAddAct = modelFor<AddActive_type>();
+                    auto* modelAddActiveDirty = modelFor<AddActiveDirty_type>();
+                    auto* modelRemoveInact = modelFor<RemoveInactive_type>();
+
+                    modelAddAct->add(AddActive_type(command.handle));
+                    modelAddActiveDirty->add(AddActiveDirty_type(command.handle));
+                    modelRemoveInact->add(RemoveInactive_type(command.handle));
+
+                } else {
+
+                    auto* modelAddInact = modelFor<AddInactive_type>();
+                    auto* modelRemoveAct = modelFor<RemoveActive_type>();
+                    auto* modelAddInactiveDirty = modelFor<AddInactiveDirty_type>();
+
+                    modelRemoveAct->add(RemoveActive_type(command.handle));
+                    modelAddInactiveDirty->add(AddInactiveDirty_type(command.handle));
+                    modelAddInact->add(AddInactive_type(command.handle));
+                }
+
+            } else {
+                auto* model = modelFor<Command_type>();
+                model->add(std::forward<TCommand>(command));
+            }
+
+
 
             return true;
         }
@@ -220,7 +299,7 @@ export namespace helios::engine::runtime::world {
         void init(CommandHandlerRegistry& commandHandlerRegistry) {}
 
         /**
-         * @brief Flushes all internal buffers, applying every queued mutation to the world.
+         * @brief Flushes all internal buffers sequentially, applying every queued mutation.
          *
          * @param updateContext Frame-local ECS context forwarded to each buffer's flush.
          */
@@ -228,6 +307,32 @@ export namespace helios::engine::runtime::world {
             for (auto* buffer : commandBufferRegistry_.items()) {
                 buffer->flush(updateContext);
             }
+
+        }
+
+        /**
+         * @brief Flushes independent buffer groups concurrently via the `JobSystem`.
+         *
+         * Each component-type group is dispatched as a separate job; groups that operate
+         * on different component types are assumed to be executable in parallel without contention.
+         *
+         * @param updateContext Frame-local ECS context forwarded to each buffer's flush.
+         */
+        void flushParallel(UpdateContext& updateContext) {
+
+            std::vector<std::size_t> activeIndices;
+            for (const auto idx : bufferGroupIndices_) {
+                if (!componentToBufferGroups_[idx].empty()) {
+                    activeIndices.push_back(idx);
+                }
+            }
+            jobSystem_.runAndWait(activeIndices.size(), [&](const std::size_t groupIndex) {
+                for (const auto bufferTypeId  : componentToBufferGroups_[activeIndices[groupIndex]]) {
+                    logger_.info("Processing MutationCommandBuffer {0}", bufferTypeId.value());
+                    auto* buffer = commandBufferRegistry_.item(bufferTypeId);
+                    buffer->flush(updateContext);
+                }
+            });
         }
 
 

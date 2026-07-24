@@ -38,7 +38,15 @@ export namespace helios::engine::runtime::world {
             {t.reset() } -> std::same_as<void>;
     };
 
-
+    /**
+     * @brief Concept detecting an optional `flushParallel(UpdateContext&)` method on a manager.
+     *
+     * @tparam T The manager type to inspect.
+     */
+    template<typename T>
+    concept HasFlushParallel = requires(T& t, UpdateContext& updateContext) {
+        {t.flushParallel(updateContext) } -> std::same_as<void>;
+    };
 
     /**
      * @brief Type-erased wrapper for game world managers.
@@ -72,6 +80,7 @@ export namespace helios::engine::runtime::world {
             virtual void flush(UpdateContext& updateContext) noexcept = 0;
             virtual void init(CommandHandlerRegistry& commandHandlerRegistry) noexcept = 0;
             virtual void reset() noexcept = 0;
+            virtual void flushParallel(UpdateContext& updateContext) noexcept = 0;
 
             [[nodiscard]] virtual void* underlying() noexcept = 0;
             [[nodiscard]] virtual const void* underlying() const noexcept = 0;
@@ -93,6 +102,26 @@ export namespace helios::engine::runtime::world {
             void flush(UpdateContext& updateContext) noexcept override {
                 manager_.flush(updateContext);
             }
+
+            /**
+             * @brief Delegates to the wrapped manager's `flushParallel()` method.
+             *
+             * Will fall back to flush() if flushParallel() is not implemented by the underlying
+             * manager.
+             *
+             * @param updateContext The current frame's update context.
+             *
+             * @pre Manager must be initialized (pimpl_ != nullptr).
+             */
+            void flushParallel(UpdateContext& updateContext) noexcept override {
+                if constexpr (HasFlushParallel<T>) {
+                    manager_.flushParallel(updateContext);
+                    return;
+                }
+                assert(false && "Manager does not support flushParallel");
+                manager_.flush(updateContext);
+            }
+
             void init(CommandHandlerRegistry& commandHandlerRegistry) noexcept override {
                 if constexpr (HasInit<T>) {
                     manager_.init(commandHandlerRegistry);
@@ -152,6 +181,17 @@ export namespace helios::engine::runtime::world {
             pimpl_->flush(updateContext);
         }
 
+        /**
+         * @brief Delegates to the wrapped manager's `flushParallel()` method.
+         *
+         * @param updateContext The current frame's update context.
+         *
+         * @pre Manager must be initialized (pimpl_ != nullptr).
+         */
+        void flushParallel(UpdateContext& updateContext) noexcept {
+            assert(pimpl_ && "Manager not initialized");
+            pimpl_->flushParallel(updateContext);
+        }
 
         /**
          * @brief Delegates to the wrapped manager's `init()` method, if present.

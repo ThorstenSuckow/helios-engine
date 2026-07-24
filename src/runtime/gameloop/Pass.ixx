@@ -18,6 +18,7 @@ import helios.engine.runtime.world.System;
 import helios.engine.runtime.world.concepts;
 import helios.engine.runtime.world.types;
 
+import helios.engine.runtime.world.concepts.HasFlushParallel;
 import helios.engine.runtime.messaging.command.types;
 import helios.engine.runtime.messaging.command.concepts.IsCommandBufferLike;
 
@@ -79,6 +80,10 @@ export namespace helios::engine::runtime::gameloop {
          */
         std::vector<ManagerTypeId> managerTypeIds_;
 
+        /**
+         * @brief List of ManagerTypeIds for parallel execution.
+         */
+        std::vector<ManagerTypeId> parallelManagerTypeIds_;
 
         /**
          * @brief Registers the ManagerTypeIds for the Managers this pass should flush.
@@ -90,6 +95,19 @@ export namespace helios::engine::runtime::gameloop {
             T* manager = gameWorld_.tryManager<T>();
             assert(manager && "Manager buffer not found for system's manager");
             managerTypeIds_.push_back(ManagerTypeId::template id<T>());
+        }
+
+        /**
+         * @brief Registers the ManagerTypeIds for the Managers this pass should flush in parallel.
+         *
+         * @tparam T The type of the manager to register.
+         */
+        template<typename T>
+        requires HasFlushParallel<T>
+        void registerManagerParallelFlush() {
+            T* manager = gameWorld_.tryManager<T>();
+            assert(manager && "Manager buffer not found for system's manager");
+            parallelManagerTypeIds_.push_back(ManagerTypeId::template id<T>());
         }
 
         /**
@@ -389,12 +407,36 @@ export namespace helios::engine::runtime::gameloop {
         }
 
         /**
+         * @brief Register the Manager this pass should flush in parallel.
+         *
+         * @tparam TManager The type of the Manager to flush in parallel.
+         * @return Reference to this Pass for method chaining.
+         */
+        template<typename TManager>
+        requires (IsManagerLike<TManager> && HasFlushParallel<TManager>)
+        Pass& flushParallel() {
+
+            registerManagerParallelFlush<TManager>();
+
+            return *this;
+        }
+
+        /**
          * @brief Returns a span of the ManagerTypeIds this pass is flushing.
          *
          * @return A span of ManagerTypeIds.
          */
         [[nodiscard]] std::span<const ManagerTypeId> managerTypeIds() noexcept {
             return managerTypeIds_;
+        }
+
+        /**
+         * @brief Returns a span of the ManagerTypeIds this pass is flushing in parallel.
+         *
+         * @return A span of ManagerTypeIds.
+         */
+        [[nodiscard]] std::span<const ManagerTypeId> parallelManagerTypeIds() noexcept {
+            return parallelManagerTypeIds_;
         }
 
     };

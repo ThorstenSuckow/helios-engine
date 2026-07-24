@@ -24,6 +24,8 @@ export namespace helios::engine::spatial::components {
 
         using Value_type = helios::math::vec3f;
 
+        using Handle_type = THandle;
+
         /** @brief Rotation around up axis in radians. */
         float yaw = 0;
 

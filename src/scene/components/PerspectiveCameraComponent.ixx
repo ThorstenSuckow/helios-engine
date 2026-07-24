@@ -54,6 +54,8 @@ export namespace helios::engine::scene::components {
 
         using Value_type = helios::math::vec4f;
 
+        using Handle_type = THandle;
+
         explicit PerspectiveCameraComponent(const float fovY, const float aspectRatio, const float zNear = 0.1f, const float zFar = 1000.0f) {
             setPerspective(fovY, aspectRatio, zNear, zFar);
         }

@@ -23,7 +23,7 @@ export namespace helios::engine::core::components {
      * @tparam THandle Owning entity handle type.
      * @tparam TNumericType Scalar type for matrix values.
      */
-    template<typename TDomainTag, typename TNumericType, typename ... Args>
+    template<typename TDomainTag, typename TNumericType, typename THandle, typename ... Args>
     requires IsNumeric<TNumericType>
     class Mat4Component  {
 
@@ -31,6 +31,8 @@ export namespace helios::engine::core::components {
 
 
     public:
+
+        using Handle_type = THandle;
 
         using Value_type = helios::math::mat4<TNumericType>;
 

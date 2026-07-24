@@ -19,6 +19,6 @@ export namespace helios::engine::spatial::components {
      *
      * @tparam THandle Owning entity handle type.
      */
-    template<typename ... Args>
-    using RectComponent = helios::engine::core::components::Vec4Component<RectComponentDomain, float, Args...>;
+    template<typename THandle, typename ... Args>
+    using RectComponent = helios::engine::core::components::Vec4Component<RectComponentDomain, float, THandle, Args...>;
 }

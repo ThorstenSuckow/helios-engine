@@ -19,6 +19,6 @@ export namespace helios::engine::spatial::components {
      *
      * @tparam THandle Owning entity handle type.
      */
-    template<typename ...Args>
-    using Position3DComponent = helios::engine::core::components::Vec3Component<Position3DComponentDomain, float, Args...>;
+    template<typename THandle, typename ...Args>
+    using Position3DComponent = helios::engine::core::components::Vec3Component<Position3DComponentDomain, float, THandle, Args...>;
 }

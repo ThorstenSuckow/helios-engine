@@ -167,14 +167,17 @@ export namespace helios::engine::bootstrap {
             helios::engine::runtime::enginestate::rules::DefaultEngineStateTransitionRules::rules());
 
         gameWorld->registerManager<helios::engine::runtime::timing::TimerManager>();
-        gameWorld->registerManager<helios::engine::runtime::world::EntityMutationManager<GameObjectHandle>>();
+        gameWorld->registerManager<helios::engine::runtime::world::EntityMutationManager<GameObjectEntityManager>>(
+            gameWorld->entityManager<GameObjectHandle>(),
+            jobSystem
+        );
 
         gameWorld->session().trackState<helios::engine::runtime::enginestate::types::EngineState>();
 
         gameWorld->registerCommandBuffer<RenderCommandBuffer>();
         gameWorld->registerCommandBuffer<PlatformCommandBuffer>();
         gameWorld->registerCommandBuffer<EngineCommandBuffer>();
-        gameWorld->registerCommandBuffer<EntityMutationCommandBuffer<GameObjectHandle>>();
+        gameWorld->registerCommandBuffer<EntityMutationCommandBuffer<GameObjectEntityManager>>();
 
         gameWorld->session().setStateFrom<EngineState>(
             StateTransitionContext<EngineState>(

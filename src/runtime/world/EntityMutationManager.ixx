@@ -316,6 +316,7 @@ export namespace helios::engine::runtime::world {
                 buffer->flush(updateContext);
             }
 
+            entityManager_.finalizeMutations();
         }
 
         /**
@@ -341,6 +342,8 @@ export namespace helios::engine::runtime::world {
                     buffer->flush(updateContext);
                 }
             });
+
+            entityManager_.finalizeMutations();
         }
 
 

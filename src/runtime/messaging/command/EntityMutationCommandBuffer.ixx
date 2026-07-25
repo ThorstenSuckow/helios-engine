@@ -20,7 +20,6 @@ import helios.engine.runtime.messaging.command.types.CommandBufferTypeId;
 import helios.engine.runtime.messaging.command.CommandBufferRegistry;
 
 import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
-import helios.engine.runtime.timing.TimerManager;
 
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.messaging.command.tags;
@@ -28,7 +27,6 @@ import helios.engine.runtime.messaging.command.TypedCommandBuffer;
 import helios.ecs.commands;
 
 using namespace helios::engine::runtime::world;
-using namespace helios::engine::runtime::timing;
 using namespace helios::engine::runtime::messaging::command::types;
 using namespace helios::engine::runtime::messaging::command::tags;
 export namespace helios::engine::runtime::messaging::command {

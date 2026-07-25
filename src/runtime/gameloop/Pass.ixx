@@ -92,8 +92,7 @@ export namespace helios::engine::runtime::gameloop {
          */
         template<typename T>
         void registerManagerFlush() {
-            T* manager = gameWorld_.tryManager<T>();
-            assert(manager && "Manager buffer not found for system's manager");
+            assert(gameWorld_.tryManager<T>() && "Manager buffer not found for system's manager");
             managerTypeIds_.push_back(ManagerTypeId::template id<T>());
         }
 
@@ -105,8 +104,7 @@ export namespace helios::engine::runtime::gameloop {
         template<typename T>
         requires HasFlushParallel<T>
         void registerManagerParallelFlush() {
-            T* manager = gameWorld_.tryManager<T>();
-            assert(manager && "Manager buffer not found for system's manager");
+            assert(gameWorld_.tryManager<T>() && "Manager buffer not found for system's manager");
             parallelManagerTypeIds_.push_back(ManagerTypeId::template id<T>());
         }
 

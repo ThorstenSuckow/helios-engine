@@ -152,7 +152,7 @@ export namespace helios::engine::runtime::world {
                     if constexpr (IsAddComponentCommand_v<TCommandType>) {
                         entityManager_.template emplace<Component_type>(command.handle, std::move(command.component));
                     } else {
-                        entityManager_.template remove<Component_type>(command.handle);
+                        std::ignore = entityManager_.template remove<Component_type>(command.handle);
                     }
                 }
 
@@ -341,9 +341,10 @@ export namespace helios::engine::runtime::world {
                     auto* buffer = commandBufferRegistry_.item(bufferTypeId);
                     buffer->flush(updateContext);
                 }
+                entityManager_.finalizeMutations(ComponentTypeId<THandle>{activeIndices[groupIndex]});
             });
 
-            entityManager_.finalizeMutations();
+
         }
 
 

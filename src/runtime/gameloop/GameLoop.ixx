@@ -142,6 +142,11 @@ export namespace helios::engine::runtime::gameloop {
         float totalTime_ = 0.0f;
 
         /**
+         * @brief The current frame count for this GameLoop.
+         */
+        std::size_t frameCount_ = 0;
+
+        /**
          * @brief Commits phase-level events and flushes commands and managers.
          *
          * Called after each phase completes. This method:
@@ -269,12 +274,14 @@ export namespace helios::engine::runtime::gameloop {
             assert(initialized_ && "GameLoop not initialized");
 
             totalTime_ += deltaTime;
+            frameCount_++;
 
             auto updateContext = UpdateContext(
                   gameWorld.session(),
                   gameWorld.runtimeEnvironment(),
                   deltaTime,
                   totalTime_,
+                  frameCount_,
                   phaseEventBus_,
                   passEventBus_,
                   frameEventBus_,

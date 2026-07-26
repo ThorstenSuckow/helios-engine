@@ -57,6 +57,11 @@ export namespace helios::engine::runtime::world {
         float totalTime_ = 0.0f;
 
         /**
+        * @brief The current frame count, since the GameLoop started.
+         */
+        std::size_t frameCount_ = 0;
+
+        /**
          * @brief Immutable snapshot of input state for the current frame.
          */
         const helios::engine::input::InputSnapshot& inputSnapshot_;
@@ -128,11 +133,11 @@ export namespace helios::engine::runtime::world {
          * @param runtimeEnvironment Reference to runtime-environment state.
          * @param deltaTime Time since last frame in seconds.
          * @param totalTime Accumulated time in seconds.
+         * @param frameCount Accumulated frames.
          * @param phaseEventBus Phase-level event bus.
          * @param passEventBus Pass-level event bus.
          * @param frameEventBus Frame-level event bus.
          * @param inputSnapshot Immutable frame input snapshot.
-         * @param viewportSnapshots Immutable frame viewport snapshot set.
          * @param level Active level pointer, or nullptr.
          * @param engineWorld Aggregate typed world for entity operations.
          */
@@ -141,6 +146,7 @@ export namespace helios::engine::runtime::world {
             helios::engine::runtime::world::RuntimeEnvironment& runtimeEnvironment,
             const float deltaTime,
             const float totalTime,
+            const std::size_t frameCount,
             helios::engine::runtime::messaging::event::GameLoopEventBus& phaseEventBus,
             helios::engine::runtime::messaging::event::GameLoopEventBus& passEventBus,
             helios::engine::runtime::messaging::event::GameLoopEventBus& frameEventBus,
@@ -152,6 +158,7 @@ export namespace helios::engine::runtime::world {
         runtimeEnvironment_(runtimeEnvironment),
         deltaTime_(deltaTime),
         totalTime_(totalTime),
+        frameCount_(frameCount),
         phaseEventSink_(phaseEventBus.writeSink()),
         phaseEventSource_(phaseEventBus.readSource()),
         passEventSink_(passEventBus.writeSink()),
@@ -183,6 +190,15 @@ export namespace helios::engine::runtime::world {
          */
         [[nodiscard]] float totalTime() const noexcept {
             return totalTime_;
+        }
+
+        /**
+         * @brief Returns the current frame count.
+         *
+         * @return Current frame count.
+         */
+        [[nodiscard]] std::size_t frameCount() const noexcept {
+            return frameCount_;
         }
 
         /**

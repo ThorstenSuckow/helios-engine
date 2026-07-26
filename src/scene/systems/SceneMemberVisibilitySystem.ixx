@@ -229,6 +229,9 @@ export namespace helios::engine::scene::systems {
                     pcc->fovY(), pcc->aspectRatio(), pcc->zNear(), pcc->zFar(), lac->value()
                 );
 
+                /**
+                 * @todo  Frustum culling only if camera changed amd if objects are stationary?
+                 */
                 auto cullingContext = CullingContext<TMemberHandle>{frustumPlanes, pmc->value(), lac->value()};
 
                 processMembers<Instanced>(

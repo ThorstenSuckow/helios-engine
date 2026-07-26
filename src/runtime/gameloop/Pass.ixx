@@ -9,6 +9,7 @@ module;
 #include <memory>
 #include <cassert>
 #include <vector>
+#include <functional>
 
 export module helios.engine.runtime.gameloop:Pass;
 
@@ -225,6 +226,10 @@ export namespace helios::engine::runtime::gameloop {
         }
 
     public:
+
+        using RunCondition = std::function<bool(UpdateContext&)>;
+
+
         virtual ~Pass() = default;
 
         /**
@@ -265,6 +270,15 @@ export namespace helios::engine::runtime::gameloop {
          * @return True if the pass should run.
          */
         virtual bool shouldRun(helios::engine::runtime::world::UpdateContext& updateContext) const noexcept = 0;
+
+        /**
+         * @brief Specifies an additional condition to be considered with shouldRun().
+         *
+         * @param fn The conditional function to evaluate.
+         *
+         * @return Reference to this pass for method chaining.
+         */
+        virtual Pass& runIf(RunCondition fn) = 0;
 
         /**
          * @brief Adds a system of type T to this pass.

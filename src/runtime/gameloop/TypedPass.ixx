@@ -7,6 +7,7 @@ module;
 #include <type_traits>
 #include <utility>
 #include <cassert>
+#include <functional>
 
 export module helios.engine.runtime.gameloop:TypedPass;
 
@@ -123,6 +124,7 @@ export namespace helios::engine::runtime::gameloop {
             }
         }
 
+        std::vector<RunCondition> runConditions_;
 
         public:
 
@@ -145,6 +147,13 @@ export namespace helios::engine::runtime::gameloop {
             return owner_;
         }
 
+        /**
+         * @copydoc Pass::runIf
+         */
+        Pass& runIf(RunCondition fn) {
+            runConditions_.push_back(std::move(fn));
+            return *this;
+        }
 
         /**
          * @brief Checks if this pass should execute based on current state.
@@ -159,7 +168,17 @@ export namespace helios::engine::runtime::gameloop {
          */
         [[nodiscard]] bool shouldRun(helios::engine::runtime::world::UpdateContext& updateContext) const noexcept override {
             auto state = updateContext.session().state<StateType>();
-            return hasFlag(mask_, state);
+            if (!hasFlag(mask_, state)) {
+                return false;
+            }
+
+            for (const auto& condition : runConditions_) {
+                if (!condition(updateContext)) {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         /**

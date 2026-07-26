@@ -29,6 +29,11 @@ export namespace helios::engine::platform::window::types {
         /** @brief Aspect-ratio denominator used for optional ratio locking. */
         float aspectRatioDenom;
 
+        /**
+         * @brief Whether to enable or disable vsync.
+         */
+        bool vsyncEnabled;
+
     };
 
 } // namespace helios::engine::platform::window::types

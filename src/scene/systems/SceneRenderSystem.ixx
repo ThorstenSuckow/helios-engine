@@ -81,15 +81,18 @@ export namespace helios::engine::scene::systems {
      *
      * @tparam TOwnerHandle Viewport entity handle type.
      * @tparam TMemberHandle Scene member handle type.
+     * @tparam TSubmissionMode Submission mode (`Instanced` oder `NonInstanced`).
      * @tparam TCommandBuffer Command buffer used for extracted render commands.
      */
     template<
         typename TOwnerHandle,
         typename TMemberHandle,
+        typename TSubmissionMode,
         typename TCommandBuffer = NullCommandBuffer
     >
     requires IsViewportHandle<TOwnerHandle> &&
-             IsCommandBufferLike<TCommandBuffer>
+             IsCommandBufferLike<TCommandBuffer> &&
+            (std::is_same_v<TSubmissionMode, Instanced> || std::is_same_v<TSubmissionMode, NonInstanced>)
     class SceneRenderSystem {
 
         static inline auto& logger_ = helios::engine::util::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
@@ -99,7 +102,7 @@ export namespace helios::engine::scene::systems {
          *
          * Filled by `SceneMemberVisibilitySystem` and read-only in this stage.
          */
-        SceneMemberVisibilityRegistry<TMemberHandle>& visibilityRegistry_;
+        const SceneMemberVisibilityRegistry<TMemberHandle, TSubmissionMode>& visibilityRegistry_;
 
 
         /**
@@ -114,8 +117,8 @@ export namespace helios::engine::scene::systems {
          */
         void dispatchNonInstancedRenderCommands(
             UpdateContext& updateContext,
-             std::span<const std::vector<SceneMemberVisibilityContext<TMemberHandle, NonInstanced>>> visibilityContexts,
-             TCommandBuffer& cmdBuffer) {
+             std::span<const std::vector<SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>>> visibilityContexts,
+             TCommandBuffer& cmdBuffer) requires std::is_same_v<TSubmissionMode, NonInstanced>  {
 
 
             for (const auto& viewportContexts : visibilityContexts) {
@@ -128,7 +131,7 @@ export namespace helios::engine::scene::systems {
                     const auto entity = updateContext.find<TMemberHandle>(memberContext.memberHandle);
                     assert(entity && "Unexpected missing entity");
 
-                    const auto* renderPrototype = entity->template get<RenderPrototypeComponent<TMemberHandle, Instanced>>();
+                    const auto* renderPrototype = entity->template get<RenderPrototypeComponent<TMemberHandle, TSubmissionMode>>();
                     assert(renderPrototype && "Unexpected missing RenderPrototypeComponent");
 
                     cmdBuffer.template add<RenderSceneMemberCommand<TMemberHandle>>(SceneMemberRenderContext<TMemberHandle>{
@@ -156,10 +159,10 @@ export namespace helios::engine::scene::systems {
          * @param visibilityContexts Visible instanced members grouped by viewport.
          * @param cmdBuffer Command buffer receiving render commands.
          */
-        void dispatchInstancedRenderCommands(
+        void dispatchInstancedRenderCommands (
             UpdateContext& updateContext,
-            std::span<const std::vector<SceneMemberVisibilityContext<TMemberHandle, Instanced>>> visibilityContexts,
-            TCommandBuffer& cmdBuffer) {
+            std::span<const std::vector<SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>>> visibilityContexts,
+            TCommandBuffer& cmdBuffer) requires std::is_same_v<TSubmissionMode, Instanced> {
 
             std::optional<InstanceRenderBatchContext<TMemberHandle>> renderBatchContext;
 
@@ -236,7 +239,7 @@ export namespace helios::engine::scene::systems {
          *
          * @param visibilityRegistry Registry containing per-frame visible/culled members.
          */
-        explicit SceneRenderSystem(SceneMemberVisibilityRegistry<TMemberHandle>& visibilityRegistry)
+        explicit SceneRenderSystem(const SceneMemberVisibilityRegistry<TMemberHandle, TSubmissionMode>& visibilityRegistry)
         : visibilityRegistry_(visibilityRegistry) {
         }
 
@@ -252,19 +255,20 @@ export namespace helios::engine::scene::systems {
          */
         void update(UpdateContext& updateContext, TCommandBuffer& cmdBuffer) noexcept {
 
-            auto sceneRenderContexts = visibilityRegistry_.sceneRenderContexts();
-
-            for (auto& sceneRenderContext : sceneRenderContexts) {
+            for (auto sceneRenderContexts = visibilityRegistry_.sceneRenderContexts();
+                auto& sceneRenderContext : sceneRenderContexts) {
                 cmdBuffer.template add<RenderSceneCommand<TMemberHandle>>(sceneRenderContext);
             }
 
-            const auto instancedMembers = visibilityRegistry_.template visibleMembers<Instanced>();
-            dispatchInstancedRenderCommands(updateContext, instancedMembers, cmdBuffer);
+            const auto members = visibilityRegistry_.visibleMembers();
 
-            const auto nonInstancedMembers = visibilityRegistry_.template visibleMembers<NonInstanced>();
-            dispatchNonInstancedRenderCommands(updateContext, nonInstancedMembers, cmdBuffer);
-
-
+            if constexpr (std::is_same_v<TSubmissionMode, Instanced>) {
+                dispatchInstancedRenderCommands(updateContext, members, cmdBuffer);
+            } else if constexpr (std::is_same_v<TSubmissionMode, NonInstanced>) {
+                dispatchNonInstancedRenderCommands(updateContext, members, cmdBuffer);
+            } else {
+                static_assert(false, "Unsupported submission mode");
+            }
         }
 
     };

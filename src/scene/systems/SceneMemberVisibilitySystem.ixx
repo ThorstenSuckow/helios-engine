@@ -76,18 +76,19 @@ export namespace helios::engine::scene::systems {
      *
      * @tparam TOwnerHandle Viewport owner handle type.
      * @tparam TMemberHandle Scene member handle type.
+     * @tparam TSubmissionMode Submission mode (`Instanced` oder `NonInstanced`).
      * @tparam TCullingStrategy Strategy used to decide member visibility.
-     * @tparam TRenderModes Reserved render mode parameter pack.
      */
     template<
         typename TOwnerHandle,
         typename TMemberHandle,
-        typename TCullingStrategy,
-        typename ... TRenderModes
+        typename TSubmissionMode,
+        typename TCullingStrategy
     >
     requires IsViewportHandle<TOwnerHandle> &&
              IsFrustumCullerLike<TCullingStrategy, typename TCullingStrategy::MemberHandle_type> &&
-             std::same_as<typename TCullingStrategy::MemberHandle_type, TMemberHandle>
+             std::same_as<typename TCullingStrategy::MemberHandle_type, TMemberHandle> &&
+            (std::same_as<TSubmissionMode, Instanced> || std::same_as<TSubmissionMode, NonInstanced>)
     class SceneMemberVisibilitySystem {
 
         /**
@@ -100,7 +101,7 @@ export namespace helios::engine::scene::systems {
         /**
          * @brief Tracks visible and culled members per viewport for diagnostics/debugging.
          */
-        SceneMemberVisibilityRegistry<TMemberHandle>& visibilityRegistry_;
+        SceneMemberVisibilityRegistry<TMemberHandle, TSubmissionMode>& visibilityRegistry_;
 
 
         /**
@@ -108,14 +109,12 @@ export namespace helios::engine::scene::systems {
          *
          * Appends each member to the visibility registry as either visible or culled.
          *
-         * @tparam TSubmissionMode Submission mode (`Instanced` or `NonInstanced`).
          * @param updateContext ECS/world update context.
          * @param cullingContext Reusable culling context used per member.
          * @param sceneHandle Scene currently bound to the viewport.
          * @param renderTargetBindingComponent Render target bound to the viewport.
          * @param viewportEntity Viewport entity being processed.
          */
-        template<typename TSubmissionMode>
         void processMembers(
             UpdateContext& updateContext,
             CullingContext<TMemberHandle>& cullingContext,
@@ -155,9 +154,9 @@ export namespace helios::engine::scene::systems {
 
 
                 if (smc->targetHandle() == sceneHandle && cullingStrategy_.shouldRender(cullingContext)) {
-                    visibilityRegistry_.template addVisibleMember<TSubmissionMode>(viewportEntity.handle(), std::move(memberContext));
+                    visibilityRegistry_.addVisibleMember(viewportEntity.handle(), std::move(memberContext));
                 } else {
-                    visibilityRegistry_.template addCulledMember<TSubmissionMode>(viewportEntity.handle(), std::move(memberContext));
+                    visibilityRegistry_.addCulledMember(viewportEntity.handle(), std::move(memberContext));
                 }
             }
         }
@@ -177,7 +176,7 @@ export namespace helios::engine::scene::systems {
          * @param cullingStrategy Culling strategy instance.
          * @param visibilityRegistry Registry receiving per-frame visibility results.
          */
-        explicit SceneMemberVisibilitySystem(TCullingStrategy cullingStrategy, SceneMemberVisibilityRegistry<TMemberHandle>& visibilityRegistry)
+        explicit SceneMemberVisibilitySystem(TCullingStrategy cullingStrategy, SceneMemberVisibilityRegistry<TMemberHandle, TSubmissionMode>& visibilityRegistry)
         : cullingStrategy_(std::move(cullingStrategy)), visibilityRegistry_(visibilityRegistry) {
         }
 
@@ -234,13 +233,11 @@ export namespace helios::engine::scene::systems {
                  */
                 auto cullingContext = CullingContext<TMemberHandle>{frustumPlanes, pmc->value(), lac->value()};
 
-                processMembers<Instanced>(
-                    updateContext, cullingContext, sceneHandle, *renderTargetBindingComponent, viewportEntity);
-                processMembers<NonInstanced>(
+                processMembers(
                     updateContext, cullingContext, sceneHandle, *renderTargetBindingComponent, viewportEntity);
             }
-
         }
+
 
     };
 

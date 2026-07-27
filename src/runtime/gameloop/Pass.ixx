@@ -152,20 +152,27 @@ export namespace helios::engine::runtime::gameloop {
             return *this;
         }
 
-        template<typename T, typename... Args>
-        requires helios::engine::runtime::world::concepts::IsTypedSystemLike<T>
-        Pass& registerParallelTypedSystem(Args&&... args) {
+        /**
+         * @brief Registers System instances that shoudl be run as parallel.
+         *
+         * @tparam TSystem The type of the system to register.
+         * @param system The system instance to register.
+         * @return Reference to this pass.
+         */
+        template<typename TSystem>
+        requires helios::engine::runtime::world::concepts::IsTypedSystemLike<std::remove_cvref_t<TSystem>>
+        Pass& registerParallelTypedSystemInstance(TSystem&& system) {
 
-            T concreteSystem(std::forward<Args>(args)...);
+            using T = std::remove_cvref_t<TSystem>;
 
             if constexpr (requires { typename T::CommandBuffer_type; }) {
                 using TCommandBuffer = typename T::CommandBuffer_type;
                 systemRegistry_.template add<T>(
-                    System(std::move(concreteSystem), TCommandBuffer())
+                    System(std::forward<TSystem>(system), TCommandBuffer())
                 );
             } else {
                 systemRegistry_.template add<T>(
-                    System(std::move(concreteSystem))
+                    System(std::forward<TSystem>(system))
                 );
             }
 
@@ -278,7 +285,7 @@ export namespace helios::engine::runtime::gameloop {
          *
          * @return Reference to this pass for method chaining.
          */
-        virtual Pass& runIf(RunCondition fn) = 0;
+        virtual Pass& runIf(RunCondition fn) noexcept = 0;
 
         /**
          * @brief Adds a system of type T to this pass.
@@ -312,7 +319,7 @@ export namespace helios::engine::runtime::gameloop {
          *
          * @return Reference to this Pass for method chaining.
          */
-        template<typename ...TSystem>
+       template<typename ...TSystem>
         requires (helios::engine::runtime::world::concepts::IsTypedSystemLike<TSystem> && ...)
                 && (sizeof...(TSystem) >= 2)
         Pass& addParallelSystems() {
@@ -346,17 +353,15 @@ export namespace helios::engine::runtime::gameloop {
          * @return Reference to this pass for method chaining.
          */
         template<typename ...TSystem>
-        requires (helios::engine::runtime::world::concepts::IsTypedSystemLike<
-                typename std::remove_cvref_t<TSystem>::System_type
-                > && ...)
+        requires (helios::engine::runtime::world::concepts::IsTypedSystemLike<std::remove_cvref_t<TSystem>> && ...)
                 && (sizeof...(TSystem) >= 2)
         Pass& addParallelSystems(TSystem&&... system) {
 
-            (registerParallelTypedSystemSpec<TSystem>(std::forward<TSystem>(system)), ...);
+            (registerParallelTypedSystemInstance<TSystem>(std::forward<TSystem>(system)), ...);
 
             auto& group = systemTypeIdQueue_.emplace_back();
             group.reserve(sizeof...(TSystem));
-            (group.push_back({SystemTypeId::template id<typename std::remove_cvref_t<TSystem>::System_type>()}), ...);
+            (group.push_back({SystemTypeId::template id<std::remove_cvref_t<TSystem>>()}), ...);
 
             return *this;
         }

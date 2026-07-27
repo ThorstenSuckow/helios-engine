@@ -9,4 +9,5 @@ export import helios.engine.runtime.world.concepts.HasUpdate;
 export import helios.engine.runtime.world.concepts.IsManagerLike;
 export import helios.engine.runtime.world.concepts.IsSystemLike;
 export import helios.engine.runtime.world.concepts.HasFlushParallel;
+export import helios.engine.runtime.world.concepts.HasFlush;
 

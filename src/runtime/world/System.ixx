@@ -93,6 +93,11 @@ export namespace helios::engine::runtime::world {
             }
 
             void flush(UpdateContext& ctx) noexcept override {
+
+                if constexpr (HasFlush<T>) {
+                    system_.flush(ctx);
+                }
+
                 if constexpr (requires { typename T::CommandBuffer_type; }) {
                     static_cast<typename T::CommandBuffer_type*>(injectedBuffer_)->flush(ctx);
                 }
@@ -128,6 +133,9 @@ export namespace helios::engine::runtime::world {
             }
 
             void flush(UpdateContext& updateContext) noexcept override {
+                if constexpr (HasFlush<T>) {
+                    system_.flush(updateContext);
+                }
                 commandBuffer_.flush(updateContext);
             }
 

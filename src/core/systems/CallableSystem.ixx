@@ -105,7 +105,7 @@ export namespace helios::engine::core::systems {
      * @return A CallableSystem specialized for the given handle/tag type and callable.
      */
     template<typename THandle, typename TFunc>
-    [[nodiscard]] auto callableSystemForLambda(TFunc&& func) {
+    [[nodiscard]] auto Lambda(TFunc&& func) {
         using FuncType = std::remove_cvref_t<TFunc>;
 
         return CallableSystem<THandle, FuncType>(std::forward<TFunc>(func));
@@ -125,7 +125,7 @@ export namespace helios::engine::core::systems {
      */
     template<typename THandle, typename TCommandBuffer, typename TFunc>
     requires IsCommandBufferLike<TCommandBuffer>
-    [[nodiscard]] auto callableSystemForLambda(TFunc&& func) {
+    [[nodiscard]] auto Lambda(TFunc&& func) {
         using FuncType = std::remove_cvref_t<TFunc>;
 
         return CallableSystem<THandle, TCommandBuffer, FuncType>(std::forward<TFunc>(func));

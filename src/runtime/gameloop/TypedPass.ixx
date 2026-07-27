@@ -150,7 +150,7 @@ export namespace helios::engine::runtime::gameloop {
         /**
          * @copydoc Pass::runIf
          */
-        Pass& runIf(RunCondition fn) {
+        Pass& runIf(RunCondition fn) noexcept override {
             runConditions_.push_back(std::move(fn));
             return *this;
         }

@@ -41,9 +41,8 @@ export namespace helios::engine::rendering::common::concepts {
      * @brief Constrains types that provide the rendering backend API surface.
      *
      * @tparam T Backend candidate type.
-     * @tparam THandle Scene member handle type used by `doRender`.
      */
-    template<typename T, typename THandle>
+    template<typename T>
     concept IsRenderBackendLike = requires(
             T& t,
             const T& ct,

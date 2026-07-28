@@ -79,19 +79,16 @@ export namespace helios::engine::scene::systems {
      * render commands and member-level commands for both instanced and
      * non-instanced submission paths.
      *
-     * @tparam TOwnerHandle Viewport entity handle type.
      * @tparam TMemberHandle Scene member handle type.
      * @tparam TSubmissionMode Submission mode (`Instanced` oder `NonInstanced`).
      * @tparam TCommandBuffer Command buffer used for extracted render commands.
      */
     template<
-        typename TOwnerHandle,
         typename TMemberHandle,
         typename TSubmissionMode,
         typename TCommandBuffer = NullCommandBuffer
     >
-    requires IsViewportHandle<TOwnerHandle> &&
-             IsCommandBufferLike<TCommandBuffer> &&
+    requires IsCommandBufferLike<TCommandBuffer> &&
             (std::is_same_v<TSubmissionMode, Instanced> || std::is_same_v<TSubmissionMode, NonInstanced>)
     class SceneRenderSystem {
 

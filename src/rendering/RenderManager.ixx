@@ -74,8 +74,8 @@ export namespace helios::engine::rendering {
      * @tparam TRenderBackend Rendering backend type.
      * @tparam TMemberHandle Renderable scene member handle type.
      */
-    template<typename TRenderBackend, typename TMemberHandle>
-    requires IsRenderBackendLike<TRenderBackend, TMemberHandle>
+    template<typename TRenderBackend, typename ...TMemberHandles>
+    requires IsRenderBackendLike<TRenderBackend>
     class RenderManager {
 
         /**
@@ -122,20 +122,18 @@ export namespace helios::engine::rendering {
             return batch;
         }
 
+
         /**
          * @brief Lowest-level batch collecting draw contexts for one mesh.
-         *
-         * @tparam TDrawMemberHandle Draw/member handle type.
          */
-        template<typename TDrawMemberHandle>
         struct MeshBatch {
             bool isActive{false};
             MeshHandle handle;
-            std::vector<SceneMemberRenderContext<TDrawMemberHandle>> drawContexts;
-            std::vector<InstanceData<TDrawMemberHandle>> instanceData;
+            std::vector<DrawContext> drawContexts;
+            std::vector<InstanceData> instanceData;
             MeshBatch() {
                 drawContexts.reserve(DEFAULT_GAMEOBJECT_CAPACITY);
-                instanceData.reserve(DEFAULT_INSTANCE_DATA_CAPACITY);
+               // instanceData.reserve(DEFAULT_INSTANCE_DATA_CAPACITY);
             }
             void clear() {
                 isActive = false;
@@ -146,17 +144,14 @@ export namespace helios::engine::rendering {
 
         /**
          * @brief Groups mesh batches for one material.
-         *
-         * @tparam TDrawMemberHandle Draw/member handle type.
          */
-        template<typename TDrawMemberHandle>
         struct MaterialBatch {
             bool isActive{false};
             MaterialHandle handle;
-            std::vector<MeshBatch<TDrawMemberHandle>> batches;
+            std::vector<MeshBatch> batches;
             std::vector<EntityId> activeIndices;
             MaterialBatch(){batches.reserve(DEFAULT_MESH_POOL_CAPACITY);}
-            [[nodiscard]] MeshBatch<TDrawMemberHandle>& getOrAdd(MeshHandle handle) {
+            [[nodiscard]] MeshBatch& getOrAdd(MeshHandle handle) {
                 return addToBatch(handle, batches, activeIndices);
             }
             void clear() {
@@ -166,17 +161,14 @@ export namespace helios::engine::rendering {
 
         /**
          * @brief Groups material batches for one shader.
-         *
-         * @tparam TDrawMemberHandle Draw/member handle type.
          */
-        template<typename TDrawMemberHandle>
         struct ShaderBatch {
             bool isActive{false};
             ShaderHandle handle;
-            std::vector<MaterialBatch<TDrawMemberHandle>> batches;
+            std::vector<MaterialBatch> batches;
             std::vector<EntityId> activeIndices;
             ShaderBatch(){batches.reserve(DEFAULT_MATERIAL_POOL_CAPACITY);}
-            [[nodiscard]] MaterialBatch<TDrawMemberHandle>& getOrAdd(MaterialHandle handle) {
+            [[nodiscard]] MaterialBatch& getOrAdd(MaterialHandle handle) {
                 return addToBatch(handle, batches, activeIndices);
             }
             void clear() {
@@ -186,16 +178,13 @@ export namespace helios::engine::rendering {
 
         /**
          * @brief Groups shader batches for one viewport.
-         *
-         * @tparam TDrawMemberHandle Draw/member handle type.
          */
-        template<typename TDrawMemberHandle>
         struct ViewportBatch {
             bool isActive{false};
             ViewportHandle handle;
-            std::vector<ShaderBatch<TDrawMemberHandle>> batches;
+            std::vector<ShaderBatch> batches;
             std::vector<EntityId> activeIndices;
-            [[nodiscard]] ShaderBatch<TDrawMemberHandle>& getOrAdd(ShaderHandle handle) {
+            [[nodiscard]] ShaderBatch& getOrAdd(ShaderHandle handle) {
                 return addToBatch(handle, batches, activeIndices);
             }
             ViewportBatch(){batches.reserve(DEFAULT_SHADER_POOL_CAPACITY);}
@@ -206,16 +195,13 @@ export namespace helios::engine::rendering {
 
         /**
          * @brief Top-level batch grouping viewport batches per render target.
-         *
-         * @tparam TDrawMemberHandle Draw/member handle type.
          */
-        template<typename TDrawMemberHandle>
         struct RenderTargetBatch {
             bool isActive{false};
             RenderTargetHandle handle;
-            std::vector<ViewportBatch<TDrawMemberHandle>> batches;
+            std::vector<ViewportBatch> batches;
             std::vector<EntityId> activeIndices;
-            [[nodiscard]] ViewportBatch<TDrawMemberHandle>& getOrAdd(ViewportHandle handle) {
+            [[nodiscard]] ViewportBatch& getOrAdd(ViewportHandle handle) {
                 return addToBatch(handle, batches, activeIndices);
             }
             RenderTargetBatch(){batches.reserve(DEFAULT_VIEWPORT_POOL_CAPACITY);}
@@ -234,7 +220,7 @@ export namespace helios::engine::rendering {
         /**
          * @brief Top-level render-target batch storage indexed by handle entity id.
          */
-        std::vector<RenderTargetBatch<TMemberHandle>> renderTargetBatches_;
+        std::vector<RenderTargetBatch> renderTargetBatches_;
 
         /**
          * @brief Active render-target indices used for frame-local flush traversal.
@@ -253,7 +239,7 @@ export namespace helios::engine::rendering {
          * @param viewportHandle Viewport used as second-level batch key.
          * @return Active viewport batch for the given handles.
          */
-        [[nodiscard]] ViewportBatch<TMemberHandle>& ensureViewportBatch(
+        [[nodiscard]] ViewportBatch& ensureViewportBatch(
             RenderTargetHandle renderTargetHandle, ViewportHandle viewportHandle) {
 
             auto renderTargetId = renderTargetHandle.entityId;
@@ -351,8 +337,8 @@ export namespace helios::engine::rendering {
 
                                 renderBackend_.beginMeshBatch(meshBatch.handle);
 
-                                renderBackend_.template renderBatch<TMemberHandle>(meshBatch.drawContexts);
-                                renderBackend_.template renderBatch<TMemberHandle>(meshBatch.instanceData);
+                                renderBackend_.renderBatch(meshBatch.drawContexts);
+                                renderBackend_.renderBatch(meshBatch.instanceData);
 
                                 renderBackend_.endMeshBatch(meshBatch.handle);
                             } // materialBatch
@@ -389,6 +375,7 @@ export namespace helios::engine::rendering {
          * @param renderSceneCommand Command containing scene-level render context.
          * @return `true` if the command was accepted.
          */
+        template<typename TMemberHandle>
         bool submit(RenderSceneCommand<TMemberHandle>&& renderSceneCommand) noexcept {
 
             std::ignore = ensureViewportBatch(
@@ -409,13 +396,22 @@ export namespace helios::engine::rendering {
          * @param renderCommand Command containing per-member render context.
          * @return `true` if the command was accepted.
          */
+        template<typename TMemberHandle>
         bool submit(RenderSceneMemberCommand<TMemberHandle>&& renderCommand) noexcept {
 
             auto renderContext = std::move(renderCommand.sceneMemberRenderContext);
 
             auto& meshBatch = meshBatchFor(renderContext);
 
-            meshBatch.drawContexts.push_back(std::move(renderContext));
+            meshBatch.drawContexts.emplace_back({
+                renderContext.renderTargetHandle,
+                renderContext.viewportHandle,
+                renderContext.sceneHandle,
+                renderContext.meshHandle,
+                renderContext.materialHandle,
+                renderContext.shaderHandle,
+                renderContext.worldMatrix
+            });
 
             return true;
         }
@@ -429,7 +425,8 @@ export namespace helios::engine::rendering {
          * @param renderCommand Command containing instance batch context.
          * @return `true` if the command was accepted.
          */
-        bool submit(RenderInstanceBatchCommand<TMemberHandle>&&renderCommand) noexcept {
+        template<typename TMemberHandle>
+        bool submit(RenderInstanceBatchCommand<TMemberHandle>&& renderCommand) noexcept {
 
             auto renderContext = std::move(renderCommand.instanceRenderBatchContext);
 
@@ -453,11 +450,11 @@ export namespace helios::engine::rendering {
          */
         void init(CommandHandlerRegistry& commandHandlerRegistry) noexcept {
 
-            commandHandlerRegistry.handleCommands<
-                RenderSceneMemberCommand<TMemberHandle>,
-                RenderInstanceBatchCommand<TMemberHandle>,
-                RenderSceneCommand<TMemberHandle>
-            >(*this);
+            (commandHandlerRegistry.handleCommands<
+                RenderSceneMemberCommand<TMemberHandles>,
+                RenderInstanceBatchCommand<TMemberHandles>,
+                RenderSceneCommand<TMemberHandles>
+            >(*this), ...);
 
 
         };

@@ -13,6 +13,7 @@ export module helios.engine.runtime.world.EngineWorld;
 import helios.ecs;
 
 import helios.engine.runtime.world.GameObjectEntityManager;
+import helios.engine.runtime.world.ParticleEntityManager;
 
 import helios.engine.platform.window.WindowEntityManager;
 import helios.engine.platform.window.concepts;
@@ -29,6 +30,7 @@ import helios.engine.rendering.material.MaterialEntityManager;
 import helios.engine.rendering.mesh.MeshEntityManager;
 
 import helios.engine.runtime.world.concepts.IsGameObjectHandle;
+import helios.engine.runtime.world.concepts.IsParticleHandle;
 import helios.engine.runtime.world.types.GameObjectHandle;
 
 import helios.engine.platform.window.concepts;
@@ -37,6 +39,7 @@ import helios.engine.rendering.common.concepts.IsRenderResourceHandle;
 import helios.engine.rendering.common.concepts;
 
 import helios.engine.scene.SceneEntityManager;
+import helios.engine.scene.CameraEntityManager;
 import helios.engine.scene.concepts;
 
 import helios.engine.rendering.viewport.ViewportEntityManager;
@@ -65,15 +68,18 @@ using namespace helios::engine::scene::concepts;
 template<typename T>
 inline constexpr bool typed_false = false;
 
-template<typename T>
-concept IsGameplaySystemHandle = IsGameObjectHandle<T> || helios::engine::scene::concepts::IsSceneHandle<T>;
 
 export namespace helios::engine::runtime::world {
 
     /**
      * @brief Typed world containing game-object entity managers.
      */
-    using GameObjectWorld = TypedHandleWorld<GameObjectEntityManager, SceneEntityManager>;
+    using GameObjectWorld = TypedHandleWorld<GameObjectEntityManager>;
+
+    /**
+     * @brief Typed world containing particle entity managers.
+     */
+    using ParticleWorld = TypedHandleWorld<ParticleEntityManager>;
 
     /**
      * @brief Typed world containing render-resource entity managers.
@@ -86,9 +92,9 @@ export namespace helios::engine::runtime::world {
     using PlatformWorld = TypedHandleWorld<WindowEntityManager, PlatformEntityManager>;
 
     /**
-     * @brief Typed world containing render-target entity managers.
+     * @brief Typed world containing render-view related entity managers.
      */
-    using RenderTargetWorld = TypedHandleWorld<RenderTargetEntityManager, ViewportEntityManager>;
+    using RenderViewWorld = TypedHandleWorld<RenderTargetEntityManager, SceneEntityManager, CameraEntityManager, ViewportEntityManager>;
 
     /**
      * @brief Concatenated tuple of all entity-manager types used by `EngineWorld`.
@@ -97,7 +103,8 @@ export namespace helios::engine::runtime::world {
         GameObjectWorld::EntityManager_types,
         RenderResourceWorld::EntityManager_types,
         PlatformWorld::EntityManager_types,
-        RenderTargetWorld::EntityManager_types
+        RenderViewWorld::EntityManager_types,
+        ParticleWorld::EntityManager_types
     >::type;
 
     /** @brief Minimal type-list used to carry handle types without instantiation. */
@@ -128,14 +135,15 @@ export namespace helios::engine::runtime::world {
      *        correct domain-specific `TypedHandleWorld` based on the handle type.
      *
      * Routes `add`, `find`, `view`, `destroy`, `clone`, `clearDirtySets`, etc.
-     * to one of four sub-worlds: game objects, render resources, platform, or render targets.
+     * to one of the sub-worlds.
      */
     class EngineWorld {
 
         GameObjectWorld gameObjectWorld_{};
         RenderResourceWorld renderResourceWorld_{};
         PlatformWorld platformWorld_{};
-        RenderTargetWorld renderTargetWorld_{};
+        RenderViewWorld renderViewWorld_{};
+        ParticleWorld particleWorld_{};
 
         /**
          * @brief Clears all dirty sets for every handle type in `THandles` inside `world`.
@@ -175,8 +183,15 @@ export namespace helios::engine::runtime::world {
         /**
          * @brief Returns the render-target and viewport sub-world.
          */
-        [[nodiscard]] RenderTargetWorld& renderTargetWorld() {
-            return renderTargetWorld_;
+        [[nodiscard]] RenderViewWorld& renderViewWorld() {
+            return renderViewWorld_;
+        }
+
+        /**
+         * @brief Returns the particle sub-world.
+         */
+        [[nodiscard]] ParticleWorld& particleWorld() {
+            return particleWorld_;
         }
 
         /**
@@ -189,14 +204,16 @@ export namespace helios::engine::runtime::world {
         template<typename THandle>
         [[nodiscard]] auto clone(THandle source) noexcept {
 
-            if constexpr(IsGameplaySystemHandle<THandle>) {
+            if constexpr(IsGameObjectHandle<THandle>) {
                 return gameObjectWorld_.cloneEntity<THandle>(source);
             } else if constexpr(IsAnyPlatformHandle<THandle>){
                 return platformWorld_.cloneEntity<THandle>(source);
             } else if constexpr(IsRenderResourceHandle<THandle>) {
                 return renderResourceWorld_.cloneEntity<THandle>(source);
-            } else if constexpr(IsRenderTargetHandle<THandle>) {
-                return renderTargetWorld_.cloneEntity<THandle>(source);
+            } else if constexpr(IsRenderViewHandle<THandle>) {
+                return renderViewWorld_.cloneEntity<THandle>(source);
+            } else if constexpr(IsParticleHandle<THandle>) {
+                return particleWorld_.cloneEntity<THandle>(source);
             } else {
                 static_assert(typed_false<THandle>, "Unsupported handle type for cloning");
             }
@@ -211,14 +228,16 @@ export namespace helios::engine::runtime::world {
         template<typename THandle>
         [[nodiscard]] auto& entityManager() noexcept {
 
-            if constexpr(IsGameplaySystemHandle<THandle>) {
+            if constexpr(IsGameObjectHandle<THandle>) {
                 return gameObjectWorld_.entityManager<THandle>();
             } else if constexpr(IsAnyPlatformHandle<THandle>){
                 return platformWorld_.entityManager<THandle>();
             } else if constexpr(IsRenderResourceHandle<THandle>) {
                 return renderResourceWorld_.entityManager<THandle>();
-            } else if constexpr(IsRenderTargetHandle<THandle>) {
-                return renderTargetWorld_.entityManager<THandle>();
+            } else if constexpr(IsRenderViewHandle<THandle>) {
+                return renderViewWorld_.entityManager<THandle>();
+            } else if constexpr(IsParticleHandle<THandle>) {
+                return particleWorld_.entityManager<THandle>();
             } else {
                 static_assert(typed_false<THandle>, "Unsupported handle type for entityManager");
             }
@@ -234,14 +253,16 @@ export namespace helios::engine::runtime::world {
         template<typename THandle, typename TComponent>
         [[nodiscard]] auto* sparseSet() noexcept {
 
-            if constexpr(IsGameplaySystemHandle<THandle>) {
+            if constexpr(IsGameObjectHandle<THandle>) {
                 return gameObjectWorld_.entityManager<THandle>().template sparseSet<TComponent>();
             } else if constexpr(IsAnyPlatformHandle<THandle>){
                 return platformWorld_.entityManager<THandle>().template sparseSet<TComponent>();
             } else if constexpr(IsRenderResourceHandle<THandle>) {
                 return renderResourceWorld_.entityManager<THandle>().template sparseSet<TComponent>();
-            } else if constexpr(IsRenderTargetHandle<THandle>) {
-                return renderTargetWorld_.entityManager<THandle>().template sparseSet<TComponent>();
+            } else if constexpr(IsRenderViewHandle<THandle>) {
+                return renderViewWorld_.entityManager<THandle>().template sparseSet<TComponent>();
+            } else if constexpr(IsParticleHandle<THandle>) {
+                return particleWorld_.entityManager<THandle>().template sparseSet<TComponent>();
             } else {
                 static_assert(typed_false<THandle>, "Unsupported handle type for storage");
             }
@@ -256,14 +277,16 @@ export namespace helios::engine::runtime::world {
         template<typename THandle>
         [[nodiscard]] bool isValid(THandle handle) noexcept {
 
-            if constexpr(IsGameplaySystemHandle<THandle>) {
+            if constexpr(IsGameObjectHandle<THandle>) {
                 return gameObjectWorld_.entityManager<THandle>().isValid(handle);
             } else if constexpr(IsAnyPlatformHandle<THandle>){
                 return platformWorld_.entityManager<THandle>().isValid(handle);
             } else if constexpr(IsRenderResourceHandle<THandle>) {
                 return renderResourceWorld_.entityManager<THandle>().isValid(handle);
-            } else if constexpr(IsRenderTargetHandle<THandle>) {
-                return renderTargetWorld_.entityManager<THandle>().isValid(handle);
+            } else if constexpr(IsRenderViewHandle<THandle>) {
+                return renderViewWorld_.entityManager<THandle>().isValid(handle);
+            } else if constexpr(IsParticleHandle<THandle>) {
+                return particleWorld_.entityManager<THandle>().isValid(handle);
             } else {
                 static_assert(typed_false<THandle>, "Unsupported handle type for storage");
             }
@@ -279,14 +302,16 @@ export namespace helios::engine::runtime::world {
         template<typename THandle>
         [[nodiscard]] auto find(THandle handle) noexcept {
 
-            if constexpr(IsGameplaySystemHandle<THandle>) {
+            if constexpr(IsGameObjectHandle<THandle>) {
                 return gameObjectWorld_.findEntity<THandle>(handle);
             } else if constexpr(IsAnyPlatformHandle<THandle>) {
                 return platformWorld_.findEntity<THandle>(handle);
             } else  if constexpr(IsRenderResourceHandle<THandle>) {
                 return renderResourceWorld_.findEntity<THandle>(handle);
-            } else if constexpr(IsRenderTargetHandle<THandle>) {
-                return renderTargetWorld_.findEntity<THandle>(handle);
+            } else if constexpr(IsRenderViewHandle<THandle>) {
+                return renderViewWorld_.findEntity<THandle>(handle);
+            } else if constexpr(IsParticleHandle<THandle>) {
+                return particleWorld_.findEntity<THandle>(handle);
             } else {
                 static_assert(typed_false<THandle>, "Unsupported handle type for searching");
             }
@@ -301,15 +326,17 @@ export namespace helios::engine::runtime::world {
          */
         template<typename THandle>
         [[nodiscard]] auto add(typename THandle::StrongId_type strongId = typename THandle::StrongId_type{}) {
-            if constexpr(IsGameplaySystemHandle<THandle>) {
+            if constexpr(IsGameObjectHandle<THandle>) {
                 return gameObjectWorld_.addEntity<THandle>(strongId);
             } else if constexpr(IsAnyPlatformHandle<THandle>) {
                 return platformWorld_.addEntity<THandle>(strongId);
             } else if constexpr(IsRenderResourceHandle<THandle>) {
                 return renderResourceWorld_.addEntity<THandle>(strongId);
-            } else if constexpr(IsRenderTargetHandle<THandle>) {
-                return renderTargetWorld_.addEntity<THandle>(strongId);
-            }  else {
+            } else if constexpr(IsRenderViewHandle<THandle>) {
+                return renderViewWorld_.addEntity<THandle>(strongId);
+            } else if constexpr(IsParticleHandle<THandle>) {
+                return particleWorld_.addEntity<THandle>(strongId);
+            } else {
                 static_assert(typed_false<THandle>, "Unsupported handle type for adding");
             }
         }
@@ -322,14 +349,16 @@ export namespace helios::engine::runtime::world {
          */
         template<typename THandle, typename... TComponents>
         [[nodiscard]] auto view() {
-            if constexpr(IsGameplaySystemHandle<THandle>) {
+            if constexpr(IsGameObjectHandle<THandle>) {
                 return gameObjectWorld_.template view<THandle, TComponents...>();
             } else if constexpr(IsAnyPlatformHandle<THandle>) {
                 return platformWorld_.template view<THandle, TComponents...>();
             } else if constexpr(IsRenderResourceHandle<THandle>) {
                 return renderResourceWorld_.template view<THandle, TComponents...>();
-            } else if constexpr(IsRenderTargetHandle<THandle>) {
-                return renderTargetWorld_.template view<THandle, TComponents...>();
+            } else if constexpr(IsRenderViewHandle<THandle>) {
+                return renderViewWorld_.template view<THandle, TComponents...>();
+            } else if constexpr(IsParticleHandle<THandle>) {
+                return particleWorld_.template view<THandle, TComponents...>();
             } else {
                 static_assert(typed_false<THandle>, "Unsupported handle type for viewing");
             }
@@ -345,14 +374,16 @@ export namespace helios::engine::runtime::world {
          */
         template<typename THandle>
         [[nodiscard]] auto destroy(const THandle handle) {
-            if constexpr(IsGameplaySystemHandle<THandle>) {
+            if constexpr(IsGameObjectHandle<THandle>) {
                 return gameObjectWorld_.destroy<THandle>(handle);
             } else if constexpr(IsAnyPlatformHandle<THandle>) {
                 return platformWorld_.destroy<THandle>(handle);
             } else  if constexpr(IsRenderResourceHandle<THandle>) {
                 return renderResourceWorld_.destroy<THandle>(handle);
-            } else if constexpr(IsRenderTargetHandle<THandle>) {
-                return renderTargetWorld_.destroy<THandle>(handle);
+            } else if constexpr(IsRenderViewHandle<THandle>) {
+                return renderViewWorld_.destroy<THandle>(handle);
+            } else if constexpr(IsParticleHandle<THandle>) {
+                return particleWorld_.destroy<THandle>(handle);
             } else {
                 static_assert(typed_false<THandle>, "Unsupported handle type for destroying");
             }
@@ -376,16 +407,19 @@ export namespace helios::engine::runtime::world {
                 clearDirtySetsForHandles<GameObjectWorld>(gameObjectWorld_, WorldHandles<GameObjectWorld>{});
                 clearDirtySetsForHandles<PlatformWorld>(platformWorld_, WorldHandles<PlatformWorld>{});
                 clearDirtySetsForHandles<RenderResourceWorld>(renderResourceWorld_, WorldHandles<RenderResourceWorld>{});
-                clearDirtySetsForHandles<RenderTargetWorld>(renderTargetWorld_, WorldHandles<RenderTargetWorld>{});
+                clearDirtySetsForHandles<RenderViewWorld>(renderViewWorld_, WorldHandles<RenderViewWorld>{});
+                clearDirtySetsForHandles<ParticleWorld>(particleWorld_, WorldHandles<ParticleWorld>{});
 
-            } else if constexpr(IsGameplaySystemHandle<THandle>) {
+            } else if constexpr(IsGameObjectHandle<THandle>) {
                 gameObjectWorld_.template clearDirtySets<THandle, TComponents...>();
             } else if constexpr(IsAnyPlatformHandle<THandle>) {
                 platformWorld_.template clearDirtySets<THandle, TComponents...>();
             } else if constexpr(IsRenderResourceHandle<THandle>) {
                 renderResourceWorld_.template clearDirtySets<THandle, TComponents...>();
-            } else if constexpr(IsRenderTargetHandle<THandle>) {
-                renderTargetWorld_.template clearDirtySets<THandle, TComponents...>();
+            } else if constexpr(IsRenderViewHandle<THandle>) {
+                renderViewWorld_.template clearDirtySets<THandle, TComponents...>();
+            } else if constexpr(IsParticleHandle<THandle>) {
+                particleWorld_.template clearDirtySets<THandle, TComponents...>();
             } else {
                 static_assert(typed_false<THandle>, "Unsupported handle type for clearDirtySets()");
             }

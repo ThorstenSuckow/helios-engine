@@ -29,6 +29,7 @@ import helios.engine.rendering.renderTarget.components.RenderTargetBindingCompon
 
 import helios.engine.spatial.components;
 
+import helios.engine.rendering.viewport.types;
 import helios.engine.rendering.viewport.ViewportEntity;
 
 import helios.engine.runtime.world.UpdateContext;
@@ -53,6 +54,7 @@ using namespace helios::ecs::components;
 using namespace helios::engine::rendering::common::components;
 using namespace helios::engine::rendering::viewport::concepts;
 using namespace helios::engine::rendering::viewport;
+using namespace helios::engine::rendering::viewport::types;
 using namespace helios::engine::rendering::renderTarget::components;
 using namespace helios::engine::scene::types;
 using namespace helios::engine::runtime::messaging::command::concepts;
@@ -74,19 +76,16 @@ export namespace helios::engine::scene::systems {
      * once per frame. The resulting visible/culled member lists are consumed by
      * subsequent rendering steps (for example by scene render submission).
      *
-     * @tparam TOwnerHandle Viewport owner handle type.
      * @tparam TMemberHandle Scene member handle type.
      * @tparam TSubmissionMode Submission mode (`Instanced` oder `NonInstanced`).
      * @tparam TCullingStrategy Strategy used to decide member visibility.
      */
     template<
-        typename TOwnerHandle,
         typename TMemberHandle,
         typename TSubmissionMode,
         typename TCullingStrategy
     >
-    requires IsViewportHandle<TOwnerHandle> &&
-             IsFrustumCullerLike<TCullingStrategy, typename TCullingStrategy::MemberHandle_type> &&
+    requires IsFrustumCullerLike<TCullingStrategy, typename TCullingStrategy::MemberHandle_type> &&
              std::same_as<typename TCullingStrategy::MemberHandle_type, TMemberHandle> &&
             (std::same_as<TSubmissionMode, Instanced> || std::same_as<TSubmissionMode, NonInstanced>)
     class SceneMemberVisibilitySystem {
@@ -119,7 +118,7 @@ export namespace helios::engine::scene::systems {
             UpdateContext& updateContext,
             CullingContext<TMemberHandle>& cullingContext,
             const SceneHandle sceneHandle,
-            const RenderTargetBindingComponent<TOwnerHandle>& renderTargetBindingComponent,
+            const RenderTargetBindingComponent<ViewportHandle>& renderTargetBindingComponent,
             const ViewportEntity &viewportEntity
         ) {
 
@@ -195,35 +194,35 @@ export namespace helios::engine::scene::systems {
             visibilityRegistry_.clear();
 
             for (auto [viewportEntity, renderTargetBindingComponent, sbc, cbc] : updateContext.view<
-                TOwnerHandle,
-                RenderTargetBindingComponent<TOwnerHandle>,
-                SceneBindingComponent<TOwnerHandle>,
-                CameraBindingComponent<TOwnerHandle>
+                ViewportHandle,
+                RenderTargetBindingComponent<ViewportHandle>,
+                SceneBindingComponent<ViewportHandle>,
+                CameraBindingComponent<ViewportHandle>
             >().withActive()) {
 
                 const auto sceneHandle  = sbc->targetHandle();
                 const auto cameraHandle = cbc->targetHandle();
 
-                const auto camera = updateContext.find<TMemberHandle>(cameraHandle);
+                const auto camera = updateContext.find<CameraHandle>(cameraHandle);
                 if (!camera) {
                     assert(false && "Camera not found");
                     logger_.error("Camera not found");
                     continue;
                 }
-                auto* pmc = camera->template get<ProjectionMatrixComponent<TMemberHandle>>();
+                auto* pmc = camera->template get<ProjectionMatrixComponent<CameraHandle>>();
                 if (!pmc) {
                     assert(pmc && "Camera had no ProjectionMatrixComponent");
                     logger_.error("Camera had no ProjectionMatrixComponent");
                     continue;
                 }
-                auto* lac = camera->template get<ViewMatrixComponent<TMemberHandle>>();
+                auto* lac = camera->template get<ViewMatrixComponent<CameraHandle>>();
                 if (!lac) {
                     assert(lac && "Camera had no ViewMatrixComponent");
                     logger_.error("Camera had no ViewMatrixComponent");
                     continue;
                 }
 
-                auto* pcc = camera->template get<PerspectiveCameraComponent<TMemberHandle>>();
+                auto* pcc = camera->template get<PerspectiveCameraComponent<CameraHandle>>();
                 auto frustumPlanes = helios::math::frustumPlanes(
                     pcc->fovY(), pcc->aspectRatio(), pcc->zNear(), pcc->zFar(), lac->value()
                 );

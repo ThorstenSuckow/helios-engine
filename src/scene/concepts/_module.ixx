@@ -6,3 +6,4 @@ export module helios.engine.scene.concepts;
 
 export import helios.engine.scene.concepts.IsFrustumCullerLike;
 export import helios.engine.scene.concepts.IsSceneHandle;
+export import helios.engine.scene.concepts.IsCameraHandle;

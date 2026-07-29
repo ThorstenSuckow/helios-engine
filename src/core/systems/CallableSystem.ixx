@@ -39,6 +39,8 @@ export namespace helios::engine::core::systems {
 
     public:
 
+        using Handle_type = THandle;
+
         using EngineRoleTag = CallableSystemRole;
 
         /**

@@ -403,7 +403,7 @@ export namespace helios::engine::rendering {
 
             auto& meshBatch = meshBatchFor(renderContext);
 
-            meshBatch.drawContexts.emplace_back({
+            meshBatch.drawContexts.push_back({
                 renderContext.renderTargetHandle,
                 renderContext.viewportHandle,
                 renderContext.sceneHandle,

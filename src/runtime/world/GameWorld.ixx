@@ -439,10 +439,10 @@ export namespace helios::engine::runtime::world {
         /**
          * @brief Returns the render-target domain world.
          *
-         * @return Reference to `RenderTargetWorld`.
+         * @return Reference to `RenderViewWorld`.
          */
-        [[nodiscard]] RenderTargetWorld& renderTargetWorld() noexcept{
-            return engineWorld_.renderTargetWorld();
+        [[nodiscard]] RenderViewWorld& renderViewWorld() noexcept{
+            return engineWorld_.renderViewWorld();
         }
 
         /**

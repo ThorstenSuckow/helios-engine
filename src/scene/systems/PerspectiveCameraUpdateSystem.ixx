@@ -41,6 +41,9 @@ export namespace helios::engine::scene::systems {
 
         public:
 
+        using Handle_type = TMemberHandle;
+
+
         /**
          * @brief Role tag used for runtime registration as a system.
          */

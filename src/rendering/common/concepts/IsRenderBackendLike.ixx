@@ -11,7 +11,7 @@ export module helios.engine.rendering.common.concepts.IsRenderBackendLike;
 
 import helios.math.types;
 
-import helios.engine.rendering.common.types.RenderPassContext;
+
 import helios.engine.util.Colors;
 
 import helios.engine.scene.types.SceneMemberRenderContext;
@@ -41,9 +41,8 @@ export namespace helios::engine::rendering::common::concepts {
      * @brief Constrains types that provide the rendering backend API surface.
      *
      * @tparam T Backend candidate type.
-     * @tparam THandle Scene member handle type used by `doRender`.
      */
-    template<typename T, typename THandle>
+    template<typename T>
     concept IsRenderBackendLike = requires(
             T& t,
             const T& ct,
@@ -52,8 +51,8 @@ export namespace helios::engine::rendering::common::concepts {
             const ShaderHandle shaderHandle,
             const MaterialHandle materialHandle,
             const MeshHandle meshHandle,
-            std::span<const SceneMemberRenderContext<THandle>> sceneMemberRenderContexts,
-            std::span<const InstanceData<THandle>> instanceData
+            std::span<const DrawContext> drawContexts,
+            std::span<const InstanceData> instanceData
            )
         {
         {t.beginRenderTargetBatch(renderTargetHandle)}->std::same_as<void>;
@@ -66,7 +65,7 @@ export namespace helios::engine::rendering::common::concepts {
         {t.endMaterialBatch(materialHandle)}->std::same_as<void>;
         {t.beginMeshBatch(meshHandle)}->std::same_as<void>;
         {t.endMeshBatch(meshHandle)}->std::same_as<void>;
-        {t.renderBatch(sceneMemberRenderContexts)}->std::same_as<void>;
+        {t.renderBatch(drawContexts)}->std::same_as<void>;
         {t.renderBatch(instanceData)}->std::same_as<void>;
     };
 

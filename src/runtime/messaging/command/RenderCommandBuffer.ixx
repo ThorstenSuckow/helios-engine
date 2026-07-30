@@ -30,6 +30,9 @@ export namespace helios::engine::runtime::messaging::command {
         helios::engine::rendering::common::commands::RenderSceneCommand<GameObjectHandle>,
         helios::engine::rendering::common::commands::RenderSceneMemberCommand<GameObjectHandle>,
         helios::engine::rendering::common::commands::RenderInstanceBatchCommand<GameObjectHandle>,
+        helios::engine::rendering::common::commands::RenderSceneCommand<ParticleHandle>,
+        helios::engine::rendering::common::commands::RenderSceneMemberCommand<ParticleHandle>,
+        helios::engine::rendering::common::commands::RenderInstanceBatchCommand<ParticleHandle>,
         helios::engine::rendering::shader::commands::ShaderCompileCommand<ShaderHandle>,
         helios::engine::rendering::shader::commands::ShaderBatchCompileCommand<ShaderHandle>,
         helios::engine::rendering::mesh::commands::MeshBatchUploadCommand<MeshHandle>

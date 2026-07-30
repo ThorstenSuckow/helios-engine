@@ -6,11 +6,11 @@ module;
 
 export module helios.engine.scene.components.CameraBindingComponent;
 
-import helios.engine.runtime.world.types.GameObjectHandle;
+import helios.engine.scene.types.CameraHandle;
 
 import helios.ecs.components.BindingComponent;
 
-using namespace helios::engine::runtime::world::types;
+using namespace helios::engine::scene::types;
 using namespace helios::ecs::components;
 export namespace helios::engine::scene::components {
 
@@ -20,6 +20,6 @@ export namespace helios::engine::scene::components {
      * @tparam TOwnerHandle Owning entity handle type.
      */
     template<typename TOwnerHandle>
-    using CameraBindingComponent = BindingComponent<TOwnerHandle, GameObjectHandle>;
+    using CameraBindingComponent = BindingComponent<TOwnerHandle, CameraHandle>;
 
 }

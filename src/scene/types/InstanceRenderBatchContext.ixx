@@ -77,7 +77,7 @@ export namespace helios::engine::scene::types {
         /**
          * @brief Per-instance payload (for example model matrices) for draw submission.
          */
-        std::vector<InstanceData<TMemberHandle>> instanceData;
+        std::vector<InstanceData> instanceData;
 
         /**
          * @brief Constructs an instance batch context for a fixed render state tuple.
@@ -90,12 +90,12 @@ export namespace helios::engine::scene::types {
          * @param shaderHdl Shader handle used for the batch.
          */
         InstanceRenderBatchContext(
-            RenderTargetHandle renderTargetHdl,
-            ViewportHandle viewportHdl,
-            SceneHandle sceneHdl,
-            MeshHandle meshHdl,
-            MaterialHandle materialHdl,
-            ShaderHandle shaderHdl
+            const RenderTargetHandle renderTargetHdl,
+            const ViewportHandle viewportHdl,
+            const SceneHandle sceneHdl,
+            const MeshHandle meshHdl,
+            const MaterialHandle materialHdl,
+            const ShaderHandle shaderHdl
         ) : renderTargetHandle(renderTargetHdl),
             viewportHandle(viewportHdl),
             sceneHandle(sceneHdl),

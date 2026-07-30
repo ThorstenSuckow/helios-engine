@@ -193,6 +193,8 @@ export namespace helios::engine::core::container {
                 underlyingAnyT_.resize(idx + 1);
             }
 
+            assert(!has<T>() && "AnyT already registered.");
+
             items_[idx] = std::make_unique<AnyT>(std::move(wrapper));
 
             void* rawUnderlying = items_[idx]->underlying();

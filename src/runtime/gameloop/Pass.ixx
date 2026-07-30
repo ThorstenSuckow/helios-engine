@@ -62,11 +62,19 @@ export namespace helios::engine::runtime::gameloop {
         helios::engine::runtime::world::SystemRegistry systemRegistry_{};
 
         /**
-         * @brief Queue of system type IDs for execution order.
+         * @brief Ordered queue of system type IDs that drives execution order within this pass.
          *
-         * Each entry holds a group of one or more SystemType-ids, whereas multiple ids indicate systems that can be executed in parallel.
+         * The three levels of nesting encode the following structure:
+         *
+         * | Level | Meaning |
+         * |-------|---------|
+         * | Outermost (`vector<…>`) | Ordered sequence of execution slots. Slots are processed sequentially. |
+         * | Middle (`vector<…>`) | Parallel group within a slot. All entries at this level may run concurrently. |
+         * | Innermost (`vector<SystemTypeId>`) | Serial sub-group within a parallel group. Entries run sequentially in order. |
+         *
+         * A single-entry slot with a single-entry serial group is therefore a plain sequential system.
          */
-        std::vector<std::vector<SystemTypeId>> systemTypeIdQueue_;
+        std::vector<std::vector<std::vector<SystemTypeId>>> systemTypeIdQueue_;
 
         /**
          * @brief Reference to the owning GameWorld.
@@ -113,8 +121,10 @@ export namespace helios::engine::runtime::gameloop {
          * @brief Registers a callable system for this pass.
          *
          * @tparam TSystem The type of the system to register.
-         * @param system The system instance to register.
-         * @param isParallel
+         * @param system     The system instance to register.
+         * @param isParallel When `true` the system receives a private, thread-local copy of its
+         *                   `CommandBuffer_type` instead of the shared one from `GameWorld`,
+         *                   allowing safe concurrent execution.
          * @return Reference to this pass.
          */
         template<typename TSystem>
@@ -152,20 +162,31 @@ export namespace helios::engine::runtime::gameloop {
             return *this;
         }
 
-        template<typename T, typename... Args>
-        requires helios::engine::runtime::world::concepts::IsTypedSystemLike<T>
-        Pass& registerParallelTypedSystem(Args&&... args) {
+        /**
+         * @brief Registers a `TypedSystem`-like system instance for parallel execution.
+         *
+         * When the system declares `CommandBuffer_type`, a private default-constructed buffer
+         * is injected so the system can safely run concurrently without sharing state with
+         * other systems.
+         *
+         * @tparam TSystem The type of the system to register. Must satisfy `IsTypedSystemLike`.
+         * @param system   System instance forwarded into the registry.
+         * @return Reference to this pass.
+         */
+        template<typename TSystem>
+        requires helios::engine::runtime::world::concepts::IsTypedSystemLike<std::remove_cvref_t<TSystem>>
+        Pass& registerParallelTypedSystemInstance(TSystem&& system) {
 
-            T concreteSystem(std::forward<Args>(args)...);
+            using T = std::remove_cvref_t<TSystem>;
 
             if constexpr (requires { typename T::CommandBuffer_type; }) {
                 using TCommandBuffer = typename T::CommandBuffer_type;
                 systemRegistry_.template add<T>(
-                    System(std::move(concreteSystem), TCommandBuffer())
+                    System(std::forward<TSystem>(system), TCommandBuffer())
                 );
             } else {
                 systemRegistry_.template add<T>(
-                    System(std::move(concreteSystem))
+                    System(std::forward<TSystem>(system))
                 );
             }
 
@@ -278,7 +299,7 @@ export namespace helios::engine::runtime::gameloop {
          *
          * @return Reference to this pass for method chaining.
          */
-        virtual Pass& runIf(RunCondition fn) = 0;
+        virtual Pass& runIf(RunCondition fn) noexcept = 0;
 
         /**
          * @brief Adds a system of type T to this pass.
@@ -300,29 +321,53 @@ export namespace helios::engine::runtime::gameloop {
 
             registerTypedSystem<T>(std::forward<Args>(args)...);
 
-            systemTypeIdQueue_.push_back({SystemTypeId::template id<T>()});
+            systemTypeIdQueue_.push_back(
+                {
+                {SystemTypeId::template id<T>()}
+            }
+            );
 
             return *this;
         }
 
         /**
-         * @brief Adds TypedSystem-like systems that should be executed parallel.
+         * @brief Adds a system of type TSystem to this pass.
          *
-         * @tparam TSystem The types of the systems to add.
+         * @tparam TSystem The system type to add.
+         *
+         * @param system System forwarded to the system constructor.
+         *
+         * @details If `TSystem` defines `CommandBuffer_type`, the buffer is resolved
+         * from the bound `GameWorld` and injected into the wrapped
+         * `helios::engine::runtime::world::System`.
          *
          * @return Reference to this Pass for method chaining.
          */
-        template<typename ...TSystem>
-        requires (helios::engine::runtime::world::concepts::IsTypedSystemLike<TSystem> && ...)
-                && (sizeof...(TSystem) >= 2)
-        Pass& addParallelSystems() {
+        template<typename TSystem>
+        requires helios::engine::runtime::world::concepts::IsCallableSystemLike<std::remove_cvref_t<TSystem>>
+        Pass& addSystem(TSystem&& system) {
+            registerCallableSystem(std::forward<TSystem>(system));
+            systemTypeIdQueue_.push_back({{SystemTypeId::template id<TSystem>()}});
+            return *this;
+        }
 
-            (registerTypedSystem<TSystem>(), ...);
+        /**
+         * @brief Adds multiple systems to this pass, allowing for parallel execution.
+         *
+         * @tparam TSystem The types of the systems to add.
+         * @param system The system instances to add.
+         * @return Reference to this pass.
+         */
+        template<typename ... TSystem>
+        requires (helios::engine::runtime::world::concepts::IsCallableSystemLike<std::remove_cvref_t<TSystem>> && ...)
+           && (sizeof...(TSystem) >= 2)
+        Pass& addParallelSystems(TSystem&&... system) {
+            (registerCallableSystem(std::forward<TSystem>(system), true), ...);
 
             auto& group = systemTypeIdQueue_.emplace_back();
             group.reserve(sizeof...(TSystem));
-            (group.push_back({SystemTypeId::template id<TSystem>()}), ...);
-
+            (group.push_back({{SystemTypeId::template id<std::remove_cvref_t<TSystem>>()}}), ...);
+            
             return *this;
         }
 
@@ -346,60 +391,83 @@ export namespace helios::engine::runtime::gameloop {
          * @return Reference to this pass for method chaining.
          */
         template<typename ...TSystem>
-        requires (helios::engine::runtime::world::concepts::IsTypedSystemLike<
-                typename std::remove_cvref_t<TSystem>::System_type
-                > && ...)
+        requires (helios::engine::runtime::world::concepts::IsTypedSystemLike<std::remove_cvref_t<TSystem>> && ...)
                 && (sizeof...(TSystem) >= 2)
         Pass& addParallelSystems(TSystem&&... system) {
 
-            (registerParallelTypedSystemSpec<TSystem>(std::forward<TSystem>(system)), ...);
+            (registerParallelTypedSystemInstance<TSystem>(std::forward<TSystem>(system)), ...);
 
             auto& group = systemTypeIdQueue_.emplace_back();
             group.reserve(sizeof...(TSystem));
-            (group.push_back({SystemTypeId::template id<typename std::remove_cvref_t<TSystem>::System_type>()}), ...);
+            (group.push_back({{SystemTypeId::template id<std::remove_cvref_t<TSystem>>()}}), ...);
 
             return *this;
         }
 
         /**
-         * @brief Adds a system of type TSystem to this pass.
+         * @brief Adds TypedSystem-like systems that should be executed parallel.
          *
-         * @tparam TSystem The system type to add.
-         *
-         * @param system System forwarded to the system constructor.
-         *
-         * @details If `TSystem` defines `CommandBuffer_type`, the buffer is resolved
-         * from the bound `GameWorld` and injected into the wrapped
-         * `helios::engine::runtime::world::System`.
+         * @tparam TSystem The types of the systems to add.
          *
          * @return Reference to this Pass for method chaining.
          */
-        template<typename TSystem>
-        requires helios::engine::runtime::world::concepts::IsCallableSystemLike<std::remove_cvref_t<TSystem>>
-        Pass& addSystem(TSystem&& system) {
-            registerCallableSystem(std::forward<TSystem>(system));
-            systemTypeIdQueue_.push_back({SystemTypeId::template id<TSystem>()});
+        template<typename ...TSystem>
+         requires (helios::engine::runtime::world::concepts::IsTypedSystemLike<TSystem> && ...)
+                 && (sizeof...(TSystem) >= 2)
+         Pass& addParallelSystems() {
+
+            (registerTypedSystem<TSystem>(), ...);
+
+            auto& group = systemTypeIdQueue_.emplace_back();
+            group.reserve(sizeof...(TSystem));
+            (group.push_back({{SystemTypeId::template id<TSystem>()}}), ...);
+
             return *this;
         }
 
         /**
-         * @brief Adds multiple systems to this pass, allowing for parallel execution.
+         * @brief Adds one or more `Serial`-wrapped system groups that may execute in parallel.
          *
-         * @tparam TSystem The types of the systems to add.
-         * @param system The system instances to add.
-         * @return Reference to this pass.
+         * Each `Serial<S1, S2, …>` argument defines an ordered sub-group: its member systems
+         * are registered and run sequentially relative to each other, while distinct `Serial`
+         * arguments form independent parallel lanes that the scheduler may execute concurrently.
+         *
+         * Example:
+         * ```cpp
+         * pass.addParallelSystems<
+         *     Serial<PhysicsUpdate, PhysicsCollision>,
+         *     Serial<AudioUpdate>
+         * >();
+         * ```
+         *
+         * @tparam TSerials One or more `Serial<…>` specialisations satisfying `IsSerialLike`.
+         *                  At least one type is required.
+         * @return Reference to this pass for method chaining.
          */
-        template<typename ... TSystem>
-        requires (helios::engine::runtime::world::concepts::IsCallableSystemLike<std::remove_cvref_t<TSystem>> && ...)
-           && (sizeof...(TSystem) >= 2)
-        Pass& addParallelSystems(TSystem&&... system) {
+        template <typename ... TSerials>
+        requires (sizeof ...(TSerials) >= 1) && ((IsSerialLike<TSerials>) && ...)
+        Pass& addParallelSystems() {
 
-            (registerCallableSystem(std::forward<TSystem>(system), true), ...);
+            auto& parallelGroup = systemTypeIdQueue_.emplace_back();
+            parallelGroup.reserve(sizeof...(TSerials));
 
-            auto& group = systemTypeIdQueue_.emplace_back();
-            group.reserve(sizeof...(TSystem));
-            (group.push_back({SystemTypeId::template id<std::remove_cvref_t<TSystem>>()}), ...);
-            
+            auto addSystemInstance = [this]
+            <typename TSystem>
+            (auto& serialGroup) {
+                registerParallelTypedSystemInstance<TSystem>(TSystem{});
+                serialGroup.push_back({{SystemTypeId::template id<TSystem>()}});
+            };
+
+            auto registerSystems = [this, &addSystemInstance]
+            <typename ...TSystems>
+            (Serial<TSystems...>, auto& serialGroup) {
+                serialGroup.reserve(sizeof...(TSystems));
+                (addSystemInstance.template operator()<TSystems>(serialGroup), ...);
+            };
+
+            (registerSystems( std::remove_cvref_t<TSerials>{}, parallelGroup.emplace_back()), ...);
+
+
             return *this;
         }
 

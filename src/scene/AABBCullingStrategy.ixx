@@ -48,7 +48,7 @@ export namespace helios::engine::scene {
          *
          * @note The
          */
-        bool shouldRender(const CullingContext<TMemberHandle>& ctx) noexcept {
+        constexpr bool shouldRender(const CullingContext<TMemberHandle>& ctx) noexcept {
 
             auto& planes = ctx.frustumPlanes;
             auto& bounds = ctx.bounds;

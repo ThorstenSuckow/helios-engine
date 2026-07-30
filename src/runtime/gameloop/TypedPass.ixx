@@ -82,28 +82,35 @@ export namespace helios::engine::runtime::gameloop {
 
             assert(jobSystem_ && "Job system not initialized");
 
-            for (auto typeIdQueue : systemTypeIdQueue_) {
+            for (auto& parallelSystems : systemTypeIdQueue_) {
 
-                assert(typeIdQueue.size() > 0 && "Type ID queue is empty");
-
-                if (typeIdQueue.size() == 1) {
-                    auto* sys = systemRegistry_.item(typeIdQueue[0]);
-                    // update, then immediately fllush the buffer contents
-                    sys->update(updateContext);
-                    sys->flush(updateContext);
+                // parallelSystems with only one entry are treated serial
+                if (parallelSystems.size() == 1) {
+                    for (const auto& serialSystem : parallelSystems[0]) {
+                        auto* sys = systemRegistry_.item(serialSystem);
+                        // update, then immediately flush the buffer contents
+                        sys->update(updateContext);
+                        sys->flush(updateContext);
+                    }
                     continue;
                 }
 
-                // 1. update all
+                // parallelSystems > 1 will be queued with the JobSystems
                 jobSystem_->runAndWait(
-                    typeIdQueue.size(),
+                    parallelSystems.size(),
                     [&] (const std::size_t i) {
-                        const auto typeId = typeIdQueue[i];
-                        systemRegistry_.item(typeId)->update(updateContext);
+                        // a parallel system owns more ore more serial systems
+                        for (const auto& serialSystem : parallelSystems[i]) {
+                            auto* sys = systemRegistry_.item(serialSystem);
+                            sys->update(updateContext);
+                        }
                 });
-                // 2. flush all when all jobs have finished
-                for (const auto typeId : typeIdQueue) {
-                    systemRegistry_.item(typeId)->flush(updateContext);
+
+                for (const auto& parallelSystem : parallelSystems) {
+                    for (const auto& serialSystem : parallelSystem) {
+                        auto* sys = systemRegistry_.item(serialSystem);
+                        sys->flush(updateContext);
+                    }
                 }
 
             }
@@ -150,7 +157,7 @@ export namespace helios::engine::runtime::gameloop {
         /**
          * @copydoc Pass::runIf
          */
-        Pass& runIf(RunCondition fn) {
+        Pass& runIf(RunCondition fn) noexcept override {
             runConditions_.push_back(std::move(fn));
             return *this;
         }

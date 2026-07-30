@@ -6,7 +6,7 @@ module;
 
 #include "helios-engine-config.h"
 #include <span>
-#include <cstdint>
+#include <cassert>
 #include <vector>
 
 export module helios.engine.scene.SceneMemberVisibilityRegistry;
@@ -41,8 +41,9 @@ export namespace helios::engine::scene {
      * and by viewport handle index for fast retrieval during render submission.
      *
      * @tparam TMemberHandle Handle type used to reference scene members.
+     * @tparam TSubmissionMode Submission mode (`Instanced` oder `NonInstanced`).
      */
-    template<typename TMemberHandle>
+    template<typename TMemberHandle, typename TSubmissionMode>
     class SceneMemberVisibilityRegistry {
 
 
@@ -56,11 +57,8 @@ export namespace helios::engine::scene {
 
         std::vector<RenderTargetViewportSceneKey> renderTargetViewportSceneKeys_;
 
-        std::vector<std::vector<SceneMemberVisibilityContext<TMemberHandle, Instanced>>> visibilityContextsInstanced_;
-        std::vector<std::vector<SceneMemberVisibilityContext<TMemberHandle, Instanced>>> culledContextsInstanced_;
-
-        std::vector<std::vector<SceneMemberVisibilityContext<TMemberHandle, NonInstanced>>> visibilityContextsNonInstanced_;
-        std::vector<std::vector<SceneMemberVisibilityContext<TMemberHandle, NonInstanced>>> culledContextsNonInstanced_;
+        std::vector<std::vector<SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>>> visibilityContexts_;
+        std::vector<std::vector<SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>>> culledContexts_;
 
         std::vector<SceneRenderContext<TMemberHandle>> sceneRenderContexts_;
 
@@ -71,22 +69,15 @@ export namespace helios::engine::scene {
          * @brief Constructs the registry with pre-reserved top-level storage.
          */
         SceneMemberVisibilityRegistry() {
-            visibilityContextsInstanced_.reserve(DEFAULT_VIEWPORT_POOL_CAPACITY);
-            for (auto& vec : visibilityContextsInstanced_) {
+            visibilityContexts_.reserve(DEFAULT_VIEWPORT_POOL_CAPACITY);
+            for (auto& vec : visibilityContexts_) {
                 vec.reserve(HELIOS_DEFAULT_VISIBLE_MEMBER_CAPACITY);
             }
-            culledContextsInstanced_.reserve(DEFAULT_VIEWPORT_POOL_CAPACITY);
-            for (auto& vec : culledContextsInstanced_) {
+            culledContexts_.reserve(DEFAULT_VIEWPORT_POOL_CAPACITY);
+            for (auto& vec : culledContexts_) {
                 vec.reserve(HELIOS_DEFAULT_VISIBLE_MEMBER_CAPACITY);
             }
-            visibilityContextsNonInstanced_.reserve(DEFAULT_VIEWPORT_POOL_CAPACITY);
-            for (auto& vec : visibilityContextsNonInstanced_) {
-                vec.reserve(HELIOS_DEFAULT_VISIBLE_MEMBER_CAPACITY);
-            }
-            culledContextsNonInstanced_.reserve(DEFAULT_VIEWPORT_POOL_CAPACITY);
-            for (auto& vec : culledContextsNonInstanced_) {
-                vec.reserve(HELIOS_DEFAULT_VISIBLE_MEMBER_CAPACITY);
-            }
+           
 
             sceneRenderContexts_.reserve(DEFAULT_VIEWPORT_POOL_CAPACITY);
         }
@@ -122,22 +113,13 @@ export namespace helios::engine::scene {
          * @param viewportHandle Target viewport.
          * @param context Visibility context to append.
          */
-        template<typename TSubmissionMode>
         void addCulledMember(const ViewportHandle viewportHandle, SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>&& context) {
             const auto idx = viewportHandle.entityId;
-            if constexpr (std::is_same_v<TSubmissionMode, NonInstanced>) {
-                if (culledContextsNonInstanced_.size() <= idx) {
-                    culledContextsNonInstanced_.resize(idx + 1);
-                }
-                culledContextsNonInstanced_[idx].emplace_back(std::move(context));
-            } else if constexpr (std::is_same_v<TSubmissionMode, Instanced>) {
-                if (culledContextsInstanced_.size() <= idx) {
-                    culledContextsInstanced_.resize(idx + 1);
-                }
-                culledContextsInstanced_[idx].emplace_back(std::move(context));
-            } else {
-                static_assert(false, "Unsupported submission mode");
+            if (culledContexts_.size() <= idx) {
+                culledContexts_.resize(idx + 1);
             }
+            culledContexts_[idx].emplace_back(std::move(context));
+            
         }
 
 
@@ -147,27 +129,13 @@ export namespace helios::engine::scene {
          * @param viewportHandle Target viewport.
          * @param context Visibility context to append.
          */
-        template<typename TSubmissionMode>
         void addVisibleMember(const ViewportHandle viewportHandle, SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>&& context) {
-
             const auto idx = viewportHandle.entityId;
-
-            if constexpr (std::is_same_v<TSubmissionMode, Instanced>) {
-                if (visibilityContextsInstanced_.size() <= idx) {
-                    visibilityContextsInstanced_.resize(idx + 1);
-                }
-
-                visibilityContextsInstanced_[idx].emplace_back(std::move(context));
-            } else if constexpr (std::is_same_v<TSubmissionMode, NonInstanced>) {
-                if (visibilityContextsNonInstanced_.size() <= idx) {
-                    visibilityContextsNonInstanced_.resize(idx + 1);
-                }
-
-                visibilityContextsNonInstanced_[idx].emplace_back(std::move(context));
-            } else {
-                static_assert(always_false_v<TSubmissionMode>, "Unsupported submission mode");
+            if (visibilityContexts_.size() <= idx) {
+                visibilityContexts_.resize(idx + 1);
             }
 
+            visibilityContexts_[idx].emplace_back(std::move(context));
         }
 
         /**
@@ -175,39 +143,20 @@ export namespace helios::engine::scene {
          * @tparam TSubmissionMode Submission mode (`Instanced` or `NonInstanced`).
          * @param viewportHandle Viewport to query.
          */
-        template<typename TSubmissionMode>
         [[nodiscard]] std::span<SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>> culledMembers(const ViewportHandle viewportHandle = {})  {
             const auto idx = viewportHandle.entityId;
-            if constexpr (std::is_same_v<TSubmissionMode, NonInstanced>) {
-                 if (idx >= culledContextsNonInstanced_.size()) {
-                    return {};
-                }
-                return culledContextsNonInstanced_[idx];
-            } else if constexpr (std::is_same_v<TSubmissionMode, Instanced>) {
-                 if (idx >= culledContextsInstanced_.size()) {
-                    return {};
-                }
-                return culledContextsInstanced_[idx];
-            } else {
-                static_assert(always_false_v<TSubmissionMode>, "Unsupported submission mode");
+            if (idx >= culledContexts_.size()) {
+                return {};
             }
-            return {};
+            return culledContexts_[idx];
         }
 
         /**
          * @brief Returns culled member context buckets for all viewports.
          * @tparam TSubmissionMode Submission mode (`Instanced` or `NonInstanced`).
          */
-        template<typename TSubmissionMode>
         [[nodiscard]] std::span<std::vector<SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>>> culledMembers() const {
-            if constexpr (std::is_same_v<TSubmissionMode, NonInstanced>) {
-                return culledContextsNonInstanced_;
-            } else if constexpr (std::is_same_v<TSubmissionMode, Instanced>) {
-                return culledContextsInstanced_;
-            } else {
-                static_assert(always_false_v<TSubmissionMode>, "Unsupported submission mode");
-            }
-            return {};
+            return culledContexts_;
         }
 
         /**
@@ -215,40 +164,20 @@ export namespace helios::engine::scene {
          * @tparam TSubmissionMode Submission mode (`Instanced` or `NonInstanced`).
          * @param viewportHandle Viewport to query.
          */
-        template<typename TSubmissionMode>
-        [[nodiscard]] std::span<SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>> visibleMembers(const ViewportHandle viewportHandle) {
+        [[nodiscard]] std::span<const SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>> visibleMembers(const ViewportHandle viewportHandle) const noexcept {
             const auto idx = viewportHandle.entityId;
-
-            if constexpr (std::is_same_v<TSubmissionMode, NonInstanced>) {
-                if (idx >= visibilityContextsNonInstanced_.size()) {
-                    return {};
-                }
-                return visibilityContextsNonInstanced_[idx];
-            } else if constexpr (std::is_same_v<TSubmissionMode, Instanced>) {
-                if (idx >= visibilityContextsInstanced_.size()) {
-                    return {};
-                }
-                return visibilityContextsInstanced_[idx];
-            } else {
-                static_assert(always_false_v<TSubmissionMode>, "Unsupported submission mode");
+            if (idx >= visibilityContexts_.size()) {
+                return {};
             }
-            return {};
+            return visibilityContexts_[idx];
         }
 
         /**
          * @brief Returns visible member context buckets for all viewports.
          * @tparam TSubmissionMode Submission mode (`Instanced` or `NonInstanced`).
          */
-        template<typename TSubmissionMode>
-        [[nodiscard]] std::span<std::vector<SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>>> visibleMembers() {
-            if constexpr (std::is_same_v<TSubmissionMode, NonInstanced>) {
-                return visibilityContextsNonInstanced_;
-            } else if constexpr (std::is_same_v<TSubmissionMode, Instanced>) {
-                return visibilityContextsInstanced_;
-            } else {
-                static_assert(always_false_v<TSubmissionMode>, "Unsupported submission mode");
-            }
-            return {};
+        [[nodiscard]] std::span<const std::vector<SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>>> visibleMembers() const noexcept {
+            return visibilityContexts_;
         }
 
         /**
@@ -256,18 +185,13 @@ export namespace helios::engine::scene {
          */
         void clear () {
             sceneRenderContexts_.clear();
-            for (auto& vec : visibilityContextsInstanced_) {
+            for (auto& vec : visibilityContexts_) {
                 vec.clear();
             }
-            for (auto& vec : visibilityContextsNonInstanced_) {
+            for (auto& vec : culledContexts_) {
                 vec.clear();
             }
-            for (auto& vec : culledContextsInstanced_) {
-                vec.clear();
-            }
-            for (auto& vec : culledContextsNonInstanced_) {
-                vec.clear();
-            }
+
         }
     };
 

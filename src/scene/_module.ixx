@@ -13,5 +13,6 @@ export import helios.engine.scene.systems;
 export import helios.engine.scene.NoCullingStrategy;
 export import helios.engine.scene.AABBCullingStrategy;
 export import helios.engine.scene.SceneEntityManager;
+export import helios.engine.scene.CameraEntityManager;
 export import helios.engine.scene.SceneMemberVisibilityRegistry;
 

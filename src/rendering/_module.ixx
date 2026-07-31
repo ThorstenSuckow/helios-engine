@@ -13,6 +13,7 @@ export import helios.engine.rendering.shader;
 export import helios.engine.rendering.material;
 export import helios.engine.rendering.mesh;
 export import helios.engine.rendering.viewport;
+export import helios.engine.rendering.texture;
 export import helios.engine.rendering.renderTarget;
 export import helios.engine.rendering.model;
 export import helios.engine.rendering.common;

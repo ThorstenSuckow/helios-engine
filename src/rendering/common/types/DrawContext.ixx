@@ -16,6 +16,7 @@ import helios.engine.rendering.renderTarget.types.RenderTargetHandle;
 import helios.engine.rendering.viewport.types.ViewportHandle;
 import helios.engine.scene.types.SceneHandle;
 import helios.engine.rendering.mesh.types.MeshHandle;
+import helios.engine.rendering.texture.types;
 import helios.engine.rendering.material.types.MaterialHandle;
 import helios.engine.rendering.shader.types.ShaderHandle;
 
@@ -28,6 +29,7 @@ using namespace helios::engine::scene::types;
 using namespace helios::engine::rendering::mesh::types;
 using namespace helios::engine::rendering::material::types;
 using namespace helios::engine::rendering::shader::types;
+using namespace helios::engine::rendering::texture::types;
 using namespace helios::engine::rendering::common::types;
 export namespace helios::engine::rendering::common::types {
 
@@ -40,6 +42,7 @@ export namespace helios::engine::rendering::common::types {
         ViewportHandle viewportHandle;
         SceneHandle sceneHandle;
         MeshHandle meshHandle;
+        TextureHandle textureHandle;
         MaterialHandle materialHandle;
         ShaderHandle shaderHandle;
         helios::math::mat4f worldMatrix;

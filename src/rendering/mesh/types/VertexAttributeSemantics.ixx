@@ -21,6 +21,11 @@ export namespace helios::engine::rendering::mesh::types {
         Position,
 
         /**
+         * @brief Texture coordinates.
+         */
+        TextureCoordinates,
+
+        /**
          * @brief Per-instance model matrix data.
          */
         InstancedModelMatrix,

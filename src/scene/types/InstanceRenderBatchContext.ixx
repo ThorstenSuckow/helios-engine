@@ -14,6 +14,7 @@ import helios.ecs.types.EntityHandle;
 import helios.engine.scene.types.SceneHandle;
 import helios.engine.rendering.mesh.types;
 import helios.engine.rendering.material.types;
+import helios.engine.rendering.texture.types;
 import helios.engine.rendering.shader.types;
 import helios.engine.rendering.common.types;
 import helios.engine.rendering.viewport.types;
@@ -25,6 +26,7 @@ using namespace helios::engine::rendering::viewport::types;
 using namespace helios::engine::rendering::renderTarget::types;
 using namespace helios::engine::rendering::mesh::types;
 using namespace helios::engine::rendering::material::types;
+using namespace helios::engine::rendering::texture::types;
 using namespace helios::engine::rendering::shader::types;
 using namespace helios::engine::rendering::common::types;
 using namespace helios::engine::scene;
@@ -58,6 +60,11 @@ export namespace helios::engine::scene::types {
          * @brief Mesh resource handle to render.
          */
         MeshHandle meshHandle;
+
+        /**
+         * @brief Texture resource handle to apply.
+         */
+        TextureHandle textureHandle;
 
         /**
          * @brief Material resource handle to apply.

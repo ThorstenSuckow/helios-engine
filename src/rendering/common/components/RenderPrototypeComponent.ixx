@@ -9,6 +9,7 @@ export module helios.engine.rendering.common.components.RenderPrototypeComponent
 import helios.engine.rendering.mesh;
 import helios.engine.rendering.shader;
 import helios.engine.rendering.material;
+import helios.engine.rendering.texture;
 
 
 using namespace helios::engine::rendering::mesh::types;
@@ -33,6 +34,8 @@ export namespace helios::engine::rendering::common::components {
 
         MeshHandle meshHandle_;
 
+        texture::types::TextureHandle textureHandle_{};
+
     public:
 
         /**
@@ -41,15 +44,18 @@ export namespace helios::engine::rendering::common::components {
          * @param shaderHandle Shader handle.
          * @param materialHandle Material handle.
          * @param meshHandle Mesh handle.
+         * @param textureHandle
          */
         explicit RenderPrototypeComponent(
             const ShaderHandle shaderHandle,
             const MaterialHandle materialHandle,
-            const MeshHandle meshHandle
+            const MeshHandle meshHandle,
+            const texture::types::TextureHandle textureHandle = {}
         )
             : shaderHandle_(shaderHandle),
               materialHandle_(materialHandle),
-              meshHandle_(meshHandle) {}
+              meshHandle_(meshHandle),
+              textureHandle_(textureHandle) {}
 
         /**
          * @brief Constructs the component from resource entities.
@@ -61,11 +67,13 @@ export namespace helios::engine::rendering::common::components {
         explicit RenderPrototypeComponent(
             const ShaderEntity shader,
             const MaterialEntity material,
-            const MeshEntity mesh
+            const MeshEntity mesh,
+            const texture::TextureEntity texture
         )
             : shaderHandle_(shader.handle()),
               materialHandle_(material.handle()),
-              meshHandle_(mesh.handle()) {}
+              meshHandle_(mesh.handle()),
+              textureHandle_(texture.handle()) {}
 
         /**
          * @brief Returns the mesh handle.
@@ -95,6 +103,15 @@ export namespace helios::engine::rendering::common::components {
         }
 
         /**
+         * @brief Returns the texture handle.
+         *
+         * @return Texture resource handle.
+         */
+        [[nodiscard]] texture::types::TextureHandle textureHandle() const noexcept {
+            return textureHandle_;
+        }
+
+        /**
          * @brief Sets the mesh handle.
          *
          * @param meshHandle Mesh resource handle.
@@ -119,6 +136,15 @@ export namespace helios::engine::rendering::common::components {
          */
         void setMaterialHandle(const MaterialHandle materialHandle) noexcept {
             materialHandle_ = materialHandle;
+        }
+
+        /**
+         * @brief Sets the texture handle.
+         *
+         * @param textureHandle Texture resource handle.
+         */
+        void setTextureHandle(const texture::types::TextureHandle textureHandle) noexcept {
+            textureHandle_ = textureHandle;
         }
 
     };

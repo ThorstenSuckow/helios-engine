@@ -137,6 +137,7 @@ export namespace helios::engine::scene::systems {
                         viewportHandle,
                         sceneHandle,
                         renderPrototype->meshHandle(),
+                        renderPrototype->textureHandle(),
                         renderPrototype->materialHandle(),
                         renderPrototype->shaderHandle(),
                         memberContext.worldMatrix
@@ -195,6 +196,7 @@ export namespace helios::engine::scene::systems {
                         sceneHandle != renderBatchContext->sceneHandle ||
                         renderPrototype->meshHandle() != renderBatchContext->meshHandle ||
                         renderPrototype->materialHandle() != renderBatchContext->materialHandle ||
+                        renderPrototype->textureHandle() != renderBatchContext->textureHandle ||
                         renderPrototype->shaderHandle() != renderBatchContext->shaderHandle) {
 
                             flushCurrentBatch();
@@ -204,6 +206,7 @@ export namespace helios::engine::scene::systems {
                                 viewportHandle,
                                 sceneHandle,
                                 renderPrototype->meshHandle(),
+                                renderPrototype->textureHandle(),
                                 renderPrototype->materialHandle(),
                                 renderPrototype->shaderHandle()
                             );

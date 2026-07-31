@@ -19,7 +19,9 @@ import helios.engine.runtime.concepts;
 
 import helios.engine.runtime.world;
 import helios.ecs.components.Active;
-import helios.engine.rendering.shader.concepts;
+import helios.engine.rendering.shader;
+import helios.engine.rendering.texture.components;
+import helios.engine.rendering.texture.types;
 
 import helios.engine.rendering.shader.components;
 
@@ -30,6 +32,7 @@ import helios.engine.runtime.enginestate;
 
 using namespace helios::engine::runtime::enginestate::types;
 using namespace helios::engine::rendering::shader::concepts;
+using namespace helios::engine::rendering::shader::types;
 using namespace helios::engine::runtime::messaging::command::concepts;
 using namespace helios::ecs::components;
 using namespace helios::engine::rendering::shader::components;
@@ -44,12 +47,10 @@ export namespace helios::engine::platform::lifecycle::systems {
     /**
      * @brief Signals warmup completion through a typed state command buffer.
      *
-     * @tparam THandle Shader handle type.
      * @tparam TCommandBuffer Command buffer type used to queue state commands.
      */
-    template<typename THandle, typename TCommandBuffer = NullCommandBuffer>
-    requires IsShaderHandle<THandle> &&
-             IsCommandBufferLike<TCommandBuffer> &&
+    template<typename TCommandBuffer = NullCommandBuffer>
+    requires IsCommandBufferLike<TCommandBuffer> &&
              (!std::is_same_v<TCommandBuffer, NullCommandBuffer>)
     class WarmupDoneSystem {
 
@@ -70,9 +71,14 @@ export namespace helios::engine::platform::lifecycle::systems {
         void update(UpdateContext& updateContext, TCommandBuffer& cmdBuffer) noexcept {
 
             if (updateContext.view<
-                THandle,
-                ShaderSourceComponent<THandle>
-                >().withActive().empty()) {
+                ShaderHandle,
+                ShaderSourceComponent<ShaderHandle>
+                >().withActive().empty() &&
+                updateContext.view<
+                rendering::texture::types::TextureHandle,
+                rendering::texture::components::TextureSourceComponent<rendering::texture::types::TextureHandle>
+                >().withActive().empty()
+                ) {
 
                 cmdBuffer.template add<StateCommand<EngineState>>(
                     StateTransitionRequest<EngineState>(

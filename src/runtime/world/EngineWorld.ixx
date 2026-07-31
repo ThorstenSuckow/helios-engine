@@ -29,14 +29,16 @@ import helios.engine.rendering.shader.ShaderEntityManager;
 import helios.engine.rendering.material.MaterialEntityManager;
 import helios.engine.rendering.mesh.MeshEntityManager;
 
+
+import helios.engine.rendering.texture.TextureEntityManager;
+import helios.engine.rendering.texture.types;
+
 import helios.engine.runtime.world.concepts.IsGameObjectHandle;
 import helios.engine.runtime.world.concepts.IsParticleHandle;
 import helios.engine.runtime.world.types.GameObjectHandle;
 
 import helios.engine.platform.window.concepts;
-import helios.engine.rendering.common.concepts.IsRenderResourceHandle;
 
-import helios.engine.rendering.common.concepts;
 
 import helios.engine.scene.SceneEntityManager;
 import helios.engine.scene.CameraEntityManager;
@@ -59,6 +61,7 @@ using namespace helios::engine::runtime::world::concepts;
 using namespace helios::engine::rendering::shader;
 using namespace helios::engine::rendering::material;
 using namespace helios::engine::rendering::mesh;
+using namespace helios::engine::rendering::texture;
 using namespace helios::engine::rendering::common::concepts;
 using namespace helios::engine::rendering::renderTarget;
 using namespace helios::engine::rendering::viewport;
@@ -84,7 +87,7 @@ export namespace helios::engine::runtime::world {
     /**
      * @brief Typed world containing render-resource entity managers.
      */
-    using RenderResourceWorld = TypedHandleWorld<ShaderEntityManager, MaterialEntityManager, MeshEntityManager>;
+    using RenderResourceWorld = TypedHandleWorld<TextureEntityManager, ShaderEntityManager, MaterialEntityManager, MeshEntityManager>;
 
     /**
      * @brief Typed world containing platform-related entity managers.

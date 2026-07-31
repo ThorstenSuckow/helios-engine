@@ -21,6 +21,7 @@ import helios.engine.scene.types.SceneHandle;
 
 import helios.engine.scene.components;
 
+import helios.engine.rendering.texture.types;
 import helios.engine.rendering.common.commands;
 import helios.engine.rendering.common.types;
 import helios.engine.scene.types;
@@ -31,7 +32,7 @@ import helios.ecs.types;
 import helios.engine.util.log;
 import helios.engine.runtime.world.UpdateContext;
 
-import helios.engine.rendering.common.concepts.IsRenderBackendLike;
+import helios.engine.rendering.common.concepts;
 
 import helios.engine.core.container.HandleMultiMap;
 
@@ -52,6 +53,7 @@ using namespace helios::engine::rendering::mesh::types;
 using namespace helios::engine::rendering::material::types;
 using namespace helios::engine::rendering::shader::types;
 using namespace helios::engine::rendering::viewport::types;
+using namespace helios::engine::rendering::texture::types;
 
 using namespace helios::engine::rendering::renderTarget::types;
 using namespace helios::engine::rendering::viewport::types;
@@ -160,15 +162,32 @@ export namespace helios::engine::rendering {
         };
 
         /**
-         * @brief Groups material batches for one shader.
+         * @brief Groups material batches for one texture.
+         */
+        struct TextureBatch {
+            bool isActive{false};
+            TextureHandle handle;
+            std::vector<MaterialBatch> batches;
+            std::vector<EntityId> activeIndices;
+            TextureBatch(){batches.reserve(DEFAULT_MATERIAL_POOL_CAPACITY);}
+            [[nodiscard]] MaterialBatch& getOrAdd(MaterialHandle handle) {
+                return addToBatch(handle, batches, activeIndices);
+            }
+            void clear() {
+                clearActive(this, activeIndices, batches);
+            }
+        };
+
+        /**
+         * @brief Groups texture batches for one shader.
          */
         struct ShaderBatch {
             bool isActive{false};
             ShaderHandle handle;
-            std::vector<MaterialBatch> batches;
+            std::vector<TextureBatch> batches;
             std::vector<EntityId> activeIndices;
-            ShaderBatch(){batches.reserve(DEFAULT_MATERIAL_POOL_CAPACITY);}
-            [[nodiscard]] MaterialBatch& getOrAdd(MaterialHandle handle) {
+            ShaderBatch(){batches.reserve(DEFAULT_TEXTURE_POOL_CAPACITY);}
+            [[nodiscard]] TextureBatch& getOrAdd(TextureHandle handle) {
                 return addToBatch(handle, batches, activeIndices);
             }
             void clear() {
@@ -276,7 +295,8 @@ export namespace helios::engine::rendering {
 
             auto& viewportBatch = ensureViewportBatch(renderContext.renderTargetHandle, renderContext.viewportHandle);
             auto& shaderBatch = viewportBatch.getOrAdd(renderContext.shaderHandle);
-            auto& materialBatch = shaderBatch.getOrAdd(renderContext.materialHandle);
+            auto& textureBatch = shaderBatch.getOrAdd(renderContext.textureHandle);
+            auto& materialBatch = textureBatch.getOrAdd(renderContext.materialHandle);
             auto& meshBatch = materialBatch.getOrAdd(renderContext.meshHandle);
 
             return meshBatch;
@@ -327,24 +347,32 @@ export namespace helios::engine::rendering {
 
                         renderBackend_.beginShaderBatch(shaderBatch.handle);
 
-                        for (auto materialIdx : shaderBatch.activeIndices) {
-                            auto& materialBatch = shaderBatch.batches[materialIdx];
+                        for (auto textureIdx : shaderBatch.activeIndices ) {
+                            auto& textureBatch = shaderBatch.batches[textureIdx];
+                            renderBackend_.beginTextureBatch(textureBatch.handle);
 
-                            renderBackend_.beginMaterialBatch(materialBatch.handle);
+                            for (auto materialIdx : textureBatch.activeIndices) {
+                                auto& materialBatch = textureBatch.batches[materialIdx];
 
-                            for (auto meshIdx : materialBatch.activeIndices) {
-                                auto& meshBatch = materialBatch.batches[meshIdx];
+                                renderBackend_.beginMaterialBatch(materialBatch.handle);
 
-                                renderBackend_.beginMeshBatch(meshBatch.handle);
+                                for (auto meshIdx : materialBatch.activeIndices) {
+                                    auto& meshBatch = materialBatch.batches[meshIdx];
 
-                                renderBackend_.renderBatch(meshBatch.drawContexts);
-                                renderBackend_.renderBatch(meshBatch.instanceData);
+                                    renderBackend_.beginMeshBatch(meshBatch.handle);
 
-                                renderBackend_.endMeshBatch(meshBatch.handle);
-                            } // materialBatch
+                                    renderBackend_.renderBatch(meshBatch.drawContexts);
+                                    renderBackend_.renderBatch(meshBatch.instanceData);
 
-                            renderBackend_.endMaterialBatch(materialBatch.handle);
-                        } //shaderBatch
+                                    renderBackend_.endMeshBatch(meshBatch.handle);
+                                } // materialBatch
+
+                                renderBackend_.endMaterialBatch(materialBatch.handle);
+                            } //textureBatch
+
+
+                            renderBackend_.endTextureBatch(textureBatch.handle);
+                        } // shader batch
 
                         renderBackend_.endShaderBatch(shaderBatch.handle);
                     } // viewportBatch
@@ -408,6 +436,7 @@ export namespace helios::engine::rendering {
                 renderContext.viewportHandle,
                 renderContext.sceneHandle,
                 renderContext.meshHandle,
+                renderContext.textureHandle,
                 renderContext.materialHandle,
                 renderContext.shaderHandle,
                 renderContext.worldMatrix

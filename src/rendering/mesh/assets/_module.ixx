@@ -9,3 +9,4 @@ export import :Cube;
 export import :Triangle;
 export import :WireframeCube;
 export import :WireframeSphere;
+export import :Rect;

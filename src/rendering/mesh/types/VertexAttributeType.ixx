@@ -19,6 +19,11 @@ export namespace helios::engine::rendering::mesh::types {
         Float,
 
         /**
+         * @brief 2-component float vector (`vec2`).
+         */
+        Vec2f,
+
+        /**
          * @brief 3-component float vector (`vec3`).
          */
         Vec3f,

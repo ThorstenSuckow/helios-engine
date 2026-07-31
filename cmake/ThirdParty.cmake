@@ -22,7 +22,11 @@ FetchContent_Declare(imgui
         GIT_REPOSITORY https://github.com/ocornut/imgui.git
         GIT_TAG docking
 )
-FetchContent_MakeAvailable(freetype glfw imgui)
+FetchContent_Declare(stb
+        GIT_REPOSITORY https://github.com/nothings/stb.git
+        GIT_TAG master
+)
+FetchContent_MakeAvailable(freetype glfw imgui stb)
 
 if(NOT TARGET thirdparty::freetype)
     add_library(thirdparty::freetype ALIAS freetype)
@@ -52,5 +56,11 @@ if(NOT TARGET imgui)
 endif()
 if(NOT TARGET thirdparty::imgui)
     add_library(thirdparty::imgui ALIAS imgui)
+endif()
+
+if(NOT TARGET thirdparty_stb)
+    add_library(thirdparty_stb INTERFACE)
+    target_include_directories(thirdparty_stb INTERFACE ${stb_SOURCE_DIR})
+    add_library(thirdparty::stb ALIAS thirdparty_stb)
 endif()
 

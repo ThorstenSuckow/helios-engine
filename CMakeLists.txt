@@ -26,6 +26,7 @@ target_link_libraries(helios_engine
         $<BUILD_INTERFACE:thirdparty::freetype>
         $<BUILD_INTERFACE:thirdparty::opengl>
         $<BUILD_INTERFACE:thirdparty::imgui>
+        $<BUILD_INTERFACE:thirdparty::stb>
 )
 
 target_include_directories(helios_engine PUBLIC

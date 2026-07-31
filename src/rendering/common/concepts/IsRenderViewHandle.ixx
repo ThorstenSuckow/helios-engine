@@ -6,7 +6,7 @@ module;
 
 #include <concepts>
 
-export module helios.engine.rendering.common.concepts.IsRenderViewHandle;
+export module helios.engine.rendering.common.concepts:IsRenderViewHandle;
 
 import helios.engine.scene.types.SceneHandle;
 import helios.engine.scene.types.CameraHandle;

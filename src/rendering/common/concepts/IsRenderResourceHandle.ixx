@@ -6,15 +6,13 @@ module;
 
 #include <concepts>
 
-export module helios.engine.rendering.common.concepts.IsRenderResourceHandle;
+export module helios.engine.rendering.common.concepts:IsRenderResourceHandle;
 
-import helios.engine.rendering.shader.types.ShaderHandle;
-import helios.engine.rendering.material.types.MaterialHandle;
-import helios.engine.rendering.mesh.types.MeshHandle;
+import helios.engine.rendering.shader.types;
+import helios.engine.rendering.material.types;
+import helios.engine.rendering.mesh.types;
+import helios.engine.rendering.texture.types;
 
-using namespace helios::engine::rendering::shader::types;
-using namespace helios::engine::rendering::material::types;
-using namespace helios::engine::rendering::mesh::types;
 export namespace helios::engine::rendering::common::concepts {
 
     /**
@@ -23,8 +21,9 @@ export namespace helios::engine::rendering::common::concepts {
      * @tparam T Type to validate.
      */
     template<typename T>
-    concept IsRenderResourceHandle = std::is_same_v<T, ShaderHandle> ||
-                                     std::is_same_v<T, MaterialHandle> ||
-                                     std::is_same_v<T, MeshHandle>;
+    concept IsRenderResourceHandle = std::is_same_v<T, shader::types::ShaderHandle> ||
+                                     std::is_same_v<T, material::types::MaterialHandle> ||
+                                     std::is_same_v<T, texture::types::TextureHandle> ||
+                                     std::is_same_v<T, mesh::types::MeshHandle>;
 
 }

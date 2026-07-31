@@ -7,7 +7,7 @@ module;
 #include <concepts>
 #include <span>
 
-export module helios.engine.rendering.common.concepts.IsRenderBackendLike;
+export module helios.engine.rendering.common.concepts:IsRenderBackendLike;
 
 import helios.math.types;
 

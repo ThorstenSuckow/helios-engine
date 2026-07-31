@@ -6,7 +6,7 @@ module;
 
 #include <concepts>
 
-export module helios.engine.rendering.common.concepts.CanProvideWindowHints;
+export module helios.engine.rendering.common.concepts:CanProvideWindowHints;
 
 export namespace helios::engine::rendering::common::concepts {
 

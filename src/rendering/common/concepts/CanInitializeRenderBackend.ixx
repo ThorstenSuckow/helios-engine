@@ -6,7 +6,7 @@ module;
 
 #include <concepts>
 
-export module helios.engine.rendering.common.concepts.CanInitializeRenderBackend;
+export module helios.engine.rendering.common.concepts:CanInitializeRenderBackend;
 
 
 import helios.engine.scene.types.SceneMemberRenderContext;

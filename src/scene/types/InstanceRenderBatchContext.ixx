@@ -93,6 +93,7 @@ export namespace helios::engine::scene::types {
          * @param viewportHdl Target viewport handle.
          * @param sceneHdl Owning scene handle.
          * @param meshHdl Mesh handle used for the batch.
+         * @param textureHdl Texture handle used for the batch.
          * @param materialHdl Material handle used for the batch.
          * @param shaderHdl Shader handle used for the batch.
          */
@@ -101,12 +102,14 @@ export namespace helios::engine::scene::types {
             const ViewportHandle viewportHdl,
             const SceneHandle sceneHdl,
             const MeshHandle meshHdl,
+            const TextureHandle textureHdl,
             const MaterialHandle materialHdl,
             const ShaderHandle shaderHdl
         ) : renderTargetHandle(renderTargetHdl),
             viewportHandle(viewportHdl),
             sceneHandle(sceneHdl),
             meshHandle(meshHdl),
+            textureHandle(textureHdl),
             materialHandle(materialHdl),
             shaderHandle(shaderHdl) {
             memberHandles.reserve(DEFAULT_INSTANCE_DATA_CAPACITY);

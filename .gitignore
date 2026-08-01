@@ -3,3 +3,4 @@
 /build-test-unified
 /build-pkg-llvm-e2e/
 /.idea
+/cmake-build-release/

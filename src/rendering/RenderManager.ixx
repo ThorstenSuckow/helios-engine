@@ -7,7 +7,7 @@ module;
 #include <vector>
 #include <format>
 #include "helios-engine-config.h"
-#include <optional>
+#include <cassert>
 #include <algorithm>
 #include <iterator>
 
@@ -81,44 +81,63 @@ export namespace helios::engine::rendering {
     class RenderManager {
 
         /**
+         * @brief Converts an entity handle to a batch index.
+         *
+         * @tparam THandle Handle type.
+         * @param handle Handle to convert.
+         * @return Batch index corresponding to the handle.
+         */
+        template<typename THandle>
+        [[nodiscard]] constexpr static std::size_t entityHandleToBatchIndex(const THandle handle) noexcept {
+            return handle.isValid() ? handle.entityId() + 1 : 0;
+        }
+
+        /**
          * @brief Clears active child batches and resets the parent batch active flag.
          *
          * @tparam TBatch Parent batch type.
          * @tparam TChildHandle Child batch element type.
          * @param batch Parent batch to reset.
-         * @param activeIndices Active child indices to clear.
+         * @param activeBatchIndices Active child indices to clear.
          * @param batches Child batch storage.
          */
         template<typename TBatch, typename TChildHandle>
-        static void clearActive(TBatch* batch, std::vector<EntityId>& activeIndices, std::vector<TChildHandle>& batches) {
+        static void clearActive(TBatch* batch, std::vector<std::size_t>& activeBatchIndices, std::vector<TChildHandle>& batches) {
             batch->isActive = false;
-            for (auto idx: activeIndices) {
+            for (auto idx: activeBatchIndices) {
                 batches[idx].clear();
             }
-            activeIndices.clear();
+            activeBatchIndices.clear();
         }
 
         /**
          * @brief Returns the existing child batch for a handle or activates a new one.
          *
+         * @details Creates a new batch with the specified handle as its owner, whereas invalid handles will all
+         * be added to bucket with index = 0.
+         * The index for buckets with valid handles will be incremented by 1 to avoid collision with the invalid handle bucket,
+         * since (0, 1) is a valid Handle that would otherwise end up in bucket 0.
+         *
          * @tparam THandle Handle type used as index source.
          * @tparam TChildBatch Child batch type.
          * @param handle Handle selecting the batch slot.
          * @param batches Child batch storage.
-         * @param activeIndices Active child indices list.
+         * @param activeBatchIndices Active child indices list.
          * @return Reference to the active child batch.
          */
         template<typename THandle, typename TChildBatch>
-        static TChildBatch& addToBatch(const THandle handle, std::vector<TChildBatch>& batches, std::vector<EntityId>& activeIndices) {
-            if (handle.entityId >= batches.size()) {
-                batches.resize(handle.entityId + 1);
-            }
-            auto& batch = batches[handle.entityId];
+        static TChildBatch& addToBatch(const THandle handle, std::vector<TChildBatch>& batches, std::vector<std::size_t>& activeBatchIndices) {
 
-            if (!batches[handle.entityId].isActive) {
+            auto idx = entityHandleToBatchIndex(handle);
+            if (idx >= batches.size()) {
+                batches.resize(idx + 1);
+            }
+            auto& batch = batches[idx];
+
+            if (!batches[idx].isActive) {
                 batch.handle = handle;
-                batches[handle.entityId].isActive = true;
-                activeIndices.push_back(handle.entityId);
+                batches[idx].isActive = true;
+                activeBatchIndices.push_back(idx);
             }
 
             return batch;
@@ -151,13 +170,13 @@ export namespace helios::engine::rendering {
             bool isActive{false};
             MaterialHandle handle;
             std::vector<MeshBatch> batches;
-            std::vector<EntityId> activeIndices;
+            std::vector<std::size_t> activeBatchIndices;
             MaterialBatch(){batches.reserve(DEFAULT_MESH_POOL_CAPACITY);}
             [[nodiscard]] MeshBatch& getOrAdd(MeshHandle handle) {
-                return addToBatch(handle, batches, activeIndices);
+                return addToBatch(handle, batches, activeBatchIndices);
             }
             void clear() {
-                clearActive(this, activeIndices, batches);
+                clearActive(this, activeBatchIndices, batches);
             }
         };
 
@@ -168,13 +187,13 @@ export namespace helios::engine::rendering {
             bool isActive{false};
             TextureHandle handle;
             std::vector<MaterialBatch> batches;
-            std::vector<EntityId> activeIndices;
+            std::vector<std::size_t> activeBatchIndices;
             TextureBatch(){batches.reserve(DEFAULT_MATERIAL_POOL_CAPACITY);}
             [[nodiscard]] MaterialBatch& getOrAdd(MaterialHandle handle) {
-                return addToBatch(handle, batches, activeIndices);
+                return addToBatch(handle, batches, activeBatchIndices);
             }
             void clear() {
-                clearActive(this, activeIndices, batches);
+                clearActive(this, activeBatchIndices, batches);
             }
         };
 
@@ -185,13 +204,13 @@ export namespace helios::engine::rendering {
             bool isActive{false};
             ShaderHandle handle;
             std::vector<TextureBatch> batches;
-            std::vector<EntityId> activeIndices;
+            std::vector<std::size_t> activeBatchIndices;
             ShaderBatch(){batches.reserve(DEFAULT_TEXTURE_POOL_CAPACITY);}
             [[nodiscard]] TextureBatch& getOrAdd(TextureHandle handle) {
-                return addToBatch(handle, batches, activeIndices);
+                return addToBatch(handle, batches, activeBatchIndices);
             }
             void clear() {
-                clearActive(this, activeIndices, batches);
+                clearActive(this, activeBatchIndices, batches);
             }
         };
 
@@ -202,13 +221,13 @@ export namespace helios::engine::rendering {
             bool isActive{false};
             ViewportHandle handle;
             std::vector<ShaderBatch> batches;
-            std::vector<EntityId> activeIndices;
+            std::vector<std::size_t> activeBatchIndices;
             [[nodiscard]] ShaderBatch& getOrAdd(ShaderHandle handle) {
-                return addToBatch(handle, batches, activeIndices);
+                return addToBatch(handle, batches, activeBatchIndices);
             }
             ViewportBatch(){batches.reserve(DEFAULT_SHADER_POOL_CAPACITY);}
             void clear() {
-                clearActive(this, activeIndices, batches);
+                clearActive(this, activeBatchIndices, batches);
             }
         };
 
@@ -219,13 +238,13 @@ export namespace helios::engine::rendering {
             bool isActive{false};
             RenderTargetHandle handle;
             std::vector<ViewportBatch> batches;
-            std::vector<EntityId> activeIndices;
+            std::vector<std::size_t> activeBatchIndices;
             [[nodiscard]] ViewportBatch& getOrAdd(ViewportHandle handle) {
-                return addToBatch(handle, batches, activeIndices);
+                return addToBatch(handle, batches, activeBatchIndices);
             }
             RenderTargetBatch(){batches.reserve(DEFAULT_VIEWPORT_POOL_CAPACITY);}
             void clear() {
-                clearActive(this, activeIndices, batches);
+                clearActive(this, activeBatchIndices, batches);
             }
         };
 
@@ -261,9 +280,9 @@ export namespace helios::engine::rendering {
         [[nodiscard]] ViewportBatch& ensureViewportBatch(
             RenderTargetHandle renderTargetHandle, ViewportHandle viewportHandle) {
 
-            auto renderTargetId = renderTargetHandle.entityId;
+            auto renderTargetId = renderTargetHandle.entityId();
 
-            if (renderTargetBatches_.size() <= renderTargetHandle.entityId) {
+            if (renderTargetBatches_.size() <= renderTargetId) {
                 renderTargetBatches_.resize(renderTargetId + 1);
             }
 
@@ -337,26 +356,31 @@ export namespace helios::engine::rendering {
 
                 renderBackend_.beginRenderTargetBatch(renderTargetBatch.handle);
 
-                for (auto viewportIdx : renderTargetBatch.activeIndices) {
+                for (auto viewportIdx : renderTargetBatch.activeBatchIndices) {
                     auto& viewportBatch = renderTargetBatch.batches[viewportIdx];
 
                     renderBackend_.beginViewportBatch(viewportBatch.handle);
 
-                    for (auto shaderIdx : viewportBatch.activeIndices ) {
+                    for (auto shaderIdx : viewportBatch.activeBatchIndices ) {
                         auto& shaderBatch = viewportBatch.batches[shaderIdx];
 
                         renderBackend_.beginShaderBatch(shaderBatch.handle);
 
-                        for (auto textureIdx : shaderBatch.activeIndices ) {
+                        for (auto textureIdx : shaderBatch.activeBatchIndices ) {
                             auto& textureBatch = shaderBatch.batches[textureIdx];
-                            renderBackend_.beginTextureBatch(textureBatch.handle);
 
-                            for (auto materialIdx : textureBatch.activeIndices) {
+                            auto validTextureBatch = textureBatch.handle.isValid();
+                            // consider invalid (intentionally missing) textures
+                            if (validTextureBatch) {
+                                renderBackend_.beginTextureBatch(textureBatch.handle);
+                            }
+
+                            for (auto materialIdx : textureBatch.activeBatchIndices) {
                                 auto& materialBatch = textureBatch.batches[materialIdx];
 
                                 renderBackend_.beginMaterialBatch(materialBatch.handle);
 
-                                for (auto meshIdx : materialBatch.activeIndices) {
+                                for (auto meshIdx : materialBatch.activeBatchIndices) {
                                     auto& meshBatch = materialBatch.batches[meshIdx];
 
                                     renderBackend_.beginMeshBatch(meshBatch.handle);
@@ -370,8 +394,9 @@ export namespace helios::engine::rendering {
                                 renderBackend_.endMaterialBatch(materialBatch.handle);
                             } //textureBatch
 
-
-                            renderBackend_.endTextureBatch(textureBatch.handle);
+                            if (validTextureBatch) {
+                                renderBackend_.endTextureBatch(textureBatch.handle);
+                            }
                         } // shader batch
 
                         renderBackend_.endShaderBatch(shaderBatch.handle);

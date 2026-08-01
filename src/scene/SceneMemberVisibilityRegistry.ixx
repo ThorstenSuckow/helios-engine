@@ -6,12 +6,10 @@ module;
 
 #include "helios-engine-config.h"
 #include <span>
-#include <cassert>
 #include <vector>
 
 export module helios.engine.scene.SceneMemberVisibilityRegistry;
 
-import helios.engine.core.container.HandleManyToManyMap;
 
 import helios.engine.scene.types;
 
@@ -24,7 +22,7 @@ using namespace helios::engine::rendering::common::types;
 using namespace helios::engine::scene::types;
 using namespace helios::engine::rendering::common::types;
 using namespace helios::engine::rendering::renderTarget::types;
-using namespace helios::engine::core::container;
+
 
 namespace {
     template<class>

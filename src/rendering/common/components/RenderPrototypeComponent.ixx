@@ -34,7 +34,7 @@ export namespace helios::engine::rendering::common::components {
 
         MeshHandle meshHandle_;
 
-        texture::types::TextureHandle textureHandle_{};
+        texture::types::TextureHandle textureHandle_;
 
     public:
 

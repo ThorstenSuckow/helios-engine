@@ -114,7 +114,7 @@ export namespace helios::engine::scene {
          * @param context Visibility context to append.
          */
         void addCulledMember(const ViewportHandle viewportHandle, SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>&& context) {
-            const auto idx = viewportHandle.entityId;
+            const auto idx = viewportHandle.entityId();
             if (culledContexts_.size() <= idx) {
                 culledContexts_.resize(idx + 1);
             }
@@ -130,7 +130,7 @@ export namespace helios::engine::scene {
          * @param context Visibility context to append.
          */
         void addVisibleMember(const ViewportHandle viewportHandle, SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>&& context) {
-            const auto idx = viewportHandle.entityId;
+            const auto idx = viewportHandle.entityId();
             if (visibilityContexts_.size() <= idx) {
                 visibilityContexts_.resize(idx + 1);
             }
@@ -144,7 +144,7 @@ export namespace helios::engine::scene {
          * @param viewportHandle Viewport to query.
          */
         [[nodiscard]] std::span<SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>> culledMembers(const ViewportHandle viewportHandle = {})  {
-            const auto idx = viewportHandle.entityId;
+            const auto idx = viewportHandle.entityId();
             if (idx >= culledContexts_.size()) {
                 return {};
             }
@@ -165,7 +165,7 @@ export namespace helios::engine::scene {
          * @param viewportHandle Viewport to query.
          */
         [[nodiscard]] std::span<const SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>> visibleMembers(const ViewportHandle viewportHandle) const noexcept {
-            const auto idx = viewportHandle.entityId;
+            const auto idx = viewportHandle.entityId();
             if (idx >= visibilityContexts_.size()) {
                 return {};
             }

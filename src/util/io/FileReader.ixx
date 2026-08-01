@@ -54,7 +54,7 @@ export namespace helios::engine::util::io {
          * @param sink Output parameter receiving the file contents on success.
          * @return true if reading succeeded and `contents` was populated, otherwise false.
          */
-        [[nodiscard]] virtual bool readInto( const std::string& filename,  TData& sink) const noexcept = 0;
+        [[nodiscard]] virtual bool readInto(const std::string& filename,  TData& sink) const noexcept = 0;
 
 
     };

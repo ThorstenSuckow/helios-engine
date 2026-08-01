@@ -7,5 +7,7 @@ export module helios.engine.util.io;
 export import helios.engine.util.io.StringFileReader;
 export import helios.engine.util.io.BasicStringFileReader;
 
+export import :types;
+
 export import :ImageReader;
 export import :FileReader;

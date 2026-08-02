@@ -27,6 +27,8 @@ import helios.engine.core.thread;
 import helios.engine.rendering.RenderManager;
 
 import helios.engine.runtime.lifecycle;
+import helios.engine.runtime.pooling;
+import helios.engine.runtime.particle;
 import helios.engine.runtime.timing;
 import helios.engine.runtime.enginestate;
 
@@ -37,6 +39,8 @@ using namespace helios::engine::platform::environment;
 using namespace helios::engine::platform::window;
 using namespace helios::engine::runtime::world;
 using namespace helios::engine::runtime::world::types;
+using namespace helios::engine::runtime::particle;
+using namespace helios::engine::runtime::particle::types;
 using namespace helios::engine::runtime::gameloop;
 using namespace helios::engine::runtime::messaging::command;
 
@@ -74,17 +78,27 @@ export namespace helios::engine::bootstrap {
             helios::engine::runtime::enginestate::rules::DefaultEngineStateTransitionRules::rules());
 
         gameWorld->registerManager<helios::engine::runtime::timing::TimerManager>();
+
+        // mutation manager
         gameWorld->registerManager<helios::engine::runtime::world::EntityMutationManager<GameObjectEntityManager>>(
             gameWorld->entityManager<GameObjectHandle>(),
             jobSystem
         );
+        gameWorld->registerManager<helios::engine::runtime::world::EntityMutationManager<ParticleEntityManager>>(
+            gameWorld->entityManager<ParticleHandle>(),
+            jobSystem
+        );
+        gameWorld->registerManager<helios::engine::runtime::pooling::EntityPoolManager<GameObjectHandle, ParticleHandle>>(gameWorld->engineWorld());
 
         gameWorld->session().trackState<helios::engine::runtime::enginestate::types::EngineState>();
 
         gameWorld->registerCommandBuffer<RenderCommandBuffer>();
         gameWorld->registerCommandBuffer<PlatformCommandBuffer>();
         gameWorld->registerCommandBuffer<EngineCommandBuffer>();
+        gameWorld->registerCommandBuffer<EntityPoolCommandBuffer>();
+
         gameWorld->registerCommandBuffer<EntityMutationCommandBuffer<GameObjectEntityManager>>();
+        gameWorld->registerCommandBuffer<EntityMutationCommandBuffer<ParticleEntityManager>>();
 
         gameWorld->session().setStateFrom<EngineState>(
             StateTransitionContext<EngineState>(

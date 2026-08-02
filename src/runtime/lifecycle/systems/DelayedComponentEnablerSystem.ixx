@@ -15,8 +15,6 @@ import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.lifecycle.components.DelayedComponentEnabler;
 import helios.ecs.types.ComponentTypeId;
 
-import helios.ecs.ComponentOpsRegistry;
-
 import helios.ecs.components.Active;
 
 import helios.engine.runtime.world.tags.SystemRole;
@@ -83,13 +81,6 @@ export namespace helios::engine::runtime::lifecycle::systems {
                     const auto componentTypeId = deferredComponent.componentTypeId;
 
                     if (deferredComponent.delta <= 0) {
-                        auto* rawCmp = entity.raw(componentTypeId);
-                        auto ops = helios::ecs::ComponentOpsRegistry<THandle>::ops(componentTypeId);
-
-                        if (rawCmp && ops.enable) {
-                            ops.enable(rawCmp);
-                        }
-
                         sync_.push_back(componentTypeId);
                     }
                 }

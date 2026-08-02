@@ -22,16 +22,9 @@ import helios.engine.runtime.world.types.GameObjectHandle;
 import helios.engine.runtime.world.EntityMutationManager;
 
 import helios.engine.platform;
-
-import helios.engine.scene.registry;
-import helios.engine.core.registry;
 import helios.engine.core.thread;
-import helios.engine.spatial.registry;
-import helios.engine.scene.registry;
 
-import helios.engine.rendering.registry;
 import helios.engine.rendering.RenderManager;
-import helios.engine.runtime.registry;
 
 import helios.engine.runtime.lifecycle;
 import helios.engine.runtime.timing;
@@ -49,92 +42,9 @@ using namespace helios::engine::runtime::messaging::command;
 
 export namespace helios::engine::bootstrap {
 
-    template<typename... Tuple>
-    struct ComponentRegistrar;
-
-    template<typename... TEntityManagers>
-    struct ComponentRegistrar<std::tuple<TEntityManagers...>> {
-        static void registerComponents() {
-            (helios::engine::rendering::registerComponents<TEntityManagers>(), ...);
-            (helios::engine::runtime::registerComponents<TEntityManagers>(), ...);
-            (helios::engine::scene::registerComponents<TEntityManagers>(), ...);
-            (helios::engine::spatial::registerComponents<TEntityManagers>(), ...);
-            (helios::engine::core::registerComponents<TEntityManagers>(), ...);
-        }
-
-    };
-
-
-    /**
-     * @brief Registers all component types with the ComponentReflector.
-     *
-     * @details This function must be called during engine initialization to
-     * enable runtime reflection features such as cloning, lifecycle callbacks
-     * (onAcquire, onRelease, onRemove), and enable/disable toggles.
-     *
-     * ## Usage
-     *
-     * ```cpp
-     * // Call once during engine startup
-     * helios::engine::bootstrap::registerAllComponents();
-     * ```
-     *
-     * @note New component types must be added to the respective module's
-     *       registry.ixx file to participate in the reflection system.
-     *
-     * @see ComponentReflector
-     * @see ComponentOpsRegistry
-     */
-    inline void registerAllComponents() {
-
-        static bool done = false;
-        if (done) {
-            return;
-        }
-        done = true;
-
-        ComponentRegistrar<RegisteredEntityManagers>::registerComponents();
-
-    }
 
     /**
      * @brief Creates a pre-configured GameWorld and GameLoop pair.
-     *
-     * @details The factory heap-allocates both objects and performs the
-     * minimal setup required before application-specific configuration:
-     *
-     * - Calls `registerAllComponents()` via `ComponentRegistrar`
-     * - Registers `WorldLifecycleManager`, `GameStateManager`,
-     *   `MatchStateManager`, and `TimerManager`
-     * - Tracks `GameState` and `MatchState` in the Session
-     * - Registers `RenderCommandBuffer`, `EngineCommandBuffer`,
-     *   and `StateCommandBuffer`
-     * - Sets initial `GameState` to `Booting`
-     *
-     * The caller receives ownership via `unique_ptr` and is responsible
-     * for registering Managers, configuring phases/passes, calling
-     * `GameWorld::init()` and `GameLoop::init()`, and driving the
-     * main loop.
-     *
-     * ## Usage
-     *
-     * ```cpp
-     * auto [gameWorldPtr, gameLoopPtr] = helios::engine::bootstrap::bootstrapGameWorld();
-     * auto& gameWorld = *gameWorldPtr;
-     * auto& gameLoop  = *gameLoopPtr;
-     *
-     * // Application-specific setup
-     * gameWorld.registerManager<SpawnManager<GameObjectHandle>>();
-     * gameLoop.phase(PhaseType::Pre)
-     *     .beginPass<GameState>(GameState::Any)
-     *         .addSystem<InputSystem>();
-     *
-     * gameWorld.init();
-     * gameLoop.init(gameWorld);
-     * ```
-     *
-     * @note `registerAllComponents()` is called automatically — no separate
-     *       call is required.
      *
      * @param jobSystem Reference to the JobSystem used for parallel system execution.
      * @param capacity Initial capacity for the EntityManager's SparseSets.
@@ -143,7 +53,6 @@ export namespace helios::engine::bootstrap {
      *
      * @return A pair of (GameWorld, GameLoop) unique pointers.
      *
-     * @see registerAllComponents
      * @see GameWorld
      * @see GameLoop
      * @see EngineCommandBuffer
@@ -157,8 +66,6 @@ export namespace helios::engine::bootstrap {
 
         auto gameLoop = std::make_unique<helios::engine::runtime::gameloop::GameLoop>(*gameWorld);
 
-
-        registerAllComponents();
 
         // managers
         gameWorld->registerManager<helios::engine::runtime::lifecycle::WorldLifecycleManager>();

@@ -19,6 +19,7 @@ import helios.engine.rendering.shader.types;
 import helios.engine.rendering.texture.types;
 import helios.engine.rendering.texture.commands;
 import helios.engine.rendering.mesh.types;
+import helios.engine.runtime.particle.types;
 import helios.engine.runtime.world.types;
 
 export namespace helios::engine::runtime::messaging::command {
@@ -27,9 +28,9 @@ export namespace helios::engine::runtime::messaging::command {
         rendering::common::commands::RenderSceneCommand<world::types::GameObjectHandle>,
         rendering::common::commands::RenderSceneMemberCommand<world::types::GameObjectHandle>,
         rendering::common::commands::RenderInstanceBatchCommand<world::types::GameObjectHandle>,
-        rendering::common::commands::RenderSceneCommand<world::types::ParticleHandle>,
-        rendering::common::commands::RenderSceneMemberCommand<world::types::ParticleHandle>,
-        rendering::common::commands::RenderInstanceBatchCommand<world::types::ParticleHandle>,
+        rendering::common::commands::RenderSceneCommand<particle::types::ParticleHandle>,
+        rendering::common::commands::RenderSceneMemberCommand<particle::types::ParticleHandle>,
+        rendering::common::commands::RenderInstanceBatchCommand<particle::types::ParticleHandle>,
         rendering::shader::commands::ShaderCompileCommand<rendering::shader::types::ShaderHandle>,
         rendering::shader::commands::ShaderBatchCompileCommand<rendering::shader::types::ShaderHandle>,
         rendering::texture::commands::TextureBatchUploadCommand<rendering::texture::types::TextureHandle>,

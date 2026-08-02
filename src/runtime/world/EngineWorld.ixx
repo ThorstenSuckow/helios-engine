@@ -13,7 +13,7 @@ export module helios.engine.runtime.world.EngineWorld;
 import helios.ecs;
 
 import helios.engine.runtime.world.GameObjectEntityManager;
-import helios.engine.runtime.world.ParticleEntityManager;
+import helios.engine.runtime.particle.ParticleEntityManager;
 
 import helios.engine.platform.window.WindowEntityManager;
 import helios.engine.platform.window.concepts;
@@ -34,7 +34,11 @@ import helios.engine.rendering.texture.TextureEntityManager;
 import helios.engine.rendering.texture.types;
 
 import helios.engine.runtime.world.concepts.IsGameObjectHandle;
-import helios.engine.runtime.world.concepts.IsParticleHandle;
+
+import helios.engine.runtime.particle.ParticleEntityManager;
+import helios.engine.runtime.particle.concepts;
+import helios.engine.runtime.particle.types;
+
 import helios.engine.runtime.world.types.GameObjectHandle;
 
 import helios.engine.platform.window.concepts;
@@ -58,6 +62,9 @@ using namespace helios::engine::platform::window::types;
 using namespace helios::engine::platform::window::concepts;
 using namespace helios::engine::runtime::world::types;
 using namespace helios::engine::runtime::world::concepts;
+using namespace helios::engine::runtime::particle;
+using namespace helios::engine::runtime::particle::types;
+using namespace helios::engine::runtime::particle::concepts;
 using namespace helios::engine::rendering::shader;
 using namespace helios::engine::rendering::material;
 using namespace helios::engine::rendering::mesh;

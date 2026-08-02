@@ -12,8 +12,6 @@ export import helios.engine.runtime.world.tags;
 export import helios.engine.runtime.world.EngineWorld;
 export import helios.engine.runtime.world.GameWorld;
 export import helios.engine.runtime.world.GameObject;
-export import helios.engine.runtime.world.ParticleEntity;
-export import helios.engine.runtime.world.ParticleEntityManager;
 export import helios.engine.runtime.world.GameObjectEntityManager;
 export import helios.engine.runtime.world.EntityMutationManager;
 export import helios.engine.runtime.world.Level;

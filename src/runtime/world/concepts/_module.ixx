@@ -6,7 +6,6 @@ export module helios.engine.runtime.world.concepts;
 
 
 export import helios.engine.runtime.world.concepts.IsGameObjectHandle;
-export import helios.engine.runtime.world.concepts.IsParticleHandle;
 export import helios.engine.runtime.world.concepts.HasUpdate;
 export import helios.engine.runtime.world.concepts.IsManagerLike;
 export import helios.engine.runtime.world.concepts.IsSystemLike;

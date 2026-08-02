@@ -4,13 +4,13 @@
  */
 module;
 
-export module helios.engine.runtime.world.ParticleEntity;
+export module helios.engine.runtime.particle.ParticleEntity;
 
-import helios.engine.runtime.world.ParticleEntityManager;
+import helios.engine.runtime.particle.ParticleEntityManager;
 import helios.ecs.Entity;
 
 using namespace helios::ecs;
-export namespace helios::engine::runtime::world {
+export namespace helios::engine::runtime::particle {
 
     /**
      * @brief Alias for an entity facade backed by `ParticleEntityManager`.

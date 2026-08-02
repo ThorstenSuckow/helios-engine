@@ -1,12 +1,12 @@
 module;
 
 
-export module helios.engine.runtime.world.types:Particle;
+export module helios.engine.runtime.particle.types:ParticleTypeDefs;
 
 import helios.ecs.types;
 
 using namespace helios::ecs::types;
-export namespace helios::engine::runtime::world::types {
+export namespace helios::engine::runtime::particle::types {
 
     struct ParticleDomainTag{};
 

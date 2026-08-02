@@ -6,12 +6,12 @@ module;
 
 #include <concepts>
 
-export module helios.engine.runtime.world.concepts.IsParticleHandle;
+export module helios.engine.runtime.particle.concepts:IsParticleHandle;
 
-import helios.engine.runtime.world.types;
+import helios.engine.runtime.particle.types;
 
-using namespace helios::engine::runtime::world::types;
-export namespace helios::engine::runtime::world::concepts {
+using namespace helios::engine::runtime::particle::types;
+export namespace helios::engine::runtime::particle::concepts {
 
     /**
      * @brief Constrains a type to `ParticleHandle`.

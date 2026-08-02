@@ -3,11 +3,10 @@
  */
 module;
 
-#include <cstdint>
 #include <string_view>
 #include <cstddef>
 
-export module helios.engine.runtime.pooling.types.EntityPoolId;
+export module helios.engine.runtime.pooling.types:EntityPoolId;
 
 import helios.engine.core.types.FuncDefs;
 import helios.engine.core.types;
@@ -18,6 +17,7 @@ export namespace helios::engine::runtime::pooling::types {
     /**
      * @brief Tag type for EntityPoolId.
      */
+    template<typename THandle>
     struct EntityPoolIdTag{};
 
     /**
@@ -30,16 +30,17 @@ export namespace helios::engine::runtime::pooling::types {
      * @see SpawnProfileId
      * @see SpawnRuleId
      */
-    using EntityPoolId = helios::ecs::types::StrongId<EntityPoolIdTag>;
+    template<typename THandle>
+    using EntityPoolId = helios::ecs::types::StrongId<EntityPoolIdTag<THandle>>;
 
 }
 
 /**
  * @brief Hash specialization for EntityPoolId.
  */
-template<>
-struct std::hash<helios::engine::runtime::pooling::types::EntityPoolId> {
-    std::size_t operator()(const helios::engine::runtime::pooling::types::EntityPoolId& id) const noexcept {
+template<typename THandle>
+struct std::hash<helios::engine::runtime::pooling::types::EntityPoolId<THandle>> {
+    std::size_t operator()(const helios::engine::runtime::pooling::types::EntityPoolId<THandle>& id) const noexcept {
         return id.value();
     }
 };

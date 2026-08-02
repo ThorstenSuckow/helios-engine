@@ -4,6 +4,4 @@
  */
 export module helios.engine.runtime.pooling.types;
 
-export import helios.engine.runtime.pooling.types.EntityPoolId;
-export import helios.engine.runtime.pooling.types.PrefabId;
-
+export import :EntityPoolId;

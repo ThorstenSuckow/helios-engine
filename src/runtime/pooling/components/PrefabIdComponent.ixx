@@ -36,7 +36,7 @@ export namespace helios::engine::runtime::pooling::components {
         /**
          * @brief The prefab identifier for this entity's template origin.
          */
-        PrefabId prefabId_;
+        PrefabId<THandle> prefabId_;
 
     public:
 
@@ -45,16 +45,24 @@ export namespace helios::engine::runtime::pooling::components {
          */
         ~PrefabIdComponent() = default;
 
-        /// @brief Copy construction is deleted (prefab identity is not cloneable).
+        /**
+         * @brief Copy construction is deleted (prefab identity is not cloneable, belongs to exactly one entity).
+         *+
         PrefabIdComponent(const PrefabIdComponent&) = delete;
 
-        /// @brief Copy assignment is deleted (prefab identity is not cloneable).
+        /**
+         * @brief Copy assignment is deleted (prefab identity is not cloneable, belongs to exactly one entity).
+         */
         PrefabIdComponent& operator=(const PrefabIdComponent&) = delete;
 
-        /// @brief Move constructor.
+        /**
+         * @brief Move constructor.
+         */
         PrefabIdComponent(PrefabIdComponent&&) = default;
 
-        /// @brief Move assignment operator.
+        /**
+         * @brief Move assignment operator.
+         **/
         PrefabIdComponent& operator=(PrefabIdComponent&&) = default;
 
         /**
@@ -62,14 +70,14 @@ export namespace helios::engine::runtime::pooling::components {
          *
          * @param prefabId The prefab identifier to store.
          */
-        explicit PrefabIdComponent(const PrefabId prefabId) : prefabId_(prefabId) {}
+        explicit PrefabIdComponent(const PrefabId<THandle> prefabId) : prefabId_(prefabId) {}
 
         /**
          * @brief Returns the stored prefab identifier.
          *
          * @return The PrefabId identifying the prefab template.
          */
-        [[nodiscard]] PrefabId prefabId() const noexcept {
+        [[nodiscard]] PrefabId<THandle> prefabId() const noexcept {
             return prefabId_;
         }
 

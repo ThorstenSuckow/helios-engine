@@ -198,27 +198,27 @@ export namespace helios::engine::runtime::world {
         }
 
         /**
-         * @brief Clones an entity within the sub-world appropriate for `THandle`.
+         * @brief Copies an entity within the sub-world appropriate for `THandle`.
          *
-         * @tparam THandle Handle type of the entity to clone.
+         * @tparam THandle Handle type of the entity to copy.
          * @param  source  Handle of the source entity.
-         * @return `Entity` wrapper for the newly cloned entity.
+         * @return `Entity` wrapper for the newly copied entity.
          */
         template<typename THandle>
-        [[nodiscard]] auto clone(THandle source) noexcept {
+        [[nodiscard]] auto copyEntity(THandle source) noexcept {
 
             if constexpr(IsGameObjectHandle<THandle>) {
-                return gameObjectWorld_.cloneEntity<THandle>(source);
+                return gameObjectWorld_.copyEntity<THandle>(source);
             } else if constexpr(IsAnyPlatformHandle<THandle>){
-                return platformWorld_.cloneEntity<THandle>(source);
+                return platformWorld_.copyEntity<THandle>(source);
             } else if constexpr(IsRenderResourceHandle<THandle>) {
-                return renderResourceWorld_.cloneEntity<THandle>(source);
+                return renderResourceWorld_.copyEntity<THandle>(source);
             } else if constexpr(IsRenderViewHandle<THandle>) {
-                return renderViewWorld_.cloneEntity<THandle>(source);
+                return renderViewWorld_.copyEntity<THandle>(source);
             } else if constexpr(IsParticleHandle<THandle>) {
-                return particleWorld_.cloneEntity<THandle>(source);
+                return particleWorld_.copyEntity<THandle>(source);
             } else {
-                static_assert(typed_false<THandle>, "Unsupported handle type for cloning");
+                static_assert(typed_false<THandle>, "Unsupported handle type for copying");
             }
         }
 

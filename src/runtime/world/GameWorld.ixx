@@ -454,6 +454,15 @@ export namespace helios::engine::runtime::world {
             return engineWorld_.gameObjectWorld();
         }
 
+        /**
+         * @brief Returns the game-object domain world.
+         *
+         * @return Reference to `GameObjectWorld`.
+         */
+        [[nodiscard]] ParticleWorld& particleWorld() noexcept{
+            return engineWorld_.particleWorld();
+        }
+
 
         /**
          * @brief Returns the aggregate typed world used for handle-routed operations.

@@ -88,7 +88,7 @@ export namespace helios::engine::bootstrap {
             gameWorld->entityManager<ParticleHandle>(),
             jobSystem
         );
-        gameWorld->registerManager<helios::engine::runtime::pooling::EntityPoolManager<GameObjectHandle, ParticleHandle>>(gameWorld->engineWorld());
+        gameWorld->registerManager<helios::engine::runtime::pooling::EntityPoolManager<GameObjectHandle, ParticleHandle>>(gameWorld->engineWorld(), jobSystem);
 
         gameWorld->session().trackState<helios::engine::runtime::enginestate::types::EngineState>();
 

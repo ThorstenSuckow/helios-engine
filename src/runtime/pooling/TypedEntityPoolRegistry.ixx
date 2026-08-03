@@ -4,9 +4,13 @@
  */
 module;
 
-#include <memory>
-#include <unordered_map>
 #include <cassert>
+#include <functional>
+#include <optional>
+#include <utility>
+#include <vector>
+#include <tuple>
+#include <type_traits>
 
 export module helios.engine.runtime.pooling.TypedEntityPoolRegistry;
 
@@ -20,9 +24,9 @@ export namespace helios::engine::runtime::pooling {
 
 
     /**
-     * @brief Typed registry that manages multiple `EntityPool` instances keyed by `EntityPoolId`.
+     * @brief Typed registry that manages multiple `EntityPool` instances keyed by `EntityPoolKey`.
      *
-     * Pools are stored in a `std::tuple` of `std::unordered_map`s, one map per managed handle type.
+     * Pools are stored in index-based `vector` slots (one `vector` per managed handle type, held in a `std::tuple`).
      * All pool operations are dispatched at compile time via the `THandle` template argument.
      *
      * @tparam TManagedHandles  Pack of handle types whose pools are managed by this registry.
@@ -33,13 +37,37 @@ export namespace helios::engine::runtime::pooling {
     private:
 
         /**
-         * @brief Maps pool IDs to their corresponding EntityPool instances.
+         * @brief Aggregates a pool together with its registration key in a single slot.
+         *
+         * @tparam THandle  Handle type of the managed pool.
          */
-        std::tuple<std::unordered_map<EntityPoolId<TManagedHandles>, EntityPool<TManagedHandles>>...> pools_;
-
         template<typename THandle>
-        [[nodiscard]] std::unordered_map<EntityPoolId<THandle>, EntityPool<THandle>>& managedPoolSet() {
-            return std::get<std::unordered_map<EntityPoolId<THandle>, EntityPool<THandle>>>(pools_);
+        struct EntityPoolSlot {
+            EntityPoolKey<THandle> key;
+            EntityPool<THandle> pool;
+        };
+
+        /**
+         * @brief Index-addressable slot storage; each slot holds an `EntityPoolSlot` or `std::nullopt`.
+         * The slot index corresponds to `EntityPoolKey::idx()`.
+         */
+        std::tuple<std::vector<std::optional<EntityPoolSlot<TManagedHandles>>>...> pools_;
+
+        /**
+         * @brief Ordered list of registered keys; used for iteration in `forEach`.
+         */
+        std::tuple<std::vector<EntityPoolKey<TManagedHandles>>...> availablePoolKeys_;
+
+        /** @brief Returns the mutable slot vector for `THandle`. */
+        template<typename THandle>
+        [[nodiscard]] std::vector<std::optional<EntityPoolSlot<THandle>>>& managedPoolVector() noexcept {
+            return std::get<std::vector<std::optional<EntityPoolSlot<THandle>>>>(pools_);
+        }
+
+        /** @brief Returns the const slot vector for `THandle`. */
+        template<typename THandle>
+        [[nodiscard]] const std::vector<std::optional<EntityPoolSlot<THandle>>>& managedPoolVector() const noexcept {
+            return std::get<std::vector<std::optional<EntityPoolSlot<THandle>>>>(pools_);
         }
 
         static inline auto& logger_ = helios::engine::util::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
@@ -52,108 +80,143 @@ export namespace helios::engine::runtime::pooling {
         TypedEntityPoolRegistry() = default;
 
 
-
         /**
          * @brief Adds a new pool to the registry.
          *
-         * @details The pool is move-constructed into the internal map.
-         * If a pool with the given ID already exists, an assertion is triggered and a warning is logged.
+         * @details The pool is move-constructed into the slot at `key.idx()`.
+         * Returns `nullptr` and triggers an assertion if the key is invalid or the slot is already occupied.
          *
-         * @tparam THandle  Handle type of the pool.
-         * @param id        Unique identifier for the pool.
-         * @param entityPool Pool to add; its contents are moved into the registry.
+         * @tparam THandle   Handle type of the pool.
+         * @param key        Key containing the slot index and strongly-typed identifier for the pool.
+         * @param entityPool Pool to add (moved into the registry).
          *
-         * @return Reference to the stored pool.
+         * @return Pointer to the stored pool, or `nullptr` on failure.
          */
         template<typename THandle>
-        EntityPool<THandle>& addPool(const EntityPoolId<THandle> id, EntityPool<THandle>& entityPool) noexcept {
+        EntityPool<THandle>* addPool(const EntityPoolKey<THandle> key, EntityPool<THandle>&& entityPool) {
 
-            auto [it, inserted] = pools_.try_emplace(id, std::move(entityPool));
-
-            if (!inserted) {
-                logger_.warn("EntityPoolId {0} already registered with this registry", id.value());
-                assert(false && "EntityPoolId already registered with this registry");
-            }
-
-            return it->second;
-        }
-
-
-        /**
-         * @brief Retrieves a pool by its ID (const).
-         *
-         * @tparam THandle  Handle type of the pool.
-         * @param id        Identifier of the pool to retrieve.
-         *
-         * @return Pointer to the pool, which may be nullptr.
-         *
-         * @note Triggers an assertion if the pool is not registered.
-         */
-        template<typename THandle>
-        [[nodiscard]] const EntityPool<THandle>* pool(const EntityPoolId<THandle> id) const {
-
-            const auto it = managedPoolSet<THandle>().find(id);
-
-            if (it == managedPoolSet<THandle>().end()) {
-                assert(false && "EntityPoolId not registered with this registry");
-                logger_.error("EntityPoolId not registered with this registry");
+            if (!key.isValid()) {
+                logger_.error("Invalid key passed.");
+                assert(false && "Invalid key passed.");
                 return nullptr;
             }
 
-            return *it->second;
-        }
+            auto& poolSlots = managedPoolVector<THandle>();
+            auto& availablePoolKeys = std::get<std::vector<EntityPoolKey<THandle>>>(availablePoolKeys_);
 
-        /**
-         * @brief Retrieves a pool by its ID.
-         *
-         * @tparam THandle  Handle type of the pool.
-         * @param id        Identifier of the pool to retrieve.
-         *
-         * @return Pointer to the pool, which may be nullptr.
-         *
-         * @note Triggers an assertion if the pool is not registered.
-         */
-        template<typename THandle>
-        [[nodiscard]] EntityPool<THandle>* pool(const helios::engine::runtime::pooling::types::EntityPoolId<THandle> id) {
+            const auto idx = key.idx();
 
-            const auto it = managedPoolSet<THandle>().find(id);
-
-            if (it == managedPoolSet<THandle>().end()) {
-                assert(false && "EntityPoolId not registered with this registry");
-                logger_.error("EntityPoolId not registered with this registry");
+            if (poolSlots.size() <= idx) {
+                poolSlots.resize(idx + 1);
+            }
+            
+            if (poolSlots[idx]) {
+                logger_.error("EntityPoolKey with this index already registered.");
+                assert(false && "EntityPoolKey with this index already registered.");
                 return nullptr;
             }
 
-            return &it->second;
+            poolSlots[idx].emplace(EntityPoolSlot<THandle>{key, std::move(entityPool)});
+            availablePoolKeys.push_back(key);
+
+            return &(poolSlots[idx]->pool);
         }
 
         /**
-         * @brief Returns the full pool map for a given handle type.
+         * @brief Invokes `func` for every registered pool of the given handle type.
          *
-         * @tparam THandle  Handle type whose pool map to retrieve.
+         * @tparam THandle  Handle type of the pools to iterate.
+         * @tparam TFunc    Callable with signature `void(EntityPool<THandle>&)`.
          *
-         * @return Reference to the `unordered_map` mapping `EntityPoolId<THandle>` to `EntityPool<THandle>`.
+         * @param func Function to invoke for each pool.
          */
-        template<typename THandle>
-        [[nodiscard]] std::unordered_map<EntityPoolId<THandle>, EntityPool<THandle>>& pools() {
-            return managedPoolSet<THandle>();
+        template<typename THandle, typename TFunc>
+        requires std::invocable<TFunc&, EntityPool<THandle>&>
+        void forEach(TFunc&& func) noexcept(std::is_nothrow_invocable_v<TFunc&, EntityPool<THandle>&>) {
+
+            auto& poolSlots = managedPoolVector<THandle>();
+            const auto& availablePoolKeys = std::get<std::vector<EntityPoolKey<THandle>>>(availablePoolKeys_);
+
+            for (const auto& key : availablePoolKeys) {
+                auto& poolSlot = poolSlots[key.idx()];
+                if (!poolSlot) {
+                    logger_.error("pool slot was not valid.");
+                    assert(false && "pool slot was not valid");
+                    continue;
+                }
+                std::invoke(func, poolSlot->pool);
+            }
         }
 
-
         /**
-         * @brief Checks whether a pool with the given ID is registered.
+         * @brief Retrieves a pool by key (const).
          *
          * @tparam THandle  Handle type of the pool.
-         * @param id        Identifier of the pool to check.
+         * @param key       Key identifying the pool slot.
          *
-         * @return `true` if the pool exists, `false` otherwise.
+         * @return Const pointer to the pool, or `nullptr` if the key is invalid or not registered.
          */
         template<typename THandle>
-        [[nodiscard]] bool has(const helios::engine::runtime::pooling::types::EntityPoolId<THandle> id) const noexcept {
-            return managedPoolSet<THandle>().contains(id);
+        [[nodiscard]] const EntityPool<THandle>* pool(const EntityPoolKey<THandle> key) const {
+            if (!key.isValid()) {
+                logger_.error("Invalid key passed.");
+                assert(false && "Invalid key passed.");
+                return nullptr;
+            }
+
+            auto& poolSlots = managedPoolVector<THandle>();
+
+            const auto idx = key.idx();
+
+            if (poolSlots.size() <= idx ||
+                !poolSlots[idx] ||
+                poolSlots[idx]->key != key) {
+                logger_.error("EntityPoolKey not registered with this registry");
+                assert(false && "EntityPoolKey not registered with this registry");
+                return nullptr;
+            }
+
+            return &poolSlots[idx]->pool;
+        }
+
+        /**
+         * @brief Retrieves a pool by key.
+         *
+         * @tparam THandle  Handle type of the pool.
+         * @param key       Key identifying the pool slot.
+         *
+         * @return Pointer to the pool, or `nullptr` if the key is invalid or not registered.
+         */
+        template<typename THandle>
+        [[nodiscard]] EntityPool<THandle>* pool(const EntityPoolKey<THandle> key) {
+            return const_cast<EntityPool<THandle>*>(std::as_const(*this).template pool<THandle>(key));
         }
 
 
+        /**
+         * @brief Checks if the pool exists for the specified key.
+         *
+        * @tparam THandle  Handle type of the pool.
+         * @param key       Key identifying the pool slot.
+         *
+         * @return True if a pool was registered with this key, false otherwise.
+         */
+        template<typename THandle>
+        [[nodiscard]] bool has(const EntityPoolKey<THandle> key) const {
+            if (!key.isValid()) {
+                return false;
+            }
+
+            auto& poolSlots = managedPoolVector<THandle>();
+
+            const auto idx = key.idx();
+
+            if (poolSlots.size() <= idx || !poolSlots[idx] || poolSlots[idx]->key != key) {
+                return false;
+            }
+
+            return true;
+        }
     };
 
 }

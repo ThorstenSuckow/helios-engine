@@ -389,7 +389,7 @@ export namespace helios::engine::runtime::world {
          * @return Pointer to the sparse set for the specified handle and component types.
          */
         template <typename THandle, typename TComponent>
-        [[nodiscard]] auto* sparseSet() const {
+        [[nodiscard]] const auto* sparseSet() const {
             return engineWorld_.template sparseSet<THandle, TComponent>();
         }
 

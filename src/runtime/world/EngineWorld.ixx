@@ -258,10 +258,10 @@ export namespace helios::engine::runtime::world {
          *
          * @tparam THandle    Handle type identifying the sub-world.
          * @tparam TComponent Component type whose storage is requested.
-         * @return Non-owning pointer to the sparse set, or `nullptr` if not allocated.
+         * @return Non-owning const pointer to the sparse set, or `nullptr` if not allocated.
          */
         template<typename THandle, typename TComponent>
-        [[nodiscard]] auto* sparseSet() noexcept {
+        [[nodiscard]] const auto* sparseSet() const noexcept {
 
             if constexpr(IsGameObjectHandle<THandle>) {
                 return gameObjectWorld_.entityManager<THandle>().template sparseSet<TComponent>();

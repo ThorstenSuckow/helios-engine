@@ -39,7 +39,7 @@ export namespace helios::engine::runtime::pooling::systems {
             >().withActive()) {
 
                 cmdBuffer.template add<commands::PrefabComponentPoolCommand<TMemberHandle>>(
-                    prefabComponent->entityPoolId,
+                    prefabComponent->entityPoolKey,
                     entity.handle(),
                     prefabComponent->amount
                 );

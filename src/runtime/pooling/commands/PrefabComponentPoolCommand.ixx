@@ -16,10 +16,13 @@ export namespace helios::engine::runtime::pooling::commands {
      */
     template<typename TOwnerHandle>
     struct PrefabComponentPoolCommand {
+
+        using Handle_type = TOwnerHandle;
+
         /**
-         * @brief The id of the pool to prefab.
+         * @brief The key that should be used for prefabrication of the pool.
          */
-        types::EntityPoolId<TOwnerHandle> entityPoolId;
+        types::EntityPoolKey<TOwnerHandle> entityPoolKey;
 
         /**
          * @brief The handle of the prefab to use.

@@ -23,6 +23,9 @@ import helios.engine.util.Guid;
 import helios.ecs.types.EntityHandle;
 import helios.ecs.types;
 
+import helios.engine.util.log;
+
+#define HELIOS_LOG_SCOPE "helios::engine::runtime::pooling::EntityPool"
 export namespace helios::engine::runtime::pooling {
 
 
@@ -45,8 +48,7 @@ export namespace helios::engine::runtime::pooling {
     template <typename THandle>
     class EntityPool {
 
-
-    protected:
+        static inline auto& logger_ = helios::engine::util::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
 
         /**
          * @brief Maps active Entity EntityIds to their index in activeEntities_.
@@ -93,49 +95,38 @@ export namespace helios::engine::runtime::pooling {
         size_t delta_ = 0;
 
         /**
-         * @brief Unique identifier for this pool instance.
-         */
-        const helios::engine::util::Guid guid_;
-
-        /**
          * @brief True if the pool is locked and ready for acquire/release operations.
          */
         bool locked_ = false;
 
     public:
-
+        /**
+         * @brief Move only.
+         */
+        EntityPool(const EntityPool<THandle>&) = delete;
+        EntityPool& operator=(const EntityPool<THandle>&) = delete;
+        EntityPool(EntityPool<THandle>&&) noexcept = default;
+        EntityPool& operator=(EntityPool<THandle>&&) noexcept = default;
 
         /**
-         * @brief Constructs a EntityPool with the specified capacity.
+         * @brief Constructs an `EntityPool` with the specified capacity.
          *
          * @details Pre-allocates internal storage for the given pool size.
          * The pool starts empty; use `addInactive()` or a factory to populate it.
          *
          * @param poolSize The maximum number of Entities this pool can manage.
          */
-        explicit EntityPool(
-            size_t poolSize
-        ) :
-        poolSize_(poolSize),
-        guid_(helios::engine::util::Guid::generate()) {
+        explicit EntityPool(const std::size_t poolSize)
+        : poolSize_(poolSize) {
             activeEntities_.reserve(poolSize);
             inactiveEntities_.reserve(poolSize);
         }
 
 
         /**
-         * @brief Returns the unique identifier of this pool.
-         *
-         * @return The Guid assigned to this pool instance.
-         */
-        [[nodiscard]] helios::engine::util::Guid guid() const noexcept {
-            return guid_;
-        }
-
-        /**
          * @brief Returns the maximum capacity of this pool.
          *
-         * @return The pool size specified at construction.
+         * @return Pool size specified at construction.
          */
         [[nodiscard]] size_t size() const noexcept {
             return poolSize_;
@@ -144,15 +135,21 @@ export namespace helios::engine::runtime::pooling {
         /**
          * @brief Acquires an inactive Entity from the pool.
          *
-         * @details Removes a EntityHandle from the inactive list and adds it to the active
+         * @details Removes an `EntityHandle` from the inactive list and adds it to the active
          * tracking structures. The caller is responsible for activating the actual
          * Entity in the GameWorld.
          *
-         * @param[out] entityHandle Receives the EntityHandle of the acquired object on success.
+         * @param[out] entityHandle  Receives the handle of the acquired Entity on success.
          *
-         * @return True if an object was acquired, false if the pool is exhausted.
+         * @return `true` if an object was acquired, `false` if the pool is exhausted.
          */
         [[nodiscard]] bool acquire(THandle& entityHandle) {
+
+            if (!locked_) {
+                logger_.error("Pool must be locked before acquiring objects");
+                assert(false && "Pool must be locked before acquiring objects");
+                return false;
+            }
 
             if (inactiveEntities_.empty()) {
                 return false;
@@ -162,7 +159,7 @@ export namespace helios::engine::runtime::pooling {
             inactiveEntities_.pop_back();
 
 
-            auto idx = entityHandle.entityId - delta_;
+            auto idx = entityHandle.entityId() - delta_;
 
             if (activeIndex_.size() <= idx) {
                 activeIndex_.resize(idx + 1, helios::ecs::types::EntityTombstone);
@@ -170,7 +167,7 @@ export namespace helios::engine::runtime::pooling {
             }
 
             activeIndex_[idx] = activeEntities_.size();
-            versionIndex_[idx] = entityHandle.versionId;
+            versionIndex_[idx] = entityHandle.versionId();
 
             activeEntities_.push_back(entityHandle);
 
@@ -178,48 +175,82 @@ export namespace helios::engine::runtime::pooling {
         }
 
         /**
-         * @brief Checks if the pool is locked.
+         * @brief Returns whether the pool is locked and ready for acquire/release operations.
          *
-         * @return True if the pool is locked and ready for acquire/release operations.
+         * @return `true` if the pool is locked.
          */
         [[nodiscard]] bool isLocked() const noexcept {
             return locked_;
         }
 
         /**
-         * @brief Locks the pool for acquire/release operations.
+         * @brief Locks the pool, enabling acquire/release operations.
          *
-         * @details After locking, no more EntityHandles can be added via `addInactive()`.
-         * The sparse arrays are sized based on the min/max EntityIds added.
+         * @details Computes the sparse-array bounds from the min/max EntityIds registered via
+         * `addInactive()`. After locking, no further `addInactive()` calls are permitted.
+         *
+         * @return `true` on success, `false` if the pool is empty or the computed range is invalid.
          */
-        void lock() noexcept {
-            locked_ = true;
+        [[nodiscard]] bool lock() noexcept {
+
             delta_ = minEntityId_;
-            activeIndex_.resize(maxEntityId_ - delta_ + 1, helios::ecs::types::EntityTombstone);
-            versionIndex_.resize(maxEntityId_ - delta_ + 1, helios::ecs::types::EntityTombstone);
+
+            const auto size = maxEntityId_ - delta_ + 1;
+
+            if (activeEntities_.empty() && inactiveEntities_.empty()) {
+                logger_.warn("Pool has no entities, cannot lock.");
+                assert(false && "Pool has no entities, cannot lock.");
+                return false;
+            }
+
+            if (size > 1000000) {
+                assert(false && "size is unreasonably large.");
+                logger_.warn("Pool size is too large.");
+                return false;
+            }
+
+            try {
+                activeIndex_.resize(size, helios::ecs::types::EntityTombstone);
+                versionIndex_.resize(size, helios::ecs::types::EntityTombstone);
+            } catch (std::exception& e) {
+                logger_.error("Could not lock pool, resiszing failed.");
+                assert(false && "Resizing failed.");
+                return false;
+            }
+
+            locked_ = true;
+
+            return true;
         }
 
         /**
-         * @brief Adds a EntityHandle to the inactive list without acquiring it.
+         * @brief Registers an `EntityHandle` as inactive without acquiring it.
          *
-         * @details Used during pool initialization to register pre-created Entities.
-         * Fails if the pool is already at capacity.
+         * @details Used during pool initialization to populate the pool with pre-created Entities.
+         * Fails if the pool is already locked or at capacity.
          *
-         * @param entityHandle The EntityHandle of the Entity to add.
+         * @param entityHandle  Handle of the Entity to register as inactive.
          *
-         * @return True if added successfully, false if pool is full.
+         * @return `true` if added successfully, `false` if the pool is locked or full.
          */
         bool addInactive(const THandle entityHandle) {
 
-            assert(!locked_ && "Pool is locked");
+            if (locked_) {
+                logger_.warn("Cannot add inactive entity, pool is locked.");
+                assert(false && "Pool is locked");
+                return false;
+            }
 
-            assert(entityHandle.isValid() && "Unexpected invalid entityHandle");
+            if (!entityHandle.isValid()) {
+                logger_.warn("Cannot add inactive entity, invalid entityHandle.");
+                assert(false && "Unexpected invalid entityHandle");
+                return false;
+            }
 
             const size_t used = (activeCount() + inactiveCount());
 
-            minEntityId_ = std::min(minEntityId_, entityHandle.entityId);
-            maxEntityId_ = std::max(maxEntityId_, entityHandle.entityId);
-
+            minEntityId_ = std::min(minEntityId_, entityHandle.entityId());
+            maxEntityId_ = std::max(maxEntityId_, entityHandle.entityId());
 
             if (used < size()) {
                 inactiveEntities_.push_back(entityHandle);
@@ -230,25 +261,29 @@ export namespace helios::engine::runtime::pooling {
         }
 
         /**
-         * @brief Releases a Entity back to the pool by its EntityHandle.
+         * @brief Releases an Entity back to the pool.
          *
-         * @details
-         * Validates the EntityHandle against both the GameWorld and the active tracking list.
-         * Uses swap-and-pop for O(1) removal from the active list. The object is
-         * marked inactive and added to the inactive list for future acquisition.
+         * @details Validates the handle against the active tracking structures, then
+         * removes it via swap-and-pop (O(1)) and pushes it onto the inactive list
+         * for future acquisition.
          *
-         * @param entityHandle The unique identifier of the Entity to release.
+         * @param entityHandle  Handle of the active Entity to release.
          *
-         * @return True if the object was successfully released, false if the EntityHandle
-         *         was not found in the GameWorld or not tracked as active.
+         * @return `true` if released successfully, `false` if the handle was not tracked as active.
          */
         bool release(const THandle entityHandle) {
 
+            if (!locked_) {
+                logger_.warn("Cannot release entity, pool is not locked.");
+                assert(false && "Cannot release entity, pool is not locked.");
+                return false;
+            }
+
             assert(entityHandle.isValid() && "Unexpected invalid entityHandle");
 
-            assert(entityHandle.entityId >= delta_  && "Unexpected entityHandle");
+            assert(entityHandle.entityId() >= delta_  && "Unexpected entityHandle");
 
-            const auto sparseIdx = entityHandle.entityId - delta_;
+            const auto sparseIdx = entityHandle.entityId() - delta_;
 
             assert(sparseIdx < activeIndex_.size() && "Unexpected sparse index");
 
@@ -257,7 +292,7 @@ export namespace helios::engine::runtime::pooling {
                 return false;
             }
 
-            assert(versionIndex_[sparseIdx] == entityHandle.versionId && "Version mismatch");
+            assert(versionIndex_[sparseIdx] == entityHandle.versionId() && "Version mismatch");
 
             auto lastEntityHandle = activeEntities_.back();
 
@@ -266,8 +301,8 @@ export namespace helios::engine::runtime::pooling {
                 // entityHandle to remove, effectively overwriting entityHandle
                 // to release with a currently active entityHandle
                 activeEntities_[denseIndex] = lastEntityHandle;
-                activeIndex_[lastEntityHandle.entityId-delta_] = denseIndex;
-                versionIndex_[lastEntityHandle.entityId-delta_] = lastEntityHandle.versionId;
+                activeIndex_[lastEntityHandle.entityId() - delta_] = denseIndex;
+                versionIndex_[lastEntityHandle.entityId() - delta_] = lastEntityHandle.versionId();
             }
 
 
@@ -286,21 +321,26 @@ export namespace helios::engine::runtime::pooling {
         }
 
         /**
-         * @brief Releases and permanently removes a Entity from the pool.
+         * @brief Releases and permanently removes an Entity from the pool.
          *
-         * @details Unlike `release()`, this method does not add the EntityHandle back to the
-         * inactive list. Use this when a pooled object is being destroyed rather than
-         * recycled.
+         * @details Unlike `release()`, the handle is **not** returned to the inactive list.
+         * Use this when a pooled Entity is being destroyed rather than recycled.
          *
-         * @param entityHandle The unique identifier of the Entity to remove.
+         * @param entityHandle  Handle of the active Entity to remove.
          *
-         * @return True if removed successfully, false if EntityHandle was not active.
+         * @return `true` if removed successfully, `false` if the handle was not tracked as active.
          */
         bool releaseAndRemove(const THandle entityHandle) {
 
+            if (!locked_) {
+                logger_.warn("Cannot release and remove entity, pool is not locked.");
+                assert(false && "Cannot release and remove entity, pool is not locked.");
+                return false;
+            }
+
             assert(entityHandle.isValid() && "Unexpected invalid entityHandle");
 
-            const auto sparseIdx = entityHandle.entityId - delta_;
+            const auto sparseIdx = entityHandle.entityId() - delta_;
 
             assert(sparseIdx < activeIndex_.size() && "Unexpected sparse index");
 
@@ -310,12 +350,12 @@ export namespace helios::engine::runtime::pooling {
                 return false;
             }
 
-            assert(versionIndex_[sparseIdx] == entityHandle.versionId && "Version mismatch");
+            assert(versionIndex_[sparseIdx] == entityHandle.versionId() && "Version mismatch");
 
             if (denseIndex != activeEntities_.size() - 1) {
                 const auto lastEntityHandle = activeEntities_.back();
-                activeIndex_[lastEntityHandle.entityId - delta_] = denseIndex;
-                versionIndex_[lastEntityHandle.entityId - delta_] = lastEntityHandle.versionId;
+                activeIndex_[lastEntityHandle.entityId() - delta_] = denseIndex;
+                versionIndex_[lastEntityHandle.entityId() - delta_] = lastEntityHandle.versionId();
                 activeEntities_[denseIndex] = lastEntityHandle;
             }
 
@@ -330,38 +370,38 @@ export namespace helios::engine::runtime::pooling {
 
 
         /**
-         * @brief Returns the number of active game objects.
+         * @brief Returns the number of currently active Entities.
          *
-         * @return The number of active game objects.
+         * @return Number of Entities that have been acquired and not yet released.
          */
         [[nodiscard]] size_t activeCount() const noexcept {
             return activeEntities_.size();
         }
 
         /**
-         * @brief Returns the number of inactive game objects.
+         * @brief Returns the number of currently inactive Entities.
          *
-         * @return The number of inactive game objects.
+         * @return Number of Entities available for acquisition.
          */
         [[nodiscard]] size_t inactiveCount() const noexcept {
             return inactiveEntities_.size();
         }
 
         /**
-         * @brief Returns a span of all inactive EntityHandles.
+         * @brief Returns a span over all inactive `EntityHandle`s.
          *
-         * @return Span of inactive EntityHandles.
+         * @return Read-only span of handles available for acquisition.
          */
-        std::span<THandle> inactiveEntities() {
+        const std::span<const THandle> inactiveEntities() {
             return inactiveEntities_;
         };
 
         /**
-         * @brief Returns a span of all active EntityHandles.
+         * @brief Returns a span over all active `EntityHandle`s.
          *
-         * @return Span of active EntityHandles.
+         * @return Read-only span of handles currently in use.
          */
-        std::span<THandle> activeEntities() {
+        const std::span<const THandle> activeEntities() {
             return activeEntities_;
         };
     };

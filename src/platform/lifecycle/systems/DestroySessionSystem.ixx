@@ -36,6 +36,9 @@ export namespace helios::engine::platform::lifecycle::systems {
          * @param updateContext Frame-local update context.
          */
         void update(helios::engine::runtime::world::UpdateContext& updateContext) noexcept {
+            /**
+             * @todo should be command
+             */
             updateContext.session().destroy();
         }
     };

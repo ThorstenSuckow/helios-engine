@@ -5,3 +5,4 @@
 export module helios.engine.runtime.pooling.types;
 
 export import :EntityPoolId;
+export import :EntityPoolKey;

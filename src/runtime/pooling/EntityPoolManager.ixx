@@ -5,402 +5,261 @@
 module;
 
 #include <cassert>
-#include <memory>
 #include <optional>
-#include <stdexcept>
 #include <unordered_map>
 #include <cstddef>
+#include <functional>
 
 
 export module helios.engine.runtime.pooling.EntityPoolManager;
 
 import helios.ecs.Entity;
-import helios.engine.runtime.pooling.types.EntityPoolId;
+import helios.engine.runtime.pooling.types;
 
 import helios.engine.runtime.world.UpdateContext;
 
 import helios.engine.runtime.world.EngineWorld;
 import helios.engine.runtime.pooling.EntityPool;
-import helios.engine.runtime.pooling.EntityPoolRegistry;
+import helios.engine.runtime.pooling.TypedEntityPoolRegistry;
 
-import helios.engine.runtime.pooling.EntityPoolConfig;
-import helios.engine.runtime.pooling.components.PrefabIdComponent;
+import helios.engine.runtime.pooling.commands;
+import helios.engine.runtime.pooling.components;
 
 import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
 
-
+import helios.engine.core.thread;
 import helios.ecs.types.EntityHandle;
 import helios.engine.core.types;
 import helios.engine.runtime.world.tags;
+import helios.engine.util.log;
 
-import helios.engine.runtime.pooling.EntityPoolSnapshot;
-
+using namespace helios::engine::runtime::pooling::types;
+using namespace helios::engine::core::thread;
+using namespace helios::engine::runtime::pooling::components;
+using namespace helios::engine::runtime::pooling::commands;
 using namespace helios::engine::runtime::messaging::command;
+using namespace helios::engine::runtime::world;
+using namespace helios::engine::runtime::world::tags;
+
+#define HELIOS_LOG_SCOPE "helios::engine::runtime::pooling::EntityPoolManager"
 export namespace helios::engine::runtime::pooling {
 
     /**
-     * @brief High-level manager for Entity pooling operations.
+     * @brief Manages the lifecycle of `EntityPool` instances for one or more handle types.
      *
-     * @details EntityPoolManager provides a unified interface for managing
-     * multiple EntityPools. It handles pool configuration, initialization,
-     * and the acquire/release lifecycle of pooled Entities.
+     * @details Processes `PrefabComponentPoolCommand`s to clone prefab entities into pools,
+     * locks the pools after population, and registers them in the internal
+     * `TypedEntityPoolRegistry`. Supports sequential (`flush`) and parallel
+     * (`flushParallel`) command processing.
      *
-     * The manager integrates with the GameWorld to clone prefabs during pool
-     * initialization and to look up Entities by their EntityHandle during
-     * acquire/release operations.
-     *
-     * ## Lifecycle
-     *
-     * 1. **Configuration**: Add pool configurations via `addPoolConfig()`.
-     * 2. **Initialization**: Call `init()` to create pools and populate them
-     *    with cloned prefab instances. This **locks** the pools.
-     * 3. **Runtime**: Use `acquire()` and `release()` to manage entity lifecycle.
-     *
-     * ## Pool Locking
-     *
-     * After `init()` completes, each pool is **locked**. A locked pool:
-     * - Cannot accept new EntityHandles via `addInactive()`
-     * - Has its sparse arrays sized based on min/max EntityIds
-     * - Is ready for O(1) acquire/release operations
-     *
-     * This design optimizes memory layout but means the pool size is fixed
-     * at initialization time.
-     *
-     * ## Trade-offs
-     *
-     * - **Fixed Capacity**: Pool size cannot grow after initialization. If more
-     *   entities are needed, `acquire()` returns nullptr when exhausted.
-     * - **Memory Overhead**: Sparse arrays are sized for the EntityId range,
-     *   which may waste memory if EntityIds are not contiguous.
-     * - **Initialization Cost**: All prefab clones are created upfront during
-     *   `init()`, which may cause a startup delay for large pools.
-     *
-     * ## Example
-     *
-     * ```cpp
-     * EntityPoolManager poolManager;
-     *
-     * // Create prefab
-     * auto bulletPrefab = gameWorld.addEntity();
-     * bulletPrefab.add<RenderableComponent>(mesh, material);
-     * bulletPrefab.add<Move2DComponent>();
-     * bulletPrefab.setActive(false);
-     *
-     * auto config = std::make_unique<EntityPoolConfig>(
-     *     bulletPoolId, bulletPrefab, 100
-     * );
-     * poolManager.addPoolConfig(std::move(config));
-     *
-     * poolManager.init(gameWorld);
-     *
-     * // Acquire returns std::optional<Entity>
-     * if (auto bullet = poolManager.acquire(bulletPoolId)) {
-     *     bullet->get<TranslationStateComponent>()->setTranslation(spawnPos);
-     *     bullet->setActive(true);
-     * }
-     *
-     * // Release back to pool
-     * poolManager.release(bulletPoolId, bullet->entityHandle());
-     * ```
-     *
-     * @see EntityPool
-     * @see EntityPoolRegistry
-     * @see Manager
+     * @tparam TMemberHandles  Pack of handle types whose pools are managed by this instance.
      */
-    template<typename TEntity>
+    template<typename ... TMemberHandles>
     class EntityPoolManager {
 
-        using Handle_type = typename TEntity::Handle_type;
-        using Entity_type = TEntity;
-        
         /**
-         * @brief Registry of EntityPools for entity recycling.
-         *
-         * @details Pools enable efficient reuse of Entities without repeated
-         * allocation/deallocation. Each pool is identified by a EntityPoolId.
+         * @brief Registry holding all managed pools, keyed by `EntityPoolKey`.
          */
-        helios::engine::runtime::pooling::EntityPoolRegistry<Handle_type> pools_{};
+        TypedEntityPoolRegistry<TMemberHandles...> entityPoolRegistry_{};
 
         /**
-         * @brief Non-owning pointer to the associated GameWorld.
-         *
-         * @details Set during `init()`. Used for cloning prefabs and looking up
-         * Entities by their EntityHandle.
+         * @brief Pending pool-creation commands, one vector per handle type.
          */
-        helios::engine::runtime::world::EngineWorld* engineWorld_ = nullptr;
+        std::tuple<std::vector<PrefabComponentPoolCommand<TMemberHandles>>...> prefabComponentPoolCommands_;
 
         /**
-         * @brief Pending pool configurations awaiting initialization.
-         *
-         * @details Configurations are consumed during `init()` to create and
-         * populate the actual pools.
+         * @brief Reference to the engine world used for cloning prefab entities.
          */
-        std::unordered_map<
-            helios::engine::runtime::pooling::types::EntityPoolId,
-            std::unique_ptr<EntityPoolConfig>> poolConfigs_;
+        EngineWorld& engineWorld_;
 
         /**
-         * @brief Populates a pool with cloned prefab instances and locks it.
-         *
-         * @details Clones the prefab Entity until the pool reaches its
-         * configured capacity. Each clone is:
-         * 1. Added to the GameWorld
-         * 2. Immediately deactivated (`setActive(false)`)
-         * 3. Prepared for pooling (`onRelease()`)
-         * 4. Registered as inactive in the pool
-         *
-         * After all clones are created, the pool is **locked** via `lock()`.
-         * Locking finalizes the sparse array sizing based on the min/max EntityIds
-         * and enables O(1) acquire/release operations. Once locked, no new
-         * EntityHandles can be added to the pool.
-         *
-         * @param entityPoolId The pool to fill.
-         * @param entityPrefab The prefab to clone.
-         *
-         * @post The pool is locked and ready for acquire/release operations.
+         * @brief Returns the mutable command queue for `THandle`.
          */
-        void fillPool(
-            const helios::engine::runtime::pooling::types::EntityPoolId entityPoolId,
-            TEntity entityPrefab
-        ) {
-            Handle_type entityHandle{};
-
-            auto* entityPool = pool(entityPoolId);
-            
-            const size_t used  = entityPool->activeCount() + entityPool->inactiveCount();
-            const size_t space = used < entityPool->size() ? entityPool->size() - used : 0;
-
-            for (size_t i = 0; i < space; i++) {
-                Entity_type go = engineWorld_->clone(entityPrefab.handle());
-                go.setActive(false);
-                go.onRelease();
-                entityPool->addInactive(go.handle());
-            }
-
-            entityPool->lock();
-        }
-        
-    public:
-        using EngineRoleTag = helios::engine::runtime::world::tags::ManagerRole;
-
-
-        explicit EntityPoolManager(helios::engine::runtime::world::EngineWorld& engineWorld) : engineWorld_(&engineWorld) {}
-
-        /**
-         * @brief Registers a pool configuration for later initialization.
-         *
-         * @details The configuration specifies the pool ID, capacity, and prefab
-         * to use for cloning. Configurations are processed during `init()`.
-         *
-         * @param entityPoolConfig The pool configuration to register.
-         *
-         * @return Reference to this manager for method chaining.
-         *
-         * @throws std::runtime_error If a pool with the same ID is already registered.
-         */
-        EntityPoolManager& addPoolConfig(std::unique_ptr<EntityPoolConfig> entityPoolConfig) {
-
-            if (poolConfigs_.contains(entityPoolConfig->entityPoolId)) {
-                throw std::runtime_error("Pool already registered with this manager");
-            }
-
-            poolConfigs_[entityPoolConfig->entityPoolId] = std::move(entityPoolConfig);
-
-            return *this;
+        template<typename THandle>
+        std::vector<PrefabComponentPoolCommand<THandle>>& prefabComponentPoolCommands() noexcept {
+            return std::get<std::vector<PrefabComponentPoolCommand<THandle>>>(prefabComponentPoolCommands_);
         }
 
-        /**
-         * @brief Returns a snapshot of the pool's current state.
-         *
-         * @details Provides the active and inactive counts for monitoring and
-         * debugging purposes.
-         *
-         * @param entityPoolId The pool to query.
-         *
-         * @return A EntityPoolSnapshot containing active and inactive counts.
-         */
-        [[nodiscard]] helios::engine::runtime::pooling::EntityPoolSnapshot poolSnapshot(
-            const helios::engine::runtime::pooling::types::EntityPoolId entityPoolId
-        ) const {
-            auto* entityPool = pool(entityPoolId);
+        static inline auto& logger_ = helios::engine::util::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
 
-            return {
-                entityPool->activeCount(), entityPool->inactiveCount()
-            };
-        }
-        
         /**
-         * @brief Releases a Entity back to its pool.
-         *
-         * @details Marks the entity as inactive in both the pool and the
-         * GameWorld. Calls `onRelease()` on the Entity to trigger
-         * component cleanup hooks, then deactivates it.
-         *
-         * @param entityPoolId The pool that owns this entity.
-         * @param entityHandle The EntityHandle of the entity to release.
-         *
-         * @return Optional containing the released Entity if found,
-         *         std::nullopt if the entity was not found in the GameWorld.
+         * @brief Job system used for parallel command processing in `flushParallel()`.
          */
-        std::optional<TEntity> release(
-            const helios::engine::runtime::pooling::types::EntityPoolId entityPoolId,
-            const Handle_type& entityHandle
-        ) {
-            auto* entityPool = pool(entityPoolId);
-            
-            auto worldGo = engineWorld_->find<Handle_type>(entityHandle);
+        JobSystem& jobSystem_;
 
-            if (worldGo) {
-                if (entityPool->release(entityHandle)) {
-                    worldGo->onRelease();
-                    worldGo->setActive(false);
+
+        /**
+         * @brief Processes all pending `PrefabComponentPoolCommand`s for `THandle`.
+         *
+         * @details For each command, clones the prefab entity `command.amount` times,
+         * marks the clones inactive, populates an `EntityPool`, locks it, and registers
+         * it in `entityPoolRegistry_`. Clears the command queue on completion.
+         */
+        template<typename THandle>
+        void processPrefabComponentPoolCommands() noexcept {
+
+            auto& commands = prefabComponentPoolCommands<THandle>();
+
+            for (auto& command : commands) {
+
+                auto key = command.entityPoolKey;
+
+                if (!key.isValid()) {
+                    assert(false && "Invalid key passed with command.");
+                    logger_.error("Invalid key passed with command.");
+                    continue;
                 }
-            }
-
-            return worldGo;
-        }
-
-        /**
-         * @brief Acquires an inactive Entity from the pool.
-         *
-         * @details Retrieves the next available inactive entity and calls
-         * `onAcquire()` to trigger component initialization hooks. The caller
-         * is responsible for activating the entity via `setActive(true)`.
-         *
-         * If an acquired entity is no longer valid in the GameWorld (stale handle),
-         * it is removed from the pool and the next available entity is tried.
-         *
-         * @param entityPoolId The pool to acquire from.
-         *
-         * @return Optional containing the acquired Entity if available,
-         *         std::nullopt if the pool is exhausted.
-         */
-        [[nodiscard]] std::optional<TEntity> acquire(
-            const helios::engine::runtime::pooling::types::EntityPoolId entityPoolId
-        )  {
-            Handle_type entityHandle{};
-
-            auto* entityPool = pool(entityPoolId);
-
-            while (entityPool->acquire(entityHandle)) {
-
-                auto worldGo = engineWorld_->find(entityHandle);
-
-                if (worldGo) {
-                    worldGo->onAcquire();
-                    return worldGo;
+                if (entityPoolRegistry_.template has<THandle>(key)) {
+                    assert(false && "Pool already exists for the given key.");
+                    logger_.error("Pool already exists for the given key.");
+                    continue;
                 }
 
-                // we assume the pool is owned by this gameWorld,
-                // so removing this entityHandle does not impact another gameWorld that is
-                // using this pool
-                entityPool->releaseAndRemove(entityHandle);
-            }
+                auto entityPool = EntityPool<THandle>(command.amount);
 
-            return std::nullopt;
+                const size_t used  = entityPool.activeCount() + entityPool.inactiveCount();
+                const size_t space = used < entityPool.size() ? entityPool.size() - used : 0;
+                const auto prefabHandle = command.prefabHandle;
+
+                auto source = engineWorld_.find(prefabHandle);
+                source->template remove<EntityPoolPrefabComponent<THandle>>();
+
+                for (size_t i = 0; i < space; i++) {
+                    auto go = engineWorld_.copyEntity(prefabHandle);
+                    go.setActive(false);
+                    entityPool.addInactive(go.handle());
+                }
+
+                if (!entityPool.lock()) {
+                    logger_.error("Failed to lock entity pool.");
+                    assert(false && "Entity pool could not be locked.");
+                    continue;
+                }
+
+                entityPoolRegistry_.template addPool<THandle>(key, std::move(entityPool));
+
+                commands.clear();
+            }
 
         }
 
         /**
-         * @brief Initializes all registered pools.
-         *
-         * @details Creates EntityPool instances from the pending configurations
-         * and populates them by cloning the specified prefabs into the GameWorld.
-         *
-         * @param gameWorld The GameWorld to associate with this manager.
+         * @brief Dispatches all command-processing steps for `THandle`.
          */
-        void init(CommandHandlerRegistry& commandHandlerRegistry) {
+        template<typename THandle>
+        void processCommandsForHandle() noexcept {
+            processPrefabComponentPoolCommands<THandle>();
+        }
 
-            
-            for (const auto& [entityPoolId, poolConfig] : poolConfigs_) {
-
-                auto pool = std::make_unique<helios::engine::runtime::pooling::EntityPool<Handle_type>>(
-                    poolConfig->amount);
-
-                pools_.addPool(entityPoolId, std::move(pool));
-
-                for (auto [entity, pic] : engineWorld_->view<
-                    Handle_type,
-                    helios::engine::runtime::pooling::components::PrefabIdComponent<Handle_type>>()) {
-                    if (pic->prefabId() == poolConfig->prefabId) {
-                        fillPool(entityPoolId, entity);
-                        break;
+        /**
+        * @brief Resets this manager and releases all active entities back to their pool for `THandle`.
+        *
+        * @details Iterates over every pool registered for `THandle`, calls `release()` on each
+        * active entity, and deactivates it in the engine world.
+        *
+        * @tparam THandle  Handle type whose pools should be reset.
+        */
+        template<typename THandle>
+        void release() {
+            entityPoolRegistry_.template forEach<THandle>([&engineWorld = engineWorld_](EntityPool<THandle>& entityPool) {
+                for (auto entityHandle : entityPool.activeEntities()) {
+                    entityPool.release(entityHandle);
+                    if (auto go = engineWorld.find(entityHandle)) {
+                        go->setActive(false);
                     }
                 }
+            });
+        }
 
-            }
+    public:
+
+        /** @brief Engine role tag identifying this class as a manager. */
+        using EngineRoleTag = ManagerRole;
+
+        /**
+         * @brief Constructs an `EntityPoolManager`.
+         *
+         * @param engineWorld  Engine world used for cloning prefab entities.
+         * @param jobSystem    Job system used by `flushParallel()`.
+         */
+        explicit EntityPoolManager(EngineWorld& engineWorld, JobSystem& jobSystem)
+        : engineWorld_(engineWorld), jobSystem_(jobSystem) {}
+
+
+
+        /**
+         * @brief Processes all pending commands sequentially for every managed handle type.
+         *
+         * @param updateContext  Current frame update context (unused directly, passed for API symmetry).
+         */
+        void flush(UpdateContext& updateContext) noexcept {
+
+            (processCommandsForHandle<TMemberHandles>(),...);
+
+        }
+
+
+        /**
+         * @brief Processes pending commands for all handle types in parallel via the `JobSystem`.
+         *
+         * @details Spawns one job per handle type and waits for all to complete before returning.
+         *
+         * @param updateContext  Current frame update context (unused directly, passed for API symmetry).
+         */
+        void flushParallel(UpdateContext& updateContext) noexcept {
+            std::array<std::function<void()>, sizeof ...(TMemberHandles)> jobs{
+                [this]() {
+                    this->template processCommandsForHandle<TMemberHandles>();
+                }...
+            };
+
+            jobSystem_.runAndWait(jobs.size(), [&jobs](const std::size_t jobsIndex) {
+                jobs[jobsIndex]();
+            });
+        }
+
+
+        /**
+         * @brief Enqueues a pool-creation command for deferred processing.
+         *
+         * @details The command will be consumed during the next `flush()` or `flushParallel()` call.
+         *
+         * @tparam THandle                   Handle type of the pool to create.
+         * @param prefabComponentPoolCommand  Command describing the prefab and pool size.
+         *
+         * @return `true` (always; reserved for future error propagation).
+         */
+        template<typename THandle>
+        bool submit(PrefabComponentPoolCommand<THandle>&& prefabComponentPoolCommand) noexcept {
+
+            prefabComponentPoolCommands<THandle>().emplace_back(std::move(prefabComponentPoolCommand));
+
+            return true;
+        }
+
+        /**
+         * @brief Registers command handlers for all managed handle types in the given registry.
+         *
+         * @details Must be called once during engine initialisation so that
+         * `PrefabComponentPoolCommand`s are routed to this manager.
+         *
+         * @param commandHandlerRegistry  Registry to register handlers with.
+         */
+        void init(CommandHandlerRegistry& commandHandlerRegistry) noexcept {
+
+            (commandHandlerRegistry.handleCommands<
+               PrefabComponentPoolCommand<TMemberHandles>
+           >(*this), ...);
 
         };
 
         /**
-         * @brief Manager flush callback (currently unused).
-         *
-         * @details Reserved for future use. May be used to process deferred
-         * release requests or pool maintenance operations.
-         *
-         * @param gameWorld The associated GameWorld.
-         * @param update_context The current frame's update context.
-         */
-        void flush(
-            helios::engine::runtime::world::UpdateContext& update_context
-        ) noexcept {
-
-        }
-
-        /**
-         * @brief Retrieves a pool by its ID.
-         *
-         * @param entityPoolId The pool ID to look up.
-         *
-         * @return Pointer to the EntityPool.
-         *
-         * @pre The pool must be registered with this manager.
-         */
-        [[nodiscard]] EntityPool<Handle_type>* pool(
-            const helios::engine::runtime::pooling::types::EntityPoolId entityPoolId
-        ) const {
-            assert(pools_.has(entityPoolId) && "EntityPoolId not registered with this manager");
-            return pools_.pool(entityPoolId);
-        }
-
-        /**
-         * @brief Resets all pools by releasing all active Entities.
-         *
-         * @details Iterates through all registered pools and releases every active
-         * entity back to its pool. This effectively returns all pooled objects to
-         * their inactive state without destroying them.
-         *
-         * Useful for level transitions or game restarts where all pooled objects
-         * should be recycled.
-         *
-         * @see reset(const types::EntityPoolId)
+         * @brief Resets this manager and releases all active entities back to their respective pools for every handle type.
          */
         void reset() {
-            for (auto& [poolId, _]  : pools_.pools()) {
-                reset(poolId);
-            }
+            (release<TMemberHandles>(), ...);
         }
 
-        /**
-         * @brief Reset the pool with the specified poolId.
-         *
-         * @details Releases every active entity back to its pool specified by poolId.
-         * This effectively returns all pooled objects to their inactive state without
-         * destroying them.
-         *
-         * @param poolId The ID of the pool to reset.
-         */
-        void reset(const types::EntityPoolId poolId) {
-
-            const auto poolPtr = pool(poolId);
-
-            auto activeSpan = poolPtr->activeEntities();
-            auto toRelease = std::vector(activeSpan.begin(), activeSpan.end());
-            for (auto entityHandle : toRelease) {
-                release(poolId, entityHandle);
-            }
-        }
     };
 
 }
-

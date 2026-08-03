@@ -16,9 +16,9 @@ export namespace helios::engine::runtime::pooling::components {
     template<typename TOwnerHandle>
     struct EntityPoolPrefabComponent {
         /**
-         * @brief The pool id that should be used for prefabrication.
+         * @brief The pool key that should be used for the pool that is created.
          */
-        types::EntityPoolId<TOwnerHandle> entityPoolId;
+        types::EntityPoolKey<TOwnerHandle> entityPoolKey;
 
         /**
          * @brief Number of copies of the owning entities, including the owning entity.

@@ -122,7 +122,7 @@ export namespace helios::engine::runtime::pooling {
                 const auto prefabHandle = command.prefabHandle;
 
                 auto source = engineWorld_.find(prefabHandle);
-                source->template remove<EntityPoolPrefabComponent<THandle>>();
+                source->template remove<PrefabRequestComponent<THandle>>();
 
                 for (size_t i = 0; i < space; i++) {
                     auto go = engineWorld_.copyEntity(prefabHandle);

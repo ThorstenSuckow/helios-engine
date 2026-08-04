@@ -14,7 +14,7 @@ import helios.engine.runtime.world.UpdateContext;
 export namespace helios::engine::runtime::pooling::systems {
 
     /**
-     * @brief System for creating PrefabComponentPoolCommand from EntityPoolPrefabComponent.
+     * @brief System for creating PrefabComponentPoolCommand from PrefabRequestComponent.
      *
      * @tparam TMemberHandle The type of the member handle.
      *
@@ -33,15 +33,16 @@ export namespace helios::engine::runtime::pooling::systems {
 
         void update(world::UpdateContext& updateContext, TCommandBuffer& cmdBuffer) {
 
-            for (auto [entity, prefabComponent] : updateContext.view<
+            for (auto [entity, requestComponent, keyComponent] : updateContext.view<
                 TMemberHandle,
-                components::EntityPoolPrefabComponent<TMemberHandle>
+                components::PrefabRequestComponent<TMemberHandle>,
+                components::EntityPoolKeyComponent<TMemberHandle>
             >().withActive()) {
 
                 cmdBuffer.template add<commands::PrefabComponentPoolCommand<TMemberHandle>>(
-                    prefabComponent->entityPoolKey,
+                    keyComponent->entityPoolKey,
                     entity.handle(),
-                    prefabComponent->amount
+                    requestComponent->value()
                 );
 
             }

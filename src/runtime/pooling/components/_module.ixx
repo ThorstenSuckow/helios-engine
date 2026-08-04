@@ -4,4 +4,6 @@
  */
 export module helios.engine.runtime.pooling.components;
 
-export import :EntityPoolPrefabComponent;
+export import :PrefabRequestComponent;
+export import :EntityPoolKeyComponent;
+

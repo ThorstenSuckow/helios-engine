@@ -1,0 +1,23 @@
+/**
+ * @file SpawnPolicyId.ixx
+ * @brief Strongly-typed identifier for spawn policies.
+ */
+module;
+
+
+export module helios.engine.runtime.spawning.types:SpawnPolicyId;
+
+import helios.ecs.types.StrongId;
+
+export namespace helios::engine::runtime::spawning::types {
+
+    /**
+     * @brief Strongly-typed string identifier for a spawn policy.
+     *
+     * @tparam TEmitterHandle  Handle type of the entity that emits spawned objects.
+     * @tparam TSpawnHandle    Handle type of the spawned entities.
+     */
+    template<typename TEmitterHandle, typename TSpawnHandle>
+    using SpawnPolicyId = helios::ecs::types::StrongId<struct SpawnPolicyIdTag>;
+
+}

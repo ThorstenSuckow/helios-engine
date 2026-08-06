@@ -21,7 +21,7 @@ export namespace helios::engine::runtime::spawning::types {
      * @tparam TEmitterHandle  Handle type of the entity that emits spawned objects.
      * @tparam TSpawnHandle    Handle type of the spawned entities.
      */
-    template<typename TEmitterHandle, typename TSpawnHandle>
+    template<typename TEmitterHandle, typename TSpawnHandle = TEmitterHandle>
     struct SpawnPolicyKey {
 
         /** @brief Identifies the concrete spawn policy type. */

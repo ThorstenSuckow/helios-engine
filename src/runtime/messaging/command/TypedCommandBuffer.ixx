@@ -311,7 +311,7 @@ export namespace helios::engine::runtime::messaging::command {
          * @param commandHandlerRegistry Registry used for handler-based command routing.
          * @param managerRegistry Manager registry used for accessing various managers.
          */
-        void init(CommandHandlerRegistry& commandHandlerRegistry, const ManagerRegistry& managerRegistry) noexcept {
+        void init(CommandHandlerRegistry& commandHandlerRegistry, ManagerRegistry& managerRegistry) noexcept {
             commandHandlerRegistry_ = &commandHandlerRegistry;
 
             timerManager_ = managerRegistry.item<TimerManager>();

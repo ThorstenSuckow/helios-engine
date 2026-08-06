@@ -128,8 +128,10 @@ export namespace helios::engine::runtime::messaging::command {
             }
 
             if (entries_[idx].owner != nullptr) {
+                #if HELIOS_DEBUG
                 auto* ownerPtr = static_cast<void*>(std::addressof(owner));
                 assert(entries_[idx].owner == ownerPtr && "Handler already registered for this command type for a different owner");
+                #endif
                 return;
             }
 

@@ -25,7 +25,7 @@ export namespace helios::engine::runtime::spawning::types {
      * @see ComponentTypeId
      * @see CommandTypeId
      */
-    template<typename TEmitterHandle, typename TSpawnHandle>
+    template<typename TEmitterHandle, typename TSpawnHandle = TEmitterHandle>
     class SpawnPolicyTypeId {
 
         /**

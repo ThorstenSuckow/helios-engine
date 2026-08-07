@@ -10,7 +10,6 @@ module;
 
 export module helios.engine.rendering.viewport.systems.StateToViewportPolicyUpdateSystem;
 
-import helios.engine.runtime.world.GameWorld;
 import helios.engine.runtime.world.Session;
 
 import helios.engine.state.StateToIdMapPair;

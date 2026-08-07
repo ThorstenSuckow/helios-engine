@@ -8,7 +8,7 @@ module;
 #include <memory>
 #include <span>
 #include <vector>
-#include <cstddef>
+#include <utility>
 
 
 export module helios.engine.core.container.ConceptModelRegistry;
@@ -224,17 +224,29 @@ export namespace helios::engine::core::container {
          *
          * @tparam T The concrete type to look up.
          *
-         * @return Pointer to T, or nullptr if not registered.
+         * @return Const Pointer to T, or nullptr if not registered.
          */
         template<typename T>
-        [[nodiscard]] T* item() const {
+        [[nodiscard]] const T* item() const {
 
             const auto idx = IdProvider::template id<T>().value();
             if (items_.size() <= idx || underlyingAnyT_.size() <= idx || !underlyingAnyT_[idx]) {
                 return nullptr;
             }
 
-            return static_cast<T*>(underlyingAnyT_[idx]);
+            return static_cast<const T*>(underlyingAnyT_[idx]);
+        }
+
+        /**
+         * @brief Returns a pointer to the registered instance of type T.
+         *
+         * @tparam T The concrete type to look up.
+         *
+         * @return Pointer to T, or nullptr if not registered.
+         */
+        template<typename T>
+        [[nodiscard]] T* item()  {
+            return const_cast<T*>(std::as_const(*this).template item<T>());
         }
 
         /**

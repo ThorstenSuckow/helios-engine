@@ -10,7 +10,6 @@ export module helios.engine.runtime.enginestate.rules.guards.DefaultEngineStateT
 
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.Session;
-import helios.engine.runtime.world.GameWorld;
 
 import helios.engine.runtime.enginestate.EngineStateBindings;
 import helios.engine.runtime.enginestate.types;

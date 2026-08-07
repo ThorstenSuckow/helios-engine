@@ -1,3 +1,7 @@
+/**
+ * @file EntityPoolWarmupSystem.ixx
+ * @brief System that translates PrefabRequestComponent into PrefabComponentPoolCommand.
+ */
 module;
 
 
@@ -26,18 +30,33 @@ export namespace helios::engine::runtime::pooling::systems {
 
     public:
 
+        /**
+         * @brief Command buffer type this system emits into.
+         */
         using CommandBuffer_type = TCommandBuffer;
 
+        /**
+         * @brief Marks this system as a typed system role.
+         */
         using EngineRoleTag = world::tags::TypedSystemRole;
 
 
+        /**
+         * @brief Picks up any PrefabRequestComponent and creates a PrefabComponentPoolCommand.
+         *
+         * @details Subsequent managers are responsible for removing the component to
+         * prevent multiple prefabs from being registered.
+         *
+         * @param updateContext The current update context providing entity views.
+         * @param cmdBuffer The command buffer receiving the emitted pool commands.
+         */
         void update(world::UpdateContext& updateContext, TCommandBuffer& cmdBuffer) {
 
             for (auto [entity, requestComponent, keyComponent] : updateContext.view<
                 TMemberHandle,
                 components::PrefabRequestComponent<TMemberHandle>,
                 components::EntityPoolKeyComponent<TMemberHandle>
-            >().withActive()) {
+            >()) {
 
                 cmdBuffer.template add<commands::PrefabComponentPoolCommand<TMemberHandle>>(
                     keyComponent->entityPoolKey,

@@ -319,7 +319,20 @@ export namespace helios::engine::runtime::world {
          */
         template<typename T>
         requires IsManagerLike<T>
-        T* tryManager() const noexcept {
+        T* tryManager() noexcept {
+            return resourceRegistry_.tryGet<T>();
+        }
+
+        /**
+         * @brief Retrieves a registered Manager by type, or nullptr if not found.
+         *
+         * @tparam T The Manager type. Must satisfy IsManagerLike.
+         *
+         * @return Const Pointer to the Manager, or nullptr if not registered.
+         */
+        template<typename T>
+        requires IsManagerLike<T>
+        const T* tryManager() const noexcept {
             return resourceRegistry_.tryGet<T>();
         }
 
@@ -332,7 +345,20 @@ export namespace helios::engine::runtime::world {
          */
         template<typename T>
         requires IsCommandBufferLike<T>
-        T* tryCommandBuffer() const noexcept {
+        T* tryCommandBuffer() noexcept {
+            return resourceRegistry_.tryGet<T>();
+        }
+
+        /**
+         * @brief Retrieves a registered CommandBuffer by type, or nullptr if not found.
+         *
+         * @tparam T The CommandBuffer type. Must satisfy IsCommandBufferLike.
+         *
+         * @return Const Pointer to the CommandBuffer, or nullptr if not registered.
+         */
+        template<typename T>
+        requires IsCommandBufferLike<T>
+        const T* tryCommandBuffer() const noexcept {
             return resourceRegistry_.tryGet<T>();
         }
 
@@ -396,26 +422,6 @@ export namespace helios::engine::runtime::world {
             }
 
             session_.reset();
-        }
-
-        /**
-         * @brief Returns a reference to the ResourceRegistry.
-         *
-         * @details Use for direct resource access. Prefer the convenience methods
-         * `registerManager()`, `registerCommandBuffer()`, `manager()`,
-         * `tryManager()`, and `tryCommandBuffer()` for type-constrained access.
-         *
-         * @return Reference to the ResourceRegistry.
-         */
-        ResourceRegistry& resourceRegistry() noexcept {
-            return resourceRegistry_;
-        }
-
-        /**
-         * @copydoc resourceRegistry()
-         */
-        const ResourceRegistry& resourceRegistry() const noexcept {
-            return resourceRegistry_;
         }
 
         /**
@@ -536,7 +542,7 @@ export namespace helios::engine::runtime::world {
          * @return Reference to the internal CommandBufferRegistry.
          */
         helios::engine::runtime::messaging::command::CommandBufferRegistry& commandBufferRegistry() noexcept {
-            return resourceRegistry().commandBufferRegistry();
+            return resourceRegistry_.commandBufferRegistry();
         }
 
 
@@ -546,7 +552,7 @@ export namespace helios::engine::runtime::world {
          * @return Reference to the internal ManagerRegistry.
          */
         ManagerRegistry& managerRegistry() noexcept {
-            return resourceRegistry().managerRegistry();
+            return resourceRegistry_.managerRegistry();
         }
 
         /**

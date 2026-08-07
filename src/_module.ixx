@@ -24,5 +24,4 @@ export import helios.engine.runtime;
 export import helios.engine.platform;
 export import helios.engine.tooling;
 
-export import helios.engine.bootstrap;
 

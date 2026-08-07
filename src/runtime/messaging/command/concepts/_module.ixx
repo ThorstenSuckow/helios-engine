@@ -5,6 +5,5 @@
 export module helios.engine.runtime.messaging.command.concepts;
 
 export import helios.engine.runtime.messaging.command.concepts.IsCommandBufferLike;
-export import helios.engine.runtime.messaging.command.concepts.IsPlatformCommandBuffer;
 export import helios.engine.runtime.messaging.command.concepts.IsCommandHandlerLike;
 

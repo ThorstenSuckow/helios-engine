@@ -60,7 +60,7 @@ export namespace helios::engine::runtime::pooling {
         /**
          * @brief Registry holding all managed pools, keyed by `EntityPoolKey`.
          */
-        TypedEntityPoolRegistry<TMemberHandles...> entityPoolRegistry_{};
+        TypedEntityPoolRegistry<TMemberHandles...>& entityPoolRegistry_;
 
         /**
          * @brief Pending pool-creation commands, one vector per handle type.
@@ -137,10 +137,9 @@ export namespace helios::engine::runtime::pooling {
                 }
 
                 entityPoolRegistry_.template addPool<THandle>(key, std::move(entityPool));
-
-                commands.clear();
             }
 
+            commands.clear();
         }
 
         /**
@@ -179,11 +178,14 @@ export namespace helios::engine::runtime::pooling {
         /**
          * @brief Constructs an `EntityPoolManager`.
          *
+         * @param entityPoolRegistry
          * @param engineWorld  Engine world used for cloning prefab entities.
          * @param jobSystem    Job system used by `flushParallel()`.
          */
-        explicit EntityPoolManager(EngineWorld& engineWorld, JobSystem& jobSystem)
-        : engineWorld_(engineWorld), jobSystem_(jobSystem) {}
+        explicit EntityPoolManager(
+        TypedEntityPoolRegistry<TMemberHandles...>&  entityPoolRegistry,
+        EngineWorld& engineWorld, JobSystem& jobSystem)
+        : entityPoolRegistry_(entityPoolRegistry), engineWorld_(engineWorld), jobSystem_(jobSystem) {}
 
 
 

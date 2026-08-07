@@ -5,9 +5,8 @@
 module;
 
 #include <cassert>
-#include <memory>
 #include <span>
-#include <vector>
+#include <utility>
 
 export module helios.engine.runtime.world.ResourceRegistry;
 
@@ -117,7 +116,7 @@ export namespace helios::engine::runtime::world {
          * @return Pointer to the resource, or nullptr if not registered.
          */
         template<class T>
-        T* tryGet() const noexcept {
+        const T* tryGet() const noexcept {
             if constexpr (IsManagerLike<T>) {
                 return managerRegistry_.item<T>();
             }
@@ -125,10 +124,20 @@ export namespace helios::engine::runtime::world {
             if constexpr (IsCommandBufferLike<T>) {
                 return commandBufferRegistry_.item<T>();
             }
-
             return nullptr;
         }
 
+       /**
+        * @brief Retrieves a registered resource by type.
+        *
+        * @tparam T The resource type.
+        *
+        * @return Const Pointer to the resource, or nullptr if not registered.
+        */
+        template<class T>
+        T* tryGet() noexcept {
+            return const_cast<T*>(std::as_const(*this).template tryGet<T>());
+        }
 
         /**
          * @brief Retrieves a registered resource by type (checked).

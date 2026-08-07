@@ -11,7 +11,6 @@ module;
 
 export module helios.engine.rendering.shader.systems.ShaderCompileSystem;
 
-import helios.engine.runtime.messaging.command.RenderCommandBuffer;
 import helios.engine.runtime.messaging.command.NullCommandBuffer;
 
 import helios.engine.runtime.world.UpdateContext;

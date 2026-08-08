@@ -47,10 +47,10 @@ export namespace helios::engine::runtime::pooling::types {
          * @brief Constructs a valid key.
          *
          * @param idx  Slot index in the owning registry's pool vector.
-         * @param id   String identifier forwarded to `EntityPoolId`.
+         * @param entityPoolId Identifier used for the associated pool.
          */
-        explicit EntityPoolKey(const std::size_t idx, std::string_view id) :
-                idx_(idx), entityPoolId_(EntityPoolId<THandle>(id)), isValid_(true) {}
+        explicit EntityPoolKey(const std::size_t idx, EntityPoolId<THandle> entityPoolId) :
+                idx_(idx), entityPoolId_(entityPoolId), isValid_(true) {}
 
 
         /**

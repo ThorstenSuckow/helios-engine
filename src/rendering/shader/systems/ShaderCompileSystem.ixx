@@ -42,7 +42,7 @@ export namespace helios::engine::rendering::shader::systems {
      * @tparam TCommandBuffer Command buffer type used for queued compile commands.
      * @tparam TCapacity Initial reserve size for the internal handle cache.
      */
-    template<typename THandle, typename TCommandBuffer = NullCommandBuffer, size_t TCapacity = DEFAULT_SHADER_POOL_CAPACITY>
+    template<typename THandle, typename TCommandBuffer = NullCommandBuffer>
     requires IsShaderHandle<THandle> && IsCommandBufferLike<TCommandBuffer>
     class ShaderCompileSystem {
 
@@ -55,7 +55,7 @@ export namespace helios::engine::rendering::shader::systems {
         using EngineRoleTag = TypedSystemRole;
         using CommandBuffer_type = TCommandBuffer;
 
-        explicit ShaderCompileSystem(size_t capacity = TCapacity) : capacity_(capacity) {
+        explicit ShaderCompileSystem(size_t capacity = SHADER_INITIAL_STORAGE_CAPACITY) : capacity_(capacity) {
             shaderHandles_.reserve(capacity);
         }
 

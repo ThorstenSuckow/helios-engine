@@ -31,7 +31,7 @@ using namespace helios::ecs::components;
 export namespace helios::engine::rendering::mesh::systems {
 
 
-    template<typename THandle, typename TCommandBuffer = NullCommandBuffer, size_t TCapacity = DEFAULT_MESH_POOL_CAPACITY>
+    template<typename THandle, typename TCommandBuffer = NullCommandBuffer>
     requires IsMeshHandle<THandle> && IsCommandBufferLike<TCommandBuffer>
     class MeshUploadSystem {
 
@@ -44,7 +44,7 @@ export namespace helios::engine::rendering::mesh::systems {
         using EngineRoleTag = TypedSystemRole;
         using CommandBuffer_type = TCommandBuffer;
 
-        explicit MeshUploadSystem(size_t capacity = TCapacity) : capacity_(capacity) {
+        explicit MeshUploadSystem(size_t capacity = MESH_INITIAL_STORAGE_CAPACITY) : capacity_(capacity) {
             meshHandles_.reserve(capacity);
         }
 

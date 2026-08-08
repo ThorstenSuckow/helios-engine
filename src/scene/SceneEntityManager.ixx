@@ -4,8 +4,6 @@
  */
 module;
 
-#include "helios-engine-config.h"
-
 export module helios.engine.scene.SceneEntityManager;
 
 import helios.ecs.EntityManager;
@@ -13,8 +11,6 @@ import helios.ecs.EntityRegistry;
 import helios.ecs.strategies;
 
 import helios.engine.scene.types;
-
-constexpr auto SCENE_SIZE = DEFAULT_SCENE_POOL_CAPACITY;
 
 using namespace helios::engine::scene::types;
 using namespace helios::ecs;
@@ -24,12 +20,12 @@ export namespace helios::engine::scene {
     /**
      * @brief Entity registry used for scene resources.
      */
-    using SceneEntityRegistry = EntityRegistry<SceneDomainTag, LinearLookupStrategy<SCENE_SIZE>, true, SCENE_SIZE>;
+    using SceneEntityRegistry = EntityRegistry<SceneDomainTag, LinearLookupStrategy<>, true>;
 
     /**
      * @brief Entity manager used for scene handles and scene components.
      */
-    using SceneEntityManager = EntityManager<SceneHandle, SceneEntityRegistry, SCENE_SIZE>;
+    using SceneEntityManager = EntityManager<SceneHandle, SceneEntityRegistry>;
 
 
 }

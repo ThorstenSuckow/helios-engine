@@ -4,9 +4,9 @@
  */
 module;
 
-#include <imgui_internal.h>
 #include <tuple>
 #include <type_traits>
+#include "helios-engine-config.h"
 
 export module helios.engine.runtime.world.EngineWorld;
 
@@ -149,11 +149,26 @@ export namespace helios::engine::runtime::world {
      */
     class EngineWorld {
 
-        GameObjectWorld gameObjectWorld_{};
-        RenderResourceWorld renderResourceWorld_{};
-        PlatformWorld platformWorld_{};
-        RenderViewWorld renderViewWorld_{};
-        ParticleWorld particleWorld_{};
+        GameObjectWorld gameObjectWorld_{GameObjectEntityManager(GAMEOBJECT_INITIAL_STORAGE_CAPACITY)};
+        RenderResourceWorld renderResourceWorld_{
+            TextureEntityManager(TEXTURE_INITIAL_STORAGE_CAPACITY),
+            ShaderEntityManager(SHADER_INITIAL_STORAGE_CAPACITY),
+            MaterialEntityManager(MATERIAL_INITIAL_STORAGE_CAPACITY),
+            MeshEntityManager(MESH_INITIAL_STORAGE_CAPACITY)
+        };
+        PlatformWorld platformWorld_{
+            WindowEntityManager(WINDOW_INITIAL_STORAGE_CAPACITY),
+            PlatformEntityManager(PLATFORM_INITIAL_STORAGE_CAPACITY)
+        };
+        RenderViewWorld renderViewWorld_{
+            RenderTargetEntityManager(RENDERTARGET_INITIAL_STORAGE_CAPACITY),
+            SceneEntityManager(SCENE_INITIAL_STORAGE_CAPACITY),
+            CameraEntityManager(CAMERA_INITIAL_STORAGE_CAPACITY),
+            ViewportEntityManager(VIEWPORT_INITIAL_STORAGE_CAPACITY)
+        };
+        ParticleWorld particleWorld_{
+            ParticleEntityManager(PARTICLE_INITIAL_STORAGE_CAPACITY)
+        };
 
         /**
          * @brief Clears all dirty sets for every handle type in `THandles` inside `world`.

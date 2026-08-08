@@ -5,16 +5,10 @@
 module;
 
 
-#include <cstddef>
-#include "helios-engine-config.h"
-
-
 export module helios.engine.runtime.world.GameObjectEntityManager;
 
 import helios.ecs;
 import helios.engine.runtime.world.types;
-
-constexpr size_t GAMEOBJECT_SIZE = DEFAULT_GAMEOBJECT_CAPACITY;
 
 
 using namespace helios::ecs;
@@ -25,11 +19,11 @@ export namespace helios::engine::runtime::world {
     /**
      * @brief Entity registry configuration used for game objects.
      */
-    using GameObjectEntityRegistry = EntityRegistry<GameObjectDomainTag, HashedLookupStrategy, true, GAMEOBJECT_SIZE>;
+    using GameObjectEntityRegistry = EntityRegistry<GameObjectDomainTag, HashedLookupStrategy<>, true>;
 
     /**
      * @brief Entity manager alias for game-object handles.
      */
-    using GameObjectEntityManager = EntityManager<GameObjectHandle, GameObjectEntityRegistry, GAMEOBJECT_SIZE>;
+    using GameObjectEntityManager = EntityManager<GameObjectHandle, GameObjectEntityRegistry>;
 
 }

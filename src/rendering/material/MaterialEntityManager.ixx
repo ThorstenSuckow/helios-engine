@@ -4,8 +4,6 @@
  */
 module;
 
-#include "helios-engine-config.h"
-
 export module helios.engine.rendering.material.MaterialEntityManager;
 
 import helios.ecs.EntityManager;
@@ -13,8 +11,6 @@ import helios.ecs.EntityRegistry;
 import helios.ecs.strategies;
 
 import helios.engine.rendering.material.types;
-
-constexpr auto MATERIAL_SIZE = DEFAULT_MATERIAL_POOL_CAPACITY;
 
 using namespace helios::engine::rendering::material::types;
 using namespace helios::ecs;
@@ -24,12 +20,12 @@ export namespace helios::engine::rendering::material {
     /**
      * @brief Entity registry used for material resources.
      */
-    using MaterialEntityRegistry = EntityRegistry<MaterialDomainTag, HashedLookupStrategy, true, MATERIAL_SIZE>;
+    using MaterialEntityRegistry = EntityRegistry<MaterialDomainTag, HashedLookupStrategy<>, true>;
 
     /**
      * @brief Entity manager used for material handles and material components.
      */
-    using MaterialEntityManager = EntityManager<MaterialHandle, MaterialEntityRegistry, MATERIAL_SIZE>;
+    using MaterialEntityManager = EntityManager<MaterialHandle, MaterialEntityRegistry>;
 
 
 }

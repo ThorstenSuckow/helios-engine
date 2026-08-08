@@ -30,8 +30,7 @@ export namespace helios::engine::rendering::texture::systems {
 
 
     template<typename THandle = texture::types::TextureHandle,
-        typename TCommandBuffer = NullCommandBuffer,
-        size_t TCapacity = DEFAULT_TEXTURE_POOL_CAPACITY>
+        typename TCommandBuffer = NullCommandBuffer>
     requires texture::concepts::IsTextureHandle<THandle> && IsCommandBufferLike<TCommandBuffer>
     class TextureUploadSystem {
 
@@ -44,7 +43,7 @@ export namespace helios::engine::rendering::texture::systems {
         using EngineRoleTag = TypedSystemRole;
         using CommandBuffer_type = TCommandBuffer;
 
-        explicit TextureUploadSystem(size_t capacity = TCapacity) : capacity_(capacity) {
+        explicit TextureUploadSystem(size_t capacity = TEXTURE_INITIAL_STORAGE_CAPACITY) : capacity_(capacity) {
             textureHandles_.reserve(capacity);
         }
 

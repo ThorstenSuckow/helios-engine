@@ -153,7 +153,7 @@ export namespace helios::engine::rendering {
             std::vector<DrawContext> drawContexts;
             std::vector<InstanceData> instanceData;
             MeshBatch() {
-                drawContexts.reserve(DEFAULT_GAMEOBJECT_CAPACITY);
+                drawContexts.reserve(GAMEOBJECT_INITIAL_STORAGE_CAPACITY);
                // instanceData.reserve(DEFAULT_INSTANCE_DATA_CAPACITY);
             }
             void clear() {
@@ -171,7 +171,7 @@ export namespace helios::engine::rendering {
             MaterialHandle handle;
             std::vector<MeshBatch> batches;
             std::vector<std::size_t> activeBatchIndices;
-            MaterialBatch(){batches.reserve(DEFAULT_MESH_POOL_CAPACITY);}
+            MaterialBatch(){batches.reserve(MESH_INITIAL_STORAGE_CAPACITY);}
             [[nodiscard]] MeshBatch& getOrAdd(MeshHandle handle) {
                 return addToBatch(handle, batches, activeBatchIndices);
             }
@@ -188,7 +188,7 @@ export namespace helios::engine::rendering {
             TextureHandle handle;
             std::vector<MaterialBatch> batches;
             std::vector<std::size_t> activeBatchIndices;
-            TextureBatch(){batches.reserve(DEFAULT_MATERIAL_POOL_CAPACITY);}
+            TextureBatch(){batches.reserve(MATERIAL_INITIAL_STORAGE_CAPACITY);}
             [[nodiscard]] MaterialBatch& getOrAdd(MaterialHandle handle) {
                 return addToBatch(handle, batches, activeBatchIndices);
             }
@@ -205,7 +205,7 @@ export namespace helios::engine::rendering {
             ShaderHandle handle;
             std::vector<TextureBatch> batches;
             std::vector<std::size_t> activeBatchIndices;
-            ShaderBatch(){batches.reserve(DEFAULT_TEXTURE_POOL_CAPACITY);}
+            ShaderBatch(){batches.reserve(TEXTURE_INITIAL_STORAGE_CAPACITY);}
             [[nodiscard]] TextureBatch& getOrAdd(TextureHandle handle) {
                 return addToBatch(handle, batches, activeBatchIndices);
             }
@@ -225,7 +225,7 @@ export namespace helios::engine::rendering {
             [[nodiscard]] ShaderBatch& getOrAdd(ShaderHandle handle) {
                 return addToBatch(handle, batches, activeBatchIndices);
             }
-            ViewportBatch(){batches.reserve(DEFAULT_SHADER_POOL_CAPACITY);}
+            ViewportBatch(){batches.reserve(SHADER_INITIAL_STORAGE_CAPACITY);}
             void clear() {
                 clearActive(this, activeBatchIndices, batches);
             }
@@ -242,7 +242,7 @@ export namespace helios::engine::rendering {
             [[nodiscard]] ViewportBatch& getOrAdd(ViewportHandle handle) {
                 return addToBatch(handle, batches, activeBatchIndices);
             }
-            RenderTargetBatch(){batches.reserve(DEFAULT_VIEWPORT_POOL_CAPACITY);}
+            RenderTargetBatch(){batches.reserve(VIEWPORT_INITIAL_STORAGE_CAPACITY);}
             void clear() {
                 clearActive(this, activeBatchIndices, batches);
             }
@@ -335,7 +335,7 @@ export namespace helios::engine::rendering {
          */
         explicit RenderManager(TRenderBackend& renderBackend) : renderBackend_(renderBackend) {
 
-            renderTargetBatches_.reserve(DEFAULT_FRAMEBUFFER_POOL_CAPACITY);
+            renderTargetBatches_.reserve(RENDERTARGET_INITIAL_STORAGE_CAPACITY);
 
         }
 

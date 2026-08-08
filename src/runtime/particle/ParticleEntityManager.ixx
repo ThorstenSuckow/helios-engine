@@ -5,17 +5,11 @@
 module;
 
 
-#include <cstddef>
-#include "helios-engine-config.h"
-
 
 export module helios.engine.runtime.particle.ParticleEntityManager;
 
 import helios.ecs;
 import helios.engine.runtime.particle.types;
-
-constexpr size_t PARTICLE_SIZE = DEFAULT_PARTICLE_CAPACITY;
-
 
 using namespace helios::ecs;
 using namespace helios::ecs::strategies;
@@ -25,11 +19,11 @@ export namespace helios::engine::runtime::particle {
     /**
      * @brief Entity registry configuration used for particles.
      */
-    using ParticleEntityRegistry = EntityRegistry<ParticleDomainTag, HashedLookupStrategy, true, PARTICLE_SIZE>;
+    using ParticleEntityRegistry = EntityRegistry<ParticleDomainTag, HashedLookupStrategy<>, true>;
 
     /**
      * @brief Entity manager alias for particle handles.
      */
-    using ParticleEntityManager = EntityManager<ParticleHandle, ParticleEntityRegistry, PARTICLE_SIZE>;
+    using ParticleEntityManager = EntityManager<ParticleHandle, ParticleEntityRegistry>;
 
 }

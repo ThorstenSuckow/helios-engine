@@ -67,17 +67,17 @@ export namespace helios::engine::scene {
          * @brief Constructs the registry with pre-reserved top-level storage.
          */
         SceneMemberVisibilityRegistry() {
-            visibilityContexts_.reserve(DEFAULT_VIEWPORT_POOL_CAPACITY);
+            visibilityContexts_.reserve(VIEWPORT_INITIAL_STORAGE_CAPACITY);
             for (auto& vec : visibilityContexts_) {
                 vec.reserve(HELIOS_DEFAULT_VISIBLE_MEMBER_CAPACITY);
             }
-            culledContexts_.reserve(DEFAULT_VIEWPORT_POOL_CAPACITY);
+            culledContexts_.reserve(VIEWPORT_INITIAL_STORAGE_CAPACITY);
             for (auto& vec : culledContexts_) {
                 vec.reserve(HELIOS_DEFAULT_VISIBLE_MEMBER_CAPACITY);
             }
            
 
-            sceneRenderContexts_.reserve(DEFAULT_VIEWPORT_POOL_CAPACITY);
+            sceneRenderContexts_.reserve(VIEWPORT_INITIAL_STORAGE_CAPACITY);
         }
 
 

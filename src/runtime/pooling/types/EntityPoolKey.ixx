@@ -63,7 +63,7 @@ export namespace helios::engine::runtime::pooling::types {
         /**
          * @return Slot index in the owning registry's pool vector.
          */
-        [[nodiscard]] std::size_t idx() const noexcept {
+        [[nodiscard]] std::size_t index() const noexcept {
             return idx_;
         }
 

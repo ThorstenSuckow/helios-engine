@@ -8,7 +8,7 @@ module;
 
 export module helios.engine.runtime.pooling.types:EntityPoolId;
 
-import helios.engine.core.types.FuncDefs;
+import helios.engine.core.types;
 import helios.engine.core.types;
 import helios.ecs.types.StrongId;
 

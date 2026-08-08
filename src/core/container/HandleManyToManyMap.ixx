@@ -6,12 +6,10 @@ module;
 
 #include <vector>
 #include <span>
-#include <cassert>
 #include <concepts>
-#include <iterator>
 #include <cstddef>
 
-export module helios.engine.core.container.HandleManyToManyMap;
+export module helios.engine.core.container:HandleManyToManyMap;
 
 import helios.ecs.types.EntityHandle;
 

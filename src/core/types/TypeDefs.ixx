@@ -8,7 +8,7 @@ module;
 #include <limits>
 #include <cstddef>
 
-export module helios.engine.core.types.TypeDefs;
+export module helios.engine.core.types:TypeDefs;
 
 
 export namespace helios::engine::core::types {

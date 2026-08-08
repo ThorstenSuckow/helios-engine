@@ -12,7 +12,7 @@ module;
 
 export module helios.engine.runtime.world.SystemRegistry;
 
-import helios.engine.core.container.ConceptModelRegistry;
+import helios.engine.core.container;
 import helios.engine.runtime.world.System;
 import helios.engine.runtime.world.types.SystemTypeId;
 

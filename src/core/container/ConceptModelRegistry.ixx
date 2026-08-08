@@ -11,7 +11,7 @@ module;
 #include <utility>
 
 
-export module helios.engine.core.container.ConceptModelRegistry;
+export module helios.engine.core.container:ConceptModelRegistry;
 
 
 export namespace helios::engine::core::container {

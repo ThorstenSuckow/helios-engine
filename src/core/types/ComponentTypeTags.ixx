@@ -4,7 +4,7 @@
  */
 module;
 
-export module helios.engine.core.types.ComponentTypeTags;
+export module helios.engine.core.types:ComponentTypeTags;
 
 export namespace helios::engine::core::types {
 

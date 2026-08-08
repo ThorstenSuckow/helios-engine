@@ -34,7 +34,7 @@ import helios.engine.runtime.world.UpdateContext;
 
 import helios.engine.rendering.common.concepts;
 
-import helios.engine.core.container.HandleMultiMap;
+import helios.engine.core.container;
 
 import helios.math;
 

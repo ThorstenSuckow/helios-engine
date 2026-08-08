@@ -6,7 +6,7 @@ module;
 
 export module helios.engine.rendering.RenderTargetToViewportMap;
 
-import helios.engine.core.container.HandleMultiMap;
+import helios.engine.core.container;
 
 import helios.engine.rendering.viewport.types.ViewportHandle;
 import helios.engine.rendering.renderTarget.types.RenderTargetHandle;

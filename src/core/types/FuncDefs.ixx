@@ -6,7 +6,7 @@ module;
 
 #include <string>
 
-export module helios.engine.core.types.FuncDefs;
+export module helios.engine.core.types:FuncDefs;
 
 
 

@@ -43,7 +43,7 @@ import helios.ecs.components.Active;
 import helios.engine.util.log;
 
 import helios.math;
-import helios.engine.core.types.ComponentTypeTags;
+import helios.engine.core.types;
 
 using namespace helios::engine::core::types;
 using namespace helios::engine::scene;

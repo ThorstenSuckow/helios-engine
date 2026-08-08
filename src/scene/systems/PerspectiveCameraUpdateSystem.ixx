@@ -15,7 +15,7 @@ import helios.engine.scene.components;
 import helios.engine.spatial.components;
 
 import helios.math;
-import helios.engine.core.types.ComponentTypeTags;
+import helios.engine.core.types;
 
 using namespace helios::engine::core::types;
 using namespace helios::ecs::components;

@@ -11,7 +11,7 @@ module;
 #include <iterator>
 #include <cstddef>
 
-export module helios.engine.core.container.HandleMultiMap;
+export module helios.engine.core.container:HandleMultiMap;
 
 import helios.ecs.types.EntityHandle;
 

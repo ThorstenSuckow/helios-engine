@@ -9,7 +9,7 @@ module;
 
 export module helios.engine.runtime.timing.types.TimerId;
 
-import helios.engine.core.types.FuncDefs;
+import helios.engine.core.types;
 import helios.engine.core.types;
 import helios.ecs.types.StrongId;
 

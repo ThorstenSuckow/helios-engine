@@ -18,6 +18,12 @@ import helios.engine.runtime.pooling.EntityPool;
 import helios.engine.runtime.pooling.types;
 import helios.engine.util.log;
 
+import helios.ecs.strategies.LinearLookupStrategy;
+import helios.ecs.strategies.HashedLookupStrategy;
+
+import helios.ecs.concepts;
+
+using namespace helios::ecs::strategies;
 using namespace helios::engine::runtime::pooling::types;
 #define HELIOS_LOG_SCOPE "helios::engine::runtime::pooling::TypedEntityPoolRegistry"
 export namespace helios::engine::runtime::pooling {
@@ -31,7 +37,11 @@ export namespace helios::engine::runtime::pooling {
      *
      * @tparam TManagedHandles  Pack of handle types whose pools are managed by this registry.
      */
-    template<typename ...TManagedHandles>
+    template<
+        template<typename> typename TStrongIdLookupStrategy,
+        typename ...TManagedHandles>
+    requires (helios::ecs::concepts::IsStrongIdCollisionResolverLike<TStrongIdLookupStrategy<TManagedHandles>> && ...)
+        && (sizeof ...(TManagedHandles) > 0)
     class TypedEntityPoolRegistry {
 
     private:
@@ -58,17 +68,29 @@ export namespace helios::engine::runtime::pooling {
          */
         std::tuple<std::vector<EntityPoolKey<TManagedHandles>>...> availablePoolKeys_;
 
-        /** @brief Returns the mutable slot vector for `THandle`. */
+        std::tuple<TStrongIdLookupStrategy<TManagedHandles>...> strongIdLookupStrategies_;
+
+        /**
+         * @brief Returns the mutable slot vector for `THandle`.
+         */
         template<typename THandle>
         [[nodiscard]] std::vector<std::optional<EntityPoolSlot<THandle>>>& managedPoolVector() noexcept {
             return std::get<std::vector<std::optional<EntityPoolSlot<THandle>>>>(pools_);
         }
 
-        /** @brief Returns the const slot vector for `THandle`. */
+        /**
+         * @brief Returns the const slot vector for `THandle`.
+         */
         template<typename THandle>
         [[nodiscard]] const std::vector<std::optional<EntityPoolSlot<THandle>>>& managedPoolVector() const noexcept {
             return std::get<std::vector<std::optional<EntityPoolSlot<THandle>>>>(pools_);
         }
+
+        template<typename THandle>
+        [[nodiscard]] TStrongIdLookupStrategy<THandle>& strongIdLookupStrategy() noexcept {
+            return std::get<TStrongIdLookupStrategy<THandle>>(strongIdLookupStrategies_);
+        }
+
 
         static inline auto& logger_ = helios::engine::util::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
 
@@ -87,39 +109,35 @@ export namespace helios::engine::runtime::pooling {
          * Returns `nullptr` and triggers an assertion if the key is invalid or the slot is already occupied.
          *
          * @tparam THandle   Handle type of the pool.
-         * @param key        Key containing the slot index and strongly-typed identifier for the pool.
+         * @param id
          * @param entityPool Pool to add (moved into the registry).
          *
          * @return Pointer to the stored pool, or `nullptr` on failure.
          */
         template<typename THandle>
-        EntityPool<THandle>* addPool(const EntityPoolKey<THandle> key, EntityPool<THandle>&& entityPool) {
+        std::optional<EntityPoolKey<THandle>> addPool(EntityPoolId<THandle> entityPoolId) {
 
-            if (!key.isValid()) {
-                logger_.error("Invalid key passed.");
-                assert(false && "Invalid key passed.");
-                return nullptr;
+            auto& lookupStrategy = strongIdLookupStrategy<THandle>();
+
+            if (lookupStrategy.has(entityPoolId.value())) {
+                logger_.error("EntityPoolKey with this strong ID already registered.");
+                assert(false && "EntityPoolKey with this strong ID already registered.");
+                return std::nullopt;
             }
 
             auto& poolSlots = managedPoolVector<THandle>();
             auto& availablePoolKeys = std::get<std::vector<EntityPoolKey<THandle>>>(availablePoolKeys_);
 
-            const auto idx = key.idx();
+            EntityPoolKey<THandle> key{poolSlots.size(), entityPoolId};
 
-            if (poolSlots.size() <= idx) {
-                poolSlots.resize(idx + 1);
-            }
-            
-            if (poolSlots[idx]) {
-                logger_.error("EntityPoolKey with this index already registered.");
-                assert(false && "EntityPoolKey with this index already registered.");
-                return nullptr;
-            }
-
-            poolSlots[idx].emplace(EntityPoolSlot<THandle>{key, std::move(entityPool)});
+            poolSlots.push_back(EntityPoolSlot<THandle>{key, EntityPool<THandle>()});
             availablePoolKeys.push_back(key);
+            if (!lookupStrategy.add(entityPoolId.value())) {
+                logger_.error("Failed to add StrongId to lookup strategy.");
+                assert(false && "Failed to add StringId to lookup strategy.");
+            }
 
-            return &(poolSlots[idx]->pool);
+            return key;
         }
 
         /**

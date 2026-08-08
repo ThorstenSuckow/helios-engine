@@ -54,18 +54,23 @@ export namespace helios::engine::runtime::pooling {
      *
      * @tparam TMemberHandles  Pack of handle types whose pools are managed by this instance.
      */
-    template<typename ... TMemberHandles>
-    class EntityPoolManager {
+    template<typename TEntityPoolRegistry>
+    class EntityPoolManager;
 
+    template<
+        template<typename> typename TLookupStrategy,
+        typename... TMemberHandles
+    >
+   class EntityPoolManager<TypedEntityPoolRegistry<TLookupStrategy, TMemberHandles...>> {
         /**
          * @brief Registry holding all managed pools, keyed by `EntityPoolKey`.
          */
-        TypedEntityPoolRegistry<TMemberHandles...>& entityPoolRegistry_;
+        TypedEntityPoolRegistry<TLookupStrategy, TMemberHandles...>& entityPoolRegistry_;
 
         /**
          * @brief Pending pool-creation commands, one vector per handle type.
          */
-        std::tuple<std::vector<PrefabComponentPoolCommand<TMemberHandles>>...> prefabComponentPoolCommands_;
+        std::tuple<std::vector<PrefabEntityPoolCommand<TMemberHandles>>...> prefabEntityPoolCommands_;
 
         /**
          * @brief Reference to the engine world used for cloning prefab entities.
@@ -76,8 +81,8 @@ export namespace helios::engine::runtime::pooling {
          * @brief Returns the mutable command queue for `THandle`.
          */
         template<typename THandle>
-        std::vector<PrefabComponentPoolCommand<THandle>>& prefabComponentPoolCommands() noexcept {
-            return std::get<std::vector<PrefabComponentPoolCommand<THandle>>>(prefabComponentPoolCommands_);
+        std::vector<PrefabEntityPoolCommand<THandle>>& prefabEntityPoolCommands() noexcept {
+            return std::get<std::vector<PrefabEntityPoolCommand<THandle>>>(prefabEntityPoolCommands_);
         }
 
         static inline auto& logger_ = helios::engine::util::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
@@ -96,9 +101,9 @@ export namespace helios::engine::runtime::pooling {
          * it in `entityPoolRegistry_`. Clears the command queue on completion.
          */
         template<typename THandle>
-        void processPrefabComponentPoolCommands() noexcept {
+        void processPrefabEntityPoolCommands() noexcept {
 
-            auto& commands = prefabComponentPoolCommands<THandle>();
+            auto& commands = prefabEntityPoolCommands<THandle>();
 
             for (auto& command : commands) {
 
@@ -109,34 +114,42 @@ export namespace helios::engine::runtime::pooling {
                     logger_.error("Invalid key passed with command.");
                     continue;
                 }
-                if (entityPoolRegistry_.template has<THandle>(key)) {
-                    assert(false && "Pool already exists for the given key.");
-                    logger_.error("Pool already exists for the given key.");
+
+                auto* entityPool = entityPoolRegistry_.template pool<THandle>(key);
+
+                if (!entityPool) {
+                    logger_.error("Failed to retrieve entity pool.");
+                    assert(false && "Entity pool could not be retrieved.");
                     continue;
                 }
 
-                auto entityPool = EntityPool<THandle>(command.amount);
+                if (entityPool->isLocked()) {
+                    logger_.error("Entity pool is already locked.");
+                    assert(false && "Entity pool is already locked.");
+                    continue;
+                }
 
-                const size_t used  = entityPool.activeCount() + entityPool.inactiveCount();
-                const size_t space = used < entityPool.size() ? entityPool.size() - used : 0;
+                entityPool->setPoolSize(command.amount);
+
+                const size_t used  = entityPool->activeCount() + entityPool->inactiveCount();
+                const size_t space = used < entityPool->size() ? entityPool->size() - used : 0;
                 const auto prefabHandle = command.prefabHandle;
 
                 auto source = engineWorld_.find(prefabHandle);
-                source->template remove<PrefabRequestComponent<THandle>>();
+                source->template remove<PrefabEntityPoolRequestComponent<THandle>>();
 
                 for (size_t i = 0; i < space; i++) {
                     auto go = engineWorld_.copyEntity(prefabHandle);
                     go.setActive(false);
-                    entityPool.addInactive(go.handle());
+                    entityPool->addInactive(go.handle());
                 }
 
-                if (!entityPool.lock()) {
+                if (!entityPool->lock()) {
                     logger_.error("Failed to lock entity pool.");
                     assert(false && "Entity pool could not be locked.");
                     continue;
                 }
 
-                entityPoolRegistry_.template addPool<THandle>(key, std::move(entityPool));
             }
 
             commands.clear();
@@ -147,7 +160,7 @@ export namespace helios::engine::runtime::pooling {
          */
         template<typename THandle>
         void processCommandsForHandle() noexcept {
-            processPrefabComponentPoolCommands<THandle>();
+            processPrefabEntityPoolCommands<THandle>();
         }
 
         /**
@@ -183,7 +196,7 @@ export namespace helios::engine::runtime::pooling {
          * @param jobSystem    Job system used by `flushParallel()`.
          */
         explicit EntityPoolManager(
-        TypedEntityPoolRegistry<TMemberHandles...>&  entityPoolRegistry,
+        TypedEntityPoolRegistry<TLookupStrategy, TMemberHandles...>&  entityPoolRegistry,
         EngineWorld& engineWorld, JobSystem& jobSystem)
         : entityPoolRegistry_(entityPoolRegistry), engineWorld_(engineWorld), jobSystem_(jobSystem) {}
 
@@ -232,9 +245,9 @@ export namespace helios::engine::runtime::pooling {
          * @return `true` (always; reserved for future error propagation).
          */
         template<typename THandle>
-        bool submit(PrefabComponentPoolCommand<THandle>&& prefabComponentPoolCommand) noexcept {
+        bool submit(PrefabEntityPoolCommand<THandle>&& prefabEntityPoolCommand) noexcept {
 
-            prefabComponentPoolCommands<THandle>().emplace_back(std::move(prefabComponentPoolCommand));
+            prefabEntityPoolCommands<THandle>().emplace_back(std::move(prefabEntityPoolCommand));
 
             return true;
         }
@@ -250,7 +263,7 @@ export namespace helios::engine::runtime::pooling {
         void init(CommandHandlerRegistry& commandHandlerRegistry) noexcept {
 
             (commandHandlerRegistry.handleCommands<
-               PrefabComponentPoolCommand<TMemberHandles>
+               PrefabEntityPoolCommand<TMemberHandles>
            >(*this), ...);
 
         };

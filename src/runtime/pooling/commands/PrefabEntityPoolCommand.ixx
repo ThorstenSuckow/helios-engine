@@ -2,7 +2,7 @@ module;
 
 #include <cstddef>
 
-export module helios.engine.runtime.pooling.commands:PrefabComponentPoolCommand;
+export module helios.engine.runtime.pooling.commands:PrefabEntityPoolCommand;
 
 import helios.engine.runtime.pooling.types;
 
@@ -10,17 +10,17 @@ export namespace helios::engine::runtime::pooling::commands {
 
 
     /**
-     * @brief Command to prefabricate a component pool for a prefab component.
+     * @brief Command to prefabricate an entity pool for a prefab entity.
      *
      * @tparam TOwnerHandle The type of the owner handle.
      */
     template<typename TOwnerHandle>
-    struct PrefabComponentPoolCommand {
+    struct PrefabEntityPoolCommand {
 
         using Handle_type = TOwnerHandle;
 
         /**
-         * @brief The key that should be used for prefabrication of the pool.
+         * @brief The key of the pool that should be used for prefabrication.
          */
         types::EntityPoolKey<TOwnerHandle> entityPoolKey;
 

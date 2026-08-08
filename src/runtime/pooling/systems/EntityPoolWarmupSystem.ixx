@@ -18,7 +18,7 @@ import helios.engine.runtime.world.UpdateContext;
 export namespace helios::engine::runtime::pooling::systems {
 
     /**
-     * @brief System for creating PrefabComponentPoolCommand from PrefabRequestComponent.
+     * @brief System for creating PrefabEntityPoolCommand from PrefabEntityPoolRequestComponent.
      *
      * @tparam TMemberHandle The type of the member handle.
      *
@@ -42,7 +42,7 @@ export namespace helios::engine::runtime::pooling::systems {
 
 
         /**
-         * @brief Picks up any PrefabRequestComponent and creates a PrefabComponentPoolCommand.
+         * @brief Picks up any PrefabEntityPoolRequestComponent and creates a PrefabEntityPoolCommand.
          *
          * @details Subsequent managers are responsible for removing the component to
          * prevent multiple prefabs from being registered.
@@ -54,11 +54,11 @@ export namespace helios::engine::runtime::pooling::systems {
 
             for (auto [entity, requestComponent, keyComponent] : updateContext.view<
                 TMemberHandle,
-                components::PrefabRequestComponent<TMemberHandle>,
+                components::PrefabEntityPoolRequestComponent<TMemberHandle>,
                 components::EntityPoolKeyComponent<TMemberHandle>
             >()) {
 
-                cmdBuffer.template add<commands::PrefabComponentPoolCommand<TMemberHandle>>(
+                cmdBuffer.template add<commands::PrefabEntityPoolCommand<TMemberHandle>>(
                     keyComponent->entityPoolKey,
                     entity.handle(),
                     requestComponent->value()

@@ -109,20 +109,19 @@ export namespace helios::engine::runtime::pooling {
          * Returns `nullptr` and triggers an assertion if the key is invalid or the slot is already occupied.
          *
          * @tparam THandle   Handle type of the pool.
-         * @param id
-         * @param entityPool Pool to add (moved into the registry).
+         * @param entityPoolId Strong ID of the pool to create.
          *
-         * @return Pointer to the stored pool, or `nullptr` on failure.
+         * @return EntityPoolKey, which might be invalid if creating the pool failed.
          */
         template<typename THandle>
-        std::optional<EntityPoolKey<THandle>> addPool(EntityPoolId<THandle> entityPoolId) {
+        EntityPoolKey<THandle> createPool(const EntityPoolId<THandle> entityPoolId) {
 
             auto& lookupStrategy = strongIdLookupStrategy<THandle>();
 
             if (lookupStrategy.has(entityPoolId.value())) {
                 logger_.error("EntityPoolKey with this strong ID already registered.");
                 assert(false && "EntityPoolKey with this strong ID already registered.");
-                return std::nullopt;
+                return EntityPoolKey<THandle>{};
             }
 
             auto& poolSlots = managedPoolVector<THandle>();
@@ -156,7 +155,7 @@ export namespace helios::engine::runtime::pooling {
             const auto& availablePoolKeys = std::get<std::vector<EntityPoolKey<THandle>>>(availablePoolKeys_);
 
             for (const auto& key : availablePoolKeys) {
-                auto& poolSlot = poolSlots[key.idx()];
+                auto& poolSlot = poolSlots[key.index()];
                 if (!poolSlot) {
                     logger_.error("pool slot was not valid.");
                     assert(false && "pool slot was not valid");
@@ -184,7 +183,7 @@ export namespace helios::engine::runtime::pooling {
 
             auto& poolSlots = managedPoolVector<THandle>();
 
-            const auto idx = key.idx();
+            const auto idx = key.index();
 
             if (poolSlots.size() <= idx ||
                 !poolSlots[idx] ||

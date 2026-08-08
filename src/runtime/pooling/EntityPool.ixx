@@ -109,6 +109,13 @@ export namespace helios::engine::runtime::pooling {
         EntityPool& operator=(EntityPool<THandle>&&) noexcept = default;
 
         /**
+         * @brief default constructor for the EntityPool.
+         *
+         * @details Use setPoolSize() in a separate call.
+         */
+        EntityPool() = default;
+
+        /**
          * @brief Constructs an `EntityPool` with the specified capacity.
          *
          * @details Pre-allocates internal storage for the given pool size.
@@ -116,12 +123,33 @@ export namespace helios::engine::runtime::pooling {
          *
          * @param poolSize The maximum number of Entities this pool can manage.
          */
-        explicit EntityPool(const std::size_t poolSize)
-        : poolSize_(poolSize) {
-            activeEntities_.reserve(poolSize);
-            inactiveEntities_.reserve(poolSize);
+        explicit EntityPool(const std::size_t poolSize) {
+            setPoolSize(poolSize);
         }
 
+        /**
+         * @brief Sets the pool size.
+         *
+         * @details Sets pool size and reserves vector capacities according to it. Must be done
+         * before pool is locked.
+         *
+         * @param poolSize The maximum number of Entities this pool can manage.
+         *
+         * @return True on success, otherwise false.
+         */
+        bool setPoolSize(const std::size_t poolSize) {
+
+            if (locked_) {
+                logger_.error("Cannot reserve pool size after locking");
+                assert(false && "Cannot reserve pool size after locking");
+                return false;
+            }
+
+            poolSize_ = poolSize;
+            activeEntities_.reserve(poolSize);
+            inactiveEntities_.reserve(poolSize);
+            return true;
+        }
 
         /**
          * @brief Returns the maximum capacity of this pool.

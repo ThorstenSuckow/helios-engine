@@ -14,4 +14,4 @@ export import helios.engine.rendering.mesh.systems;
 
 export import helios.engine.rendering.mesh.MeshEntityManager;
 export import helios.engine.rendering.mesh.MeshEntity;
-export import helios.engine.rendering.mesh.MeshRegistry;
+

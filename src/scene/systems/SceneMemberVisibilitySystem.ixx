@@ -147,11 +147,6 @@ export namespace helios::engine::scene::systems {
                     transformWorld->value()
                 };
 
-                visibilityRegistry_.addSceneRenderContext({
-                    renderTargetBindingComponent.targetHandle(), viewportEntity.handle(), sceneHandle
-                });
-
-
                 if (smc->targetHandle() == sceneHandle && cullingStrategy_.shouldRender(cullingContext)) {
                     visibilityRegistry_.addVisibleMember(viewportEntity.handle(), std::move(memberContext));
                 } else {
@@ -231,6 +226,14 @@ export namespace helios::engine::scene::systems {
                  * @todo  Frustum culling only if camera changed amd if objects are stationary?
                  */
                 auto cullingContext = CullingContext<TMemberHandle>{frustumPlanes, pmc->value(), lac->value()};
+
+                /**
+                 * Moved from processMembers() to make sure a scene gets re-rendered (i.e. framebuffer cleared)
+                 * even if no members are visible. Otherwise the last frame's contents would remain in the framebuffer.
+                 */
+                visibilityRegistry_.addSceneRenderContext({
+                    renderTargetBindingComponent->targetHandle(), viewportEntity.handle(), sceneHandle
+                });
 
                 processMembers(
                     updateContext, cullingContext, sceneHandle, *renderTargetBindingComponent, viewportEntity);

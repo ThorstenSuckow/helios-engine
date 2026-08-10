@@ -8,11 +8,9 @@ export import helios.engine.runtime.world.types;
 export import helios.engine.runtime.world.concepts;
 export import helios.engine.runtime.world.tags;
 
-
-export import helios.engine.runtime.world.EngineWorld;
 export import helios.engine.runtime.world.GameWorld;
 export import helios.engine.runtime.world.GameObject;
-export import helios.engine.runtime.world.GameObjectEntityManager;
+
 export import helios.engine.runtime.world.EntityMutationManager;
 export import helios.engine.runtime.world.Level;
 export import helios.engine.runtime.world.UpdateContext;

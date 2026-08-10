@@ -6,14 +6,13 @@ module;
 
 export module helios.engine.rendering.mesh.MeshEntity;
 
-import helios.engine.rendering.mesh.MeshEntityManager;
-import helios.ecs.Entity;
+import helios.engine.rendering.mesh.types;
+import helios.ecs;
 
 using namespace helios::ecs;
 export namespace helios::engine::rendering::mesh {
 
-    /** @brief ECS entity alias bound to `MeshEntityManager`. */
-    using MeshEntity = Entity<MeshEntityManager>;
+    using MeshEntity = Entity<EntityManager<types::MeshHandle>>;
 
 
 }

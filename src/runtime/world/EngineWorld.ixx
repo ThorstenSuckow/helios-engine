@@ -12,30 +12,23 @@ export module helios.engine.runtime.world.EngineWorld;
 
 import helios.ecs;
 
-import helios.engine.runtime.world.GameObjectEntityManager;
-import helios.engine.runtime.particle.ParticleEntityManager;
-
-import helios.engine.platform.window.WindowEntityManager;
 import helios.engine.platform.window.concepts;
 import helios.engine.platform.window.types;
 
-import helios.engine.platform.environment.PlatformEntityManager;
 import helios.engine.platform.environment.types;
 
 import helios.engine.platform.concepts;
 import helios.engine.rendering.common.concepts;
 
-import helios.engine.rendering.shader.ShaderEntityManager;
-import helios.engine.rendering.material.MaterialEntityManager;
-import helios.engine.rendering.mesh.MeshEntityManager;
+import helios.engine.rendering.shader.types;
+import helios.engine.rendering.material.types;
+import helios.engine.rendering.viewport.types;
+import helios.engine.rendering.renderTarget.types;
 
-
-import helios.engine.rendering.texture.TextureEntityManager;
 import helios.engine.rendering.texture.types;
 
 import helios.engine.runtime.world.concepts.IsGameObjectHandle;
 
-import helios.engine.runtime.particle.ParticleEntityManager;
 import helios.engine.runtime.particle.concepts;
 import helios.engine.runtime.particle.types;
 
@@ -48,8 +41,9 @@ import helios.engine.scene.SceneEntityManager;
 import helios.engine.scene.CameraEntityManager;
 import helios.engine.scene.concepts;
 
-import helios.engine.rendering.viewport.ViewportEntityManager;
-import helios.engine.rendering.renderTarget.RenderTargetEntityManager;
+import helios.engine.rendering.viewport.types;
+import helios.engine.rendering.mesh.types;
+import helios.engine.scene.types;
 
 import helios.engine.core.TypedTupleCat;
 
@@ -69,6 +63,7 @@ using namespace helios::engine::rendering::shader;
 using namespace helios::engine::rendering::material;
 using namespace helios::engine::rendering::mesh;
 using namespace helios::engine::rendering::texture;
+using namespace helios::engine::rendering::viewport;
 using namespace helios::engine::rendering::common::concepts;
 using namespace helios::engine::rendering::renderTarget;
 using namespace helios::engine::rendering::viewport;
@@ -84,27 +79,37 @@ export namespace helios::engine::runtime::world {
     /**
      * @brief Typed world containing game-object entity managers.
      */
-    using GameObjectWorld = TypedHandleWorld<GameObjectEntityManager>;
+    using GameObjectWorld = TypedHandleWorld<GameObjectHandle>;
 
     /**
      * @brief Typed world containing particle entity managers.
      */
-    using ParticleWorld = TypedHandleWorld<ParticleEntityManager>;
+    using ParticleWorld = TypedHandleWorld<ParticleHandle>;
 
     /**
      * @brief Typed world containing render-resource entity managers.
      */
-    using RenderResourceWorld = TypedHandleWorld<TextureEntityManager, ShaderEntityManager, MaterialEntityManager, MeshEntityManager>;
+    using RenderResourceWorld = TypedHandleWorld<
+        rendering::texture::types::TextureHandle,
+        rendering::shader::types::ShaderHandle,
+        rendering::material::types::MaterialHandle,
+        rendering::mesh::types::MeshHandle
+    >;
 
     /**
      * @brief Typed world containing platform-related entity managers.
      */
-    using PlatformWorld = TypedHandleWorld<WindowEntityManager, PlatformEntityManager>;
+    using PlatformWorld = TypedHandleWorld<WindowHandle, PlatformHandle>;
 
     /**
      * @brief Typed world containing render-view related entity managers.
      */
-    using RenderViewWorld = TypedHandleWorld<RenderTargetEntityManager, SceneEntityManager, CameraEntityManager, ViewportEntityManager>;
+    using RenderViewWorld =
+        TypedHandleWorld<rendering::renderTarget::types::RenderTargetHandle,
+        scene::types::SceneHandle,
+        scene::types::CameraHandle,
+        rendering::viewport::types::ViewportHandle
+    >;
 
     /**
      * @brief Concatenated tuple of all entity-manager types used by `EngineWorld`.
@@ -149,26 +154,11 @@ export namespace helios::engine::runtime::world {
      */
     class EngineWorld {
 
-        GameObjectWorld gameObjectWorld_{GameObjectEntityManager(GAMEOBJECT_INITIAL_STORAGE_CAPACITY)};
-        RenderResourceWorld renderResourceWorld_{
-            TextureEntityManager(TEXTURE_INITIAL_STORAGE_CAPACITY),
-            ShaderEntityManager(SHADER_INITIAL_STORAGE_CAPACITY),
-            MaterialEntityManager(MATERIAL_INITIAL_STORAGE_CAPACITY),
-            MeshEntityManager(MESH_INITIAL_STORAGE_CAPACITY)
-        };
-        PlatformWorld platformWorld_{
-            WindowEntityManager(WINDOW_INITIAL_STORAGE_CAPACITY),
-            PlatformEntityManager(PLATFORM_INITIAL_STORAGE_CAPACITY)
-        };
-        RenderViewWorld renderViewWorld_{
-            RenderTargetEntityManager(RENDERTARGET_INITIAL_STORAGE_CAPACITY),
-            SceneEntityManager(SCENE_INITIAL_STORAGE_CAPACITY),
-            CameraEntityManager(CAMERA_INITIAL_STORAGE_CAPACITY),
-            ViewportEntityManager(VIEWPORT_INITIAL_STORAGE_CAPACITY)
-        };
-        ParticleWorld particleWorld_{
-            ParticleEntityManager(PARTICLE_INITIAL_STORAGE_CAPACITY)
-        };
+        GameObjectWorld gameObjectWorld_{};
+        RenderResourceWorld renderResourceWorld_{};
+        PlatformWorld platformWorld_{};
+        RenderViewWorld renderViewWorld_{};
+        ParticleWorld particleWorld_{};
 
         /**
          * @brief Clears all dirty sets for every handle type in `THandles` inside `world`.
@@ -183,6 +173,28 @@ export namespace helios::engine::runtime::world {
         }
 
     public:
+
+        EngineWorld() {
+
+            gameObjectWorld_.reserve<GameObjectHandle>(GAMEOBJECT_INITIAL_STORAGE_CAPACITY);
+
+            renderResourceWorld_.reserve<rendering::texture::types::TextureHandle>(TEXTURE_INITIAL_STORAGE_CAPACITY);
+            renderResourceWorld_.reserve<rendering::shader::types::ShaderHandle>(SHADER_INITIAL_STORAGE_CAPACITY);
+            renderResourceWorld_.reserve<rendering::material::types::MaterialHandle>(MATERIAL_INITIAL_STORAGE_CAPACITY);
+            renderResourceWorld_.reserve<rendering::mesh::types::MeshHandle>(MESH_INITIAL_STORAGE_CAPACITY);
+
+            renderViewWorld_.reserve<rendering::viewport::types::ViewportHandle>(VIEWPORT_INITIAL_STORAGE_CAPACITY);
+            renderViewWorld_.reserve<rendering::renderTarget::types::RenderTargetHandle>(RENDERTARGET_INITIAL_STORAGE_CAPACITY);
+            renderViewWorld_.reserve<scene::types::SceneHandle>(SCENE_INITIAL_STORAGE_CAPACITY);
+            renderViewWorld_.reserve<scene::types::CameraHandle>(CAMERA_INITIAL_STORAGE_CAPACITY);
+
+            particleWorld_.reserve<ParticleHandle>(PARTICLE_INITIAL_STORAGE_CAPACITY);
+
+            platformWorld_.reserve<WindowHandle>(WINDOW_INITIAL_STORAGE_CAPACITY);
+            platformWorld_.reserve<PlatformHandle>(PLATFORM_INITIAL_STORAGE_CAPACITY);
+
+        }
+
 
         /**
          * @brief Returns the game-object and scene sub-world.
@@ -346,21 +358,20 @@ export namespace helios::engine::runtime::world {
          * @brief Creates a new entity in the sub-world appropriate for `THandle`.
          *
          * @tparam THandle   Handle type that determines the target sub-world.
-         * @param  strongId  Optional strong identifier for the new entity.
          * @return `Entity` wrapper for the newly created entity.
          */
         template<typename THandle>
-        [[nodiscard]] auto add(typename THandle::StrongId_type strongId = typename THandle::StrongId_type{}) {
+        [[nodiscard]] auto add() {
             if constexpr(IsGameObjectHandle<THandle>) {
-                return gameObjectWorld_.addEntity<THandle>(strongId);
+                return gameObjectWorld_.addEntity<THandle>();
             } else if constexpr(IsAnyPlatformHandle<THandle>) {
-                return platformWorld_.addEntity<THandle>(strongId);
+                return platformWorld_.addEntity<THandle>();
             } else if constexpr(IsRenderResourceHandle<THandle>) {
-                return renderResourceWorld_.addEntity<THandle>(strongId);
+                return renderResourceWorld_.addEntity<THandle>();
             } else if constexpr(IsRenderViewHandle<THandle>) {
-                return renderViewWorld_.addEntity<THandle>(strongId);
+                return renderViewWorld_.addEntity<THandle>();
             } else if constexpr(IsParticleHandle<THandle>) {
-                return particleWorld_.addEntity<THandle>(strongId);
+                return particleWorld_.addEntity<THandle>();
             } else {
                 static_assert(typed_false<THandle>, "Unsupported handle type for adding");
             }

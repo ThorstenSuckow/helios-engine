@@ -6,15 +6,12 @@ module;
 
 export module helios.engine.runtime.particle.ParticleEntity;
 
-import helios.engine.runtime.particle.ParticleEntityManager;
-import helios.ecs.Entity;
+import helios.engine.runtime.particle.types;
+import helios.ecs;
 
 using namespace helios::ecs;
 export namespace helios::engine::runtime::particle {
 
-    /**
-     * @brief Alias for an entity facade backed by `ParticleEntityManager`.
-     */
-    using ParticleEntity = Entity<ParticleEntityManager>;
+    using ParticleEntity = Entity<EntityManager<types::ParticleHandle>>;
 
 } // namespace helios

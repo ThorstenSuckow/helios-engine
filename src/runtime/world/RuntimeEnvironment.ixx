@@ -10,13 +10,11 @@ module;
 
 export module helios.engine.runtime.world.RuntimeEnvironment;
 
-import helios.ecs.Entity;
-import helios.ecs.types.EntityHandle;
+import helios.ecs;
 
 import helios.engine.platform.environment.types;
 import helios.engine.platform.environment.components;
 
-import helios.engine.platform.environment.PlatformEntityManager;
 
 using namespace helios::ecs;
 using namespace helios::engine::platform::environment;
@@ -33,7 +31,7 @@ export namespace helios::engine::runtime::world {
 
     private:
 
-        using PlatformEntity = Entity<PlatformEntityManager>;
+        using PlatformEntity = Entity<EntityManager<platform::environment::types::PlatformHandle>>;
 
         using Handle_type = typename PlatformEntity::Handle_type;
 

@@ -18,14 +18,9 @@ using namespace helios::ecs::strategies;
 export namespace helios::engine::scene {
 
     /**
-     * @brief Entity registry used for camera resources.
-     */
-    using CameraEntityRegistry = EntityRegistry<CameraDomainTag, LinearLookupStrategy<>, true>;
-
-    /**
      * @brief Entity manager used for scene handles and scene components.
      */
-    using CameraEntityManager = EntityManager<CameraHandle, CameraEntityRegistry>;
+    using CameraEntityManager = EntityManager<CameraHandle>;
 
 
 }

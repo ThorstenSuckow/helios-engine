@@ -18,14 +18,9 @@ using namespace helios::ecs::strategies;
 export namespace helios::engine::scene {
 
     /**
-     * @brief Entity registry used for scene resources.
-     */
-    using SceneEntityRegistry = EntityRegistry<SceneDomainTag, LinearLookupStrategy<>, true>;
-
-    /**
      * @brief Entity manager used for scene handles and scene components.
      */
-    using SceneEntityManager = EntityManager<SceneHandle, SceneEntityRegistry>;
+    using SceneEntityManager = EntityManager<SceneHandle>;
 
 
 }

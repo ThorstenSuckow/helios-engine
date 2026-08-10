@@ -6,14 +6,13 @@ module;
 
 export module helios.engine.rendering.renderTarget.RenderTargetEntity;
 
-import helios.engine.rendering.renderTarget.RenderTargetEntityManager;
-import helios.ecs.Entity;
+import helios.engine.rendering.renderTarget.types;
+import helios.ecs;
 
 using namespace helios::ecs;
 export namespace helios::engine::rendering::renderTarget {
 
-    /** @brief ECS entity alias bound to `RenderTargetEntityManager`. */
-    using RenderTargetEntity = Entity<RenderTargetEntityManager>;
+    using RenderTargetEntity = Entity<EntityManager<types::RenderTargetHandle>>;
 
 
 }

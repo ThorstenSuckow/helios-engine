@@ -8,5 +8,4 @@ export import helios.engine.rendering.texture.components;
 export import helios.engine.rendering.texture.systems;
 export import helios.engine.rendering.texture.commands;
 
-export import helios.engine.rendering.texture.TextureEntityManager;
 export import helios.engine.rendering.texture.TextureEntity;

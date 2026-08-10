@@ -6,14 +6,13 @@ module;
 
 export module helios.engine.rendering.viewport.ViewportEntity;
 
-import helios.engine.rendering.viewport.ViewportEntityManager;
-import helios.ecs.Entity;
+import helios.engine.rendering.viewport.types;
+import helios.ecs;
 
 using namespace helios::ecs;
 export namespace helios::engine::rendering::viewport {
 
-    /** @brief ECS entity alias bound to `ViewportEntityManager`. */
-    using ViewportEntity = Entity<ViewportEntityManager>;
+    using ViewportEntity = Entity<EntityManager<types::ViewportHandle>>;
 
 
 }

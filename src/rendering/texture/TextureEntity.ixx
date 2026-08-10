@@ -6,14 +6,14 @@ module;
 
 export module helios.engine.rendering.texture.TextureEntity;
 
-import helios.engine.rendering.texture.TextureEntityManager;
-import helios.ecs.Entity;
+import helios.engine.rendering.texture.types;
+import helios.ecs;
 
 using namespace helios::ecs;
 export namespace helios::engine::rendering::texture {
 
-    /** @brief ECS entity alias bound to `TextureEntityManager`. */
-    using TextureEntity = Entity<TextureEntityManager>;
+
+    using TextureEntity = Entity<EntityManager<types::TextureHandle>>;
 
 
 }

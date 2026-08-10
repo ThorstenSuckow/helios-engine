@@ -11,4 +11,3 @@ export import helios.engine.rendering.viewport.components;
 export import helios.engine.rendering.viewport.systems;
 
 export import helios.engine.rendering.viewport.ViewportEntity;
-export import helios.engine.rendering.viewport.ViewportEntityManager;

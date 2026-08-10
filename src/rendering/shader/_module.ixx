@@ -10,6 +10,5 @@ export import helios.engine.rendering.shader.concepts;
 export import helios.engine.rendering.shader.types;
 export import helios.engine.rendering.shader.systems;
 
-export import helios.engine.rendering.shader.ShaderEntityManager;
 export import helios.engine.rendering.shader.ShaderEntity;
 export import helios.engine.rendering.shader.UniformValueBag;

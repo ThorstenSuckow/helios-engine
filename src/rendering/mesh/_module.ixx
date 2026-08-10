@@ -12,6 +12,5 @@ export import helios.engine.rendering.mesh.concepts;
 export import helios.engine.rendering.mesh.commands;
 export import helios.engine.rendering.mesh.systems;
 
-export import helios.engine.rendering.mesh.MeshEntityManager;
 export import helios.engine.rendering.mesh.MeshEntity;
 

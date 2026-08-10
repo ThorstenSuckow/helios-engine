@@ -510,14 +510,13 @@ export namespace helios::engine::runtime::world {
          * @brief Adds a new entity in the domain inferred from `THandle`.
          *
          * @tparam THandle Handle type.
-         *
-         * @param strongId Optional strong id value used by the handle domain.
+
          *
          * @return Domain-specific entity facade for the created entity.
          */
         template<typename THandle>
-        [[nodiscard]] auto add(const typename THandle::StrongId_type strongId = typename THandle::StrongId_type{}, const bool isActive = true) noexcept {
-            auto entity = engineWorld_.template add<THandle>(strongId);
+        [[nodiscard]] auto add(const bool isActive = true) noexcept {
+            auto entity = engineWorld_.template add<THandle>();
             entity.setActive(isActive);
             return entity;
         }

@@ -14,15 +14,16 @@ export module helios.engine.runtime.gameloop:TypedPass;
 import :Pass;
 
 import helios.engine.runtime.world.SystemRegistry;
-import helios.engine.core.thread.JobSystem;
+import helios.core.thread.JobSystem;
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.Session;
 
 import helios.engine.runtime.enginestate.types;
 
-using namespace helios::engine::core::thread;
+using namespace helios::core::thread;
 export namespace helios::engine::runtime::gameloop {
 
+    template<typename TTypedHandleWorld>
     class Phase;
 
     /**
@@ -53,15 +54,15 @@ export namespace helios::engine::runtime::gameloop {
      * @see Phase::beginPass()
      * @see Session::state()
      */
-    template<typename StateType>
-    class TypedPass : public Pass {
+    template<typename StateType, typename TTypedHandleWorld>
+    class TypedPass : public Pass<TTypedHandleWorld> {
 
-        friend class helios::engine::runtime::gameloop::Phase;
+        friend class helios::engine::runtime::gameloop::Phase<TTypedHandleWorld>;
 
         /**
          * @brief Reference to the owning Phase.
          */
-        Phase& owner_;
+        Phase<TTypedHandleWorld>& owner_;
 
         /**
          * @brief Bitmask of states in which this pass should execute.
@@ -72,6 +73,12 @@ export namespace helios::engine::runtime::gameloop {
          * @brief Pointer to the job system used for parallel execution.
          */
         JobSystem* jobSystem_;
+
+        using Pass<TTypedHandleWorld>::systemRegistry_;
+        using Pass<TTypedHandleWorld>::systemTypeIdQueue_;
+        using Pass<TTypedHandleWorld>::managerTypeIds;
+        using Pass<TTypedHandleWorld>::parallelManagerTypeIds;
+        using Pass<TTypedHandleWorld>::gameWorld_;
 
         /**
          * @brief Updates all systems registered in this pass.
@@ -117,19 +124,31 @@ export namespace helios::engine::runtime::gameloop {
 
         }
 
+        void onPassEnd(runtime::world::UpdateContext& updateContext) noexcept override {
+
+            for (const auto typeId : managerTypeIds()) {
+                gameWorld_.managerRegistry().item(typeId)->flush(updateContext);
+            }
+
+            for (const auto typeId : parallelManagerTypeIds()) {
+                gameWorld_.managerRegistry().item(typeId)->flushParallel(updateContext);
+            }
+        }
 
         /**
          * @brief Initializes all systems registered in this pass.
          *
          * @param gameWorld Reference to the game world.
          */
-        void init(helios::engine::runtime::world::GameWorld& gameWorld) override {
-            jobSystem_ = &gameWorld.jobSystem();
+        void init() override {
+            jobSystem_ = &gameWorld_.jobSystem();
 
             for (auto* system : systemRegistry_.items()) {
-                system->init(gameWorld);
+                system->init(gameWorld_);
             }
         }
+
+        using RunCondition = typename Pass<TTypedHandleWorld>::RunCondition;
 
         std::vector<RunCondition> runConditions_;
 
@@ -143,21 +162,21 @@ export namespace helios::engine::runtime::gameloop {
          * @param gameWorld GameWorld used by the base Pass for buffer injection.
          */
         explicit TypedPass(
-            Phase& owner, const StateType mask,
-            helios::engine::runtime::world::GameWorld& gameWorld
-        ) : owner_(owner), mask_(mask), Pass(gameWorld) {}
+            Phase<TTypedHandleWorld>& owner, const StateType mask,
+            helios::engine::runtime::world::GameWorld<TTypedHandleWorld>& gameWorld
+        ) : owner_(owner), mask_(mask), Pass<TTypedHandleWorld>(gameWorld) {}
 
         /**
          * @copydoc Pass::endPass
          */
-        Phase& endPass() override {
+        Phase<TTypedHandleWorld>& endPass() override {
             return owner_;
         }
 
         /**
          * @copydoc Pass::runIf
          */
-        Pass& runIf(RunCondition fn) noexcept override {
+        Pass<TTypedHandleWorld>& runIf(RunCondition fn) noexcept override {
             runConditions_.push_back(std::move(fn));
             return *this;
         }

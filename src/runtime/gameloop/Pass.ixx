@@ -19,21 +19,21 @@ import helios.engine.runtime.world.System;
 import helios.engine.runtime.world.concepts;
 import helios.engine.runtime.world.types;
 
-import helios.engine.runtime.world.concepts.HasFlushParallel;
-import helios.engine.runtime.messaging.command.types;
-import helios.engine.runtime.messaging.command.concepts.IsCommandBufferLike;
+import helios.ecs.types;
+import helios.ecs.concepts;
 
 import helios.engine.runtime.world.UpdateContext;
 
 import helios.engine.runtime.enginestate.types;
 
-using namespace helios::engine::runtime::messaging::command::types;
-using namespace helios::engine::runtime::messaging::command::concepts;
+using namespace helios::ecs::types;
+using namespace helios::ecs::concepts;
 using namespace helios::engine::runtime::world;
 using namespace helios::engine::runtime::world::concepts;
 using namespace helios::engine::runtime::world::types;
 export namespace helios::engine::runtime::gameloop {
 
+    template<typename TTypedHandleWorld>
     class Phase;
 
     /**
@@ -53,13 +53,16 @@ export namespace helios::engine::runtime::gameloop {
      * @see Phase
      * @see System
      */
+    template<typename TTypedHandleWorld>
     class Pass {
+
+        using GameWorld = GameWorld<TTypedHandleWorld>;
 
     protected:
         /**
          * @brief Registry holding all systems for this pass.
          */
-        helios::engine::runtime::world::SystemRegistry systemRegistry_{};
+        helios::engine::runtime::world::SystemRegistry<TTypedHandleWorld> systemRegistry_{};
 
         /**
          * @brief Ordered queue of system type IDs that drives execution order within this pass.
@@ -101,7 +104,7 @@ export namespace helios::engine::runtime::gameloop {
          */
         template<typename T>
         void registerManagerFlush() {
-            assert(gameWorld_.tryManager<T>() && "Manager buffer not found for system's manager");
+            assert(gameWorld_.template tryManager<T>() && "Manager buffer not found for system's manager");
             managerTypeIds_.push_back(ManagerTypeId::template id<T>());
         }
 
@@ -111,9 +114,9 @@ export namespace helios::engine::runtime::gameloop {
          * @tparam T The type of the manager to register.
          */
         template<typename T>
-        requires HasFlushParallel<T>
+        requires ecs::concepts::HasFlushParallel<T>
         void registerManagerParallelFlush() {
-            assert(gameWorld_.tryManager<T>() && "Manager buffer not found for system's manager");
+            assert(gameWorld_.template tryManager<T>() && "Manager buffer not found for system's manager");
             parallelManagerTypeIds_.push_back(ManagerTypeId::template id<T>());
         }
 
@@ -133,31 +136,21 @@ export namespace helios::engine::runtime::gameloop {
 
             using SystemType = std::remove_cvref_t<TSystem>;
 
-            if (!isParallel) {
-                void* bufferPtr = nullptr;
-                if constexpr (requires { typename SystemType::CommandBuffer_type; }) {
-                    using TCommandBuffer = typename TSystem::CommandBuffer_type;
-                    bufferPtr = gameWorld_.tryCommandBuffer<TCommandBuffer>();
-                    assert(bufferPtr && "Command buffer not found for system's CommandBuffer_type");
-                }
+            if constexpr (requires { typename SystemType::CommandBuffer_type; }) {
+                using TCommandBuffer = typename TSystem::CommandBuffer_type;
+
+                auto cmdBuffer = TCommandBuffer{};
+                cmdBuffer.init(gameWorld_.commandHandlerRegistry(), gameWorld_.managerRegistry());
 
                 systemRegistry_.template add<SystemType>(
-                    System(std::forward<TSystem>(system), bufferPtr)
+                    System(std::forward<TSystem>(system), gameWorld_.typedHandleWorld(), std::move(cmdBuffer))
                 );
-
             } else {
-                if constexpr (requires { typename SystemType::CommandBuffer_type; }) {
-                    using TCommandBuffer = typename TSystem::CommandBuffer_type;
-                    systemRegistry_.template add<SystemType>(
-                        System(std::forward<TSystem>(system), TCommandBuffer{})
-                    );
-                } else {
-                    systemRegistry_.template add<SystemType>(
-                        System(std::forward<TSystem>(system))
-                    );
-                }
-
+                systemRegistry_.template add<SystemType>(
+                    System(std::forward<TSystem>(system), gameWorld_.typedHandleWorld())
+                );
             }
+
 
             return *this;
         }
@@ -182,11 +175,11 @@ export namespace helios::engine::runtime::gameloop {
             if constexpr (requires { typename T::CommandBuffer_type; }) {
                 using TCommandBuffer = typename T::CommandBuffer_type;
                 systemRegistry_.template add<T>(
-                    System(std::forward<TSystem>(system), TCommandBuffer())
+                    System(std::forward<TSystem>(system), gameWorld_.typedHandleWorld(), TCommandBuffer())
                 );
             } else {
                 systemRegistry_.template add<T>(
-                    System(std::forward<TSystem>(system))
+                    System(std::forward<TSystem>(system), gameWorld_.typedHandleWorld())
                 );
             }
 
@@ -211,12 +204,12 @@ export namespace helios::engine::runtime::gameloop {
             void* bufferPtr = nullptr;
             if constexpr (requires { typename T::CommandBuffer_type; }) {
                 using TCommandBuffer = typename T::CommandBuffer_type;
-                bufferPtr = gameWorld_.tryCommandBuffer<TCommandBuffer>();
+                bufferPtr = gameWorld_.template tryCommandBuffer<TCommandBuffer>();
                 assert(bufferPtr && "Command buffer not found for system's CommandBuffer_type");
             }
 
             systemRegistry_.template add<T>(
-                System(std::move(concreteSystem), bufferPtr)
+                System(std::move(concreteSystem), gameWorld_.typedHandleWorld(), bufferPtr)
             );
 
             return *this;
@@ -248,7 +241,7 @@ export namespace helios::engine::runtime::gameloop {
 
     public:
 
-        using RunCondition = std::function<bool(UpdateContext&)>;
+        using RunCondition = std::function<bool(helios::engine::runtime::world::UpdateContext&)>;
 
 
         virtual ~Pass() = default;
@@ -268,19 +261,19 @@ export namespace helios::engine::runtime::gameloop {
          */
         virtual void update(helios::engine::runtime::world::UpdateContext& updateContext) = 0;
 
+        virtual void onPassEnd(helios::engine::runtime::world::UpdateContext& updateContext) = 0;
+
         /**
          * @brief Initializes all systems in this pass.
-         *
-         * @param gameWorld Reference to the game world.
          */
-        virtual void init(helios::engine::runtime::world::GameWorld& gameWorld) = 0;
+        virtual void init() = 0;
 
         /**
          * @brief Ends this pass.
          *
          * @return Reference to the owning phase.
          */
-        virtual Phase& endPass() = 0;
+        virtual Phase<TTypedHandleWorld>& endPass() = 0;
 
 
         /**
@@ -362,7 +355,7 @@ export namespace helios::engine::runtime::gameloop {
         requires (helios::engine::runtime::world::concepts::IsCallableSystemLike<std::remove_cvref_t<TSystem>> && ...)
            && (sizeof...(TSystem) >= 2)
         Pass& addParallelSystems(TSystem&&... system) {
-            (registerCallableSystem(std::forward<TSystem>(system), true), ...);
+            (registerCallableSystem(std::forward<TSystem>(system)), ...);
 
             auto& group = systemTypeIdQueue_.emplace_back();
             group.reserve(sizeof...(TSystem));

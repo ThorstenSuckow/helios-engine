@@ -14,20 +14,17 @@ export module helios.engine.runtime.gameloop:GameLoop;
 import helios.engine.runtime.world.GameWorld;
 
 import helios.engine.runtime.world.UpdateContext;
-import helios.engine.util.log.Logger;
-import helios.engine.util.log.LogManager;
+import helios.core.log.Logger;
+import helios.core.log.LogManager;
 
 import helios.ecs;
-
-import helios.engine.runtime.messaging.event.GameLoopEventBus;
 
 import helios.engine.runtime.enginestate.types;
 
 import :Pass;
 import :Phase;
-import :PassEndListener;
 
-import helios.engine.runtime.world.Manager;
+import helios.ecs.Manager;
 
 import helios.engine.input.InputSnapshot;
 
@@ -58,7 +55,8 @@ export namespace helios::engine::runtime::gameloop {
      * @see EngineCommandBuffer
      * @see PassEndListener
      */
-    class GameLoop : public helios::engine::runtime::gameloop::PassEndListener {
+    template<typename TTypedHandleWorld>
+    class GameLoop {
 
 
         /**
@@ -75,66 +73,25 @@ export namespace helios::engine::runtime::gameloop {
         /**
          * @brief The logger used with this GameLoop instance.
          */
-        inline static const helios::engine::util::log::Logger& logger_ = helios::engine::util::log::LogManager::loggerForScope(
+        inline static const helios::core::log::Logger& logger_ = helios::core::log::LogManager::loggerForScope(
             HELIOS_LOG_SCOPE);
-        GameWorld& gameWorld_;
+        GameWorld<TTypedHandleWorld>& gameWorld_;
 
 
         /**
          * @brief The pre-update phase, executed before main gameplay logic.
          */
-        helios::engine::runtime::gameloop::Phase prePhase_;
+        helios::engine::runtime::gameloop::Phase<TTypedHandleWorld> prePhase_;
 
         /**
          * @brief The main update phase for core gameplay systems.
          */
-        helios::engine::runtime::gameloop::Phase mainPhase_;
+        helios::engine::runtime::gameloop::Phase<TTypedHandleWorld> mainPhase_;
 
         /**
          * @brief The post-update phase for cleanup and synchronization.
          */
-        helios::engine::runtime::gameloop::Phase postPhase_;
-
-
-        /**
-         * @brief Event bus for phase-level event propagation.
-         *
-         * Events pushed via `UpdateContext::pushPhase()` are buffered here
-         * and become readable in the next phase via `UpdateContext::readPhase()`.
-         * The buffer swap occurs in phaseEnd().
-         *
-         * @see UpdateContext::pushPhase()
-         * @see UpdateContext::readPhase()
-         */
-        helios::engine::runtime::messaging::event::GameLoopEventBus phaseEventBus_{};
-
-        /**
-         * @brief Event bus for pass-level event propagation.
-         *
-         * Events pushed via `UpdateContext::pushPass()` are buffered here
-         * and become readable in subsequent passes via `UpdateContext::readPass()`.
-         *
-         * @see UpdateContext::pushPass()
-         * @see UpdateContext::readPass()
-         * @see Pass::addCommitPoint()
-         */
-        helios::engine::runtime::messaging::event::GameLoopEventBus passEventBus_{};
-
-        /**
-         * @brief Event bus for frame-level event propagation.
-         *
-         * Events pushed via `UpdateContext::pushFrame()` are buffered here
-         * and become readable in the next frame via `UpdateContext::readFrame()`.
-         * The buffer swap occurs at the end of the Post phase.
-         *
-         * Frame-level events persist across all phases within a frame and are
-         * useful for cross-frame communication (e.g., collision events that
-         * should be processed in the next frame).
-         *
-         * @see UpdateContext::pushFrame()
-         * @see UpdateContext::readFrame()
-         */
-        helios::engine::runtime::messaging::event::GameLoopEventBus frameEventBus_{};
+        helios::engine::runtime::gameloop::Phase<TTypedHandleWorld> postPhase_;
 
         /**
          * @brief Accumulated total time since the first frame, in seconds.
@@ -163,13 +120,9 @@ export namespace helios::engine::runtime::gameloop {
          * @see UpdateContext::readPhase()
          */
         void phaseEnd(
-            GameWorld& gameWorld,
-            UpdateContext& updateContext) {
+            GameWorld<TTypedHandleWorld>& gameWorld,
+            runtime::world::UpdateContext& updateContext) {
 
-            passEventBus_.clearAll();
-
-            // make sure flushed managers make their events available to the phase event bus
-            phaseEventBus_.swapBuffers();
         }
 
 
@@ -185,7 +138,7 @@ export namespace helios::engine::runtime::gameloop {
          *
          * @param gameWorld The GameWorld associated with this GameLoop.
          */
-        GameLoop(GameWorld& gameWorld) : gameWorld_(gameWorld), prePhase_(*this, gameWorld_), mainPhase_(*this, gameWorld_), postPhase_(*this, gameWorld_) {};
+        GameLoop(GameWorld<TTypedHandleWorld>& gameWorld) : gameWorld_(gameWorld), prePhase_(*this, gameWorld_), mainPhase_(*this, gameWorld_), postPhase_(*this, gameWorld_) {};
 
 
         /**
@@ -195,7 +148,7 @@ export namespace helios::engine::runtime::gameloop {
          *
          * @return Reference to the requested Phase.
          */
-        [[nodiscard]] helios::engine::runtime::gameloop::Phase& phase(const helios::engine::runtime::gameloop::PhaseType phaseType) noexcept {
+        [[nodiscard]] helios::engine::runtime::gameloop::Phase<TTypedHandleWorld>& phase(const helios::engine::runtime::gameloop::PhaseType phaseType) noexcept {
 
             switch (phaseType) {
                 case helios::engine::runtime::gameloop::PhaseType::Pre:
@@ -232,23 +185,20 @@ export namespace helios::engine::runtime::gameloop {
          * @see Pass::init()
          * @see System::init()
          */
-        void init(GameWorld& gameWorld) {
+        void init(GameWorld<TTypedHandleWorld>& gameWorld) {
 
             assert(!initialized_ && "init() already called");
 
             prePhase_.init(gameWorld);
-            prePhase_.addPassEndListener(this);
 
             mainPhase_.init(gameWorld);
-            mainPhase_.addPassEndListener(this);
 
             postPhase_.init(gameWorld);
-            postPhase_.addPassEndListener(this);
 
             initialized_ = true;
         }
 
-        GameWorld& gameWorld() noexcept {
+        GameWorld<TTypedHandleWorld>& gameWorld() noexcept {
             return gameWorld_;
         }
 
@@ -266,7 +216,7 @@ export namespace helios::engine::runtime::gameloop {
          * @see UpdateContext
          */
         void update(
-            GameWorld& gameWorld,
+            GameWorld<TTypedHandleWorld>& gameWorld,
             float deltaTime,
             const helios::engine::input::InputSnapshot& inputSnapshot
         ) noexcept {
@@ -276,15 +226,12 @@ export namespace helios::engine::runtime::gameloop {
             totalTime_ += deltaTime;
             frameCount_++;
 
-            auto updateContext = UpdateContext(
+            auto updateContext = runtime::world::UpdateContext(
                   gameWorld.session(),
                   gameWorld.runtimeEnvironment(),
                   deltaTime,
                   totalTime_,
                   frameCount_,
-                  phaseEventBus_,
-                  passEventBus_,
-                  frameEventBus_,
                   inputSnapshot,
                   gameWorld.level(),
                   gameWorld.engineWorld()
@@ -301,38 +248,10 @@ export namespace helios::engine::runtime::gameloop {
 
             postPhase_.update(gameWorld, updateContext);
             phaseEnd(gameWorld, updateContext);
-            frameEventBus_.swapBuffers();
         }
 
-        /**
-         * @brief Ends pass-level state.
-         *
-         * @param pass The pass that was finished.
-         * @param gameWorld The game world where the pass end occured.
-         * @param updateContext The current update context.
-         *
-         * @see CommitPoint
-         * @see Pass::addCommitPoint()
-         * @see UpdateContext::pushPass()
-         * @see UpdateContext::readPass()
-         */
-        void onPassEnd(
-            Pass& pass,
-            GameWorld& gameWorld,
-            UpdateContext& updateContext) noexcept override {
 
-            for (const auto typeId :pass.managerTypeIds()) {
-                gameWorld.managerRegistry().item(typeId)->flush(updateContext);
-            }
-
-            for (const auto typeId :pass.parallelManagerTypeIds()) {
-                gameWorld.managerRegistry().item(typeId)->flushParallel(updateContext);
-            }
-
-            passEventBus_.swapBuffers();
-        }
-
-        [[nodiscard]] bool isRunning( GameWorld& gameWorld) const noexcept {
+        [[nodiscard]] bool isRunning(GameWorld<TTypedHandleWorld>& gameWorld) const noexcept {
             return initialized_ && !gameWorld.session().isDestroyed();
         }
 

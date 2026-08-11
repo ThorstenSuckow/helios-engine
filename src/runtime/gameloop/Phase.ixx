@@ -9,7 +9,6 @@ module;
 
 export module helios.engine.runtime.gameloop:Phase;
 
-import :PassEndListener;
 import :Pass;
 import :TypedPass;
 
@@ -25,6 +24,8 @@ using namespace helios::engine::runtime::enginestate::types;
 using namespace helios::engine::runtime::world;
 
 export namespace helios::engine::runtime::gameloop {
+
+    template<typename TTypedHandleWorld>
     class GameLoop;
 
 
@@ -59,27 +60,21 @@ export namespace helios::engine::runtime::gameloop {
      * @see Pass
      * @see GameLoop
      */
+    template<typename TTypedHandleWorld>
     class Phase {
 
-        friend class helios::engine::runtime::gameloop::GameLoop;
+        friend class helios::engine::runtime::gameloop::GameLoop<TTypedHandleWorld>;
 
-        /**
-         * @brief Collection of listeners to be notified when a pass ends.
-         *
-         * @see PassEndListener
-         * @see notifyPassEndListeners()
-         */
-        std::vector<PassEndListener*> passEndListeners_;
 
         /**
          * @brief Initializes all passes within this phase.
          *
          * @param gameWorld Reference to the game world.
          */
-        void init(GameWorld& gameWorld){
+        void init(GameWorld<TTypedHandleWorld>& gameWorld){
             for (auto& pass : passEntries_) {
                 // every pass contains systems that are updated here
-                pass->init(gameWorld);
+                pass->init();
             }
         };
 
@@ -93,49 +88,29 @@ export namespace helios::engine::runtime::gameloop {
          * @see Pass::addCommitPoint()
          * @see Pass::runsIn()
          */
-        void update(GameWorld& gameWorld, UpdateContext& updateContext){
+        void update(GameWorld<TTypedHandleWorld>& gameWorld, runtime::world::UpdateContext& updateContext){
 
             for (auto& pass : passEntries_) {
 
                 if (pass->shouldRun(updateContext)) {
                     pass->update(updateContext);
-                    notifyPassEndListeners(*pass, gameWorld, updateContext);
+                    pass->onPassEnd(updateContext);
                 }
 
             }
         };
 
         /**
-         * @brief Notifies all registered listeners about a pass reaching its end.
-         *
-         * @param pass The pass that reached its end.
-         * @param gameWorld The game world where the pass end occured.
-         * @param updateContext The current update context.
-         *
-         * @return Always returns true.
-         *
-         * @see PassEndListener::onPassCommit()
-         * @see addPassEndListener()
-         */
-        bool notifyPassEndListeners(Pass& pass, GameWorld& gameWorld, UpdateContext& updateContext) {
-
-            for (const auto& passEndListener : passEndListeners_) {
-                passEndListener->onPassEnd(pass, gameWorld, updateContext);
-            }
-            return true;
-        }
-
-        /**
          * @brief Collection of passes belonging to this phase.
          */
-        std::vector<std::unique_ptr<Pass>> passEntries_;
+        std::vector<std::unique_ptr<Pass<TTypedHandleWorld>>> passEntries_;
 
         /**
          * @brief Reference to the owning GameLoop.
          */
-        helios::engine::runtime::gameloop::GameLoop& gameloop_;
+        helios::engine::runtime::gameloop::GameLoop<TTypedHandleWorld>& gameloop_;
 
-        helios::engine::runtime::world::GameWorld& gameWorld_;
+        helios::engine::runtime::world::GameWorld<TTypedHandleWorld>& gameWorld_;
 
     public:
 
@@ -145,34 +120,10 @@ export namespace helios::engine::runtime::gameloop {
          * @param gameloop Reference to the parent GameLoop.
          * @param gameWorld Shared GameWorld used by passes in this phase.
          */
-        explicit Phase(helios::engine::runtime::gameloop::GameLoop& gameloop, GameWorld& gameWorld) : gameloop_(gameloop), gameWorld_(gameWorld) {
+        explicit Phase(helios::engine::runtime::gameloop::GameLoop<TTypedHandleWorld>& gameloop, GameWorld<TTypedHandleWorld>& gameWorld) : gameloop_(gameloop), gameWorld_(gameWorld) {
 
         }
 
-
-        /**
-         * @brief Registers a listener to be notified when passes end.
-         *
-         * @param passEndListener Pointer to the listener to register. Must remain
-         *        valid for the lifetime of this Phase or until removed.
-         *
-         * @return True if the listener was added, false if it was already registered.
-         *
-         * @see PassEndListener
-         * @see notifyPassEndListeners()
-         */
-        bool addPassEndListener(PassEndListener* passEndListener) {
-
-            for (int i = 0; i < passEndListeners_.size(); i++) {
-                if (passEndListeners_[i] == passEndListener) {
-                    return false;
-                }
-            }
-
-            passEndListeners_.emplace_back(passEndListener);
-
-            return true;
-        }
 
         /**
          * @brief Creates and adds a new typed pass to this phase.
@@ -192,21 +143,12 @@ export namespace helios::engine::runtime::gameloop {
          * @see Session::state()
          */
         template<typename StateType>
-        Pass& beginPass(const StateType t) {
-            auto entry = std::make_unique<TypedPass<StateType>>(*this, t, gameWorld_);
+        Pass<TTypedHandleWorld>& beginPass(const StateType t) {
+            auto entry = std::make_unique<TypedPass<StateType, TTypedHandleWorld>>(*this, t, gameWorld_);
             auto* raw = entry.get();
             passEntries_.emplace_back(std::move(entry));
 
             return *raw;
-        }
-
-        /**
-         * @brief Returns a reference to the owning GameLoop.
-         *
-         * @return Reference to the parent GameLoop.
-         */
-        [[nodiscard]] helios::engine::runtime::gameloop::GameLoop& gameLoop() noexcept {
-            return gameloop_;
         }
 
 

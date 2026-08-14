@@ -24,8 +24,6 @@ import helios.engine.runtime.enginestate.types;
 import :Pass;
 import :Phase;
 
-import helios.ecs.Manager;
-
 import helios.engine.input.InputSnapshot;
 
 import helios.engine.runtime.world.GameWorld;
@@ -55,7 +53,7 @@ export namespace helios::engine::runtime::gameloop {
      * @see EngineCommandBuffer
      * @see PassEndListener
      */
-    template<typename TTypedHandleWorld>
+    template<typename TGameWorld>
     class GameLoop {
 
 
@@ -75,23 +73,23 @@ export namespace helios::engine::runtime::gameloop {
          */
         inline static const helios::core::log::Logger& logger_ = helios::core::log::LogManager::loggerForScope(
             HELIOS_LOG_SCOPE);
-        GameWorld<TTypedHandleWorld>& gameWorld_;
+        TGameWorld& gameWorld_;
 
 
         /**
          * @brief The pre-update phase, executed before main gameplay logic.
          */
-        helios::engine::runtime::gameloop::Phase<TTypedHandleWorld> prePhase_;
+        helios::engine::runtime::gameloop::Phase<TGameWorld> prePhase_;
 
         /**
          * @brief The main update phase for core gameplay systems.
          */
-        helios::engine::runtime::gameloop::Phase<TTypedHandleWorld> mainPhase_;
+        helios::engine::runtime::gameloop::Phase<TGameWorld> mainPhase_;
 
         /**
          * @brief The post-update phase for cleanup and synchronization.
          */
-        helios::engine::runtime::gameloop::Phase<TTypedHandleWorld> postPhase_;
+        helios::engine::runtime::gameloop::Phase<TGameWorld> postPhase_;
 
         /**
          * @brief Accumulated total time since the first frame, in seconds.
@@ -120,7 +118,7 @@ export namespace helios::engine::runtime::gameloop {
          * @see UpdateContext::readPhase()
          */
         void phaseEnd(
-            GameWorld<TTypedHandleWorld>& gameWorld,
+            TGameWorld& gameWorld,
             runtime::world::UpdateContext& updateContext) {
 
         }
@@ -138,7 +136,7 @@ export namespace helios::engine::runtime::gameloop {
          *
          * @param gameWorld The GameWorld associated with this GameLoop.
          */
-        GameLoop(GameWorld<TTypedHandleWorld>& gameWorld) : gameWorld_(gameWorld), prePhase_(*this, gameWorld_), mainPhase_(*this, gameWorld_), postPhase_(*this, gameWorld_) {};
+        GameLoop(TGameWorld& gameWorld) : gameWorld_(gameWorld), prePhase_(*this, gameWorld_), mainPhase_(*this, gameWorld_), postPhase_(*this, gameWorld_) {};
 
 
         /**
@@ -148,7 +146,7 @@ export namespace helios::engine::runtime::gameloop {
          *
          * @return Reference to the requested Phase.
          */
-        [[nodiscard]] helios::engine::runtime::gameloop::Phase<TTypedHandleWorld>& phase(const helios::engine::runtime::gameloop::PhaseType phaseType) noexcept {
+        [[nodiscard]] helios::engine::runtime::gameloop::Phase<TGameWorld>& phase(const helios::engine::runtime::gameloop::PhaseType phaseType) noexcept {
 
             switch (phaseType) {
                 case helios::engine::runtime::gameloop::PhaseType::Pre:
@@ -185,7 +183,7 @@ export namespace helios::engine::runtime::gameloop {
          * @see Pass::init()
          * @see System::init()
          */
-        void init(GameWorld<TTypedHandleWorld>& gameWorld) {
+        void init(TGameWorld& gameWorld) {
 
             assert(!initialized_ && "init() already called");
 
@@ -198,7 +196,7 @@ export namespace helios::engine::runtime::gameloop {
             initialized_ = true;
         }
 
-        GameWorld<TTypedHandleWorld>& gameWorld() noexcept {
+        TGameWorld& gameWorld() noexcept {
             return gameWorld_;
         }
 
@@ -216,7 +214,7 @@ export namespace helios::engine::runtime::gameloop {
          * @see UpdateContext
          */
         void update(
-            GameWorld<TTypedHandleWorld>& gameWorld,
+            TGameWorld& gameWorld,
             float deltaTime,
             const helios::engine::input::InputSnapshot& inputSnapshot
         ) noexcept {
@@ -251,7 +249,7 @@ export namespace helios::engine::runtime::gameloop {
         }
 
 
-        [[nodiscard]] bool isRunning(GameWorld<TTypedHandleWorld>& gameWorld) const noexcept {
+        [[nodiscard]] bool isRunning(TGameWorld& gameWorld) const noexcept {
             return initialized_ && !gameWorld.session().isDestroyed();
         }
 

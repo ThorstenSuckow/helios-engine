@@ -4,4 +4,4 @@
  */
 export module helios.engine.runtime.lifecycle.components;
 
-export import helios.engine.runtime.lifecycle.components.DelayedComponentEnabler;
+export import :LifetimeComponent;

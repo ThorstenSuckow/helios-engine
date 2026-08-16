@@ -11,7 +11,7 @@ module;
 
 export module helios.engine.tooling.FramePacer;
 
-import helios.engine.util.time.Stopwatch;
+import helios.core.time;
 import helios.engine.tooling.FrameStats;
 
 export namespace helios::engine::tooling {
@@ -47,7 +47,7 @@ export namespace helios::engine::tooling {
         /**
          * @brief The stopwatch used for high-resolution time measurement.
          */
-        helios::engine::util::time::Stopwatch stopwatch_{};
+        helios::core::time::Stopwatch stopwatch_{};
 
         /**
          * @brief The target frame rate in Frames Per Second (FPS).

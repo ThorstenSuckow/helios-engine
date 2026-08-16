@@ -25,9 +25,7 @@ target_link_libraries(helios_engine
         PRIVATE
         $<BUILD_INTERFACE:thirdparty::freetype>
         $<BUILD_INTERFACE:thirdparty::opengl>
-        $<BUILD_INTERFACE:thirdparty::imgui>
-        $<BUILD_INTERFACE:thirdparty::stb>
-)
+        $<BUILD_INTERFACE:thirdparty::imgui>)
 
 target_include_directories(helios_engine PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>

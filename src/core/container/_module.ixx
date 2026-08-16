@@ -7,7 +7,5 @@ export module helios.engine.core.container;
 
 export import helios.engine.core.container.buffer;
 
-export import :ConceptModelRegistry;
-export import :ConceptModelCollectionRegistry;
 export import :HandleMultiMap;
 export import :HandleManyToManyMap;

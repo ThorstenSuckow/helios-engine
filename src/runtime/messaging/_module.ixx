@@ -6,4 +6,3 @@
 export module helios.engine.runtime.messaging;
 
 export import helios.engine.runtime.messaging.command;
-export import helios.engine.runtime.messaging.event;

@@ -16,37 +16,22 @@ export module helios.engine.runtime.messaging.command.TypedCommandBuffer;
 
 import helios.engine.state.components;
 
-import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.world.ManagerRegistry;
-import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
+import helios.ecs;
 
 import helios.engine.state.commands.DelayedStateCommand;
 
 import helios.engine.runtime.timing.TimerManager;
 import helios.engine.runtime.timing.types;
+import helios.engine.runtime.world.UpdateContext;
 
-import helios.engine.runtime.messaging.command.tags.CommandBufferRole;
 
-using namespace helios::engine::runtime::world;
+using namespace helios::ecs::common::types;
 using namespace helios::engine::state::commands;
 using namespace helios::engine::runtime::timing;
 using namespace helios::engine::runtime::timing::types;
 
 export namespace helios::engine::runtime::messaging::command {
 
-    /**
-     * @brief Concept constraining commands that can self-execute.
-     *
-     * @details A command satisfies ExecutableCommand if it provides a
-     * noexcept `execute(UpdateContext&)` method. Commands that do not
-     * satisfy this concept must have a registered handler.
-     *
-     * @tparam Cmd The command type to check.
-     */
-    template<typename Cmd>
-    concept ExecutableCommand = requires(Cmd const& c, UpdateContext& updateContext) {
-        {c.execute(updateContext) } noexcept;
-    };
 
     /**
      * @brief Concept constraining commands that carry a timer gate.
@@ -91,12 +76,15 @@ export namespace helios::engine::runtime::messaging::command {
      * @see EngineCommandBuffer
      * @see ExecutableCommand
      */
-    template <typename... CommandTypes>
+    template <typename TTimerManager, typename... CommandTypes>
     class TypedCommandBuffer {
 
-        TimerManager* timerManager_;
+        using TimerManager = TTimerManager;
 
-        CommandHandlerRegistry* commandHandlerRegistry_;
+
+        TimerManager* timerManager_ = nullptr;;
+
+        ecs::command::CommandHandlerRegistry* commandHandlerRegistry_ = nullptr;
 
         /**
          * @brief Per-type command queues stored as a tuple of vectors.
@@ -213,7 +201,7 @@ export namespace helios::engine::runtime::messaging::command {
          * @param updateContext The current frame's update context.
          */
         template<typename CommandType>
-        void flushCommandQueue(UpdateContext& updateContext) noexcept {
+        void flushCommandQueue(runtime::world::UpdateContext& updateContext) noexcept {
 
             auto& queue = commandQueue<CommandType>();
             auto& delayed = delayedQueue<CommandType>();
@@ -247,36 +235,9 @@ export namespace helios::engine::runtime::messaging::command {
                 }
 
 
-            } else {
-               if constexpr (ExecutableCommand<CommandType>) {
-
-                   for (auto& cmd : queue) {
-                      if constexpr (DelayedCommandLike<CommandType>)  {
-                           auto* timer = timerManager_->getTimer(cmd.timerId());
-                           if (!timer) {
-                               assert(timer && "Unexpected null game timer");
-                               cmd.execute(updateContext);
-                               continue;
-                           }
-
-                           if (shouldDelayCommand(timer->state())) {
-                               delayed.push_back(std::move(cmd));
-                           } else if (isDelayedCommandReady(timer->state())) {
-                               cmd.execute(updateContext);
-                           } else if (shouldDiscardCommand(timer->state())) {
-                               // cancelled? Discard! intentionally noop
-                           }
-                       } else {
-                           cmd.execute(updateContext);
-                       }
-
-                   }
-
-               } else {
+            }  else {
                    std::cerr << "Command type is not executable" << HELIOS_FUNCTION_SIGNATURE << std::endl;
                    assert(false &&  "Command type is not executable");
-               }
-
             }
 
             queue.clear();
@@ -286,7 +247,7 @@ export namespace helios::engine::runtime::messaging::command {
 
     public:
 
-        using EngineRoleTag = helios::engine::runtime::messaging::command::tags::CommandBufferRole;
+        using EcsRoleTag = helios::ecs::command::tags::CommandBufferRole;
 
         /**
          * @brief Enqueues a command of the specified type.
@@ -311,10 +272,10 @@ export namespace helios::engine::runtime::messaging::command {
          * @param commandHandlerRegistry Registry used for handler-based command routing.
          * @param managerRegistry Manager registry used for accessing various managers.
          */
-        void init(CommandHandlerRegistry& commandHandlerRegistry, ManagerRegistry& managerRegistry) noexcept {
+        void init(ecs::command::CommandHandlerRegistry& commandHandlerRegistry) noexcept {
             commandHandlerRegistry_ = &commandHandlerRegistry;
 
-            timerManager_ = managerRegistry.item<TimerManager>();
+           // timerManager_ = managerRegistry.item<TimerManager>();
             assert(timerManager_ && "TimerManager not found");
         }
 
@@ -333,7 +294,7 @@ export namespace helios::engine::runtime::messaging::command {
          *
          * @param updateContext The current frame's update context.
          */
-        void flush(UpdateContext& updateContext) noexcept {
+        void flush(runtime::world::UpdateContext& updateContext) noexcept {
             (flushCommandQueue<CommandTypes>(updateContext), ...);
         }
 

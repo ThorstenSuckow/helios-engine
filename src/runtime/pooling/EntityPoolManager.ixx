@@ -13,31 +13,30 @@ module;
 
 export module helios.engine.runtime.pooling.EntityPoolManager;
 
-import helios.ecs.Entity;
+import helios.ecs;
 import helios.engine.runtime.pooling.types;
 
 import helios.engine.runtime.world.UpdateContext;
 
-import helios.engine.runtime.world.EngineWorld;
 import helios.engine.runtime.pooling.EntityPool;
 import helios.engine.runtime.pooling.TypedEntityPoolRegistry;
 
 import helios.engine.runtime.pooling.commands;
 import helios.engine.runtime.pooling.components;
 
-import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
+import helios.ecs.command;
 
-import helios.engine.core.thread;
-import helios.ecs.types.EntityHandle;
+import helios.core.thread;
 import helios.engine.core.types;
 import helios.engine.runtime.world.tags;
-import helios.engine.util.log;
+import helios.core.log;
 
 using namespace helios::engine::runtime::pooling::types;
-using namespace helios::engine::core::thread;
+using namespace helios::core::thread;
 using namespace helios::engine::runtime::pooling::components;
 using namespace helios::engine::runtime::pooling::commands;
-using namespace helios::engine::runtime::messaging::command;
+using namespace helios::ecs;
+using namespace helios::ecs::command;
 using namespace helios::engine::runtime::world;
 using namespace helios::engine::runtime::world::tags;
 
@@ -54,14 +53,18 @@ export namespace helios::engine::runtime::pooling {
      *
      * @tparam TMemberHandles  Pack of handle types whose pools are managed by this instance.
      */
-    template<typename TEntityPoolRegistry>
+    template<typename TEntityPoolRegistry, typename TInitContext, typename TExecutionContext>
     class EntityPoolManager;
 
+
     template<
+        typename TInitContext,
+        typename TExecutionContext,
         template<typename> typename TLookupStrategy,
         typename... TMemberHandles
     >
-   class EntityPoolManager<TypedEntityPoolRegistry<TLookupStrategy, TMemberHandles...>> {
+    requires ecs::common::concepts::ProvidesCommandHandlerRegistry<TInitContext, ecs::command::CommandHandlerRegistry>
+   class EntityPoolManager<TypedEntityPoolRegistry<TLookupStrategy, TMemberHandles...>, TInitContext, TExecutionContext> {
         /**
          * @brief Registry holding all managed pools, keyed by `EntityPoolKey`.
          */
@@ -72,10 +75,12 @@ export namespace helios::engine::runtime::pooling {
          */
         std::tuple<std::vector<PrefabEntityPoolCommand<TMemberHandles>>...> prefabEntityPoolCommands_;
 
+        std::tuple<std::vector<ReleaseEntityCommand<TMemberHandles>>...> releaseEntityCommands_;
+
         /**
          * @brief Reference to the engine world used for cloning prefab entities.
          */
-        EngineWorld& engineWorld_;
+        ecs::EntitySpace& entitySpace_;
 
         /**
          * @brief Returns the mutable command queue for `THandle`.
@@ -85,7 +90,12 @@ export namespace helios::engine::runtime::pooling {
             return std::get<std::vector<PrefabEntityPoolCommand<THandle>>>(prefabEntityPoolCommands_);
         }
 
-        static inline auto& logger_ = helios::engine::util::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
+        template<typename THandle>
+        std::vector<ReleaseEntityCommand<THandle>>& releaseEntityCommands() noexcept {
+            return std::get<std::vector<ReleaseEntityCommand<THandle>>>(releaseEntityCommands_);
+        }
+
+        static inline auto& logger_ = helios::core::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
 
         /**
          * @brief Job system used for parallel command processing in `flushParallel()`.
@@ -135,11 +145,11 @@ export namespace helios::engine::runtime::pooling {
                 const size_t space = used < entityPool->size() ? entityPool->size() - used : 0;
                 const auto prefabHandle = command.prefabHandle;
 
-                auto source = engineWorld_.find(prefabHandle);
+                auto source = entitySpace_.findEntity(prefabHandle);
                 source->template remove<PrefabEntityPoolRequestComponent<THandle>>();
 
                 for (size_t i = 0; i < space; i++) {
-                    auto go = engineWorld_.copyEntity(prefabHandle);
+                    auto go = entitySpace_.copyEntity(prefabHandle);
                     go.setActive(false);
                     entityPool->addInactive(go.handle());
                 }
@@ -155,12 +165,40 @@ export namespace helios::engine::runtime::pooling {
             commands.clear();
         }
 
+        template<typename THandle>
+        void processReleaseEntityCommands() noexcept {
+
+            auto& commands = releaseEntityCommands<THandle>();
+
+            for (auto& command : commands) {
+
+                auto key = command.entityPoolKey;
+                auto handle = command.entityHandle;
+
+                auto* entityPool = entityPoolRegistry_.template pool<THandle>(key);
+
+                if (!entityPool || !entityPool->isLocked()) {
+                    logger_.error("Failed to retrieve entity pool, or pool is in invalid state.");
+                    assert(false && "Entity pool could not be retrieved, or pool is in invalid state    .");
+                    continue;
+                }
+
+                entityPool->release(handle);
+                if (auto entity = entitySpace_.findEntity(handle)) {
+                    entity->setActive(false);
+                }
+            }
+
+            commands.clear();
+        }
+
         /**
          * @brief Dispatches all command-processing steps for `THandle`.
          */
         template<typename THandle>
         void processCommandsForHandle() noexcept {
             processPrefabEntityPoolCommands<THandle>();
+            processReleaseEntityCommands<THandle>();
         }
 
         /**
@@ -172,11 +210,11 @@ export namespace helios::engine::runtime::pooling {
         * @tparam THandle  Handle type whose pools should be reset.
         */
         template<typename THandle>
-        void release() {
-            entityPoolRegistry_.template forEach<THandle>([&engineWorld = engineWorld_](EntityPool<THandle>& entityPool) {
+        void releaseAll() {
+            entityPoolRegistry_.template forEach<THandle>([&entitySpace = entitySpace_](EntityPool<THandle>& entityPool) {
                 for (auto entityHandle : entityPool.activeEntities()) {
                     entityPool.release(entityHandle);
-                    if (auto go = engineWorld.find(entityHandle)) {
+                    if (auto go = entitySpace.findEntity(entityHandle)) {
                         go->setActive(false);
                     }
                 }
@@ -186,19 +224,22 @@ export namespace helios::engine::runtime::pooling {
     public:
 
         /** @brief Engine role tag identifying this class as a manager. */
-        using EngineRoleTag = ManagerRole;
+        using EcsRoleTag = ecs::manager::tags::ManagerRole;
+
+        using ExecutionContextType = TExecutionContext;
+        using InitContextType = TInitContext;
 
         /**
          * @brief Constructs an `EntityPoolManager`.
          *
          * @param entityPoolRegistry
-         * @param engineWorld  Engine world used for cloning prefab entities.
+         * @param entitySpace  Engine world used for cloning prefab entities.
          * @param jobSystem    Job system used by `flushParallel()`.
          */
         explicit EntityPoolManager(
         TypedEntityPoolRegistry<TLookupStrategy, TMemberHandles...>&  entityPoolRegistry,
-        EngineWorld& engineWorld, JobSystem& jobSystem)
-        : entityPoolRegistry_(entityPoolRegistry), engineWorld_(engineWorld), jobSystem_(jobSystem) {}
+        EntitySpace& entitySpace, JobSystem& jobSystem)
+        : entityPoolRegistry_(entityPoolRegistry), entitySpace_(entitySpace), jobSystem_(jobSystem) {}
 
 
 
@@ -207,10 +248,11 @@ export namespace helios::engine::runtime::pooling {
          *
          * @param updateContext  Current frame update context (unused directly, passed for API symmetry).
          */
-        void flush(UpdateContext& updateContext) noexcept {
+        bool executeCommands(TExecutionContext&) noexcept {
 
             (processCommandsForHandle<TMemberHandles>(),...);
 
+            return true;
         }
 
 
@@ -221,7 +263,7 @@ export namespace helios::engine::runtime::pooling {
          *
          * @param updateContext  Current frame update context (unused directly, passed for API symmetry).
          */
-        void flushParallel(UpdateContext& updateContext) noexcept {
+        bool executeCommandsParallel(TExecutionContext&) noexcept {
             std::array<std::function<void()>, sizeof ...(TMemberHandles)> jobs{
                 [this]() {
                     this->template processCommandsForHandle<TMemberHandles>();
@@ -231,6 +273,8 @@ export namespace helios::engine::runtime::pooling {
             jobSystem_.runAndWait(jobs.size(), [&jobs](const std::size_t jobsIndex) {
                 jobs[jobsIndex]();
             });
+
+            return true;
         }
 
 
@@ -246,9 +290,13 @@ export namespace helios::engine::runtime::pooling {
          */
         template<typename THandle>
         bool submit(PrefabEntityPoolCommand<THandle>&& prefabEntityPoolCommand) noexcept {
-
             prefabEntityPoolCommands<THandle>().emplace_back(std::move(prefabEntityPoolCommand));
+            return true;
+        }
 
+        template<typename THandle>
+        bool submit(ReleaseEntityCommand<THandle>&& releaseEntityCommand) noexcept {
+            releaseEntityCommands<THandle>().emplace_back(std::move(releaseEntityCommand));
             return true;
         }
 
@@ -260,19 +308,23 @@ export namespace helios::engine::runtime::pooling {
          *
          * @param commandHandlerRegistry  Registry to register handlers with.
          */
-        void init(CommandHandlerRegistry& commandHandlerRegistry) noexcept {
+        bool init(TInitContext& initContext) noexcept {
 
-            (commandHandlerRegistry.handleCommands<
-               PrefabEntityPoolCommand<TMemberHandles>
+            auto& commandHandlerRegistry = initContext.commandHandlerRegistry();
+
+            (commandHandlerRegistry.template handleCommands<
+               PrefabEntityPoolCommand<TMemberHandles>,
+               ReleaseEntityCommand<TMemberHandles>
            >(*this), ...);
 
+            return true;
         };
 
         /**
          * @brief Resets this manager and releases all active entities back to their respective pools for every handle type.
          */
         void reset() {
-            (release<TMemberHandles>(), ...);
+            (releaseAll<TMemberHandles>(), ...);
         }
 
     };

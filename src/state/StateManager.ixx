@@ -7,31 +7,31 @@ module;
 #include <memory>
 #include <span>
 #include <vector>
-
+#include <cassert>
 
 export module helios.engine.state.StateManager;
 
 
 import helios.engine.state.StateTransitionListener;
-import helios.engine.state.types.StateTransitionRule;
-
+import helios.engine.state.types;
 import helios.engine.state.components;
 import helios.engine.state.commands;
-import helios.engine.state.types;
 
 import helios.engine.runtime.world.GameObject;
 
+import helios.ecs.common.types;
+import helios.ecs.common.concepts;
 
 import helios.engine.runtime.world.UpdateContext;
 
-import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
+import helios.ecs.command.CommandHandlerRegistry;
 import helios.engine.runtime.world.Session;
+import helios.engine.runtime.concepts;
 
 import helios.engine.runtime.world.Session;
 
-import helios.engine.core.types;
-import helios.engine.util.Guid;
-import helios.engine.runtime.world.tags.ManagerRole;
+import helios.ecs.manager;
+import helios.ecs.EntityManager;
 
 using helios::engine::state::types::StateTransitionIdType;
 using helios::engine::state::types::StateTransitionContext;
@@ -65,7 +65,9 @@ export namespace helios::engine::state {
      * @see StateTransitionListener
      * @see StateCommand
      */
-    template <typename StateType>
+    template<typename StateType, typename TInitContext, typename TExecutionContext>
+requires ecs::common::concepts::ProvidesCommandHandlerRegistry<TInitContext, ecs::command::CommandHandlerRegistry>
+    && engine::runtime::concepts::ProvidesUpdateContext<TExecutionContext, runtime::world::UpdateContext>
     class StateManager {
 
         /**
@@ -146,7 +148,10 @@ export namespace helios::engine::state {
 
 
     public:
-        using EngineRoleTag = helios::engine::runtime::world::tags::ManagerRole;
+        using EcsRoleTag = helios::ecs::manager::tags::ManagerRole;
+
+        using ExecutionContextType = TExecutionContext;
+        using InitContextType = TInitContext;
 
         /**
          * @brief Constructs a state manager with transition rules.
@@ -176,12 +181,12 @@ export namespace helios::engine::state {
          *
          * @param updateContext The current frame's update context.
          */
-        void flush(
-            helios::engine::runtime::world::UpdateContext& updateContext
-        ) noexcept {
+        bool executeCommands(TExecutionContext& executionContext) noexcept {
+
+            auto& updateContext = executionContext.updateContext();
 
             if (pending_.empty()) {
-                return;
+                return true;
             }
 
             auto command = pending_.back();
@@ -189,14 +194,14 @@ export namespace helios::engine::state {
             auto transitionRequest = command.transitionRequest();
 
             auto& session = updateContext.session();
-            auto currentFrom = session.state<StateType>();
+            auto currentFrom = session.template state<StateType>();
             auto from = transitionRequest.from();
             auto transitionId = transitionRequest.transitionId();
 
 
             if (currentFrom != from) {
                 pending_.clear();
-                return;
+                return true;
             }
 
 
@@ -211,12 +216,14 @@ export namespace helios::engine::state {
 
                     signalExit(from, rule.to(), transitionId, updateContext);
                     signalTransition(from, rule.to(), transitionId, updateContext);
-                    session.setStateFrom<StateType>(StateTransitionContext<StateType>{rule.from(), rule.to(), transitionId});
+                    session.template setStateFrom<StateType>(StateTransitionContext<StateType>{rule.from(), rule.to(), transitionId});
                     signalEnter(from, rule.to(), transitionId, updateContext);
                 }
             }
 
             pending_.clear();
+
+            return true;
         }
 
         /**
@@ -258,9 +265,13 @@ export namespace helios::engine::state {
          *
          * @param commandHandlerRegistry The command-handler registry to register with.
          */
-        void init(helios::engine::runtime::messaging::command::CommandHandlerRegistry& commandHandlerRegistry) {
-            commandHandlerRegistry.registerHandler<StateCommand<StateType>>(*this);
-            commandHandlerRegistry.registerHandler<DelayedStateCommand<StateType>>(*this);
+        bool init(TInitContext& initContext) {
+            auto& commandHandlerRegistry = initContext.commandHandlerRegistry();
+
+            commandHandlerRegistry.template registerHandler<StateCommand<StateType>>(*this);
+            commandHandlerRegistry.template registerHandler<DelayedStateCommand<StateType>>(*this);
+
+            return true;
         }
 
         /**

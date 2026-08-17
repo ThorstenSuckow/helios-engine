@@ -13,7 +13,7 @@ module;
 
 export module helios.engine.rendering.RenderManager;
 
-import helios.engine.runtime.world.tags.ManagerRole;
+import helios.ecs.manager.tags;
 
 import helios.engine.rendering.renderTarget.types.RenderTargetHandle;
 import helios.engine.rendering.viewport.types.ViewportHandle;
@@ -25,11 +25,9 @@ import helios.engine.rendering.texture.types;
 import helios.engine.rendering.common.commands;
 import helios.engine.rendering.common.types;
 import helios.engine.scene.types;
-import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
+import helios.ecs;
 
-import helios.ecs.types;
-
-import helios.engine.util.log;
+import helios.core.log;
 import helios.engine.runtime.world.UpdateContext;
 
 import helios.engine.rendering.common.concepts;
@@ -45,8 +43,7 @@ import helios.engine.rendering.shader.types;
 using namespace helios::engine::scene::components;
 using namespace helios::engine::core::container;
 using namespace helios::engine::runtime::world;
-using namespace helios::engine::runtime::world::tags;
-using namespace helios::engine::runtime::messaging::command;
+using namespace helios::ecs;
 using namespace helios::engine::rendering::common::commands;
 using namespace helios::engine::rendering::common::types;
 using namespace helios::engine::rendering::mesh::types;
@@ -58,9 +55,9 @@ using namespace helios::engine::rendering::texture::types;
 using namespace helios::engine::rendering::renderTarget::types;
 using namespace helios::engine::rendering::viewport::types;
 using namespace helios::engine::scene::types;
-using namespace helios::ecs::types;
+using namespace helios::ecs::common::types;
 using namespace helios::engine::scene::types;
-using namespace helios::engine::util::log;
+using namespace helios::core::log;
 using namespace helios::engine::rendering::common::concepts;
 
 #define HELIOS_LOG_SCOPE "helios::engine::rendering::RenderManager"
@@ -76,8 +73,12 @@ export namespace helios::engine::rendering {
      * @tparam TRenderBackend Rendering backend type.
      * @tparam TMemberHandle Renderable scene member handle type.
      */
-    template<typename TRenderBackend, typename ...TMemberHandles>
-    requires IsRenderBackendLike<TRenderBackend>
+    template<
+        typename TRenderBackend,
+        typename TInitContext,
+        typename TExecutionContext,
+        typename ...TMemberHandles>
+    requires IsRenderBackendLike<TRenderBackend> && ecs::common::concepts::ProvidesCommandHandlerRegistry<TInitContext, ecs::command::CommandHandlerRegistry>
     class RenderManager {
 
         /**
@@ -326,7 +327,10 @@ export namespace helios::engine::rendering {
         /**
          * @brief Runtime role tag used for engine manager registration.
          */
-        using EngineRoleTag = ManagerRole;
+        using EcsRoleTag = ecs::manager::tags::ManagerRole;
+
+        using ExecutionContextType = TExecutionContext;
+        using InitContextType = TInitContext;
 
         /**
          * @brief Constructs the manager for a specific render backend.
@@ -346,10 +350,10 @@ export namespace helios::engine::rendering {
          * @details Traverses active render targets and nested viewport/shader/material/mesh batches,
          * executes backend begin/end hooks for each level, renders queued draw contexts,
          * and clears all active batch indices afterwards.
-         *
-         * @param updateContext Current frame update context.
+
          */
-        void flush(UpdateContext& updateContext) {
+        bool executeCommands(TExecutionContext&) {
+
 
             for (auto renderTargetIdx : activeRenderTargetIndices_) {
                 auto& renderTargetBatch = renderTargetBatches_[renderTargetIdx];
@@ -413,7 +417,7 @@ export namespace helios::engine::rendering {
             }
             activeRenderTargetIndices_.clear();
 
-
+            return true;
         }
 
 
@@ -502,16 +506,22 @@ export namespace helios::engine::rendering {
          *
          * @param commandHandlerRegistry Command handler registry used at runtime.
          */
-        void init(CommandHandlerRegistry& commandHandlerRegistry) noexcept {
+        bool init(TInitContext& initContext) noexcept {
 
-            (commandHandlerRegistry.handleCommands<
+            auto& commandHandlerRegistry = initContext.commandHandlerRegistry();
+
+            (commandHandlerRegistry.template handleCommands<
                 RenderSceneMemberCommand<TMemberHandles>,
                 RenderInstanceBatchCommand<TMemberHandles>,
                 RenderSceneCommand<TMemberHandles>
             >(*this), ...);
 
+            return true;
 
         };
+
+
+        void reset(){/* intentionally noop */}
 
 
     };

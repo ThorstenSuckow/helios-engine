@@ -21,11 +21,13 @@ import helios.engine.runtime.timing.Timer;
 import helios.engine.runtime.timing.types.TimerId;
 
 import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
+import helios.ecs.command.CommandHandlerRegistry;
+
+import helios.ecs.common.types;
 
 import helios.engine.core.types;
-import helios.engine.util.Guid;
-import helios.engine.runtime.world.tags.ManagerRole;
+import helios.core.common;
+import helios.ecs.manager.tags;
 
 using namespace helios::engine::runtime::timing::commands;
 using namespace helios::engine::runtime::timing::types;
@@ -44,6 +46,7 @@ export namespace helios::engine::runtime::timing {
      * @see TimerCommandHandler
      * @see Manager
      */
+    template<typename TInitContext, typename TExecutionContext>
     class TimerManager {
 
         /**
@@ -82,7 +85,10 @@ export namespace helios::engine::runtime::timing {
         }
 
     public:
-        using EngineRoleTag = helios::engine::runtime::world::tags::ManagerRole;
+        using EcsRoleTag = helios::ecs::manager::tags::ManagerRole;
+
+        using ExecutionContextType = TExecutionContext;
+        using InitContextType = TInitContext;
 
         /**
          * @brief Registers a new game timer.
@@ -134,12 +140,9 @@ export namespace helios::engine::runtime::timing {
          * For each pending context, the corresponding timer's state is updated.
          * The pending list is cleared after processing.
          *
-         * @param gameWorld Reference to the game world.
-         * @param updateContext Reference to the current update context.
+         * @param executionContext Reference to the current execution context.
          */
-        void flush(
-            helios::engine::runtime::world::UpdateContext& updateContext
-        ) noexcept {
+        bool executeCommands(TExecutionContext& executionContext) noexcept {
 
             for (const auto& controlContext : pendingControlContexts_) {
                 auto* timer = getTimer(controlContext.timerId);
@@ -152,6 +155,8 @@ export namespace helios::engine::runtime::timing {
                 }
             }
             pendingControlContexts_.clear();
+
+            return true;
         }
 
         /**
@@ -164,15 +169,17 @@ export namespace helios::engine::runtime::timing {
         bool submit(TimerControlCommand timerControlCommand) noexcept {
             pendingControlContexts_.push_back(timerControlCommand.timerControlContext());
             return true;
-        };
+        }
 
         /**
          * @brief Registers this manager as the timer command handler in the game world.
          *
          * @param gameWorld The game world to register with.
          */
-        void init(helios::engine::runtime::messaging::command::CommandHandlerRegistry& commandHandlerRegistry) {
+        bool init(TInitContext& initContext) {
+            ecs::command::CommandHandlerRegistry& commandHandlerRegistry = initContext.commandHandlerRegistry();
             commandHandlerRegistry.registerHandler<TimerControlCommand>(*this);
+            return true;
         }
 
         /**

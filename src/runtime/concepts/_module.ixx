@@ -10,5 +10,3 @@ export import helios.engine.runtime.concepts.HasTag;
 export import helios.engine.runtime.concepts.HasReset;
 export import helios.engine.runtime.concepts.HasClear;
 export import helios.engine.runtime.concepts.HasSubmit;
-
-export import :ProvidesUpdateContext;

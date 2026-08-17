@@ -13,7 +13,7 @@ module;
 
 export module helios.engine.core.container:HandleMultiMap;
 
-import helios.ecs.types.EntityHandle;
+import helios.ecs.common.types;
 
 using namespace helios::ecs;
 export namespace helios::engine::core::container {

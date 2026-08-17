@@ -8,10 +8,10 @@ export module helios.engine.scene.NoCullingStrategy;
 
 
 
-import helios.ecs.types.EntityHandle;
+import helios.ecs.common.types;
 import helios.engine.scene.types.CullingContext;
 
-using namespace helios::ecs::types;
+using namespace helios::ecs::common::types;
 using namespace helios::engine::scene::types;
 export namespace helios::engine::scene {
 

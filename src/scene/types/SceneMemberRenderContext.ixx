@@ -7,7 +7,7 @@ module;
 
 export module helios.engine.scene.types.SceneMemberRenderContext;
 
-import helios.ecs.types.EntityHandle;
+import helios.ecs.common.types;
 import helios.engine.scene.types.SceneHandle;
 import helios.engine.rendering.mesh.types;
 import helios.engine.rendering.material.types;
@@ -17,7 +17,7 @@ import helios.engine.rendering.viewport.types;
 import helios.engine.rendering.renderTarget.types;
 import helios.math.types;
 
-using namespace helios::ecs::types;
+using namespace helios::ecs::common::types;
 using namespace helios::engine::rendering::viewport::types;
 using namespace helios::engine::rendering::renderTarget::types;
 using namespace helios::engine::rendering::mesh::types;

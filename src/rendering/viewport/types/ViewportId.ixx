@@ -6,7 +6,7 @@ module;
 
 export module helios.engine.rendering.viewport.types.ViewportId;
 
-import helios.ecs.types.StrongId;
+import helios.core.common.types;
 import helios.engine.rendering.viewport.types.ViewportDomainTag;
 
 export namespace helios::engine::rendering::viewport::types {
@@ -14,6 +14,6 @@ export namespace helios::engine::rendering::viewport::types {
     /**
      * @brief Strongly-typed identifier for viewport resources.
      */
-    using ViewportId = helios::ecs::types::StrongId<ViewportDomainTag>;
+    using ViewportId = helios::core::common::types::StrongId<ViewportDomainTag>;
 
 }

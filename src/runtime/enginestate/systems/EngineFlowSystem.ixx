@@ -8,7 +8,7 @@ export module helios.engine.runtime.enginestate.systems.EngineFlowSystem;
 
 import helios.engine.runtime.enginestate.types;
 
-import helios.engine.runtime.messaging.command.concepts;
+import helios.ecs.common.concepts;
 
 import helios.engine.state.commands;
 import helios.engine.state.types.StateTransitionRequest;
@@ -24,7 +24,7 @@ import helios.engine.runtime.world.Session;
 import helios.engine.runtime.world.tags.SystemRole;
 
 using namespace helios::engine::state::commands;
-using namespace helios::engine::runtime::messaging::command::concepts;
+using namespace helios::ecs::common::concepts;
 using namespace helios::engine::state::types;
 using namespace helios::engine::runtime::enginestate;
 using namespace helios::engine::runtime::enginestate::types;
@@ -44,7 +44,7 @@ export namespace helios::engine::runtime::enginestate::systems {
      * @see StateCommand
      */
     template<typename TCommandBuffer>
-    requires IsCommandBufferLike<TCommandBuffer>
+    requires ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
     class EngineFlowSystem {
 
         /**
@@ -59,7 +59,7 @@ export namespace helios::engine::runtime::enginestate::systems {
 
     public:
 
-        using EngineRoleTag = helios::engine::runtime::world::tags::TypedSystemRole;
+        using EcsRoleTag = helios::engine::runtime::world::tags::TypedSystemRole;
 
         using CommandBuffer_type = TCommandBuffer;
 

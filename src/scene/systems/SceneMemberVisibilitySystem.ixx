@@ -33,14 +33,14 @@ import helios.engine.rendering.viewport.types;
 import helios.engine.rendering.viewport.ViewportEntity;
 
 import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.messaging.command.NullCommandBuffer;
-import helios.engine.runtime.messaging.command.concepts.IsCommandBufferLike;
+import helios.ecs.command.NullCommandBuffer;
+import helios.ecs.common.concepts;
 import helios.engine.runtime.world.tags.SystemRole;
 
-import helios.ecs.components.Active;
+import helios.ecs.component;
 
 
-import helios.engine.util.log;
+import helios.core.log;
 
 import helios.math;
 import helios.engine.core.types;
@@ -57,12 +57,12 @@ using namespace helios::engine::rendering::viewport;
 using namespace helios::engine::rendering::viewport::types;
 using namespace helios::engine::rendering::renderTarget::components;
 using namespace helios::engine::scene::types;
-using namespace helios::engine::runtime::messaging::command::concepts;
+using namespace helios::ecs::common::concepts;
 using namespace helios::engine::spatial::components;
 using namespace helios::engine::rendering::common::commands;
 using namespace helios::engine::rendering::common::types;
 using namespace helios::engine::rendering::common::components;
-using namespace helios::engine::runtime::messaging::command;
+using namespace helios::ecs;
 using namespace helios::engine::runtime::world;
 
 #define HELIOS_LOG_SCOPE "helios::engine::scene::systems::SceneRenderSystem"
@@ -95,7 +95,7 @@ export namespace helios::engine::scene::systems {
          */
         TCullingStrategy cullingStrategy_;
 
-        static inline auto& logger_ = helios::engine::util::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
+        static inline auto& logger_ = helios::core::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
 
         /**
          * @brief Tracks visible and culled members per viewport for diagnostics/debugging.
@@ -162,7 +162,7 @@ export namespace helios::engine::scene::systems {
         /**
          * @brief Runtime role tag used for engine system registration.
          */
-        using EngineRoleTag = helios::engine::runtime::world::tags::TypedSystemRole;
+        using EcsRoleTag = helios::engine::runtime::world::tags::TypedSystemRole;
 
 
         /**

@@ -11,8 +11,10 @@ module;
 
 export module helios.engine.runtime.world.GameObject;
 
-import helios.ecs;
-import helios.engine.runtime.world.types;
+import helios.ecs.EntityManager;
+import helios.ecs.Entity;
+
+import helios.engine.runtime.world.types.GameObjectHandle;
 
 using namespace helios::ecs;
 export namespace helios::engine::runtime::world {

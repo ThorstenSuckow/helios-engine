@@ -9,7 +9,7 @@ module;
 
 export module helios.engine.rendering.viewport.components.ActiveViewportHandlesStateComponent;
 
-import helios.ecs.types.EntityHandle;
+import helios.ecs.common.types;
 import helios.engine.rendering.viewport.types.ViewportHandle;
 
 using namespace helios::engine::rendering::viewport::types;

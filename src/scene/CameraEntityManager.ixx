@@ -8,13 +8,13 @@ export module helios.engine.scene.CameraEntityManager;
 
 import helios.ecs.EntityManager;
 import helios.ecs.EntityRegistry;
-import helios.ecs.strategies;
+import helios.engine.core.strategies;
 
 import helios.engine.scene.types;
 
 using namespace helios::engine::scene::types;
 using namespace helios::ecs;
-using namespace helios::ecs::strategies;
+using namespace helios::engine::core::strategies;
 export namespace helios::engine::scene {
 
     /**

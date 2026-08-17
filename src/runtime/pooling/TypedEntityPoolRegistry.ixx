@@ -16,14 +16,14 @@ export module helios.engine.runtime.pooling.TypedEntityPoolRegistry;
 
 import helios.engine.runtime.pooling.EntityPool;
 import helios.engine.runtime.pooling.types;
-import helios.engine.util.log;
+import helios.core.log;
 
-import helios.ecs.strategies.LinearLookupStrategy;
-import helios.ecs.strategies.HashedLookupStrategy;
+import helios.engine.core.strategies.LinearLookupStrategy;
+import helios.engine.core.strategies.HashedLookupStrategy;
 
-import helios.ecs.concepts;
+import helios.core.concepts;
 
-using namespace helios::ecs::strategies;
+using namespace helios::engine::core::strategies;
 using namespace helios::engine::runtime::pooling::types;
 #define HELIOS_LOG_SCOPE "helios::engine::runtime::pooling::TypedEntityPoolRegistry"
 export namespace helios::engine::runtime::pooling {
@@ -40,7 +40,7 @@ export namespace helios::engine::runtime::pooling {
     template<
         template<typename> typename TStrongIdLookupStrategy,
         typename ...TManagedHandles>
-    requires (helios::ecs::concepts::IsStrongIdCollisionResolverLike<TStrongIdLookupStrategy<TManagedHandles>> && ...)
+    requires (helios::core::concepts::IsStrongIdCollisionResolverLike<TStrongIdLookupStrategy<TManagedHandles>> && ...)
         && (sizeof ...(TManagedHandles) > 0)
     class TypedEntityPoolRegistry {
 
@@ -92,7 +92,7 @@ export namespace helios::engine::runtime::pooling {
         }
 
 
-        static inline auto& logger_ = helios::engine::util::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
+        static inline auto& logger_ = helios::core::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
 
     public:
 

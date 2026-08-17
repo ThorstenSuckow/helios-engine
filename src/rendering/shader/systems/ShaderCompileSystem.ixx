@@ -11,7 +11,7 @@ module;
 
 export module helios.engine.rendering.shader.systems.ShaderCompileSystem;
 
-import helios.engine.runtime.messaging.command.NullCommandBuffer;
+import helios.ecs.command;
 
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.tags.SystemRole;
@@ -20,15 +20,15 @@ import helios.engine.rendering.shader.components;
 import helios.engine.rendering.shader.concepts;
 import helios.engine.rendering.shader.commands;
 
-import helios.engine.runtime.messaging.command.concepts.IsCommandBufferLike;
+import helios.ecs.common.concepts;
 
-import helios.ecs.components;
+import helios.ecs.component;
 
 using namespace helios::engine::runtime::world::tags;
 using namespace helios::engine::runtime::world;
-using namespace helios::engine::runtime::messaging::command;
+using namespace helios::ecs;
 using namespace helios::engine::rendering::shader;
-using namespace helios::engine::runtime::messaging::command::concepts;
+using namespace helios::ecs::common::concepts;
 using namespace helios::engine::rendering::shader::components;
 using namespace helios::engine::rendering::shader::commands;
 using namespace helios::ecs::components;
@@ -42,8 +42,8 @@ export namespace helios::engine::rendering::shader::systems {
      * @tparam TCommandBuffer Command buffer type used for queued compile commands.
      * @tparam TCapacity Initial reserve size for the internal handle cache.
      */
-    template<typename THandle, typename TCommandBuffer = NullCommandBuffer>
-    requires IsShaderHandle<THandle> && IsCommandBufferLike<TCommandBuffer>
+    template<typename THandle, typename TCommandBuffer = ecs::command::NullCommandBuffer>
+    requires IsShaderHandle<THandle> && ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
     class ShaderCompileSystem {
 
         std::vector<THandle> shaderHandles_;
@@ -52,7 +52,7 @@ export namespace helios::engine::rendering::shader::systems {
 
     public:
 
-        using EngineRoleTag = TypedSystemRole;
+        using EcsRoleTag = TypedSystemRole;
         using CommandBuffer_type = TCommandBuffer;
 
         explicit ShaderCompileSystem(size_t capacity = SHADER_INITIAL_STORAGE_CAPACITY) : capacity_(capacity) {

@@ -12,22 +12,18 @@ module;
 
 export module helios.engine.runtime.world.SystemRegistry;
 
-import helios.engine.core.container;
+import helios.core.container;
 import helios.engine.runtime.world.System;
 import helios.engine.runtime.world.types.SystemTypeId;
 
 
-using namespace helios::engine::core::container;
+using namespace helios::core::container;
 using namespace helios::engine::runtime::world::types;
 
 export namespace helios::engine::runtime::world {
 
     /**
      * @brief Type alias for a ConceptModelRegistry specialized for Systems.
-     *
-     * @details Stores type-erased System wrappers indexed by SystemTypeId,
-     * providing O(1) lookup by concrete system type and insertion-order
-     * iteration for deterministic update cycles within a game loop pass.
      *
      * @see ConceptModelRegistry
      * @see System

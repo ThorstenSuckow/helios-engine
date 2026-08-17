@@ -12,12 +12,12 @@ import helios.engine.runtime.world.tags.SystemRole;
 import helios.engine.runtime.world.UpdateContext;
 
 import helios.engine.platform.window.components;
-import helios.ecs.components.Active;
+import helios.ecs.component;
 import helios.engine.platform.window.concepts.IsWindowHandle;
 
 import helios.engine.rendering.renderTarget;
 
-import helios.engine.util.log;
+import helios.core.log;
 
 import helios.engine.spatial.components.Size2DComponent;
 
@@ -42,12 +42,12 @@ export namespace helios::engine::platform::window::systems {
     requires IsWindowHandle<TMemberHandle>
     class WindowSizeUpdateSystem {
 
-        static inline auto& logger_ = helios::engine::util::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
+        static inline auto& logger_ = helios::core::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
 
     public:
 
         /** @brief Runtime role tag used for engine system registration. */
-        using EngineRoleTag = TypedSystemRole;
+        using EcsRoleTag = TypedSystemRole;
 
         /**
          * @brief Processes active windows with dirty size state.

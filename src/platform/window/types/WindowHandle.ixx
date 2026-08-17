@@ -6,7 +6,7 @@ module;
 
 export module helios.engine.platform.window.types.WindowHandle;
 
-import helios.ecs.types.EntityHandle;
+import helios.ecs.common.types;
 import helios.engine.platform.window.types.WindowDomainTag;
 
 export namespace helios::engine::platform::window::types {
@@ -14,6 +14,6 @@ export namespace helios::engine::platform::window::types {
     /**
      * @brief ECS handle type referencing window entities.
      */
-    using WindowHandle = helios::ecs::types::EntityHandle<WindowDomainTag>;
+    using WindowHandle = helios::ecs::common::types::EntityHandle<WindowDomainTag>;
 
 } // namespace helios::engine::platform::window::types

@@ -38,7 +38,7 @@ export namespace helios::engine::runtime::pooling::systems {
         /**
          * @brief Marks this system as a typed system role.
          */
-        using EngineRoleTag = world::tags::TypedSystemRole;
+        using EcsRoleTag = world::tags::TypedSystemRole;
 
 
         /**

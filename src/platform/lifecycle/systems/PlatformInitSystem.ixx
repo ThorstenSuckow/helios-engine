@@ -13,17 +13,15 @@ import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.tags.SystemRole;
 
 import helios.engine.runtime.world;
-import helios.engine.runtime.messaging.command.NullCommandBuffer;
-import helios.engine.runtime.messaging.command.concepts.IsCommandBufferLike;
+import helios.ecs;
 
 import helios.engine.platform.lifecycle.commands;
 
-import helios.ecs.components.Active;
 
 using namespace helios::engine::runtime::world::tags;
 using namespace helios::engine::runtime::world;
-using namespace helios::engine::runtime::messaging::command;
-using namespace helios::engine::runtime::messaging::command::concepts;
+using namespace helios::ecs;
+using namespace helios::ecs::common::concepts;
 using namespace helios::engine::platform::lifecycle::commands;
 export namespace helios::engine::platform::lifecycle::systems {
 
@@ -32,8 +30,8 @@ export namespace helios::engine::platform::lifecycle::systems {
      *
      * @tparam TCommandBuffer Command buffer used for platform init command submission.
      */
-    template<typename TCommandBuffer = NullCommandBuffer>
-    requires IsCommandBufferLike<TCommandBuffer>
+    template<typename TCommandBuffer = ecs::command::NullCommandBuffer>
+    requires ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
     class PlatformInitSystem {
 
         public:
@@ -43,7 +41,7 @@ export namespace helios::engine::platform::lifecycle::systems {
         /**
          * @brief Engine role marker used by runtime system registries.
          */
-        using EngineRoleTag = TypedSystemRole;
+        using EcsRoleTag = TypedSystemRole;
 
         /**
          * @brief Queues platform initialization command when required.

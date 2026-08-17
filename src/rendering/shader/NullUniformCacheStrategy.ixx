@@ -7,8 +7,8 @@ module;
 
 export module helios.engine.rendering.shader.NullUniformCacheStrategy;
 
-import helios.engine.runtime.world.EngineWorld;
 import helios.engine.runtime.world.UpdateContext;
+import helios.ecs.EntitySpace;
 
 using namespace helios::engine::runtime::world;
 export namespace helios::opengl {
@@ -30,14 +30,14 @@ export namespace helios::opengl {
         /**
          * @brief No-op uniform caching entry point.
          * @param memberHandle Shader member handle.
-         * @param renderResourceWorld Render-resource world.
+         * @param entitySpace Entity space.
          * @param updateContext Frame-local update context.
          * @return Always returns `true`.
          */
         template<typename TUniformScope>
         [[nodiscard]] bool cacheUniforms(
             TMemberHandle memberHandle,
-            RenderResourceWorld& renderResourceWorld,
+            ecs::EntitySpace& entitySpace,
             UpdateContext& updateContext
         ) {
             return true;

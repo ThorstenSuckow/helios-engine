@@ -8,7 +8,7 @@ module;
 export module helios.engine.rendering.renderTarget.components.RenderTargetBindingComponent;
 
 import helios.engine.rendering.renderTarget.types.RenderTargetHandle;
-import helios.ecs.components.BindingComponent;
+import helios.ecs.component;
 
 using namespace helios::engine::rendering::renderTarget::types;
 using namespace helios::ecs::components;

@@ -35,24 +35,25 @@ export namespace helios::engine::runtime::timing::systems {
      * @see TimerManager
      * @see Timer
      */
+    template<typename TTimerManager>
     class TimerClearSystem {
 
         /**
          * @brief Reference to the TimerManager owning the timers.
          */
-        TimerManager& timerManager_;
+        TTimerManager& timerManager_;
 
     public:
 
 
-        using EngineRoleTag = helios::engine::runtime::world::tags::TypedSystemRole;
+        using EcsRoleTag = helios::engine::runtime::world::tags::TypedSystemRole;
 
         /**
          * @brief Constructs the system with a reference to the TimerManager.
          *
          * @param timerManager The manager whose timers are cleared.
          */
-        explicit TimerClearSystem(TimerManager& timerManager)
+        explicit TimerClearSystem(TTimerManager& timerManager)
         : timerManager_(timerManager) {}
 
         /**

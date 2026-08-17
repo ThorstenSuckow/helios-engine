@@ -6,10 +6,10 @@ module;
 
 export module helios.engine.platform.environment.types.PlatformId;
 
-import helios.ecs.types.StrongId;
+import helios.core.common.types;
 import helios.engine.platform.environment.types.PlatformDomainTag;
 
-using namespace helios::ecs::types;
+using namespace helios::core::common::types;
 export namespace helios::engine::platform::environment::types {
 
     /**

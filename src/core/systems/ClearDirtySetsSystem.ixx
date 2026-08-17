@@ -9,12 +9,12 @@ export module helios.engine.core.systems.ClearDirtySetsSystem;
 import helios.engine.runtime.world.tags.SystemRole;
 import helios.engine.runtime.world.UpdateContext;
 
-import helios.ecs.components;
+import helios.ecs.component;
 
-import helios.ecs.concepts.Traits;
+import helios.ecs.common.concepts;
 
 
-using namespace helios::ecs::concepts::traits;
+using namespace helios::ecs::common::concepts::traits;
 using namespace helios::ecs::components;
 using namespace helios::engine::runtime::world;
 using namespace helios::engine::runtime::world::tags;
@@ -34,7 +34,7 @@ export namespace helios::engine::core::systems {
         /**
          * @brief Runtime role tag used for system registration.
          */
-        using EngineRoleTag = TypedSystemRole;
+        using EcsRoleTag = TypedSystemRole;
 
         /**
          * @brief Executes one dirty-clear pass for all configured component specifications.

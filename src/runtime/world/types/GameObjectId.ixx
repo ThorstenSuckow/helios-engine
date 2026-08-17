@@ -6,10 +6,10 @@ module;
 
 export module helios.engine.runtime.world.types.GameObjectId;
 
-import helios.ecs.types.StrongId;
+import helios.core.common.types;
 import helios.engine.runtime.world.types.GameObjectDomainTag;
 
-using namespace helios::ecs::types;
+using namespace helios::core::common::types;
 export namespace helios::engine::runtime::world::types {
 
     /**

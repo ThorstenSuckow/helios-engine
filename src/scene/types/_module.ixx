@@ -14,6 +14,4 @@ export import helios.engine.scene.types.CameraDomainTag;
 export import helios.engine.scene.types.CameraHandle;
 export import helios.engine.scene.types.SceneDomainTag;
 export import helios.engine.scene.types.SceneHandle;
-export import helios.engine.scene.types.SceneId;
-export import helios.engine.scene.types.CameraId;
 export import helios.engine.scene.types.InstanceRenderBatchContext;

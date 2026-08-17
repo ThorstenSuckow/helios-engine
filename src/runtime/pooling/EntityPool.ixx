@@ -19,11 +19,9 @@ module;
 
 export module helios.engine.runtime.pooling.EntityPool;
 
-import helios.engine.util.Guid;
-import helios.ecs.types.EntityHandle;
-import helios.ecs.types;
+import helios.ecs.common.types;
 
-import helios.engine.util.log;
+import helios.core.log;
 
 #define HELIOS_LOG_SCOPE "helios::engine::runtime::pooling::EntityPool"
 export namespace helios::engine::runtime::pooling {
@@ -48,7 +46,7 @@ export namespace helios::engine::runtime::pooling {
     template <typename THandle>
     class EntityPool {
 
-        static inline auto& logger_ = helios::engine::util::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
+        static inline auto& logger_ = helios::core::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
 
         /**
          * @brief Maps active Entity EntityIds to their index in activeEntities_.
@@ -82,12 +80,12 @@ export namespace helios::engine::runtime::pooling {
         /**
          * @brief Minimum EntityId in the pool (used for sparse array offset).
          */
-        helios::ecs::types::EntityId minEntityId_ = std::numeric_limits<helios::ecs::types::EntityId>::max();
+        helios::ecs::common::types::EntityId minEntityId_ = std::numeric_limits<helios::ecs::common::types::EntityId>::max();
 
         /**
          * @brief Maximum EntityId in the pool (used for sparse array sizing).
          */
-        helios::ecs::types::EntityId maxEntityId_ = std::numeric_limits<helios::ecs::types::EntityId>::lowest();
+        helios::ecs::common::types::EntityId maxEntityId_ = std::numeric_limits<helios::ecs::common::types::EntityId>::lowest();
 
         /**
          * @brief Offset for sparse array indexing (equals minEntityId_ after lock).
@@ -190,8 +188,8 @@ export namespace helios::engine::runtime::pooling {
             auto idx = entityHandle.entityId() - delta_;
 
             if (activeIndex_.size() <= idx) {
-                activeIndex_.resize(idx + 1, helios::ecs::types::EntityTombstone);
-                versionIndex_.resize(idx + 1, helios::ecs::types::EntityTombstone);
+                activeIndex_.resize(idx + 1, helios::ecs::common::types::EntityTombstone);
+                versionIndex_.resize(idx + 1, helios::ecs::common::types::EntityTombstone);
             }
 
             activeIndex_[idx] = activeEntities_.size();
@@ -238,8 +236,8 @@ export namespace helios::engine::runtime::pooling {
             }
 
             try {
-                activeIndex_.resize(size, helios::ecs::types::EntityTombstone);
-                versionIndex_.resize(size, helios::ecs::types::EntityTombstone);
+                activeIndex_.resize(size, helios::ecs::common::types::EntityTombstone);
+                versionIndex_.resize(size, helios::ecs::common::types::EntityTombstone);
             } catch (std::exception& e) {
                 logger_.error("Could not lock pool, resiszing failed.");
                 assert(false && "Resizing failed.");
@@ -316,7 +314,7 @@ export namespace helios::engine::runtime::pooling {
             assert(sparseIdx < activeIndex_.size() && "Unexpected sparse index");
 
             const auto denseIndex = activeIndex_[sparseIdx];
-            if (denseIndex == helios::ecs::types::EntityTombstone) {
+            if (denseIndex == helios::ecs::common::types::EntityTombstone) {
                 return false;
             }
 
@@ -340,8 +338,8 @@ export namespace helios::engine::runtime::pooling {
 
             // clear the queried entityHandle from active index and update
             // inactiveEntities
-            activeIndex_[sparseIdx] = helios::ecs::types::EntityTombstone;
-            versionIndex_[sparseIdx] = helios::ecs::types::EntityTombstone;
+            activeIndex_[sparseIdx] = helios::ecs::common::types::EntityTombstone;
+            versionIndex_[sparseIdx] = helios::ecs::common::types::EntityTombstone;
 
             inactiveEntities_.push_back(entityHandle);
 
@@ -374,7 +372,7 @@ export namespace helios::engine::runtime::pooling {
 
             const auto denseIndex = activeIndex_[sparseIdx];
 
-            if (denseIndex == helios::ecs::types::EntityTombstone) {
+            if (denseIndex == helios::ecs::common::types::EntityTombstone) {
                 return false;
             }
 
@@ -389,8 +387,8 @@ export namespace helios::engine::runtime::pooling {
 
             activeEntities_.pop_back();
 
-            activeIndex_[sparseIdx] = helios::ecs::types::EntityTombstone;
-            versionIndex_[sparseIdx] = helios::ecs::types::EntityTombstone;
+            activeIndex_[sparseIdx] = helios::ecs::common::types::EntityTombstone;
+            versionIndex_[sparseIdx] = helios::ecs::common::types::EntityTombstone;
 
             return true;
 

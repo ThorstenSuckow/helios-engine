@@ -7,11 +7,11 @@ module;
 
 export module helios.engine.scene.components.ViewportComponent;
 
-import helios.ecs.types.EntityHandle;
+import helios.ecs.common.types;
 import helios.engine.scene.types;
 import helios.engine.rendering.viewport.types;
 
-using namespace helios::ecs::types;
+using namespace helios::ecs::common::types;
 using namespace helios::engine::scene::types;
 using namespace helios::engine::rendering::viewport::types;
 export namespace helios::engine::scene::components {

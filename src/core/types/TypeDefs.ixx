@@ -32,13 +32,13 @@ export namespace helios::engine::core::types {
      *
      * ```cpp
      * import helios.engine.util.Guid;
-     * import helios.ecs.types;
+     * import helios.ecs.common.types;
      *
      * // Generate a new unique Guid
      * auto id = helios::engine::util::Guid::generate();
      *
      * // Declare uninitialized Guid for later assignment
-     * helios::engine::util::Guid deferredId{helios::ecs::types::no_init};
+     * helios::engine::util::Guid deferredId{helios::core::common::types::no_init};
      *
      * // Assign later
      * deferredId = helios::engine::util::Guid::generate();
@@ -59,7 +59,7 @@ export namespace helios::engine::core::types {
      * passed to constructors supporting uninitialized construction.
      *
      * ```cpp
-     * helios::engine::util::Guid id{helios::ecs::types::no_init};
+     * helios::engine::util::Guid id{helios::core::common::types::no_init};
      * ```
      *
      * @see no_init_t

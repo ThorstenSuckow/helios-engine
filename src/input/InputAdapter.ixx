@@ -15,8 +15,8 @@ import helios.engine.input.types.Gamepad;
 import helios.engine.input.gamepad.GamepadState;
 import helios.engine.input.types.Key;
 
-import helios.engine.util.log.Logger;
-import helios.engine.util.log.LogManager;
+import helios.core.log.Logger;
+import helios.core.log.LogManager;
 import helios.engine.input.gamepad.GamepadSettings;
 import helios.engine.input.gamepad.DeadzoneStrategy;
 
@@ -49,7 +49,7 @@ export namespace helios::engine::input {
         /**
          * @brief Shared logger instance for all InputAdapter objects.
          */
-        inline static const helios::engine::util::log::Logger& logger_ = helios::engine::util::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
+        inline static const helios::core::log::Logger& logger_ = helios::core::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
 
         /**
          * @brief Strategy used to normalize analog stick input within deadzones.

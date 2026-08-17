@@ -10,7 +10,7 @@ import helios.engine.runtime.world.tags.SystemRole;
 
 import helios.engine.runtime.world.UpdateContext;
 
-import helios.ecs.components;
+import helios.ecs.component;
 import helios.engine.scene.components;
 import helios.engine.spatial.components;
 
@@ -47,7 +47,7 @@ export namespace helios::engine::scene::systems {
         /**
          * @brief Role tag used for runtime registration as a system.
          */
-        using EngineRoleTag = TypedSystemRole;
+        using EcsRoleTag = TypedSystemRole;
 
         /**
          * @brief Executes the camera update pass for all active camera entities.

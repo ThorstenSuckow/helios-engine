@@ -9,36 +9,22 @@ module;
 export module helios.engine.platform.lifecycle.systems.WarmupDoneSystem;
 
 
-import helios.engine.runtime.world.UpdateContext;
+import helios.ecs;
 
-import helios.engine.runtime.world.tags.SystemRole;
-
-import helios.engine.runtime.messaging.command;
-
-import helios.engine.runtime.concepts;
-
-import helios.engine.runtime.world;
-import helios.ecs.components.Active;
-import helios.engine.rendering.shader;
-import helios.engine.rendering.texture.components;
-import helios.engine.rendering.texture.types;
-
-import helios.engine.rendering.shader.components;
-
-import helios.engine.state.commands;
-import helios.engine.state.types;
-
-import helios.engine.runtime.enginestate;
+import helios.engine.runtime;
+import helios.engine.rendering;
+import helios.engine.state;
 
 using namespace helios::engine::runtime::enginestate::types;
 using namespace helios::engine::rendering::shader::concepts;
 using namespace helios::engine::rendering::shader::types;
-using namespace helios::engine::runtime::messaging::command::concepts;
+using namespace helios::ecs::common::concepts;
+using namespace helios::ecs::command;
 using namespace helios::ecs::components;
 using namespace helios::engine::rendering::shader::components;
 using namespace helios::engine::runtime::world::tags;
 using namespace helios::engine::runtime::world;
-using namespace helios::engine::runtime::messaging::command;
+using namespace helios::ecs;
 using namespace helios::engine::state::types;
 using namespace helios::engine::state::commands;
 
@@ -49,8 +35,8 @@ export namespace helios::engine::platform::lifecycle::systems {
      *
      * @tparam TCommandBuffer Command buffer type used to queue state commands.
      */
-    template<typename TCommandBuffer = NullCommandBuffer>
-    requires IsCommandBufferLike<TCommandBuffer> &&
+    template<typename TCommandBuffer = ecs::command::NullCommandBuffer>
+    requires ecs::command::concepts::IsCommandBufferLike<TCommandBuffer> &&
              (!std::is_same_v<TCommandBuffer, NullCommandBuffer>)
     class WarmupDoneSystem {
 
@@ -61,7 +47,7 @@ export namespace helios::engine::platform::lifecycle::systems {
         /**
          * @brief Engine role marker used by runtime registries.
          */
-        using EngineRoleTag = TypedSystemRole;
+        using EcsRoleTag = TypedSystemRole;
 
         /**
          * @brief Queues `StateCommand<EngineState>` with `WarmupDoneSignal` when warmup resources are consumed.

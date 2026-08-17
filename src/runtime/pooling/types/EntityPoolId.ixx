@@ -8,9 +8,8 @@ module;
 
 export module helios.engine.runtime.pooling.types:EntityPoolId;
 
-import helios.engine.core.types;
-import helios.engine.core.types;
-import helios.ecs.types.StrongId;
+import helios.core.common.types;
+import helios.ecs.common.types;
 
 export namespace helios::engine::runtime::pooling::types {
 
@@ -26,12 +25,12 @@ export namespace helios::engine::runtime::pooling::types {
      * @details Provides type-safety when working with multiple object pools.
      * Uses FNV-1a hashing for compile-time string-based construction.
      *
-     * @see helios::ecs::types::StrongId
+     * @see helios::core::common::types::StrongId
      * @see SpawnProfileId
      * @see SpawnRuleId
      */
     template<typename THandle>
-    using EntityPoolId = helios::ecs::types::StrongId<EntityPoolIdTag<THandle>>;
+    using EntityPoolId = helios::core::common::types::StrongId<EntityPoolIdTag<THandle>>;
 
 }
 

@@ -6,7 +6,7 @@ module;
 
 export module helios.engine.runtime.world.types.GameObjectHandle;
 
-import helios.ecs.types.EntityHandle;
+import helios.ecs.common.types;
 import helios.engine.runtime.world.types.GameObjectDomainTag;
 
 export namespace helios::engine::runtime::world::types {
@@ -16,6 +16,6 @@ export namespace helios::engine::runtime::world::types {
      *
      * @see EntityHandle
      */
-    using GameObjectHandle = helios::ecs::types::EntityHandle<GameObjectDomainTag>;
+    using GameObjectHandle = helios::ecs::common::types::EntityHandle<GameObjectDomainTag>;
 
 }

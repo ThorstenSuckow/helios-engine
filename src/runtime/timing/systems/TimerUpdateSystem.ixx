@@ -13,8 +13,8 @@ import helios.engine.runtime.timing.TimerManager;
 
 
 import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.messaging.command.NullCommandBuffer;
-import helios.engine.runtime.messaging.command.concepts.IsCommandBufferLike;
+import helios.ecs.command;
+import helios.ecs.common.concepts;
 
 import helios.engine.runtime.world.tags.SystemRole;
 
@@ -26,8 +26,8 @@ using namespace helios::engine::runtime::timing;
 using namespace helios::engine::runtime::timing::types;
 using namespace helios::engine::runtime::timing::commands;
 using namespace helios::engine::runtime::world;
-using namespace helios::engine::runtime::messaging::command;
-using namespace helios::engine::runtime::messaging::command::concepts;
+using namespace helios::ecs;
+using namespace helios::ecs::common::concepts;
 
 export namespace helios::engine::runtime::timing::systems {
 
@@ -40,19 +40,19 @@ export namespace helios::engine::runtime::timing::systems {
      * @see TimerManager
      * @see Timer
      */
-    template<typename TCommandBuffer = NullCommandBuffer>
-    requires IsCommandBufferLike<TCommandBuffer>
+    template<typename TTimerManager, typename TCommandBuffer = ecs::command::NullCommandBuffer>
+    requires ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
     class TimerUpdateSystem {
 
         /**
          * @brief Reference to the TimerManager owning the timers.
          */
-        TimerManager& timerManager_;
+        TTimerManager& timerManager_;
 
     public:
 
 
-        using EngineRoleTag = helios::engine::runtime::world::tags::TypedSystemRole;
+        using EcsRoleTag = helios::engine::runtime::world::tags::TypedSystemRole;
         using CommandBuffer_type = TCommandBuffer;
 
 
@@ -61,7 +61,7 @@ export namespace helios::engine::runtime::timing::systems {
          *
          * @param timerManager The manager whose timers are updated.
          */
-        explicit TimerUpdateSystem(TimerManager& timerManager)
+        explicit TimerUpdateSystem(TTimerManager& timerManager)
         : timerManager_(timerManager) {}
 
         /**

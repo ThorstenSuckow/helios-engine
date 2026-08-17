@@ -6,7 +6,7 @@ module;
 
 export module helios.engine.rendering.material.types.MaterialHandle;
 
-import helios.ecs.types;
+import helios.ecs.common.types;
 import helios.engine.rendering.material.types.MaterialDomainTag;
 
 export namespace helios::engine::rendering::material::types {
@@ -14,6 +14,6 @@ export namespace helios::engine::rendering::material::types {
     /**
      * @brief Handle type used to reference material entities.
      */
-    using MaterialHandle = helios::ecs::types::EntityHandle<MaterialDomainTag>;
+    using MaterialHandle = helios::ecs::common::types::EntityHandle<MaterialDomainTag>;
 
 }

@@ -16,10 +16,7 @@ import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.tags.SystemRole;
 
 import helios.engine.runtime.world;
-import helios.engine.runtime.messaging.command.NullCommandBuffer;
-import helios.engine.runtime.messaging.command.concepts.IsCommandBufferLike;
-
-import helios.ecs.components.Active;
+import helios.ecs;
 
 import helios.engine.platform.window.commands;
 import helios.engine.platform.window.components;
@@ -27,8 +24,8 @@ import helios.engine.platform.window.concepts.IsWindowHandle;
 
 using namespace helios::engine::runtime::world::tags;
 using namespace helios::engine::runtime::world;
-using namespace helios::engine::runtime::messaging::command;
-using namespace helios::engine::runtime::messaging::command::concepts;
+using namespace helios::ecs;
+using namespace helios::ecs::common::concepts;
 using namespace helios::engine::platform::window::components;
 using namespace helios::engine::platform::window::concepts;
 using namespace helios::engine::platform::window::commands;
@@ -40,8 +37,8 @@ export namespace helios::engine::platform::window::systems {
      *
      * @tparam THandle Window handle type.
      */
-    template<typename THandle, typename TCommandBuffer = NullCommandBuffer>
-    requires IsWindowHandle<THandle> && IsCommandBufferLike<TCommandBuffer>
+    template<typename THandle, typename TCommandBuffer = ecs::command::NullCommandBuffer>
+    requires IsWindowHandle<THandle> && ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
     class SwapBuffersSystem {
 
     public:
@@ -51,7 +48,7 @@ export namespace helios::engine::platform::window::systems {
         /**
          * @brief Engine role marker used by runtime registries.
          */
-        using EngineRoleTag = TypedSystemRole;
+        using EcsRoleTag = TypedSystemRole;
 
         /**
          * @brief Enqueues swap-buffer commands for the current frame.

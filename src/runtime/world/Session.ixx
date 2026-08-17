@@ -12,7 +12,7 @@ module;
 export module helios.engine.runtime.world.Session;
 
 
-import helios.ecs.components;
+import helios.ecs.component;
 
 import helios.engine.state.types.StateTransitionContext;
 import helios.engine.state.components;
@@ -20,7 +20,7 @@ import helios.engine.state.types.StateTransitionId;
 import helios.engine.runtime.enginestate.EngineStateBindings;
 
 import helios.engine.runtime.world.GameObject;
-import helios.ecs.types.EntityHandle;
+import helios.ecs.common.types;
 
 import helios.engine.rendering.viewport.types.ViewportHandle;
 

@@ -13,7 +13,7 @@ import helios.engine.runtime.world.tags.SystemRole;
 
 import helios.engine.runtime.world.UpdateContext;
 
-import helios.ecs.components;
+import helios.ecs.component;
 import helios.engine.spatial.components;
 
 
@@ -55,7 +55,7 @@ export namespace helios::engine::scene::systems {
         /**
          * @brief Runtime role tag used for system registration.
          */
-        using EngineRoleTag = TypedSystemRole;
+        using EcsRoleTag = TypedSystemRole;
 
         /**
          * @brief Executes one update pass for active entities.

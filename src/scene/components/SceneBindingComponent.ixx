@@ -8,7 +8,7 @@ module;
 export module helios.engine.scene.components.SceneBindingComponent;
 
 import helios.engine.scene.types.SceneHandle;
-import helios.ecs.components.BindingComponent;
+import helios.ecs.component;
 
 using namespace helios::engine::scene::types;
 using namespace helios::ecs::components;

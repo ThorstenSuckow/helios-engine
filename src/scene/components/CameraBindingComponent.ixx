@@ -8,7 +8,7 @@ export module helios.engine.scene.components.CameraBindingComponent;
 
 import helios.engine.scene.types.CameraHandle;
 
-import helios.ecs.components.BindingComponent;
+import helios.ecs.component;
 
 using namespace helios::engine::scene::types;
 using namespace helios::ecs::components;

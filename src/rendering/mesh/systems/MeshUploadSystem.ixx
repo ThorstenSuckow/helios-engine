@@ -10,29 +10,29 @@ module;
 export module helios.engine.rendering.mesh.systems.MeshUploadSystem;
 
 import helios.engine.rendering.mesh.concepts;
-import helios.engine.runtime.messaging.command.NullCommandBuffer;
-import helios.engine.runtime.messaging.command.concepts.IsCommandBufferLike;
-import helios.engine.rendering.mesh.components.MeshDataComponent;
-import helios.engine.rendering.mesh.components.MeshUploadRequestComponent;
-import helios.engine.rendering.mesh.commands.MeshBatchUploadCommand;
+import helios.ecs.command.NullCommandBuffer;
+import helios.ecs.command.concepts;
+import helios.engine.rendering.mesh.components;
+import helios.engine.rendering.mesh.commands;
 import helios.engine.runtime.world.tags.SystemRole;
 import helios.engine.runtime.world.UpdateContext;
 
-import helios.ecs.components.Active;
+import helios.ecs.component;
 
 using namespace helios::engine::rendering::mesh::concepts;
 using namespace helios::engine::rendering::mesh::commands;
 using namespace helios::engine::rendering::mesh::components;
-using namespace helios::engine::runtime::messaging::command;
+using namespace helios::ecs;
 using namespace helios::engine::runtime::world;
 using namespace helios::engine::runtime::world::tags;
-using namespace helios::engine::runtime::messaging::command::concepts;
+using namespace helios::ecs::command::concepts;
+using namespace helios::ecs::command;
 using namespace helios::ecs::components;
 export namespace helios::engine::rendering::mesh::systems {
 
 
-    template<typename THandle, typename TCommandBuffer = NullCommandBuffer>
-    requires IsMeshHandle<THandle> && IsCommandBufferLike<TCommandBuffer>
+    template<typename THandle, typename TCommandBuffer = ecs::command::NullCommandBuffer>
+    requires IsMeshHandle<THandle> && ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
     class MeshUploadSystem {
 
         std::vector<THandle> meshHandles_;
@@ -41,7 +41,7 @@ export namespace helios::engine::rendering::mesh::systems {
 
     public:
 
-        using EngineRoleTag = TypedSystemRole;
+        using EcsRoleTag = TypedSystemRole;
         using CommandBuffer_type = TCommandBuffer;
 
         explicit MeshUploadSystem(size_t capacity = MESH_INITIAL_STORAGE_CAPACITY) : capacity_(capacity) {

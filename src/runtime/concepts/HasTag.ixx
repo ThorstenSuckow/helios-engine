@@ -11,11 +11,11 @@ export module helios.engine.runtime.concepts.HasTag;
 export namespace helios::engine::runtime::concepts {
 
     /**
-     * @brief Detects whether T declares a nested `EngineRoleTag` alias equal to Tag.
+     * @brief Detects whether T declares a nested `EcsRoleTag` alias equal to Tag.
      *
      * @details Used by role-specific concepts (IsManagerLike, IsSystemLike) to verify
      * that a type has been explicitly tagged for a particular engine role.
-     * The tag must be declared as `using EngineRoleTag = Tag;` inside the class.
+     * The tag must be declared as `using EcsRoleTag = Tag;` inside the class.
      *
      * @tparam T The type to inspect.
      * @tparam Tag The expected tag type (e.g. ManagerRole, SystemRole).
@@ -24,7 +24,7 @@ export namespace helios::engine::runtime::concepts {
      * @see SystemRole
      */
     template<class T, class Tag>
-    concept HasTag = requires { typename T::EngineRoleTag; } &&
-                 std::same_as<typename T::EngineRoleTag, Tag>;
+    concept HasTag = requires { typename T::EcsRoleTag; } &&
+                 std::same_as<typename T::EcsRoleTag, Tag>;
 
 }

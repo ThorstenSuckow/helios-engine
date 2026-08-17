@@ -13,14 +13,16 @@ export module helios.engine.core.systems.CallableSystem;
 
 import helios.engine.runtime.world.tags.SystemRole;
 import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.messaging.command.concepts;
+import helios.ecs.common.concepts;
 
-import helios.ecs.components;
+import helios.ecs.command.concepts;
+
+import helios.ecs.component;
 
 using namespace helios::ecs::components;
 using namespace helios::engine::runtime::world;
 using namespace helios::engine::runtime::world::tags;
-using namespace helios::engine::runtime::messaging::command::concepts;
+using namespace helios::ecs::common::concepts;
 export namespace helios::engine::core::systems {
 
     template <typename THandle, typename... TArgs>
@@ -41,7 +43,7 @@ export namespace helios::engine::core::systems {
 
         using Handle_type = THandle;
 
-        using EngineRoleTag = CallableSystemRole;
+        using EcsRoleTag = CallableSystemRole;
 
         /**
          * @brief Creates the system from an update callback.
@@ -67,7 +69,7 @@ export namespace helios::engine::core::systems {
      * @tparam TFunc lambda function type
      */
     template <typename THandle, typename TCommandBuffer, typename TFunc>
-    requires IsCommandBufferLike<TCommandBuffer>
+    requires ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
     class CallableSystem<THandle, TCommandBuffer, TFunc> {
 
         TFunc lambda_;
@@ -76,7 +78,7 @@ export namespace helios::engine::core::systems {
 
         using CommandBuffer_type = TCommandBuffer;
 
-        using EngineRoleTag = CallableSystemRole;
+        using EcsRoleTag = CallableSystemRole;
 
         /**
          * @brief Creates the system from an update callback.
@@ -126,7 +128,7 @@ export namespace helios::engine::core::systems {
      * @return A CallableSystem specialized for the given handle/tag type and callable.
      */
     template<typename THandle, typename TCommandBuffer, typename TFunc>
-    requires IsCommandBufferLike<TCommandBuffer>
+    requires ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
     [[nodiscard]] auto Lambda(TFunc&& func) {
         using FuncType = std::remove_cvref_t<TFunc>;
 

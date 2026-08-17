@@ -11,8 +11,8 @@ module;
 export module helios.engine.input.gamepad.GamepadState;
 
 import helios.math.types;
-import helios.engine.util.log.Logger;
-import helios.engine.util.log.LogManager;
+import helios.core.log.Logger;
+import helios.core.log.LogManager;
 
 import helios.engine.input.types.Gamepad;
 
@@ -66,7 +66,7 @@ export namespace helios::engine::input::gamepad {
         /**
          * @brief Shared logger instance for all GamepadState objects.
          */
-        inline static const helios::engine::util::log::Logger& logger_ = helios::engine::util::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
+        inline static const helios::core::log::Logger& logger_ = helios::core::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
 
 
         /**

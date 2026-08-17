@@ -6,17 +6,15 @@ module;
 
 export module helios.engine.rendering.texture.types:TextureHandle;
 
-import helios.ecs.types;
+import helios.ecs.common.types;
 
 export namespace helios::engine::rendering::texture::types {
     
     struct TextureDomainTag{};
 
-    using TextureId = helios::ecs::types::StrongId<TextureDomainTag>;
-
     /**
      * @brief Handle type used to reference texture entities.
      */
-    using TextureHandle = helios::ecs::types::EntityHandle<TextureDomainTag>;
+    using TextureHandle = helios::ecs::common::types::EntityHandle<TextureDomainTag>;
 
 }

@@ -7,7 +7,7 @@ module;
 export module helios.engine.rendering.renderTarget.types.RenderTargetHandle;
 
 
-import helios.ecs.types;
+import helios.ecs.common.types;
 import helios.engine.rendering.renderTarget.types.RenderTargetDomainTag;
 
 export namespace helios::engine::rendering::renderTarget::types {
@@ -15,6 +15,6 @@ export namespace helios::engine::rendering::renderTarget::types {
     /**
      * @brief Handle type used to reference renderTarget entities.
      */
-    using RenderTargetHandle = helios::ecs::types::EntityHandle<RenderTargetDomainTag>;
+    using RenderTargetHandle = helios::ecs::common::types::EntityHandle<RenderTargetDomainTag>;
 
 }

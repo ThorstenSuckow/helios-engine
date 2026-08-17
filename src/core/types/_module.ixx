@@ -9,6 +9,5 @@ export import :FuncDefs;
 export import :TypeDefs;
 export import :ComponentTypeTags;
 export import :ComponentTypeSpecs;
-export import :ConceptModelCollectionKey;
 
 

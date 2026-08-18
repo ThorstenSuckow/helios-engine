@@ -26,6 +26,7 @@ import helios.engine.runtime.world.UpdateContext;
 
 import helios.ecs.command.CommandHandlerRegistry;
 import helios.engine.runtime.world.Session;
+import helios.engine.runtime.world.concepts;
 import helios.engine.runtime.concepts;
 
 import helios.engine.runtime.world.Session;

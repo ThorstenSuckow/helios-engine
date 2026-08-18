@@ -28,7 +28,7 @@ import helios.ecs.command;
 
 import helios.core.thread;
 import helios.engine.core.types;
-import helios.engine.runtime.world.tags;
+
 import helios.core.log;
 
 using namespace helios::engine::runtime::pooling::types;
@@ -38,7 +38,7 @@ using namespace helios::engine::runtime::pooling::commands;
 using namespace helios::ecs;
 using namespace helios::ecs::command;
 using namespace helios::engine::runtime::world;
-using namespace helios::engine::runtime::world::tags;
+
 
 #define HELIOS_LOG_SCOPE "helios::engine::runtime::pooling::EntityPoolManager"
 export namespace helios::engine::runtime::pooling {

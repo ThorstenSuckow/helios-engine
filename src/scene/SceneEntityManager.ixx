@@ -7,14 +7,10 @@ module;
 export module helios.engine.scene.SceneEntityManager;
 
 import helios.ecs.EntityManager;
-import helios.ecs.EntityRegistry;
-import helios.engine.core.strategies;
-
 import helios.engine.scene.types;
 
 using namespace helios::engine::scene::types;
 using namespace helios::ecs;
-using namespace helios::engine::core::strategies;
 export namespace helios::engine::scene {
 
     /**

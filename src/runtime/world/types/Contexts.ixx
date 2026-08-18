@@ -20,16 +20,16 @@ export namespace helios::engine::runtime::world::types {
 
     class ManagerExecutionContext {
         UpdateContext& updateContext_;
-        ecs::EntitySpace& entitySpace_;
+        ecs::EcsWorld& ecsWorld_;
     public:
-        explicit ManagerExecutionContext(UpdateContext& updateContext, ecs::EntitySpace& entitySpace) :
-        updateContext_(updateContext), entitySpace_(entitySpace) {};
+        explicit ManagerExecutionContext(UpdateContext& updateContext, ecs::EcsWorld& ecsWorld) :
+        updateContext_(updateContext), ecsWorld_(ecsWorld) {};
         UpdateContext& updateContext() {
             return updateContext_;
         }
         template<typename THandle>
         ecs::EntityManager<THandle>& entityManager() {
-            return entitySpace_.entityManager<THandle>();
+            return ecsWorld_.entityManager<THandle>();
         }
     };
 

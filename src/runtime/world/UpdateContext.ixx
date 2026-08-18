@@ -17,7 +17,7 @@ import helios.engine.runtime.world.RuntimeEnvironment;
 import helios.ecs.common.types;
 
 
-import helios.ecs.EntitySpace;
+import helios.ecs.EcsWorld;
 import helios.ecs.View;
 import helios.engine.runtime.world.Session;
 
@@ -30,7 +30,7 @@ export namespace helios::engine::runtime::world {
      *
      * @details UpdateContext bundles frame-scoped data and services used by
      * system updates: timing values, immutable input/viewport snapshots,
-     * session/runtime environment access, typed entity access via `EngineWorld`,
+     * session/runtime environment access, typed entity access via `EcsWorld`,
      * event-bus read/write channels, and typed ECS access.
      *
      * Command submission is handled by systems through injected command buffers
@@ -39,7 +39,7 @@ export namespace helios::engine::runtime::world {
      * @see GameLoop
      * @see Session
      * @see RuntimeEnvironment
-     * @see EngineWorld
+     * @see EcsWorld
      * @see ResourceRegistry
      */
     class UpdateContext {
@@ -83,7 +83,7 @@ export namespace helios::engine::runtime::world {
         /**
          * @brief Aggregate typed world used for domain-routed ECS operations.
          */
-        helios::ecs::EntitySpace& engineWorld_;
+        helios::ecs::EcsWorld& ecsWorld_;
     public:
 
 
@@ -100,7 +100,7 @@ export namespace helios::engine::runtime::world {
          * @param frameEventBus Frame-level event bus.
          * @param inputSnapshot Immutable frame input snapshot.
          * @param level Active level pointer, or nullptr.
-         * @param engineWorld Aggregate typed world for entity operations.
+         * @param ecsWorld Aggregate typed world for entity operations.
          */
         UpdateContext(
             helios::engine::runtime::world::Session& session,
@@ -109,7 +109,7 @@ export namespace helios::engine::runtime::world {
             const float totalTime,
             const std::size_t frameCount,
             const helios::engine::input::InputSnapshot& inputSnapshot,
-            helios::ecs::EntitySpace& engineWorld
+            helios::ecs::EcsWorld& ecsWorld
         ) :
         session_(session),
         runtimeEnvironment_(runtimeEnvironment),
@@ -117,7 +117,7 @@ export namespace helios::engine::runtime::world {
         totalTime_(totalTime),
         frameCount_(frameCount),
         inputSnapshot_(inputSnapshot),
-        engineWorld_(engineWorld)
+        ecsWorld_(ecsWorld)
         {
 
         }
@@ -171,7 +171,7 @@ export namespace helios::engine::runtime::world {
          */
         template<typename THandle>
         [[nodiscard]] auto find(const THandle handle) noexcept {
-            return engineWorld_.findEntity<THandle>(handle);
+            return ecsWorld_.find<THandle>(handle);
         }
 
 
@@ -213,7 +213,7 @@ export namespace helios::engine::runtime::world {
          */
         template <typename THandle, typename... Components>
         [[nodiscard]] auto view() {
-            return engineWorld_.view<THandle, Components...>();
+            return ecsWorld_.view<THandle, Components...>();
         }
 
         /**
@@ -226,12 +226,12 @@ export namespace helios::engine::runtime::world {
          */
         template <typename THandle, typename TComponent>
         [[nodiscard]] const auto* sparseSet() const {
-            return engineWorld_.template sparseSet<THandle, TComponent>();
+            return ecsWorld_.template sparseSet<THandle, TComponent>();
         }
 
         template <typename THandle>
         [[nodiscard]] auto& entityManager() {
-            return engineWorld_.template entityManager<THandle>();
+            return ecsWorld_.template entityManager<THandle>();
         }
         /**
          * @brief Checks whether a handle refers to a valid entity in the appropriate sub-world.
@@ -241,7 +241,7 @@ export namespace helios::engine::runtime::world {
          */
         template <typename THandle>
         [[nodiscard]] bool isValid(THandle handle) const {
-            return engineWorld_.template isValid<THandle>(handle);
+            return ecsWorld_.template isValid<THandle>(handle);
         }
 
         /**
@@ -254,7 +254,7 @@ export namespace helios::engine::runtime::world {
          */
         template <typename THandle = void, typename... Components>
         void clearDirtySets() {
-            engineWorld_.clearDirtySets<THandle, Components...>();
+            ecsWorld_.clearDirtySets<THandle, Components...>();
         }
 
     };

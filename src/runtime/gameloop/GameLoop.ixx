@@ -159,7 +159,7 @@ export namespace helios::engine::runtime::gameloop {
                   totalTime_,
                   frameCount_,
                   inputSnapshot,
-                  gameWorld_.entitySpace()
+                  gameWorld_.ecsWorld()
             );
 
             auto& session = gameWorld_.session();

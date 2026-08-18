@@ -64,6 +64,10 @@ export namespace helios::engine::runtime::world {
 
         EcsWorld ecsWorld_;
 
+        ecs::manager::ManagerRegistry managerRegistry_{};
+
+        ecs::command::CommandHandlerRegistry commandHandlerRegistry_{};
+
         /**
          * @brief Session object storing runtime/game state.
          */
@@ -102,8 +106,8 @@ export namespace helios::engine::runtime::world {
         GameWorld(GameWorld&&) = default;
         GameWorld& operator=(GameWorld&&) = delete;
 
-        [[nodiscard]] EntitySpace& entitySpace() {
-            return ecsWorld_.entitySpace();
+        [[nodiscard]] EcsWorld& ecsWorld() {
+            return ecsWorld_;
         }
 
         /**
@@ -148,7 +152,7 @@ export namespace helios::engine::runtime::world {
          * @brief Initializes managers and command buffers.
          */
         GameWorld& init(ContextProvider& contextProvider) {
-            for (auto& manager : ecsWorld_.managerRegistry().items()) {
+            for (auto& manager : managerRegistry_.items()) {
                 auto initContextTypeId = manager->expectedInitContextTypeId();
 
                 auto contextRef = contextProvider.get(initContextTypeId);
@@ -169,7 +173,7 @@ export namespace helios::engine::runtime::world {
         template<typename T>
         requires ecs::manager::concepts::IsManagerLike<T>
         [[nodiscard]] bool hasManager() const {
-            return ecsWorld_.hasManager<T>();
+            return managerRegistry_.has<T>();
         }
 
 
@@ -187,7 +191,7 @@ export namespace helios::engine::runtime::world {
         template<typename T, typename... Args>
         requires helios::ecs::manager::concepts::IsManagerLike<T>
         T& registerManager(Args&&... args) {
-            return ecsWorld_.registerManager<T>(std::forward<Args>(args)...);
+            return managerRegistry_.add<T>(std::forward<Args>(args)...);
         }
 
 
@@ -201,7 +205,7 @@ export namespace helios::engine::runtime::world {
         template<typename T>
         requires helios::ecs::manager::concepts::IsManagerLike<T>
         T* tryManager() noexcept {
-            return ecsWorld_.tryManager<T>();
+            return managerRegistry_.item<T>();
         }
 
         /**
@@ -214,7 +218,7 @@ export namespace helios::engine::runtime::world {
         template<typename T>
         requires helios::ecs::manager::concepts::IsManagerLike<T>
         const T* tryManager() const noexcept {
-            return ecsWorld_.tryManager<T>();
+            return managerRegistry_.item<T>();
         }
 
 
@@ -224,7 +228,7 @@ export namespace helios::engine::runtime::world {
          * @return Reference to the CommandHandlerRegistry.
          */
         [[nodiscard]] ecs::command::CommandHandlerRegistry& commandHandlerRegistry() noexcept {
-            return ecsWorld_.commandHandlerRegistry();
+            return commandHandlerRegistry_;
         }
 
         /**
@@ -233,7 +237,7 @@ export namespace helios::engine::runtime::world {
          * @return Reference to the ManagerRegistry.
          */
         [[nodiscard]] ecs::manager::ManagerRegistry& managerRegistry() noexcept {
-            return ecsWorld_.managerRegistry();
+            return managerRegistry_;
         }
 
 
@@ -244,8 +248,9 @@ export namespace helios::engine::runtime::world {
          * accumulated state. Invokes reset() on all managers and the session.
          */
         void reset() {
-            ecsWorld_.reset();
-            session_.reset();
+            for (auto& mgr : managerRegistry_.items()) {
+                mgr->reset();
+            }
         }
 
 
@@ -260,7 +265,7 @@ export namespace helios::engine::runtime::world {
          */
         template <typename THandle, typename... Components>
         [[nodiscard]] auto view() {
-            return ecsWorld_.entitySpace().view<THandle, Components...>();
+            return ecsWorld_.view<THandle, Components...>();
         }
 
         /**
@@ -273,8 +278,8 @@ export namespace helios::engine::runtime::world {
          * @return Domain-specific entity facade (or empty facade if not found).
          */
         template<typename THandle>
-        [[nodiscard]] auto findEntity(const THandle handle) noexcept {
-            return ecsWorld_.entitySpace().findEntity<THandle>(handle);
+        [[nodiscard]] auto find(const THandle handle) noexcept {
+            return ecsWorld_.find<THandle>(handle);
         }
 
         /**
@@ -286,8 +291,8 @@ export namespace helios::engine::runtime::world {
          * @return Domain-specific entity facade for the created entity.
          */
         template<typename THandle>
-        [[nodiscard]] auto addEntity(const bool isActive = true) noexcept {
-            auto entity = ecsWorld_.entitySpace().addEntity<THandle>();
+        [[nodiscard]] auto add(const bool isActive = true) noexcept {
+            auto entity = ecsWorld_.add<THandle>();
             entity.setActive(isActive);
             return entity;
         }
@@ -303,7 +308,7 @@ export namespace helios::engine::runtime::world {
          */
         template<typename THandle>
         [[nodiscard]] auto destroy(const THandle handle) noexcept {
-            return ecsWorld_.entitySpace().destroy<THandle>(handle);
+            return ecsWorld_.destroy<THandle>(handle);
         }
 
 
@@ -315,7 +320,7 @@ export namespace helios::engine::runtime::world {
          */
         template<typename THandle>
         auto& entityManager() noexcept {
-            return ecsWorld_.entitySpace().entityManager<THandle>();
+            return ecsWorld_.entityManager<THandle>();
         }
 
     };

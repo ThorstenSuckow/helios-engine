@@ -80,7 +80,7 @@ export namespace helios::engine::runtime::pooling {
         /**
          * @brief Reference to the engine world used for cloning prefab entities.
          */
-        ecs::EntitySpace& entitySpace_;
+        ecs::EcsWorld& ecsWorld_;
 
         /**
          * @brief Returns the mutable command queue for `THandle`.
@@ -145,11 +145,11 @@ export namespace helios::engine::runtime::pooling {
                 const size_t space = used < entityPool->size() ? entityPool->size() - used : 0;
                 const auto prefabHandle = command.prefabHandle;
 
-                auto source = entitySpace_.findEntity(prefabHandle);
+                auto source = ecsWorld_.find(prefabHandle);
                 source->template remove<PrefabEntityPoolRequestComponent<THandle>>();
 
                 for (size_t i = 0; i < space; i++) {
-                    auto go = entitySpace_.copyEntity(prefabHandle);
+                    auto go = ecsWorld_.copy(prefabHandle);
                     go.setActive(false);
                     entityPool->addInactive(go.handle());
                 }
@@ -184,7 +184,7 @@ export namespace helios::engine::runtime::pooling {
                 }
 
                 entityPool->release(handle);
-                if (auto entity = entitySpace_.findEntity(handle)) {
+                if (auto entity = ecsWorld_.find(handle)) {
                     entity->setActive(false);
                 }
             }
@@ -211,10 +211,10 @@ export namespace helios::engine::runtime::pooling {
         */
         template<typename THandle>
         void releaseAll() {
-            entityPoolRegistry_.template forEach<THandle>([&entitySpace = entitySpace_](EntityPool<THandle>& entityPool) {
+            entityPoolRegistry_.template forEach<THandle>([&ecsWorld = ecsWorld_](EntityPool<THandle>& entityPool) {
                 for (auto entityHandle : entityPool.activeEntities()) {
                     entityPool.release(entityHandle);
-                    if (auto go = entitySpace.findEntity(entityHandle)) {
+                    if (auto go = ecsWorld.find(entityHandle)) {
                         go->setActive(false);
                     }
                 }
@@ -233,13 +233,13 @@ export namespace helios::engine::runtime::pooling {
          * @brief Constructs an `EntityPoolManager`.
          *
          * @param entityPoolRegistry
-         * @param entitySpace  Engine world used for cloning prefab entities.
+         * @param ecsWorld  Engine world used for cloning prefab entities.
          * @param jobSystem    Job system used by `flushParallel()`.
          */
         explicit EntityPoolManager(
         TypedEntityPoolRegistry<TLookupStrategy, TMemberHandles...>&  entityPoolRegistry,
-        EntitySpace& entitySpace, JobSystem& jobSystem)
-        : entityPoolRegistry_(entityPoolRegistry), entitySpace_(entitySpace), jobSystem_(jobSystem) {}
+        EcsWorld& ecsWorld, JobSystem& jobSystem)
+        : entityPoolRegistry_(entityPoolRegistry), ecsWorld_(ecsWorld), jobSystem_(jobSystem) {}
 
 
 

@@ -10,7 +10,6 @@ export import helios.engine.core.TypedTupleCat;
 export import helios.engine.core.components;
 export import helios.engine.core.container;
 export import helios.engine.core.types;
-export import helios.engine.core.strategies;
 export import helios.engine.core.spatial;
 export import helios.engine.core.units;
 export import helios.engine.core.systems;

@@ -10,30 +10,34 @@ module;
 #include <cassert>
 #include <vector>
 #include <functional>
+#include <iostream>
+#include <exception>
+#include "helios-engine-config.h"
 
 export module helios.engine.runtime.gameloop:Pass;
 
 import helios.engine.runtime.world.GameWorld;
-import helios.engine.runtime.world.SystemRegistry;
-import helios.engine.runtime.world.System;
+import helios.engine.runtime.world.ContextProvider;
 import helios.engine.runtime.world.concepts;
 import helios.engine.runtime.world.types;
 
-import helios.ecs.types;
-import helios.ecs.concepts;
+import helios.ecs.common.types;
+import helios.ecs.common.concepts;
+
+import helios.ecs.manager;
+import helios.ecs.system;
 
 import helios.engine.runtime.world.UpdateContext;
 
 import helios.engine.runtime.enginestate.types;
 
-using namespace helios::ecs::types;
-using namespace helios::ecs::concepts;
+using namespace helios::ecs::common::types;
+using namespace helios::ecs::common::concepts;
 using namespace helios::engine::runtime::world;
 using namespace helios::engine::runtime::world::concepts;
 using namespace helios::engine::runtime::world::types;
 export namespace helios::engine::runtime::gameloop {
 
-    template<typename TTypedHandleWorld>
     class Phase;
 
     /**
@@ -53,16 +57,14 @@ export namespace helios::engine::runtime::gameloop {
      * @see Phase
      * @see System
      */
-    template<typename TTypedHandleWorld>
     class Pass {
 
-        using GameWorld = GameWorld<TTypedHandleWorld>;
-
+        friend class helios::engine::runtime::gameloop::Phase;
     protected:
         /**
          * @brief Registry holding all systems for this pass.
          */
-        helios::engine::runtime::world::SystemRegistry<TTypedHandleWorld> systemRegistry_{};
+        ecs::system::SystemRegistry systemRegistry_{};
 
         /**
          * @brief Ordered queue of system type IDs that drives execution order within this pass.
@@ -77,7 +79,7 @@ export namespace helios::engine::runtime::gameloop {
          *
          * A single-entry slot with a single-entry serial group is therefore a plain sequential system.
          */
-        std::vector<std::vector<std::vector<SystemTypeId>>> systemTypeIdQueue_;
+        std::vector<std::vector<std::vector<ecs::system::types::SystemTypeId>>> systemTypeIdQueue_;
 
         /**
          * @brief Reference to the owning GameWorld.
@@ -87,15 +89,17 @@ export namespace helios::engine::runtime::gameloop {
          */
         GameWorld& gameWorld_;
 
+        ContextProvider& contextProvider_;
+
         /**
          * @brief List of ManagerTypeIds.
          */
-        std::vector<ManagerTypeId> managerTypeIds_;
+        std::vector<ecs::manager::types::ManagerTypeId> managerTypeIds_;
 
         /**
          * @brief List of ManagerTypeIds for parallel execution.
          */
-        std::vector<ManagerTypeId> parallelManagerTypeIds_;
+        std::vector<ecs::manager::types::ManagerTypeId> parallelManagerTypeIds_;
 
         /**
          * @brief Registers the ManagerTypeIds for the Managers this pass should flush.
@@ -103,9 +107,16 @@ export namespace helios::engine::runtime::gameloop {
          * @tparam T The type of the manager to register.
          */
         template<typename T>
-        void registerManagerFlush() {
-            assert(gameWorld_.template tryManager<T>() && "Manager buffer not found for system's manager");
-            managerTypeIds_.push_back(ManagerTypeId::template id<T>());
+        void registerManagerExecuteCommands() {
+            if (!gameWorld_.tryManager<T>()) {
+                #if HELIOS_DEBUG
+                std::cerr << "Manager not found for system's manager: " << typeid(T).name() << '\n';
+                assert(gameWorld_.template tryManager<T>() && "Manager not found for system's manager");
+                #endif
+                std::terminate();
+            }
+
+            managerTypeIds_.push_back(ecs::manager::types::ManagerTypeId::template id<T>());
         }
 
         /**
@@ -114,10 +125,10 @@ export namespace helios::engine::runtime::gameloop {
          * @tparam T The type of the manager to register.
          */
         template<typename T>
-        requires ecs::concepts::HasFlushParallel<T>
-        void registerManagerParallelFlush() {
-            assert(gameWorld_.template tryManager<T>() && "Manager buffer not found for system's manager");
-            parallelManagerTypeIds_.push_back(ManagerTypeId::template id<T>());
+        requires ecs::manager::concepts::HasExecuteCommandsParallel<T>
+        void registerManagerExecuteCommandsParallel() {
+            assert(gameWorld_.template tryManager<T>() && "Manager not found for system's manager");
+            parallelManagerTypeIds_.push_back(ecs::manager::types::ManagerTypeId::template id<T>());
         }
 
         /**
@@ -131,7 +142,7 @@ export namespace helios::engine::runtime::gameloop {
          * @return Reference to this pass.
          */
         template<typename TSystem>
-        requires helios::engine::runtime::world::concepts::IsCallableSystemLike<std::remove_cvref_t<TSystem>>
+        requires ecs::system::concepts::IsCallableSystemLike<std::remove_cvref_t<TSystem>>
         Pass& registerCallableSystem(TSystem&& system, const bool isParallel = false) {
 
             using SystemType = std::remove_cvref_t<TSystem>;
@@ -139,15 +150,12 @@ export namespace helios::engine::runtime::gameloop {
             if constexpr (requires { typename SystemType::CommandBuffer_type; }) {
                 using TCommandBuffer = typename TSystem::CommandBuffer_type;
 
-                auto cmdBuffer = TCommandBuffer{};
-                cmdBuffer.init(gameWorld_.commandHandlerRegistry(), gameWorld_.managerRegistry());
-
                 systemRegistry_.template add<SystemType>(
-                    System(std::forward<TSystem>(system), gameWorld_.typedHandleWorld(), std::move(cmdBuffer))
+                    ecs::system::System(std::forward<TSystem>(system), TCommandBuffer{})
                 );
             } else {
                 systemRegistry_.template add<SystemType>(
-                    System(std::forward<TSystem>(system), gameWorld_.typedHandleWorld())
+                    ecs::system::System(std::forward<TSystem>(system))
                 );
             }
 
@@ -167,7 +175,7 @@ export namespace helios::engine::runtime::gameloop {
          * @return Reference to this pass.
          */
         template<typename TSystem>
-        requires helios::engine::runtime::world::concepts::IsTypedSystemLike<std::remove_cvref_t<TSystem>>
+        requires ecs::system::concepts::IsTypedSystemLike<std::remove_cvref_t<TSystem>>
         Pass& registerParallelTypedSystemInstance(TSystem&& system) {
 
             using T = std::remove_cvref_t<TSystem>;
@@ -175,11 +183,11 @@ export namespace helios::engine::runtime::gameloop {
             if constexpr (requires { typename T::CommandBuffer_type; }) {
                 using TCommandBuffer = typename T::CommandBuffer_type;
                 systemRegistry_.template add<T>(
-                    System(std::forward<TSystem>(system), gameWorld_.typedHandleWorld(), TCommandBuffer())
+                    ecs::system::System(std::forward<TSystem>(system), TCommandBuffer{})
                 );
             } else {
                 systemRegistry_.template add<T>(
-                    System(std::forward<TSystem>(system), gameWorld_.typedHandleWorld())
+                    ecs::system::System(std::forward<TSystem>(system))
                 );
             }
 
@@ -196,21 +204,25 @@ export namespace helios::engine::runtime::gameloop {
          * @return This pass.
          */
         template<typename T, typename... Args>
-        requires helios::engine::runtime::world::concepts::IsTypedSystemLike<T>
+        requires ecs::system::concepts::IsTypedSystemLike<T>
         Pass& registerTypedSystem(Args&&... args) {
 
             T concreteSystem(std::forward<Args>(args)...);
 
-            void* bufferPtr = nullptr;
             if constexpr (requires { typename T::CommandBuffer_type; }) {
                 using TCommandBuffer = typename T::CommandBuffer_type;
-                bufferPtr = gameWorld_.template tryCommandBuffer<TCommandBuffer>();
-                assert(bufferPtr && "Command buffer not found for system's CommandBuffer_type");
+                auto cmdBuffer = TCommandBuffer{};
+
+                systemRegistry_.template add<T>(
+                    ecs::system::System(std::move(concreteSystem), std::move(cmdBuffer))
+                );
+            } else {
+                systemRegistry_.template add<T>(
+                    ecs::system::System(std::move(concreteSystem))
+                );
             }
 
-            systemRegistry_.template add<T>(
-                System(std::move(concreteSystem), gameWorld_.typedHandleWorld(), bufferPtr)
-            );
+
 
             return *this;
         }
@@ -239,6 +251,48 @@ export namespace helios::engine::runtime::gameloop {
             return *this;
         }
 
+        virtual void onPassEnd(helios::engine::runtime::world::UpdateContext& updateContext) = 0;
+
+        /**
+         * @brief Initializes all systems in this pass.
+         */
+        virtual void init() = 0;
+
+        /**
+         * @brief Updates all systems in this pass.
+         *
+         * @param updateContext The current update context.
+         */
+        virtual void update(helios::engine::runtime::world::UpdateContext& updateContext) = 0;
+
+
+        /**
+         * @brief Determines if this pass should execute.
+         *
+         * @param updateContext The current update context.
+         *
+         * @return True if the pass should run.
+         */
+        virtual bool shouldRun(helios::engine::runtime::world::UpdateContext& updateContext) const noexcept = 0;
+
+        /**
+         * @brief Returns a span of the ManagerTypeIds this pass is flushing.
+         *
+         * @return A span of ManagerTypeIds.
+         */
+        [[nodiscard]] std::span<const ecs::manager::types::ManagerTypeId> managerTypeIds() noexcept {
+            return managerTypeIds_;
+        }
+
+        /**
+         * @brief Returns a span of the ManagerTypeIds this pass is flushing in parallel.
+         *
+         * @return A span of ManagerTypeIds.
+         */
+        [[nodiscard]] std::span<const ecs::manager::types::ManagerTypeId> parallelManagerTypeIds() noexcept {
+            return parallelManagerTypeIds_;
+        }
+
     public:
 
         using RunCondition = std::function<bool(helios::engine::runtime::world::UpdateContext&)>;
@@ -252,38 +306,18 @@ export namespace helios::engine::runtime::gameloop {
          * @param gameWorld GameWorld used for system initialization and
          *        command buffer lookup.
          */
-        explicit Pass(GameWorld& gameWorld) : gameWorld_(gameWorld) {};
+        explicit Pass(GameWorld& gameWorld, ContextProvider& contextProvider)
+        : gameWorld_(gameWorld), contextProvider_(contextProvider) {};
 
-        /**
-         * @brief Updates all systems in this pass.
-         *
-         * @param updateContext The current update context.
-         */
-        virtual void update(helios::engine::runtime::world::UpdateContext& updateContext) = 0;
 
-        virtual void onPassEnd(helios::engine::runtime::world::UpdateContext& updateContext) = 0;
-
-        /**
-         * @brief Initializes all systems in this pass.
-         */
-        virtual void init() = 0;
 
         /**
          * @brief Ends this pass.
          *
          * @return Reference to the owning phase.
          */
-        virtual Phase<TTypedHandleWorld>& endPass() = 0;
+        virtual Phase& endPass() = 0;
 
-
-        /**
-         * @brief Determines if this pass should execute.
-         *
-         * @param updateContext The current update context.
-         *
-         * @return True if the pass should run.
-         */
-        virtual bool shouldRun(helios::engine::runtime::world::UpdateContext& updateContext) const noexcept = 0;
 
         /**
          * @brief Specifies an additional condition to be considered with shouldRun().
@@ -309,14 +343,14 @@ export namespace helios::engine::runtime::gameloop {
          * @return Reference to this Pass for method chaining.
          */
         template<typename T, typename... Args>
-        requires helios::engine::runtime::world::concepts::IsTypedSystemLike<T>
+        requires ecs::system::concepts::IsTypedSystemLike<T>
         Pass& addSystem(Args&&... args) {
 
             registerTypedSystem<T>(std::forward<Args>(args)...);
 
             systemTypeIdQueue_.push_back(
                 {
-                {SystemTypeId::template id<T>()}
+                {ecs::system::types::SystemTypeId::template id<T>()}
             }
             );
 
@@ -337,10 +371,10 @@ export namespace helios::engine::runtime::gameloop {
          * @return Reference to this Pass for method chaining.
          */
         template<typename TSystem>
-        requires helios::engine::runtime::world::concepts::IsCallableSystemLike<std::remove_cvref_t<TSystem>>
+        requires ecs::system::concepts::IsCallableSystemLike<std::remove_cvref_t<TSystem>>
         Pass& addSystem(TSystem&& system) {
             registerCallableSystem(std::forward<TSystem>(system));
-            systemTypeIdQueue_.push_back({{SystemTypeId::template id<TSystem>()}});
+            systemTypeIdQueue_.push_back({{ecs::system::types::SystemTypeId::template id<TSystem>()}});
             return *this;
         }
 
@@ -352,14 +386,14 @@ export namespace helios::engine::runtime::gameloop {
          * @return Reference to this pass.
          */
         template<typename ... TSystem>
-        requires (helios::engine::runtime::world::concepts::IsCallableSystemLike<std::remove_cvref_t<TSystem>> && ...)
+        requires (ecs::system::concepts::IsCallableSystemLike<std::remove_cvref_t<TSystem>> && ...)
            && (sizeof...(TSystem) >= 2)
         Pass& addParallelSystems(TSystem&&... system) {
             (registerCallableSystem(std::forward<TSystem>(system)), ...);
 
             auto& group = systemTypeIdQueue_.emplace_back();
             group.reserve(sizeof...(TSystem));
-            (group.push_back({{SystemTypeId::template id<std::remove_cvref_t<TSystem>>()}}), ...);
+            (group.push_back({{ecs::system::types::SystemTypeId::template id<std::remove_cvref_t<TSystem>>()}}), ...);
             
             return *this;
         }
@@ -384,7 +418,7 @@ export namespace helios::engine::runtime::gameloop {
          * @return Reference to this pass for method chaining.
          */
         template<typename ...TSystem>
-        requires (helios::engine::runtime::world::concepts::IsTypedSystemLike<std::remove_cvref_t<TSystem>> && ...)
+        requires (ecs::system::concepts::IsTypedSystemLike<std::remove_cvref_t<TSystem>> && ...)
                 && (sizeof...(TSystem) >= 2)
         Pass& addParallelSystems(TSystem&&... system) {
 
@@ -392,7 +426,7 @@ export namespace helios::engine::runtime::gameloop {
 
             auto& group = systemTypeIdQueue_.emplace_back();
             group.reserve(sizeof...(TSystem));
-            (group.push_back({{SystemTypeId::template id<std::remove_cvref_t<TSystem>>()}}), ...);
+            (group.push_back({{ecs::system::types::SystemTypeId::template id<std::remove_cvref_t<TSystem>>()}}), ...);
 
             return *this;
         }
@@ -405,7 +439,7 @@ export namespace helios::engine::runtime::gameloop {
          * @return Reference to this Pass for method chaining.
          */
         template<typename ...TSystem>
-         requires (helios::engine::runtime::world::concepts::IsTypedSystemLike<TSystem> && ...)
+         requires (ecs::system::concepts::IsTypedSystemLike<TSystem> && ...)
                  && (sizeof...(TSystem) >= 2)
          Pass& addParallelSystems() {
 
@@ -413,7 +447,7 @@ export namespace helios::engine::runtime::gameloop {
 
             auto& group = systemTypeIdQueue_.emplace_back();
             group.reserve(sizeof...(TSystem));
-            (group.push_back({{SystemTypeId::template id<TSystem>()}}), ...);
+            (group.push_back({{ecs::system::types::SystemTypeId::template id<TSystem>()}}), ...);
 
             return *this;
         }
@@ -438,7 +472,7 @@ export namespace helios::engine::runtime::gameloop {
          * @return Reference to this pass for method chaining.
          */
         template <typename ... TSerials>
-        requires (sizeof ...(TSerials) >= 1) && ((IsSerialLike<TSerials>) && ...)
+        requires (sizeof ...(TSerials) >= 1) && ((ecs::system::concepts::IsSerialLike<TSerials>) && ...)
         Pass& addParallelSystems() {
 
             auto& parallelGroup = systemTypeIdQueue_.emplace_back();
@@ -448,12 +482,12 @@ export namespace helios::engine::runtime::gameloop {
             <typename TSystem>
             (auto& serialGroup) {
                 registerParallelTypedSystemInstance<TSystem>(TSystem{});
-                serialGroup.push_back({{SystemTypeId::template id<TSystem>()}});
+                serialGroup.push_back({{ecs::system::types::SystemTypeId::template id<TSystem>()}});
             };
 
             auto registerSystems = [this, &addSystemInstance]
             <typename ...TSystems>
-            (Serial<TSystems...>, auto& serialGroup) {
+            (ecs::system::concepts::Serial<TSystems...>, auto& serialGroup) {
                 serialGroup.reserve(sizeof...(TSystems));
                 (addSystemInstance.template operator()<TSystems>(serialGroup), ...);
             };
@@ -471,10 +505,10 @@ export namespace helios::engine::runtime::gameloop {
          * @return Reference to this Pass for method chaining.
          */
         template<typename... T>
-        requires (IsManagerLike<T> && ...)
-        Pass& flush() {
+        requires (ecs::manager::concepts::IsManagerLike<T> && ...)
+        Pass& executeCommands() {
 
-            (registerManagerFlush<T>(), ...);
+            (registerManagerExecuteCommands<T>(), ...);
 
             return *this;
         }
@@ -486,31 +520,14 @@ export namespace helios::engine::runtime::gameloop {
          * @return Reference to this Pass for method chaining.
          */
         template<typename TManager>
-        requires (IsManagerLike<TManager> && HasFlushParallel<TManager>)
-        Pass& flushParallel() {
+        requires (ecs::manager::concepts::IsManagerLike<TManager> && ecs::manager::concepts::HasExecuteCommandsParallel<TManager>)
+        Pass& executeCommandsParallel() {
 
-            registerManagerParallelFlush<TManager>();
+            registerManagerExecuteCommandsParallel<TManager>();
 
             return *this;
         }
 
-        /**
-         * @brief Returns a span of the ManagerTypeIds this pass is flushing.
-         *
-         * @return A span of ManagerTypeIds.
-         */
-        [[nodiscard]] std::span<const ManagerTypeId> managerTypeIds() noexcept {
-            return managerTypeIds_;
-        }
-
-        /**
-         * @brief Returns a span of the ManagerTypeIds this pass is flushing in parallel.
-         *
-         * @return A span of ManagerTypeIds.
-         */
-        [[nodiscard]] std::span<const ManagerTypeId> parallelManagerTypeIds() noexcept {
-            return parallelManagerTypeIds_;
-        }
 
     };
 

@@ -14,6 +14,7 @@ import :TypedPass;
 
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.GameWorld;
+import helios.engine.runtime.world.ContextProvider;
 
 import helios.engine.runtime.world.Session;
 
@@ -25,53 +26,38 @@ using namespace helios::engine::runtime::world;
 
 export namespace helios::engine::runtime::gameloop {
 
-    template<typename TTypedHandleWorld>
     class GameLoop;
 
 
     /**
      * @brief Enumeration of game loop phase types.
-     *
-     * The game loop is divided into three sequential phases:
-     * - **Pre:** Input processing and command generation.
-     * - **Main:** Core gameplay simulation (physics, AI, game logic).
-     * - **Post:** Synchronization, cleanup, and preparation for rendering.
      */
     enum class PhaseType {
-        /**
-         * @brief Pre-update phase for input and command processing.
-         */
         Pre,
-
-        /**
-         * @brief Main update phase for core gameplay systems.
-         */
         Main,
-
-        /**
-         * @brief Post-update phase for cleanup and scene synchronization.
-         */
         Post
     };
 
     /**
      * @brief Represents a phase in the game loop containing multiple passes.
-     *
-     * @see Pass
-     * @see GameLoop
      */
-    template<typename TTypedHandleWorld>
     class Phase {
 
-        friend class helios::engine::runtime::gameloop::GameLoop<TTypedHandleWorld>;
+        friend class helios::engine::runtime::gameloop::GameLoop;
 
+        /**
+         * @brief Collection of passes belonging to this phase.
+         */
+        std::vector<std::unique_ptr<Pass>> passEntries_;
+
+        GameWorld& gameWorld_;
+
+        ContextProvider& contextProvider_;
 
         /**
          * @brief Initializes all passes within this phase.
-         *
-         * @param gameWorld Reference to the game world.
          */
-        void init(GameWorld<TTypedHandleWorld>& gameWorld){
+        void init(){
             for (auto& pass : passEntries_) {
                 // every pass contains systems that are updated here
                 pass->init();
@@ -81,14 +67,9 @@ export namespace helios::engine::runtime::gameloop {
         /**
          * @brief Updates all passes within this phase.
          *
-         * @param gameWorld The game world where the update occurred.
          * @param updateContext The current update context.
-         *
-         * @see CommitPoint
-         * @see Pass::addCommitPoint()
-         * @see Pass::runsIn()
          */
-        void update(GameWorld<TTypedHandleWorld>& gameWorld, runtime::world::UpdateContext& updateContext){
+        void update(runtime::world::UpdateContext& updateContext){
 
             for (auto& pass : passEntries_) {
 
@@ -96,21 +77,9 @@ export namespace helios::engine::runtime::gameloop {
                     pass->update(updateContext);
                     pass->onPassEnd(updateContext);
                 }
-
             }
         };
 
-        /**
-         * @brief Collection of passes belonging to this phase.
-         */
-        std::vector<std::unique_ptr<Pass<TTypedHandleWorld>>> passEntries_;
-
-        /**
-         * @brief Reference to the owning GameLoop.
-         */
-        helios::engine::runtime::gameloop::GameLoop<TTypedHandleWorld>& gameloop_;
-
-        helios::engine::runtime::world::GameWorld<TTypedHandleWorld>& gameWorld_;
 
     public:
 
@@ -120,18 +89,13 @@ export namespace helios::engine::runtime::gameloop {
          * @param gameloop Reference to the parent GameLoop.
          * @param gameWorld Shared GameWorld used by passes in this phase.
          */
-        explicit Phase(helios::engine::runtime::gameloop::GameLoop<TTypedHandleWorld>& gameloop, GameWorld<TTypedHandleWorld>& gameWorld) : gameloop_(gameloop), gameWorld_(gameWorld) {
-
+        explicit Phase(GameWorld& gameWorld, ContextProvider& contextProvider)
+        : gameWorld_(gameWorld), contextProvider_(contextProvider) {
         }
 
 
         /**
          * @brief Creates and adds a new typed pass to this phase.
-         *
-         * @details The state parameter specifies in which states this pass
-         * should execute. Passes are skipped if the current state does not
-         * match the configured mask (using bitwise AND). New passes are
-         * bound to this phase's GameWorld reference.
          *
          * @tparam StateType The state enum type (e.g., GameState, MatchState).
          *
@@ -143,8 +107,8 @@ export namespace helios::engine::runtime::gameloop {
          * @see Session::state()
          */
         template<typename StateType>
-        Pass<TTypedHandleWorld>& beginPass(const StateType t) {
-            auto entry = std::make_unique<TypedPass<StateType, TTypedHandleWorld>>(*this, t, gameWorld_);
+        Pass& beginPass(const StateType t) {
+            auto entry = std::make_unique<TypedPass<StateType>>(*this, t, gameWorld_, contextProvider_);
             auto* raw = entry.get();
             passEntries_.emplace_back(std::move(entry));
 

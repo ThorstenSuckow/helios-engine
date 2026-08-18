@@ -8,12 +8,13 @@ module;
 #include <utility>
 #include <cassert>
 #include <functional>
+#include "helios-engine-config.h"
+
 
 export module helios.engine.runtime.gameloop:TypedPass;
 
 import :Pass;
 
-import helios.engine.runtime.world.SystemRegistry;
 import helios.core.thread.JobSystem;
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.Session;
@@ -23,7 +24,6 @@ import helios.engine.runtime.enginestate.types;
 using namespace helios::core::thread;
 export namespace helios::engine::runtime::gameloop {
 
-    template<typename TTypedHandleWorld>
     class Phase;
 
     /**
@@ -54,15 +54,15 @@ export namespace helios::engine::runtime::gameloop {
      * @see Phase::beginPass()
      * @see Session::state()
      */
-    template<typename StateType, typename TTypedHandleWorld>
-    class TypedPass : public Pass<TTypedHandleWorld> {
+    template<typename StateType>
+    class TypedPass : public Pass {
 
-        friend class helios::engine::runtime::gameloop::Phase<TTypedHandleWorld>;
+        friend class helios::engine::runtime::gameloop::Phase;
 
         /**
          * @brief Reference to the owning Phase.
          */
-        Phase<TTypedHandleWorld>& owner_;
+        Phase& owner_;
 
         /**
          * @brief Bitmask of states in which this pass should execute.
@@ -74,11 +74,16 @@ export namespace helios::engine::runtime::gameloop {
          */
         JobSystem* jobSystem_;
 
-        using Pass<TTypedHandleWorld>::systemRegistry_;
-        using Pass<TTypedHandleWorld>::systemTypeIdQueue_;
-        using Pass<TTypedHandleWorld>::managerTypeIds;
-        using Pass<TTypedHandleWorld>::parallelManagerTypeIds;
-        using Pass<TTypedHandleWorld>::gameWorld_;
+        using RunCondition = typename Pass::RunCondition;
+
+        std::vector<RunCondition> runConditions_;
+
+        using Pass::systemRegistry_;
+        using Pass::systemTypeIdQueue_;
+        using Pass::managerTypeIds;
+        using Pass::parallelManagerTypeIds;
+        using Pass::gameWorld_;
+        using Pass::contextProvider_;
 
         /**
          * @brief Updates all systems registered in this pass.
@@ -94,10 +99,16 @@ export namespace helios::engine::runtime::gameloop {
                 // parallelSystems with only one entry are treated serial
                 if (parallelSystems.size() == 1) {
                     for (const auto& serialSystem : parallelSystems[0]) {
-                        auto* sys = systemRegistry_.item(serialSystem);
+                        auto* system = systemRegistry_.item(serialSystem);
                         // update, then immediately flush the buffer contents
-                        sys->update(updateContext);
-                        sys->flush(updateContext);
+                        const auto updateTypeId = system->expectedUpdateContextTypeId();
+                        auto updateCtx = contextProvider_.get(updateTypeId, updateContext);
+                        system->update(updateCtx);
+
+
+                        const auto flushTypeId = system->expectedFlushContextTypeId();
+                        auto ctx = contextProvider_.get(flushTypeId);
+                        system->flush(ctx);
                     }
                     continue;
                 }
@@ -108,15 +119,22 @@ export namespace helios::engine::runtime::gameloop {
                     [&] (const std::size_t i) {
                         // a parallel system owns more ore more serial systems
                         for (const auto& serialSystem : parallelSystems[i]) {
-                            auto* sys = systemRegistry_.item(serialSystem);
-                            sys->update(updateContext);
+                            auto* system = systemRegistry_.item(serialSystem);
+
+                            const auto updateTypeId = system->expectedUpdateContextTypeId();
+                            auto updateCtx = contextProvider_.get(updateTypeId, updateContext);
+                            system->update(updateCtx);
                         }
                 });
 
+                // once parallel systems where updates, flush their command buffers
                 for (const auto& parallelSystem : parallelSystems) {
                     for (const auto& serialSystem : parallelSystem) {
-                        auto* sys = systemRegistry_.item(serialSystem);
-                        sys->flush(updateContext);
+                        auto* system = systemRegistry_.item(serialSystem);
+
+                        const auto flushTypeId = system->expectedFlushContextTypeId();
+                        auto flushCtx = contextProvider_.get(flushTypeId);
+                        system->flush(flushCtx);
                     }
                 }
 
@@ -126,14 +144,37 @@ export namespace helios::engine::runtime::gameloop {
 
         void onPassEnd(runtime::world::UpdateContext& updateContext) noexcept override {
 
-            for (const auto typeId : managerTypeIds()) {
-                gameWorld_.managerRegistry().item(typeId)->flush(updateContext);
-            }
+            auto exec = [&, this](auto& typeIds, const bool isParallel = false) {
 
-            for (const auto typeId : parallelManagerTypeIds()) {
-                gameWorld_.managerRegistry().item(typeId)->flushParallel(updateContext);
-            }
+                for (const auto typeId : typeIds) {
+                    auto* manager = gameWorld_.managerRegistry().item(typeId);
+                    #if HELIOS_DEBUG
+                    if (!manager) {
+                        assert(manager && "Manager not found in registry");
+                    }
+                    #endif
+
+                    auto ctxTypeId = manager->expectedExecutionContextTypeId();
+                    auto contextRef = contextProvider_.get(ctxTypeId, updateContext);
+
+                    if (isParallel) {
+                        manager->executeCommandsParallel(contextRef);
+                    } else {
+                        manager->executeCommands(contextRef);
+                    }
+
+                    for (auto* commandBuffer : manager->commandBuffers()) {
+                        auto flushCtxTypeId = commandBuffer->expectedFlushContextTypeId();
+                        auto flushContextRef = contextProvider_.get(flushCtxTypeId);
+                        commandBuffer->flush(flushContextRef);
+                    }
+                }
+            };
+
+            exec(managerTypeIds_, false);
+            exec(parallelManagerTypeIds_,true);
         }
+
 
         /**
          * @brief Initializes all systems registered in this pass.
@@ -144,54 +185,23 @@ export namespace helios::engine::runtime::gameloop {
             jobSystem_ = &gameWorld_.jobSystem();
 
             for (auto* system : systemRegistry_.items()) {
-                system->init(gameWorld_);
+                auto typeId = system->expectedInitContextTypeId();
+                auto ctx = contextProvider_.get(typeId);
+                system->init(ctx);
             }
         }
 
-        using RunCondition = typename Pass<TTypedHandleWorld>::RunCondition;
-
-        std::vector<RunCondition> runConditions_;
-
-        public:
-
-        /**
-         * @brief Constructs a typed pass for a state mask.
-         *
-         * @param owner Reference to the parent Phase.
-         * @param mask State mask controlling when this pass runs.
-         * @param gameWorld GameWorld used by the base Pass for buffer injection.
-         */
-        explicit TypedPass(
-            Phase<TTypedHandleWorld>& owner, const StateType mask,
-            helios::engine::runtime::world::GameWorld<TTypedHandleWorld>& gameWorld
-        ) : owner_(owner), mask_(mask), Pass<TTypedHandleWorld>(gameWorld) {}
-
-        /**
-         * @copydoc Pass::endPass
-         */
-        Phase<TTypedHandleWorld>& endPass() override {
-            return owner_;
-        }
-
-        /**
-         * @copydoc Pass::runIf
-         */
-        Pass<TTypedHandleWorld>& runIf(RunCondition fn) noexcept override {
-            runConditions_.push_back(std::move(fn));
-            return *this;
-        }
-
-        /**
-         * @brief Checks if this pass should execute based on current state.
-         *
-         * @details Queries the current state from the Session and compares it
-         * against the configured mask using bitwise AND. The pass runs if
-         * any bit in the mask matches the current state.
-         *
-         * @param updateContext The current update context.
-         *
-         * @return True if the pass should execute.
-         */
+       /**
+        * @brief Checks if this pass should execute based on current state.
+        *
+        * @details Queries the current state from the Session and compares it
+        * against the configured mask using bitwise AND. The pass runs if
+        * any bit in the mask matches the current state.
+        *
+        * @param updateContext The current update context.
+        *
+        * @return True if the pass should execute.
+        */
         [[nodiscard]] bool shouldRun(helios::engine::runtime::world::UpdateContext& updateContext) const noexcept override {
             auto state = updateContext.session().state<StateType>();
             if (!hasFlag(mask_, state)) {
@@ -219,6 +229,38 @@ export namespace helios::engine::runtime::gameloop {
             using U = std::underlying_type_t<StateType>;
             return (static_cast<U>(mask) & static_cast<U>(value)) != 0;
         }
+
+        public:
+
+        /**
+         * @brief Constructs a typed pass for a state mask.
+         *
+         * @param owner Reference to the parent Phase.
+         * @param mask State mask controlling when this pass runs.
+         * @param gameWorld GameWorld used by the base Pass for buffer injection.
+         */
+        explicit TypedPass(
+            Phase& owner, const StateType mask,
+            helios::engine::runtime::world::GameWorld& gameWorld,
+            helios::engine::runtime::world::ContextProvider& contextProvider
+        ) : owner_(owner), mask_(mask), Pass(gameWorld, contextProvider) {}
+
+        /**
+         * @copydoc Pass::endPass
+         */
+        Phase& endPass() override {
+            return owner_;
+        }
+
+        /**
+         * @copydoc Pass::runIf
+         */
+        Pass& runIf(RunCondition fn) noexcept override {
+            runConditions_.push_back(std::move(fn));
+            return *this;
+        }
+
+
 
 
     };

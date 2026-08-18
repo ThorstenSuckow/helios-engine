@@ -15,42 +15,29 @@ export module helios.engine.runtime.world.GameWorld;
 
 import helios.engine.runtime.world.Session;
 
-import helios.engine.core.thread.JobSystem;
+import helios.core.thread.JobSystem;
+import helios.core.container;
 
-import helios.engine.runtime.timing.TimerManager;
-
-import helios.ecs.Entity;
 import helios.engine.runtime.world.RuntimeEnvironment;
 import helios.engine.platform.environment.types;
 
-import helios.engine.runtime.messaging.command.CommandHandlerRegistry;
-import helios.engine.runtime.messaging.command.CommandBufferRegistry;
-
-import helios.engine.runtime.world.ManagerRegistry;
-import helios.engine.runtime.world.ResourceRegistry;
+import helios.ecs;
 
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.GameObject;
+import helios.engine.runtime.world.ContextProvider;
 import helios.engine.runtime.world.types.GameObjectId;
 import helios.engine.runtime.world.types.GameObjectHandle;
-import helios.engine.runtime.world.Manager;
 
-import helios.engine.util.Guid;
-import helios.engine.util.log.Logger;
-import helios.engine.util.log.LogManager;
+import helios.core.log.Logger;
+import helios.core.log.LogManager;
 import helios.engine.runtime.world.Level;
 
-import helios.ecs.View;
-
-import helios.engine.runtime.messaging.command.concepts;
-
-import helios.engine.runtime.world.EngineWorld;
 import helios.engine.runtime.world.concepts;
 
-using namespace helios::engine::core::thread;
-using namespace helios::engine::runtime::timing;
-using namespace helios::engine::runtime::messaging::command::concepts;
-using namespace helios::engine::runtime::messaging::command;
+using namespace helios::core::thread;
+using namespace helios::ecs::common::concepts;
+using namespace helios::ecs;
 using namespace helios::engine::runtime::world::concepts;
 using namespace helios::engine::platform::environment::types;
 using namespace helios::engine::runtime::world::types;
@@ -58,18 +45,13 @@ using namespace helios::engine::runtime::world::types;
 export namespace helios::engine::runtime::world {
 
     /**
-     * @brief Runtime root object coordinating world domains, resources, and frame services.
+     * @brief Engine-level representation of a runtime world.
      *
-     * @details `GameWorld` owns the `EngineWorld` (entity domains), `Session`,
-     * `RuntimeEnvironment`, and runtime registries for managers/command buffers.
-     * It also exposes typed convenience APIs (`add`, `find`, `view`, `destroy`)
-     * that delegate to `EngineWorld`.
+     * Owns an EcsWorld and provides world-scoped resources and runtime state information.
      */
     class GameWorld {
 
-
-
-    protected:
+        struct GameWorldResources{};
 
 
         /**
@@ -77,40 +59,10 @@ export namespace helios::engine::runtime::world {
          *
          * Defaults to HELIOS_LOG_SCOPE.
          */
-        inline static const helios::engine::util::log::Logger& logger_ = helios::engine::util::log::LogManager::loggerForScope(
+        inline static const helios::core::log::Logger& logger_ = helios::core::log::LogManager::loggerForScope(
             HELIOS_LOG_SCOPE);
 
-        /**
-         * @brief The current level loaded in the game world.
-         *
-         * @details Can be null if no level is currently active.
-         */
-        std::unique_ptr<Level> level_ = nullptr;
-
-
-        /**
-         * @brief Type-indexed registry for Managers and CommandBuffers.
-         *
-         * @details Provides O(1) type-based access via ManagerRegistry and
-         * CommandBufferRegistry. Owns all registered Manager and CommandBuffer
-         * instances via ConceptModelRegistry.
-         */
-        ResourceRegistry resourceRegistry_;
-
-        /**
-         * @brief Registry mapping command types to their handler function pointers.
-         *
-         * @details Used by TypedCommandBuffer during flush to route commands
-         * to the correct handler. Handlers are usually registered by managers
-         * in `init(CommandHandlerRegistry&)`; direct registration via
-         * `registerCommandHandler<CommandTypes...>(owner)` is still supported.
-         */
-        CommandHandlerRegistry commandHandlerRegistry_;
-
-        /**
-         * @brief Aggregate multi-domain entity world.
-         */
-        EngineWorld engineWorld_{};
+        EcsWorld ecsWorld_;
 
         /**
          * @brief Session object storing runtime/game state.
@@ -127,17 +79,18 @@ export namespace helios::engine::runtime::world {
          */
         JobSystem& jobSystem_;
 
+        helios::core::container::TypeMap<GameWorldResources> resourceRegistry_;
+
+
     public:
 
         /**
          * @brief Constructs `GameWorld` and creates internal session/environment entities.
-         *
-         * @details The constructor creates one game-object entity for `Session`
-         * and one platform entity for `RuntimeEnvironment`.
          */
-        explicit GameWorld(JobSystem& jobSystem, const size_t capacity = ENTITY_MANAGER_DEFAULT_CAPACITY)
-        : session_(Session(engineWorld_.add<GameObjectHandle>())),
-          runtimeEnvironment_(RuntimeEnvironment(engineWorld_.add<PlatformHandle>())),
+        explicit GameWorld(EcsWorld&& ecsWorld, JobSystem& jobSystem)
+        : ecsWorld_(std::move(ecsWorld)),
+          session_(Session(ecsWorld_.add<GameObjectHandle>())),
+          runtimeEnvironment_(RuntimeEnvironment(ecsWorld_.add<PlatformHandle>())),
           jobSystem_(jobSystem)
         {};
 
@@ -145,9 +98,13 @@ export namespace helios::engine::runtime::world {
          * @brief Non-copyable, non-movable.
          */
         GameWorld(const GameWorld&) = delete;
-        GameWorld operator=(const GameWorld&) = delete;
-        GameWorld(const GameWorld&&) = delete;
-        GameWorld operator=(const GameWorld&&) = delete;
+        GameWorld& operator=(const GameWorld&) = delete;
+        GameWorld(GameWorld&&) = default;
+        GameWorld& operator=(GameWorld&&) = delete;
+
+        [[nodiscard]] EntitySpace& entitySpace() {
+            return ecsWorld_.entitySpace();
+        }
 
         /**
          * @brief Returns a reference to the current game session.
@@ -176,57 +133,31 @@ export namespace helios::engine::runtime::world {
             return runtimeEnvironment_;
         }
 
+        template<typename TResource, typename ... TArgs>
+        TResource& addResource(TArgs&&... args) {
+            return resourceRegistry_.add<TResource>(std::forward<TArgs>(args)...);
+        }
 
+
+        template<typename TResource>
+        TResource& resource() {
+            return resourceRegistry_.get<TResource>();
+        }
 
         /**
          * @brief Initializes managers and command buffers.
-         *
-         * @details Should be called after all resources have been registered and
-         * before the game loop starts. Manager `init()` receives the
-         * `CommandHandlerRegistry` so managers can register command handlers
-         * without a hard GameWorld dependency. Command buffers are initialized
-         * afterward and bound to the same handler registry.
          */
-        GameWorld& init() {
-            for (auto& mgr :  resourceRegistry_.managers()) {
-                mgr->init(commandHandlerRegistry_);
-            }
+        GameWorld& init(ContextProvider& contextProvider) {
+            for (auto& manager : ecsWorld_.managerRegistry().items()) {
+                auto initContextTypeId = manager->expectedInitContextTypeId();
 
-            for (auto& buff : resourceRegistry_.commandBuffers()) {
-                buff->init(commandHandlerRegistry_, resourceRegistry_.managerRegistry());
+                auto contextRef = contextProvider.get(initContextTypeId);
+                manager->init(contextRef);
             }
 
             return *this;
         }
 
-        /**
-         * @brief Sets the current level for the game world.
-         *
-         * @param level Unique pointer to the Level instance. Ownership is transferred to the GameWorld.
-         */
-        void setLevel(std::unique_ptr<Level> level) noexcept {
-            level_ = std::move(level);
-        }
-
-        /**
-         * @brief Checks if a level is currently loaded.
-         *
-         * @return True if a level is set, false otherwise.
-         */
-        [[nodiscard]] bool hasLevel() const noexcept{
-            return level_ != nullptr;
-        }
-
-        /**
-         * @brief Retrieves the currently loaded level.
-         *
-         * @return Const pointer to the active Level.
-         *
-         * @warning Calling this method when hasLevel() returns false results in undefined behavior.
-         */
-        [[nodiscard]] const Level* level() const noexcept{
-            return level_.get();
-        }
 
         /**
          * @brief Checks whether a Manager of type T is registered.
@@ -236,30 +167,15 @@ export namespace helios::engine::runtime::world {
          * @return True if the Manager is registered.
          */
         template<typename T>
-        requires IsManagerLike<T>
+        requires ecs::manager::concepts::IsManagerLike<T>
         [[nodiscard]] bool hasManager() const {
-            return resourceRegistry_.has<T>();
+            return ecsWorld_.hasManager<T>();
         }
 
-        /**
-         * @brief Checks whether a CommandBuffer of type T is registered.
-         *
-         * @tparam T The CommandBuffer type. Must satisfy IsCommandBufferLike.
-         *
-         * @return True if the CommandBuffer is registered.
-         */
-        template<typename T>
-        requires IsCommandBufferLike<T>
-        [[nodiscard]] bool hasCommandBuffer() const {
-            return resourceRegistry_.has<T>();
-        }
+
 
         /**
          * @brief Registers and constructs a Manager of type T.
-         *
-         * @details Delegates to ResourceRegistry::emplace. The Manager is
-         * constructed in-place with forwarded arguments and owned by the
-         * ManagerRegistry.
          *
          * @tparam T The Manager type. Must satisfy IsManagerLike.
          * @tparam Args Constructor argument types.
@@ -269,144 +185,55 @@ export namespace helios::engine::runtime::world {
          * @return Reference to the newly registered Manager.
          */
         template<typename T, typename... Args>
-        requires IsManagerLike<T>
+        requires helios::ecs::manager::concepts::IsManagerLike<T>
         T& registerManager(Args&&... args) {
-            return resourceRegistry_.emplace<T>(std::forward<Args>(args)...);
+            return ecsWorld_.registerManager<T>(std::forward<Args>(args)...);
         }
 
-        /**
-         * @brief Registers and constructs a CommandBuffer of type T.
-         *
-         * @details Delegates to ResourceRegistry::emplace. The buffer is
-         * constructed in-place with forwarded arguments and owned by the
-         * CommandBufferRegistry.
-         *
-         * @tparam T The CommandBuffer type. Must satisfy IsCommandBufferLike.
-         * @tparam Args Constructor argument types.
-         *
-         * @param args Arguments forwarded to the T constructor.
-         *
-         * @return Reference to the newly registered CommandBuffer.
-         */
-        template<typename T, typename... Args>
-        requires IsCommandBufferLike<T>
-        T& registerCommandBuffer(Args&&... args) {
-            return resourceRegistry_.emplace<T>(std::forward<Args>(args)...);
-        }
-
-        /**
-         * @brief Retrieves a registered Manager by type.
-         *
-         * @tparam T The Manager type. Must satisfy IsManagerLike.
-         *
-         * @return Reference to the Manager.
-         *
-         * @pre A Manager of type T must be registered.
-         */
-        template<typename T>
-        requires IsManagerLike<T>
-        T& manager() const noexcept {
-            assert(resourceRegistry_.has<T>() && "Manager not registered");
-            return resourceRegistry_.get<T>();
-        }
 
         /**
          * @brief Retrieves a registered Manager by type, or nullptr if not found.
          *
-         * @tparam T The Manager type. Must satisfy IsManagerLike.
+         * @tparam T The Manager type. Must satisfy helios::ecs::manager::concepts::IsManagerLike.
          *
          * @return Pointer to the Manager, or nullptr if not registered.
          */
         template<typename T>
-        requires IsManagerLike<T>
+        requires helios::ecs::manager::concepts::IsManagerLike<T>
         T* tryManager() noexcept {
-            return resourceRegistry_.tryGet<T>();
+            return ecsWorld_.tryManager<T>();
         }
 
         /**
          * @brief Retrieves a registered Manager by type, or nullptr if not found.
          *
-         * @tparam T The Manager type. Must satisfy IsManagerLike.
+         * @tparam T The Manager type. Must satisfy helios::ecs::manager::concepts::IsManagerLike.
          *
          * @return Const Pointer to the Manager, or nullptr if not registered.
          */
         template<typename T>
-        requires IsManagerLike<T>
+        requires helios::ecs::manager::concepts::IsManagerLike<T>
         const T* tryManager() const noexcept {
-            return resourceRegistry_.tryGet<T>();
+            return ecsWorld_.tryManager<T>();
         }
 
-        /**
-         * @brief Retrieves a registered CommandBuffer by type, or nullptr if not found.
-         *
-         * @tparam T The CommandBuffer type. Must satisfy IsCommandBufferLike.
-         *
-         * @return Pointer to the CommandBuffer, or nullptr if not registered.
-         */
-        template<typename T>
-        requires IsCommandBufferLike<T>
-        T* tryCommandBuffer() noexcept {
-            return resourceRegistry_.tryGet<T>();
-        }
-
-        /**
-         * @brief Retrieves a registered CommandBuffer by type, or nullptr if not found.
-         *
-         * @tparam T The CommandBuffer type. Must satisfy IsCommandBufferLike.
-         *
-         * @return Const Pointer to the CommandBuffer, or nullptr if not registered.
-         */
-        template<typename T>
-        requires IsCommandBufferLike<T>
-        const T* tryCommandBuffer() const noexcept {
-            return resourceRegistry_.tryGet<T>();
-        }
-
-        /**
-         * @brief  Retrieves a registered CommandBuffer by type.
-         *
-         * @tparam T The CommandBuffer type. Must satisfy IsCommandBufferLike.
-         *
-         * @pre A CommandBuffer of type `T` must already be registered.
-         *      Use tryCommandBuffer<T>() when the buffer is optional.
-         *
-         * @return Reference to the CommandBuffer.
-         */
-        template<typename T>
-        requires IsCommandBufferLike<T>
-        T& commandBuffer() const noexcept {
-            return resourceRegistry_.get<T>();
-        }
-
-
-        /**
-         * @brief Registers a command handler for one or more command types.
-         *
-         * @details Stores a type-erased function pointer for each CommandType
-         * that routes to `owner.submit(cmd)`. During flush, the
-         * TypedCommandBuffer uses the CommandHandlerRegistry to dispatch
-         * queued commands to the registered handler.
-         *
-         * @tparam CommandType The command types to register handlers for.
-         * @tparam OwningT The handler type. Must satisfy IsCommandHandlerLike.
-         *
-         * @param owner Reference to the handler instance. Must outlive the GameWorld.
-         *
-         * @see CommandHandlerRegistry
-         */
-        template<typename... CommandType, typename OwningT>
-        requires IsCommandHandlerLike<OwningT, CommandType...>
-        void registerCommandHandler(OwningT& owner) {
-            (commandHandlerRegistry_.template registerHandler<CommandType>(owner), ...);
-        }
 
         /**
          * @brief Returns a reference to the CommandHandlerRegistry.
          *
          * @return Reference to the CommandHandlerRegistry.
          */
-        [[nodiscard]] CommandHandlerRegistry& commandHandlerRegistry() noexcept {
-            return commandHandlerRegistry_;
+        [[nodiscard]] ecs::command::CommandHandlerRegistry& commandHandlerRegistry() noexcept {
+            return ecsWorld_.commandHandlerRegistry();
+        }
+
+        /**
+         * @brief Returns a reference to the ManagerRegistry.
+         *
+         * @return Reference to the ManagerRegistry.
+         */
+        [[nodiscard]] ecs::manager::ManagerRegistry& managerRegistry() noexcept {
+            return ecsWorld_.managerRegistry();
         }
 
 
@@ -417,67 +244,11 @@ export namespace helios::engine::runtime::world {
          * accumulated state. Invokes reset() on all managers and the session.
          */
         void reset() {
-            for (auto& mgr : resourceRegistry_.managers()) {
-                mgr->reset();
-            }
-
+            ecsWorld_.reset();
             session_.reset();
         }
 
-        /**
-         * @brief Returns the platform-domain world.
-         *
-         * @return Reference to `PlatformWorld`.
-         */
-        [[nodiscard]] PlatformWorld& platformWorld() noexcept{
-            return engineWorld_.platformWorld();
-        }
 
-        /**
-         * @brief Returns the render-resource domain world.
-         *
-         * @return Reference to `RenderResourceWorld`.
-         */
-        [[nodiscard]] RenderResourceWorld& renderResourceWorld() noexcept{
-            return engineWorld_.renderResourceWorld();
-        }
-
-        /**
-         * @brief Returns the render-target domain world.
-         *
-         * @return Reference to `RenderViewWorld`.
-         */
-        [[nodiscard]] RenderViewWorld& renderViewWorld() noexcept{
-            return engineWorld_.renderViewWorld();
-        }
-
-        /**
-         * @brief Returns the game-object domain world.
-         *
-         * @return Reference to `GameObjectWorld`.
-         */
-        [[nodiscard]] GameObjectWorld& gameObjectWorld() noexcept{
-            return engineWorld_.gameObjectWorld();
-        }
-
-        /**
-         * @brief Returns the game-object domain world.
-         *
-         * @return Reference to `GameObjectWorld`.
-         */
-        [[nodiscard]] ParticleWorld& particleWorld() noexcept{
-            return engineWorld_.particleWorld();
-        }
-
-
-        /**
-         * @brief Returns the aggregate typed world used for handle-routed operations.
-         *
-         * @return Reference to `EngineWorld`.
-         */
-        [[nodiscard]] EngineWorld& engineWorld() noexcept{
-            return engineWorld_;
-        }
 
         /**
          * @brief Builds a typed ECS view for a handle domain and component set.
@@ -489,7 +260,7 @@ export namespace helios::engine::runtime::world {
          */
         template <typename THandle, typename... Components>
         [[nodiscard]] auto view() {
-            return engineWorld_.view<THandle, Components...>();
+            return ecsWorld_.entitySpace().view<THandle, Components...>();
         }
 
         /**
@@ -502,8 +273,8 @@ export namespace helios::engine::runtime::world {
          * @return Domain-specific entity facade (or empty facade if not found).
          */
         template<typename THandle>
-        [[nodiscard]] auto find(const THandle handle) noexcept {
-            return engineWorld_.template find<THandle>(handle);
+        [[nodiscard]] auto findEntity(const THandle handle) noexcept {
+            return ecsWorld_.entitySpace().findEntity<THandle>(handle);
         }
 
         /**
@@ -515,8 +286,8 @@ export namespace helios::engine::runtime::world {
          * @return Domain-specific entity facade for the created entity.
          */
         template<typename THandle>
-        [[nodiscard]] auto add(const bool isActive = true) noexcept {
-            auto entity = engineWorld_.template add<THandle>();
+        [[nodiscard]] auto addEntity(const bool isActive = true) noexcept {
+            auto entity = ecsWorld_.entitySpace().addEntity<THandle>();
             entity.setActive(isActive);
             return entity;
         }
@@ -532,27 +303,9 @@ export namespace helios::engine::runtime::world {
          */
         template<typename THandle>
         [[nodiscard]] auto destroy(const THandle handle) noexcept {
-            return engineWorld_.template destroy<THandle>(handle);
+            return ecsWorld_.entitySpace().destroy<THandle>(handle);
         }
 
-        /**
-         * @brief Returns direct access to the command-buffer registry.
-         *
-         * @return Reference to the internal CommandBufferRegistry.
-         */
-        helios::engine::runtime::messaging::command::CommandBufferRegistry& commandBufferRegistry() noexcept {
-            return resourceRegistry_.commandBufferRegistry();
-        }
-
-
-        /**
-         * @brief Returns direct access to the manager registry.
-         *
-         * @return Reference to the internal ManagerRegistry.
-         */
-        ManagerRegistry& managerRegistry() noexcept {
-            return resourceRegistry_.managerRegistry();
-        }
 
         /**
          * @brief Returns direct access to the entity manager for a specific handle type.
@@ -562,7 +315,7 @@ export namespace helios::engine::runtime::world {
          */
         template<typename THandle>
         auto& entityManager() noexcept {
-            return engineWorld_.template entityManager<THandle>();
+            return ecsWorld_.entitySpace().entityManager<THandle>();
         }
 
     };

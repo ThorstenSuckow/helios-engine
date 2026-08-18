@@ -8,9 +8,9 @@ module;
 #include <concepts>
 
 
-export module helios.engine.runtime.world.concepts:ProvidesUpdateContext;
+export module helios.engine.runtime.concepts:ProvidesUpdateContext;
 
-export namespace helios::engine::runtime::world::concepts {
+export namespace helios::engine::runtime::concepts {
 
 
     template<typename T, typename TUpdateContext>

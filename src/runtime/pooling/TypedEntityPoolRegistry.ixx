@@ -18,12 +18,8 @@ import helios.engine.runtime.pooling.EntityPool;
 import helios.engine.runtime.pooling.types;
 import helios.core.log;
 
-import helios.engine.core.strategies.LinearLookupStrategy;
-import helios.engine.core.strategies.HashedLookupStrategy;
-
 import helios.core.concepts;
 
-using namespace helios::engine::core::strategies;
 using namespace helios::engine::runtime::pooling::types;
 #define HELIOS_LOG_SCOPE "helios::engine::runtime::pooling::TypedEntityPoolRegistry"
 export namespace helios::engine::runtime::pooling {

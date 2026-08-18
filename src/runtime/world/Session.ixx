@@ -24,11 +24,9 @@ import helios.ecs.common.types;
 
 import helios.engine.rendering.viewport.types.ViewportHandle;
 
-import helios.engine.rendering.viewport.components.ActiveViewportHandlesStateComponent;
 
 using namespace helios::engine::state::components;
 
-using namespace helios::engine::rendering::viewport::components;
 
 using namespace helios::engine::state::types;
 using namespace helios::engine::rendering::viewport::types;
@@ -77,13 +75,11 @@ export namespace helios::engine::runtime::world {
         /**
          * @brief Constructs a session with the given GameObject.
          *
-         * @details Automatically adds ActiveViewportHandlesStateComponent.
-         * State types must be registered separately via trackState<T>().
+         * @details State types must be registered separately via trackState<T>().
          *
          * @param go The GameObject to use as the session entity.
          */
         explicit Session(const GameObject go) : gameObject_(go) {
-            gameObject_.add<ActiveViewportHandlesStateComponent<Handle_type>>();
             gameObject_.add<Uninitialized<Handle_type>>();
         }
 
@@ -197,41 +193,6 @@ export namespace helios::engine::runtime::world {
             gameObject_.getOrAdd<StateComponent<StateType>>();
         }
 
-        /**
-         * @brief Replaces the active viewport IDs with the provided list.
-         *
-         * @param viewportHandles The new list of active viewport IDs.
-         */
-        void setViewportHandles(std::span<const ViewportHandle>& viewportHandles) noexcept {
-            gameObject_.get<ActiveViewportHandlesStateComponent<Handle_type>>()->setViewportHandles(viewportHandles);
-        }
-
-        /**
-         * @brief Returns the currently active viewport handles.
-         *
-         * @return Read-only span of viewport handles.
-         */
-        [[nodiscard]] std::span<const ViewportHandle> viewportHandles() const noexcept {
-            return gameObject_.get<ActiveViewportHandlesStateComponent<Handle_type>>()->viewportHandles();
-        }
-
-        /**
-         * @brief Returns true if the specified ViewportHandle is currently active.
-         *
-         * @param viewportHandle The ViewportHandle to check for activity.
-         *
-         * @return true if the ViewportHandle is considered active, otherwise false.
-         */
-        [[nodiscard]] bool isActiveViewport(const ViewportHandle viewportHandle) const noexcept {
-            return gameObject_.get<ActiveViewportHandlesStateComponent<Handle_type>>()->has(viewportHandle);
-        }
-
-        /**
-         * @brief Clears all active viewport handles.
-         */
-       void clearViewportHandles() noexcept {
-            gameObject_.get<ActiveViewportHandlesStateComponent<Handle_type>>()->clear();
-        }
     };
 
 

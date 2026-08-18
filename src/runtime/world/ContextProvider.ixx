@@ -16,6 +16,18 @@ import helios.engine.runtime.world.UpdateContext;
 
 export namespace helios::engine::runtime::world {
 
+
+    /**
+     * @todo ontexts should be frame-local and, where possible, materialized before parallel
+     * system execution. This keeps context lookup read-only during parallel execution
+     * and avoids concurrent mutation of the TypeMap.
+     *
+     * Shared mutable context state must still be synchronized or avoided.
+     *
+     * @param typeId
+     * @param updateContext
+     * @return
+     */
     class ContextProvider {
         
         using ContextRef = ecs::common::types::ContextRef;

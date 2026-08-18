@@ -12,16 +12,15 @@ export module helios.engine.runtime.world.UpdateContext;
 import helios.engine.input.InputSnapshot;
 
 import helios.engine.runtime.world.Level;
-import helios.engine.runtime.messaging.event.GameLoopEventBus;
 
 import helios.engine.runtime.world.RuntimeEnvironment;
-import helios.ecs.types.EntityHandle;
+import helios.ecs.common.types;
 
+
+import helios.ecs.EntitySpace;
 import helios.ecs.View;
 import helios.engine.runtime.world.Session;
 
-
-import helios.engine.runtime.world.EngineWorld;
 
 export namespace helios::engine::runtime::world {
 
@@ -77,44 +76,6 @@ export namespace helios::engine::runtime::world {
         helios::engine::runtime::world::RuntimeEnvironment& runtimeEnvironment_;
 
         /**
-         * @brief Sink for pushing phase-level events during update.
-         *
-         * Used by systems and components to publish events (e.g., collision,
-         * spawn requests) that will be processed in the next phase of the game loop.
-         */
-        helios::engine::runtime::messaging::event::GameLoopEventBus::WriteSink phaseEventSink_;
-
-        /**
-         * @brief Source for reading phase-level events from the previous phase.
-         */
-        const helios::engine::runtime::messaging::event::GameLoopEventBus::ReadSource phaseEventSource_;
-
-        /**
-         * @brief Sink for pushing pass-level events during update.
-         *
-         */
-        helios::engine::runtime::messaging::event::GameLoopEventBus::WriteSink passEventSink_;
-
-        /**
-         * @brief Source for reading pass-level events from previous passes.
-         */
-        const helios::engine::runtime::messaging::event::GameLoopEventBus::ReadSource passEventSource_;
-
-        /**
-         * @brief Sink for pushing frame-level events during update.
-         *
-         * Used by systems and components to publish events that will be processed
-         * in the next frame. Frame-level events persist across all phases and are
-         * swapped at the end of the Post phase.
-         */
-        helios::engine::runtime::messaging::event::GameLoopEventBus::WriteSink frameEventSink_;
-
-        /**
-         * @brief Source for reading frame-level events from the previous frame.
-         */
-        const helios::engine::runtime::messaging::event::GameLoopEventBus::ReadSource frameEventSource_;
-
-        /**
          * @brief Pointer to the active Level, or nullptr if no level is loaded.
          */
         const Level* level_;
@@ -122,7 +83,7 @@ export namespace helios::engine::runtime::world {
         /**
          * @brief Aggregate typed world used for domain-routed ECS operations.
          */
-        helios::engine::runtime::world::EngineWorld& engineWorld_;
+        helios::ecs::EntitySpace& engineWorld_;
     public:
 
 
@@ -147,26 +108,15 @@ export namespace helios::engine::runtime::world {
             const float deltaTime,
             const float totalTime,
             const std::size_t frameCount,
-            helios::engine::runtime::messaging::event::GameLoopEventBus& phaseEventBus,
-            helios::engine::runtime::messaging::event::GameLoopEventBus& passEventBus,
-            helios::engine::runtime::messaging::event::GameLoopEventBus& frameEventBus,
             const helios::engine::input::InputSnapshot& inputSnapshot,
-            const Level* level,
-            EngineWorld& engineWorld
+            helios::ecs::EntitySpace& engineWorld
         ) :
         session_(session),
         runtimeEnvironment_(runtimeEnvironment),
         deltaTime_(deltaTime),
         totalTime_(totalTime),
         frameCount_(frameCount),
-        phaseEventSink_(phaseEventBus.writeSink()),
-        phaseEventSource_(phaseEventBus.readSource()),
-        passEventSink_(passEventBus.writeSink()),
-        passEventSource_(passEventBus.readSource()),
-        frameEventSink_(frameEventBus.writeSink()),
-        frameEventSource_(frameEventBus.readSource()),
         inputSnapshot_(inputSnapshot),
-        level_(level),
         engineWorld_(engineWorld)
         {
 
@@ -221,7 +171,7 @@ export namespace helios::engine::runtime::world {
          */
         template<typename THandle>
         [[nodiscard]] auto find(const THandle handle) noexcept {
-            return engineWorld_.template find<THandle>(handle);
+            return engineWorld_.findEntity<THandle>(handle);
         }
 
 
@@ -254,120 +204,6 @@ export namespace helios::engine::runtime::world {
         }
 
         /**
-         * @brief Pushes an event to the pass-level event bus.
-         *
-         * @tparam E The event type to push.
-         * @tparam Args Constructor argument types for the event.
-         *
-         * @param args Arguments forwarded to the event constructor.
-         *
-         * @see readPass()
-         * @see Pass::addCommitPoint()
-         */
-        template<typename E, typename... Args>
-        void pushPass(Args&&... args) {
-            passEventSink_.template push<E>(std::forward<Args>(args)...);
-        }
-
-        /**
-         * @brief Pushes an event to the phase-level event bus.
-         *
-         * @tparam E The event type to push.
-         * @tparam Args Constructor argument types for the event.
-         *
-         * @param args Arguments forwarded to the event constructor.
-         *
-         * @see readPhase()
-         * @see GameLoop
-         */
-        template<typename E, typename... Args>
-        void pushPhase(Args&&... args) {
-            phaseEventSink_.template push<E>(std::forward<Args>(args)...);
-        }
-
-        /**
-         * @brief Reads events from the phase-level event bus.
-         *
-         * Returns events that were pushed during the previous phase via
-         * `pushPhase()`. The phase event bus is swapped at phase boundaries,
-         * configured in GameLoop::phaseEnd().
-         *
-         * @tparam E The event type to read.
-         *
-         * @return A span of const events of type E.
-         *
-         * @see pushPhase()
-         * @see GameLoop
-         */
-        template<typename E>
-        std::span<const E> readPhase() {
-            return phaseEventSource_.template read<E>();
-        }
-
-        /**
-         * @brief Reads events from the pass-level event bus.
-         *
-         * @tparam E The event type to read.
-         *
-         * @return A span of const events of type E.
-         *
-         * @see pushPass()
-         * @see Pass::addCommitPoint()
-         */
-        template<typename E>
-        std::span<const E> readPass() {
-            return passEventSource_.template read<E>();
-        }
-
-        /**
-         * @brief Reads events from the frame-level event bus.
-         *
-         * @details Returns events that were pushed during the previous frame via
-         * `pushFrame()`. The frame event bus is swapped at the end of the Post
-         * phase, making events readable in the subsequent frame.
-         *
-         * Frame-level events are useful for cross-frame communication, such as:
-         * - Collision events that trigger effects in the next frame
-         * - Spawn confirmations for UI updates
-         * - Audio/VFX triggers
-         *
-         * @tparam E The event type to read.
-         *
-         * @return A span of const events of type E.
-         *
-         * @see pushFrame()
-         * @see GameLoop
-         */
-        template<typename E>
-        std::span<const E> readFrame() {
-            return frameEventSource_.template read<E>();
-        }
-
-        /**
-         * @brief Pushes an event to the frame-level event bus.
-         *
-         * @details Events pushed here become readable in the next frame via
-         * `readFrame()`. The frame event bus is swapped at the end of the Post
-         * phase in GameLoop.
-         *
-         * Use frame-level events for cross-frame communication where events
-         * should persist beyond the current phase.
-         *
-         * @tparam E The event type to push.
-         * @tparam Args Constructor argument types for the event.
-         *
-         * @param args Arguments forwarded to the event constructor.
-         *
-         * @see readFrame()
-         * @see GameLoop
-         */
-        template<typename E, typename... Args>
-        void pushFrame(Args&&... args) {
-            frameEventSink_.template push<E>(std::forward<Args>(args)...);
-        }
-
-
-        /**
          * @brief Builds a typed ECS view for a handle domain and component set.
          *
          * @tparam THandle Handle domain type.
@@ -393,6 +229,10 @@ export namespace helios::engine::runtime::world {
             return engineWorld_.template sparseSet<THandle, TComponent>();
         }
 
+        template <typename THandle>
+        [[nodiscard]] auto& entityManager() {
+            return engineWorld_.template entityManager<THandle>();
+        }
         /**
          * @brief Checks whether a handle refers to a valid entity in the appropriate sub-world.
          * @tparam THandle Handle domain type.

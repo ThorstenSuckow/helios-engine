@@ -33,9 +33,11 @@ import helios.engine.rendering.viewport.types;
 import helios.engine.rendering.viewport.ViewportEntity;
 
 import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.world.types;
+import helios.engine.runtime.concepts;
 import helios.ecs.command.NullCommandBuffer;
 import helios.ecs.common.concepts;
-import helios.engine.runtime.world.tags.SystemRole;
+import helios.ecs.system.tags;
 
 import helios.ecs.component;
 
@@ -79,15 +81,18 @@ export namespace helios::engine::scene::systems {
      * @tparam TMemberHandle Scene member handle type.
      * @tparam TSubmissionMode Submission mode (`Instanced` oder `NonInstanced`).
      * @tparam TCullingStrategy Strategy used to decide member visibility.
+     * @tparam TUpdateContextType Type of the UpdateContext to use.
      */
     template<
         typename TMemberHandle,
         typename TSubmissionMode,
-        typename TCullingStrategy
+        typename TCullingStrategy,
+        typename TUpdateContextType = helios::engine::runtime::world::types::SystemUpdateContext
     >
     requires IsFrustumCullerLike<TCullingStrategy, typename TCullingStrategy::MemberHandle_type> &&
              std::same_as<typename TCullingStrategy::MemberHandle_type, TMemberHandle> &&
-            (std::same_as<TSubmissionMode, Instanced> || std::same_as<TSubmissionMode, NonInstanced>)
+            (std::same_as<TSubmissionMode, Instanced> || std::same_as<TSubmissionMode, NonInstanced>) &&
+             runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
     class SceneMemberVisibilitySystem {
 
         /**
@@ -162,7 +167,8 @@ export namespace helios::engine::scene::systems {
         /**
          * @brief Runtime role tag used for engine system registration.
          */
-        using EcsRoleTag = helios::engine::runtime::world::tags::TypedSystemRole;
+        using EcsRoleTag = ecs::system::tags::TypedSystemRole;
+        using UpdateContextType = TUpdateContextType;
 
 
         /**
@@ -182,13 +188,15 @@ export namespace helios::engine::scene::systems {
          * traversed. For each viewport, members are tested and classified into
          * visible/culled buckets per submission mode.
          *
-         * @param updateContext ECS/world update context.
+         * @param updateCtx ECS/world update context.
          */
-        void update(UpdateContext& updateContext) noexcept {
+        bool update(TUpdateContextType& updateCtx) noexcept {
+
+            auto& updateContext = updateCtx.updateContext();
 
             visibilityRegistry_.clear();
 
-            for (auto [viewportEntity, renderTargetBindingComponent, sbc, cbc] : updateContext.view<
+            for (auto [viewportEntity, renderTargetBindingComponent, sbc, cbc] : updateContext.template view<
                 ViewportHandle,
                 RenderTargetBindingComponent<ViewportHandle>,
                 SceneBindingComponent<ViewportHandle>,
@@ -198,7 +206,7 @@ export namespace helios::engine::scene::systems {
                 const auto sceneHandle  = sbc->targetHandle();
                 const auto cameraHandle = cbc->targetHandle();
 
-                const auto camera = updateContext.find<CameraHandle>(cameraHandle);
+                const auto camera = updateContext.template find<CameraHandle>(cameraHandle);
                 if (!camera) {
                     assert(false && "Camera not found");
                     logger_.error("Camera not found");
@@ -238,6 +246,7 @@ export namespace helios::engine::scene::systems {
                 processMembers(
                     updateContext, cullingContext, sceneHandle, *renderTargetBindingComponent, viewportEntity);
             }
+            return true;
         }
 
 

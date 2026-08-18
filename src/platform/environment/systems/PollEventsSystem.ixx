@@ -9,13 +9,15 @@ export module helios.engine.platform.environment.systems.PollEventsSystem;
 
 
 import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.world.types;
+import helios.engine.runtime.concepts;
 import helios.ecs.command.NullCommandBuffer;
 import helios.ecs.command.concepts;
-import helios.engine.runtime.world.tags.SystemRole;
+import helios.ecs.system.tags;
 
 import helios.engine.platform.environment.commands.PollEventsCommand;
 
-using namespace helios::engine::runtime::world::tags;
+
 using namespace helios::engine::runtime::world;
 using namespace helios::ecs;
 using namespace helios::ecs::command;
@@ -25,26 +27,33 @@ export namespace helios::engine::platform::environment::systems {
     /**
      * @brief Queues `PollEventsCommand` once per update call.
      */
-    template<typename TCommandBuffer = ecs::command::NullCommandBuffer>
-    requires ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
+    template<
+        typename TCommandBuffer = ecs::command::NullCommandBuffer,
+        typename TUpdateContextType = types::SystemUpdateContext
+    >
+    requires ecs::command::concepts::IsCommandBufferLike<TCommandBuffer> &&
+             runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
     class PollEventsSystem {
 
         public:
 
         using CommandBuffer_type = TCommandBuffer;
+        using UpdateContextType = TUpdateContextType;
 
         /**
          * @brief Engine role marker used by runtime system registries.
          */
-        using EcsRoleTag = TypedSystemRole;
+        using EcsRoleTag = ecs::system::tags::TypedSystemRole;
 
         /**
          * @brief Enqueues polling of native platform/window events.
          *
-         * @param updateContext Frame-local update context.
+         * @param updateCtx Frame-local update context.
          */
-        void update(UpdateContext& updateContext, TCommandBuffer& cmdBuffer) noexcept {
+        bool update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
+            (void)updateCtx.updateContext();
             cmdBuffer.template add<PollEventsCommand>();
+            return true;
         }
 
     };

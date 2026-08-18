@@ -12,8 +12,10 @@ import helios.engine.runtime.timing.Timer;
 import helios.engine.runtime.timing.TimerManager;
 
 import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.world.types;
+import helios.engine.runtime.concepts;
 
-import helios.engine.runtime.world.tags.SystemRole;
+import helios.ecs.system.tags;
 
 import helios.engine.runtime.timing.types;
 
@@ -35,7 +37,9 @@ export namespace helios::engine::runtime::timing::systems {
      * @see TimerManager
      * @see Timer
      */
-    template<typename TTimerManager>
+    template<typename TTimerManager,
+             typename TUpdateContextType = helios::engine::runtime::world::types::SystemUpdateContext>
+    requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, helios::engine::runtime::world::UpdateContext>
     class TimerClearSystem {
 
         /**
@@ -46,7 +50,8 @@ export namespace helios::engine::runtime::timing::systems {
     public:
 
 
-        using EcsRoleTag = helios::engine::runtime::world::tags::TypedSystemRole;
+        using EcsRoleTag = ecs::system::tags::TypedSystemRole;
+        using UpdateContextType = TUpdateContextType;
 
         /**
          * @brief Constructs the system with a reference to the TimerManager.
@@ -59,15 +64,18 @@ export namespace helios::engine::runtime::timing::systems {
         /**
          * @brief Resets all finished timers to TimerState::Undefined.
          *
-         * @param updateContext The current frame's update context.
+         * @param updateCtx The current frame's update context.
          */
-        void update(helios::engine::runtime::world::UpdateContext& updateContext) noexcept {
+        bool update(TUpdateContextType& updateCtx) noexcept {
+
+            (void)updateCtx.updateContext();
 
             for (auto& timer : timerManager_.timers()) {
                 if (timer.state() == TimerState::Finished || timer.state() == TimerState::Cancelled) {
                     timer.setState(TimerState::Undefined);
                 }
             }
+            return true;
         }
 
     };

@@ -6,9 +6,11 @@ module;
 
 export module helios.engine.scene.systems.PerspectiveCameraUpdateSystem;
 
-import helios.engine.runtime.world.tags.SystemRole;
+import helios.ecs.system.tags;
 
 import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.world.types;
+import helios.engine.runtime.concepts;
 
 import helios.ecs.component;
 import helios.engine.scene.components;
@@ -22,7 +24,7 @@ using namespace helios::ecs::components;
 using namespace helios::engine::scene::components;
 using namespace helios::engine::spatial::components;
 using namespace helios::engine::runtime::world;
-using namespace helios::engine::runtime::world::tags;
+
 export namespace helios::engine::scene::systems {
 
     /**
@@ -32,32 +34,37 @@ export namespace helios::engine::scene::systems {
      * target components are marked as dirty.
      *
      * @tparam TMemberHandle Camera entity handle type.
+     * @tparam TUpdateContextType Type of the UpdateContext to use.
      *
      * @note Although this system could be separated into to concurrently running systems,
      * the regular use case for this system is that it only has to consider few camera entities per frames.
      */
-    template<typename TMemberHandle>
+    template<typename TMemberHandle,
+             typename TUpdateContextType = helios::engine::runtime::world::types::SystemUpdateContext>
+    requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
     class PerspectiveCameraUpdateSystem {
 
         public:
 
         using Handle_type = TMemberHandle;
+        using UpdateContextType = TUpdateContextType;
 
 
         /**
          * @brief Role tag used for runtime registration as a system.
          */
-        using EcsRoleTag = TypedSystemRole;
+        using EcsRoleTag = ecs::system::tags::TypedSystemRole;
 
         /**
          * @brief Executes the camera update pass for all active camera entities.
          *
-         * @param updateContext Frame-local update context with ECS access.
+         * @param updateCtx Frame-local update context with ECS access.
          */
-        void update(UpdateContext& updateContext) noexcept {
+        bool update(TUpdateContextType& updateCtx) noexcept {
 
+            auto& updateContext = updateCtx.updateContext();
 
-            for (auto [entity, tcw, vmc] : updateContext.view<
+            for (auto [entity, tcw, vmc] : updateContext.template view<
                 TMemberHandle,
                 TransformComponent<TMemberHandle, World>,
                 ViewMatrixComponent<TMemberHandle>
@@ -77,7 +84,7 @@ export namespace helios::engine::scene::systems {
                 entity.setTrackedValue(vmc, helios::math::lookAt(eye, center, up));
             }
 
-            for (auto [entity, pcc, pmc] : updateContext.view<
+            for (auto [entity, pcc, pmc] : updateContext.template view<
                 TMemberHandle,
                 PerspectiveCameraComponent<TMemberHandle>,
                 ProjectionMatrixComponent<TMemberHandle>
@@ -95,7 +102,7 @@ export namespace helios::engine::scene::systems {
                 ));
             }
 
-
+            return true;
         }
 
 

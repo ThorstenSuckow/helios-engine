@@ -17,13 +17,15 @@ import helios.engine.rendering.texture.components;
 
 import helios.ecs.command.NullCommandBuffer;
 import helios.ecs.common.concepts;
-import helios.engine.runtime.world.tags.SystemRole;
+import helios.ecs.system.tags;
 import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.world.types;
+import helios.engine.runtime.concepts;
 import helios.ecs;
 
 using namespace helios::ecs;
 using namespace helios::engine::runtime::world;
-using namespace helios::engine::runtime::world::tags;
+
 using namespace helios::ecs::command::concepts;
 using namespace helios::ecs::command;
 using namespace helios::ecs::components;
@@ -31,8 +33,11 @@ export namespace helios::engine::rendering::texture::systems {
 
 
     template<typename THandle = texture::types::TextureHandle,
-        typename TCommandBuffer = ecs::command::NullCommandBuffer>
-    requires texture::concepts::IsTextureHandle<THandle> && ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
+        typename TCommandBuffer = ecs::command::NullCommandBuffer,
+        typename TUpdateContextType = helios::engine::runtime::world::types::SystemUpdateContext>
+    requires texture::concepts::IsTextureHandle<THandle> &&
+             ecs::command::concepts::IsCommandBufferLike<TCommandBuffer> &&
+             runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
     class TextureUploadSystem {
 
         std::vector<THandle> textureHandles_;
@@ -41,8 +46,9 @@ export namespace helios::engine::rendering::texture::systems {
 
     public:
 
-        using EcsRoleTag = TypedSystemRole;
+        using EcsRoleTag = ecs::system::tags::TypedSystemRole;
         using CommandBuffer_type = TCommandBuffer;
+        using UpdateContextType = TUpdateContextType;
 
         explicit TextureUploadSystem(size_t capacity = TEXTURE_INITIAL_STORAGE_CAPACITY) : capacity_(capacity) {
             textureHandles_.reserve(capacity);
@@ -51,11 +57,14 @@ export namespace helios::engine::rendering::texture::systems {
         /**
          * @brief Collects texture handles and queues one batch upload command.
          *
-         * @param updateContext Frame update context.
+         * @param updateCtx Frame update context.
+         * @return true if the update was successful.
          */
-        void update(UpdateContext& updateContext, TCommandBuffer& cmdBuffer) noexcept {
+        bool update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
 
-            for (auto [entity, textureSource] : updateContext.view<
+            auto& updateContext = updateCtx.updateContext();
+
+            for (auto [entity, textureSource] : updateContext.template view<
                 THandle,
                 texture::components::TextureSourceComponent<THandle>
             >().withActive()) {
@@ -66,6 +75,7 @@ export namespace helios::engine::rendering::texture::systems {
 
             textureHandles_.clear();
             textureHandles_.reserve(capacity_);
+            return true;
         }
 
     };

@@ -8,8 +8,10 @@ module;
 
 export module helios.engine.platform.window.systems.WindowSizeUpdateSystem;
 
-import helios.engine.runtime.world.tags.SystemRole;
+import helios.ecs.system.tags;
 import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.world.types;
+import helios.engine.runtime.concepts;
 
 import helios.engine.platform.window.components;
 import helios.ecs.component;
@@ -24,7 +26,7 @@ import helios.engine.spatial.components.Size2DComponent;
 using namespace helios::engine::spatial::components;
 using namespace helios::engine::rendering::renderTarget::components;
 using namespace helios::engine::rendering::renderTarget::types;
-using namespace helios::engine::runtime::world::tags;
+
 using namespace helios::engine::platform::window::concepts;
 using namespace helios::engine::runtime::world;
 using namespace helios::engine::platform::window::components;
@@ -37,9 +39,12 @@ export namespace helios::engine::platform::window::systems {
      * @brief System that reacts to dirty window size components.
      *
      * @tparam TMemberHandle Window entity handle type.
+     * @tparam TUpdateContextType Type of the UpdateContext to use.
      */
-    template<typename TMemberHandle>
-    requires IsWindowHandle<TMemberHandle>
+    template<typename TMemberHandle,
+             typename TUpdateContextType = types::SystemUpdateContext>
+    requires IsWindowHandle<TMemberHandle> &&
+             runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
     class WindowSizeUpdateSystem {
 
         static inline auto& logger_ = helios::core::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
@@ -47,15 +52,17 @@ export namespace helios::engine::platform::window::systems {
     public:
 
         /** @brief Runtime role tag used for engine system registration. */
-        using EcsRoleTag = TypedSystemRole;
+        using EcsRoleTag = ecs::system::tags::TypedSystemRole;
+        using UpdateContextType = TUpdateContextType;
 
         /**
          * @brief Processes active windows with dirty size state.
          *
-         * @param updateContext Frame update context.
+         * @param updateCtx Frame update context.
          */
-        void update(UpdateContext& updateContext) noexcept {
-            for (auto [entity, wc, wsc, fbc] : updateContext.view<
+        bool update(TUpdateContextType& updateCtx) noexcept {
+            auto& updateContext = updateCtx.updateContext();
+            for (auto [entity, wc, wsc, fbc] : updateContext.template view<
                 TMemberHandle,
                 WindowComponent<TMemberHandle>,
                 Size2DComponent<TMemberHandle>,
@@ -65,6 +72,7 @@ export namespace helios::engine::platform::window::systems {
                 // c'mon now do something
 
             }
+            return true;
         };
 
     };

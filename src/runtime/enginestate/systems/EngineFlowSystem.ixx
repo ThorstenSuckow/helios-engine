@@ -19,9 +19,11 @@ import helios.engine.runtime.enginestate.types;
 
 import helios.ecs;
 import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.world.types;
+import helios.engine.runtime.concepts;
 import helios.engine.runtime.world.Session;
 
-import helios.engine.runtime.world.tags.SystemRole;
+import helios.ecs.system.tags;
 
 using namespace helios::engine::state::commands;
 using namespace helios::ecs::common::concepts;
@@ -43,8 +45,10 @@ export namespace helios::engine::runtime::enginestate::systems {
      * @see EngineStateTransitionId
      * @see StateCommand
      */
-    template<typename TCommandBuffer>
-    requires ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
+    template<typename TCommandBuffer,
+             typename TUpdateContextType = runtime::world::types::SystemUpdateContext>
+    requires ecs::command::concepts::IsCommandBufferLike<TCommandBuffer> &&
+             runtime::concepts::ProvidesUpdateContext<TUpdateContextType, runtime::world::UpdateContext>
     class EngineFlowSystem {
 
         /**
@@ -59,9 +63,10 @@ export namespace helios::engine::runtime::enginestate::systems {
 
     public:
 
-        using EcsRoleTag = helios::engine::runtime::world::tags::TypedSystemRole;
+        using EcsRoleTag = ecs::system::tags::TypedSystemRole;
 
         using CommandBuffer_type = TCommandBuffer;
+        using UpdateContextType = TUpdateContextType;
 
         /**
          * @brief Updates the game flow and emits state transition commands.
@@ -70,21 +75,23 @@ export namespace helios::engine::runtime::enginestate::systems {
          * the previously observed state. If a transition is required, a
          * StateCommand is added to the command buffer.
          *
-         * @param updateContext The update context providing session and command buffer access.
+         * @param updateCtx The update context providing session and command buffer access.
          */
-        void update(helios::engine::runtime::world::UpdateContext& updateContext, TCommandBuffer& buffer) noexcept {
+        bool update(TUpdateContextType& updateCtx, TCommandBuffer& buffer) noexcept {
+
+            auto& updateContext = updateCtx.updateContext();
 
             auto& session = updateContext.session();
 
-            const auto engineState = session.state<EngineState>();
-            auto engineStateTransitionId = session.stateTransitionId<EngineState>();
+            const auto engineState = session.template state<EngineState>();
+            auto engineStateTransitionId = session.template stateTransitionId<EngineState>();
 
             // only return if the state is undefined.
             // in any other case, we allow to drive the state forward, even if
             // the previous state is the same as the current one, in case any guard
             // did veto the next state
             if (engineState == EngineState::Undefined) {// && prevMatchState_ == engineState && prevEngineStateTransitionId_ == engineStateTransitionId) {
-                return;
+                return false;
             }
 
             prevMatchState_= engineState;
@@ -109,6 +116,7 @@ export namespace helios::engine::runtime::enginestate::systems {
                 default:
                     break;
             }
+            return true;
         }
     };
 }

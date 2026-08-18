@@ -13,10 +13,12 @@ import helios.engine.runtime.timing.TimerManager;
 
 
 import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.world.types;
+import helios.engine.runtime.concepts;
 import helios.ecs.command;
 import helios.ecs.common.concepts;
 
-import helios.engine.runtime.world.tags.SystemRole;
+import helios.ecs.system.tags;
 
 import helios.engine.runtime.timing.types;
 import helios.engine.runtime.timing.commands;
@@ -40,8 +42,11 @@ export namespace helios::engine::runtime::timing::systems {
      * @see TimerManager
      * @see Timer
      */
-    template<typename TTimerManager, typename TCommandBuffer = ecs::command::NullCommandBuffer>
-    requires ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
+    template<typename TTimerManager,
+             typename TCommandBuffer = ecs::command::NullCommandBuffer,
+             typename TUpdateContextType = helios::engine::runtime::world::types::SystemUpdateContext>
+    requires ecs::command::concepts::IsCommandBufferLike<TCommandBuffer> &&
+             runtime::concepts::ProvidesUpdateContext<TUpdateContextType, helios::engine::runtime::world::UpdateContext>
     class TimerUpdateSystem {
 
         /**
@@ -52,8 +57,9 @@ export namespace helios::engine::runtime::timing::systems {
     public:
 
 
-        using EcsRoleTag = helios::engine::runtime::world::tags::TypedSystemRole;
+        using EcsRoleTag = ecs::system::tags::TypedSystemRole;
         using CommandBuffer_type = TCommandBuffer;
+        using UpdateContextType = TUpdateContextType;
 
 
         /**
@@ -67,9 +73,11 @@ export namespace helios::engine::runtime::timing::systems {
         /**
          * @brief Advances all game timers by the current delta time.
          *
-         * @param updateContext The current frame's update context.
+         * @param updateCtx The current frame's update context.
          */
-        void update(helios::engine::runtime::world::UpdateContext& updateContext, TCommandBuffer& cmdBuffer) noexcept {
+        bool update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
+
+            auto& updateContext = updateCtx.updateContext();
 
             for (auto& timer : timerManager_.timers()) {
                 if (timer.state() == TimerState::Running) {
@@ -82,6 +90,7 @@ export namespace helios::engine::runtime::timing::systems {
                     }
                 }
             }
+            return true;
         }
 
     };

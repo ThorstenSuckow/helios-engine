@@ -14,7 +14,9 @@ export module helios.engine.rendering.shader.systems.ShaderCompileSystem;
 import helios.ecs.command;
 
 import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.world.tags.SystemRole;
+import helios.engine.runtime.world.types;
+import helios.engine.runtime.concepts;
+import helios.ecs.system.tags;
 
 import helios.engine.rendering.shader.components;
 import helios.engine.rendering.shader.concepts;
@@ -24,7 +26,7 @@ import helios.ecs.common.concepts;
 
 import helios.ecs.component;
 
-using namespace helios::engine::runtime::world::tags;
+
 using namespace helios::engine::runtime::world;
 using namespace helios::ecs;
 using namespace helios::engine::rendering::shader;
@@ -41,9 +43,16 @@ export namespace helios::engine::rendering::shader::systems {
      * @tparam THandle Shader handle type.
      * @tparam TCommandBuffer Command buffer type used for queued compile commands.
      * @tparam TCapacity Initial reserve size for the internal handle cache.
+     * @tparam TUpdateContextType Type of the UpdateContext to use.
      */
-    template<typename THandle, typename TCommandBuffer = ecs::command::NullCommandBuffer>
-    requires IsShaderHandle<THandle> && ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
+    template<
+        typename THandle,
+        typename TCommandBuffer = ecs::command::NullCommandBuffer,
+        typename TUpdateContextType = types::SystemUpdateContext
+    >
+    requires IsShaderHandle<THandle> &&
+             ecs::command::concepts::IsCommandBufferLike<TCommandBuffer> &&
+             runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
     class ShaderCompileSystem {
 
         std::vector<THandle> shaderHandles_;
@@ -52,8 +61,9 @@ export namespace helios::engine::rendering::shader::systems {
 
     public:
 
-        using EcsRoleTag = TypedSystemRole;
+        using EcsRoleTag = ecs::system::tags::TypedSystemRole;
         using CommandBuffer_type = TCommandBuffer;
+        using UpdateContextType = TUpdateContextType;
 
         explicit ShaderCompileSystem(size_t capacity = SHADER_INITIAL_STORAGE_CAPACITY) : capacity_(capacity) {
             shaderHandles_.reserve(capacity);
@@ -62,11 +72,13 @@ export namespace helios::engine::rendering::shader::systems {
         /**
          * @brief Collects active shader handles and queues one batch compile command.
          *
-         * @param updateContext Frame update context.
+         * @param updateCtx Frame update context.
          */
-        void update(UpdateContext& updateContext, TCommandBuffer& cmdBuffer) noexcept {
+        bool update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
 
-            for (auto [entity, scc] : updateContext.view<
+            auto& updateContext = updateCtx.updateContext();
+
+            for (auto [entity, scc] : updateContext.template view<
                 THandle,
                 ShaderSourceComponent<THandle>
             >().withActive()) {
@@ -79,6 +91,7 @@ export namespace helios::engine::rendering::shader::systems {
             shaderHandles_.reserve(capacity_);
 
 
+            return true;
         }
 
     };

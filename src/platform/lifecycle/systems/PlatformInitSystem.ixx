@@ -29,22 +29,10 @@ export namespace helios::engine::platform::lifecycle::systems {
 
     /**
      * @brief Submits `PlatformInitCommand` until session/runtime initialization completed.
-     *
-     * @tparam TCommandBuffer Command buffer used for platform init command submission.
-     * @tparam TUpdateContextType Type of the UpdateContext to use.
      */
-    template<
-        typename TCommandBuffer = ecs::command::NullCommandBuffer,
-        typename TUpdateContextType = types::SystemUpdateContext
-    >
-    requires ecs::command::concepts::IsCommandBufferLike<TCommandBuffer> &&
-             runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
     class PlatformInitSystem {
 
         public:
-
-        using CommandBuffer_type = TCommandBuffer;
-        using UpdateContextType = TUpdateContextType;
 
         /**
          * @brief Engine role marker used by runtime system registries.
@@ -56,6 +44,9 @@ export namespace helios::engine::platform::lifecycle::systems {
          *
          * @param updateCtx Frame-local update context.
          */
+        template<typename TUpdateContextType, typename TCommandBuffer>
+        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext> &&
+                 ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
         bool update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
 
             auto& updateContext = updateCtx.updateContext();

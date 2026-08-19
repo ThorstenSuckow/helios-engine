@@ -19,7 +19,6 @@ export namespace helios::engine::rendering::texture::commands {
      * @tparam THandle Texture handle type.
      */
     template<typename THandle>
-    requires texture::concepts::IsTextureHandle<THandle>
     struct TextureBatchUploadCommand {
         std::vector<THandle> textureHandles{};
     };

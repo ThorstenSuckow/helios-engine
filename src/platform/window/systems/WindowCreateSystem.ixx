@@ -37,20 +37,12 @@ export namespace helios::engine::platform::window::systems {
      * @brief Queues `WindowCreateCommand` for active entities with pending create requests.
      *
      * @tparam THandle Window-domain entity handle type.
-     * @tparam TUpdateContextType Type of the UpdateContext to use.
      */
-    template<typename THandle,
-             typename TCommandBuffer = ecs::command::NullCommandBuffer,
-             typename TUpdateContextType = types::SystemUpdateContext>
-    requires IsWindowHandle<THandle> &&
-             ecs::command::concepts::IsCommandBufferLike<TCommandBuffer> &&
-             runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
+    template<typename THandle>
+    requires IsWindowHandle<THandle>
     class WindowCreateSystem {
 
         public:
-
-        using CommandBuffer_type = TCommandBuffer;
-        using UpdateContextType = TUpdateContextType;
 
         /**
          * @brief Engine role marker used by runtime registries.
@@ -62,6 +54,9 @@ export namespace helios::engine::platform::window::systems {
          *
          * @param updateCtx Frame-local update context.
          */
+        template<typename TUpdateContextType, typename TCommandBuffer>
+        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext> &&
+                 ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
         bool update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
 
             auto& updateContext = updateCtx.updateContext();

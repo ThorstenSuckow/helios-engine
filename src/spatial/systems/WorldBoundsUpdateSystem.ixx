@@ -31,17 +31,13 @@ export namespace helios::engine::scene::systems {
      * @brief Updates world-space bounds for active entities.
      *
      * @tparam TMemberHandle ECS member handle type used by queried components.
-     * @tparam TUpdateContextType Type of the UpdateContext to use.
      */
-    template<typename TMemberHandle,
-             typename TUpdateContextType = types::SystemUpdateContext>
-    requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
+    template<typename TMemberHandle>
     class WorldBoundsUpdateSystem {
 
     public:
 
         using Handle_type = TMemberHandle;
-        using UpdateContextType = TUpdateContextType;
 
         /**
          * @brief Runtime role tag used for system registration.
@@ -56,6 +52,8 @@ export namespace helios::engine::scene::systems {
          *
          * @param updateCtx Frame-local update context with ECS access.
          */
+        template<typename TUpdateContextType>
+        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
         bool update(TUpdateContextType& updateCtx) noexcept {
 
             auto& updateContext = updateCtx.updateContext();

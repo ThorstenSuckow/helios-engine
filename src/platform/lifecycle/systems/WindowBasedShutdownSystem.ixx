@@ -41,20 +41,12 @@ export namespace helios::engine::platform::lifecycle::systems {
      * @brief Queues `ShutdownCommand` when no active window entities are left.
      *
      * @tparam THandle Window handle type.
-     * @tparam TUpdateContextType Type of the UpdateContext to use.
      */
-    template<typename THandle,
-             typename TCommandBuffer = ecs::command::NullCommandBuffer,
-             typename TUpdateContextType = types::SystemUpdateContext>
-    requires IsWindowHandle<THandle> &&
-             ecs::command::concepts::IsCommandBufferLike<TCommandBuffer> &&
-             runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
+    template<typename THandle>
+    requires IsWindowHandle<THandle>
     class WindowBasedShutdownSystem {
 
     public:
-
-        using CommandBuffer_type = TCommandBuffer;
-        using UpdateContextType = TUpdateContextType;
 
         /**
          * @brief Engine role marker used by runtime registries.
@@ -67,6 +59,9 @@ export namespace helios::engine::platform::lifecycle::systems {
          * @param updateCtx Frame-local update context.
          * @param cmdBuffer Command buffer for submitting shutdown commands.
          */
+        template<typename TUpdateContextType, typename TCommandBuffer>
+        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext> &&
+                 ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
         bool update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
 
             auto& updateContext = updateCtx.updateContext();

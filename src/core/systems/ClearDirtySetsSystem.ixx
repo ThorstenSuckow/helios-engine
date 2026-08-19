@@ -26,13 +26,10 @@ export namespace helios::engine::core::systems {
      * @brief Generic ECS system that clears dirty sets.
      *
      * @tparam TMemberHandle Member/registry handle type used to access ECS components.
-     * @tparam TUpdateContextType Type of the UpdateContext to use.
      * @tparam TComponents Components which dirty set should be cleared.
      */
     template<typename TMemberHandle,
-             typename TUpdateContextType = types::SystemUpdateContext,
              typename ... TComponents>
-    requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
     class ClearDirtySetsSystem {
 
     public:
@@ -41,7 +38,6 @@ export namespace helios::engine::core::systems {
          * @brief Runtime role tag used for system registration.
          */
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
-        using UpdateContextType = TUpdateContextType;
 
         /**
          * @brief Executes one dirty-clear pass for all configured component specifications.
@@ -49,6 +45,8 @@ export namespace helios::engine::core::systems {
          * @param updateCtx Frame-local update context with ECS access.
          * @return true if the update was successful, false otherwise.
          */
+        template<typename TUpdateContextType>
+        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
         bool update(TUpdateContextType& updateCtx) noexcept {
             auto& updateContext = updateCtx.updateContext();
             updateContext.template clearDirtySets<TMemberHandle, TComponents...>();

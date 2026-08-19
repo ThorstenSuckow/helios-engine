@@ -82,18 +82,12 @@ export namespace helios::engine::scene::systems {
      *
      * @tparam TMemberHandle Scene member handle type.
      * @tparam TSubmissionMode Submission mode (`Instanced` oder `NonInstanced`).
-     * @tparam TCommandBuffer Command buffer used for extracted render commands.
-     * @tparam TUpdateContextType Type of the UpdateContext to use.
      */
     template<
         typename TMemberHandle,
-        typename TSubmissionMode,
-        typename TCommandBuffer = ecs::command::NullCommandBuffer,
-        typename TUpdateContextType = helios::engine::runtime::world::types::SystemUpdateContext
+        typename TSubmissionMode
     >
-    requires ecs::command::concepts::IsCommandBufferLike<TCommandBuffer> &&
-            (std::is_same_v<TSubmissionMode, Instanced> || std::is_same_v<TSubmissionMode, NonInstanced>) &&
-             runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
+    requires (std::is_same_v<TSubmissionMode, Instanced> || std::is_same_v<TSubmissionMode, NonInstanced>)
     class SceneRenderSystem {
 
         static inline auto& logger_ = helios::core::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
@@ -116,6 +110,7 @@ export namespace helios::engine::scene::systems {
          * @param visibilityContexts Visible non-instanced members grouped by viewport.
          * @param cmdBuffer Command buffer receiving render commands.
          */
+        template<typename TCommandBuffer>
         void dispatchNonInstancedRenderCommands(
             UpdateContext& updateContext,
              std::span<const std::vector<SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>>> visibilityContexts,
@@ -161,6 +156,7 @@ export namespace helios::engine::scene::systems {
          * @param visibilityContexts Visible instanced members grouped by viewport.
          * @param cmdBuffer Command buffer receiving render commands.
          */
+        template<typename TCommandBuffer>
         void dispatchInstancedRenderCommands (
             UpdateContext& updateContext,
             std::span<const std::vector<SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>>> visibilityContexts,
@@ -234,12 +230,6 @@ export namespace helios::engine::scene::systems {
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
 
         /**
-         * @brief Command buffer type used by this extraction system.
-         */
-        using CommandBuffer_type = TCommandBuffer;
-        using UpdateContextType = TUpdateContextType;
-
-        /**
          * @brief Constructs the system with the visibility snapshot registry.
          *
          * @param visibilityRegistry Registry containing per-frame visible/culled members.
@@ -258,6 +248,9 @@ export namespace helios::engine::scene::systems {
          * @param updateCtx Current frame update context.
          * @param cmdBuffer Command buffer receiving extracted render commands.
          */
+        template<typename TUpdateContextType, typename TCommandBuffer>
+        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext> &&
+                 ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
         bool update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
 
             auto& updateContext = updateCtx.updateContext();

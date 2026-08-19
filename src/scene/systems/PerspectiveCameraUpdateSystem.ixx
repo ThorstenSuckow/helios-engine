@@ -34,20 +34,16 @@ export namespace helios::engine::scene::systems {
      * target components are marked as dirty.
      *
      * @tparam TMemberHandle Camera entity handle type.
-     * @tparam TUpdateContextType Type of the UpdateContext to use.
      *
      * @note Although this system could be separated into to concurrently running systems,
      * the regular use case for this system is that it only has to consider few camera entities per frames.
      */
-    template<typename TMemberHandle,
-             typename TUpdateContextType = helios::engine::runtime::world::types::SystemUpdateContext>
-    requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
+    template<typename TMemberHandle>
     class PerspectiveCameraUpdateSystem {
 
         public:
 
         using Handle_type = TMemberHandle;
-        using UpdateContextType = TUpdateContextType;
 
 
         /**
@@ -60,6 +56,8 @@ export namespace helios::engine::scene::systems {
          *
          * @param updateCtx Frame-local update context with ECS access.
          */
+        template<typename TUpdateContextType>
+        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
         bool update(TUpdateContextType& updateCtx) noexcept {
 
             auto& updateContext = updateCtx.updateContext();

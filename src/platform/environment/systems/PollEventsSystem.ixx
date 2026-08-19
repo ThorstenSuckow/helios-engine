@@ -27,18 +27,9 @@ export namespace helios::engine::platform::environment::systems {
     /**
      * @brief Queues `PollEventsCommand` once per update call.
      */
-    template<
-        typename TCommandBuffer = ecs::command::NullCommandBuffer,
-        typename TUpdateContextType = types::SystemUpdateContext
-    >
-    requires ecs::command::concepts::IsCommandBufferLike<TCommandBuffer> &&
-             runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
     class PollEventsSystem {
 
         public:
-
-        using CommandBuffer_type = TCommandBuffer;
-        using UpdateContextType = TUpdateContextType;
 
         /**
          * @brief Engine role marker used by runtime system registries.
@@ -50,6 +41,9 @@ export namespace helios::engine::platform::environment::systems {
          *
          * @param updateCtx Frame-local update context.
          */
+        template<typename TUpdateContextType, typename TCommandBuffer>
+        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext> &&
+                 ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
         bool update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
             (void)updateCtx.updateContext();
             cmdBuffer.template add<PollEventsCommand>();

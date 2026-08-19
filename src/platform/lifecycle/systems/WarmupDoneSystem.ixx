@@ -35,23 +35,10 @@ export namespace helios::engine::platform::lifecycle::systems {
 
     /**
      * @brief Signals warmup completion through a typed state command buffer.
-     *
-     * @tparam TCommandBuffer Command buffer type used to queue state commands.
-     * @tparam TUpdateContextType Type of the UpdateContext to use.
      */
-    template<
-        typename TCommandBuffer = ecs::command::NullCommandBuffer,
-        typename TUpdateContextType = runtime::world::types::SystemUpdateContext
-    >
-    requires ecs::command::concepts::IsCommandBufferLike<TCommandBuffer> &&
-             (!std::is_same_v<TCommandBuffer, NullCommandBuffer>) &&
-             runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
     class WarmupDoneSystem {
 
     public:
-
-        using CommandBuffer_type = TCommandBuffer;
-        using UpdateContextType = TUpdateContextType;
 
         /**
          * @brief Engine role marker used by runtime registries.
@@ -63,6 +50,10 @@ export namespace helios::engine::platform::lifecycle::systems {
          *
          * @param updateCtx Frame-local update context.
          */
+        template<typename TUpdateContextType, typename TCommandBuffer>
+        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext> &&
+                 ecs::command::concepts::IsCommandBufferLike<TCommandBuffer> &&
+                 (!std::is_same_v<TCommandBuffer, NullCommandBuffer>)
         bool update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
 
             auto& updateContext = updateCtx.updateContext();

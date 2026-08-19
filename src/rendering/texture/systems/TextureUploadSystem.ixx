@@ -31,13 +31,8 @@ using namespace helios::ecs::command;
 using namespace helios::ecs::components;
 export namespace helios::engine::rendering::texture::systems {
 
-
-    template<typename THandle = texture::types::TextureHandle,
-        typename TCommandBuffer = ecs::command::NullCommandBuffer,
-        typename TUpdateContextType = helios::engine::runtime::world::types::SystemUpdateContext>
-    requires texture::concepts::IsTextureHandle<THandle> &&
-             ecs::command::concepts::IsCommandBufferLike<TCommandBuffer> &&
-             runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
+struct Meh{};
+    template<typename THandle>
     class TextureUploadSystem {
 
         std::vector<THandle> textureHandles_;
@@ -47,8 +42,7 @@ export namespace helios::engine::rendering::texture::systems {
     public:
 
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
-        using CommandBuffer_type = TCommandBuffer;
-        using UpdateContextType = TUpdateContextType;
+
 
         explicit TextureUploadSystem(size_t capacity = TEXTURE_INITIAL_STORAGE_CAPACITY) : capacity_(capacity) {
             textureHandles_.reserve(capacity);
@@ -60,6 +54,9 @@ export namespace helios::engine::rendering::texture::systems {
          * @param updateCtx Frame update context.
          * @return true if the update was successful.
          */
+        template<typename TUpdateContextType, typename TCommandBuffer>
+        requires ecs::command::concepts::IsCommandBufferLike<TCommandBuffer> &&
+            engine::runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
         bool update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
 
             auto& updateContext = updateCtx.updateContext();

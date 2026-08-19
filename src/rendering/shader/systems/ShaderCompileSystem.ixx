@@ -41,18 +41,10 @@ export namespace helios::engine::rendering::shader::systems {
      * @brief System that batches shader compile requests for active shader entities.
      *
      * @tparam THandle Shader handle type.
-     * @tparam TCommandBuffer Command buffer type used for queued compile commands.
      * @tparam TCapacity Initial reserve size for the internal handle cache.
-     * @tparam TUpdateContextType Type of the UpdateContext to use.
      */
-    template<
-        typename THandle,
-        typename TCommandBuffer = ecs::command::NullCommandBuffer,
-        typename TUpdateContextType = types::SystemUpdateContext
-    >
-    requires IsShaderHandle<THandle> &&
-             ecs::command::concepts::IsCommandBufferLike<TCommandBuffer> &&
-             runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
+    template<typename THandle>
+    requires IsShaderHandle<THandle>
     class ShaderCompileSystem {
 
         std::vector<THandle> shaderHandles_;
@@ -62,18 +54,14 @@ export namespace helios::engine::rendering::shader::systems {
     public:
 
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
-        using CommandBuffer_type = TCommandBuffer;
-        using UpdateContextType = TUpdateContextType;
 
         explicit ShaderCompileSystem(size_t capacity = SHADER_INITIAL_STORAGE_CAPACITY) : capacity_(capacity) {
             shaderHandles_.reserve(capacity);
         }
 
-        /**
-         * @brief Collects active shader handles and queues one batch compile command.
-         *
-         * @param updateCtx Frame update context.
-         */
+        template<typename TUpdateContextType, typename TCommandBuffer>
+        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext> &&
+                 ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
         bool update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
 
             auto& updateContext = updateCtx.updateContext();

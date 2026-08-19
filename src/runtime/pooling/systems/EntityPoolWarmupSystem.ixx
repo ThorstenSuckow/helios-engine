@@ -8,6 +8,8 @@ module;
 export module helios.engine.runtime.pooling.systems:EntityPoolWarmupSystem;
 
 import helios.ecs.system.tags;
+import helios.ecs.common.concepts;
+import helios.ecs.command.concepts;
 
 import helios.engine.runtime.pooling.commands;
 import helios.engine.runtime.pooling.types;
@@ -23,24 +25,12 @@ export namespace helios::engine::runtime::pooling::systems {
      * @brief System for creating PrefabEntityPoolCommand from PrefabEntityPoolRequestComponent.
      *
      * @tparam TMemberHandle The type of the member handle.
-     * @tparam TCommandBuffer The target command buffer.
-     * @tparam TUpdateContextType Type of the UpdateContext to use.
      */
-    template<typename TMemberHandle,
-             typename TCommandBuffer,
-             typename TUpdateContextType = world::types::SystemUpdateContext>
-    requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, world::UpdateContext>
+    template<typename TMemberHandle>
     class EntityPoolWarmupSystem {
 
 
     public:
-
-        /**
-         * @brief Command buffer type this system emits into.
-         */
-        using CommandBuffer_type = TCommandBuffer;
-        using UpdateContextType = TUpdateContextType;
-
 
         /**
          * @brief Marks this system as a typed system role.
@@ -57,6 +47,9 @@ export namespace helios::engine::runtime::pooling::systems {
          * @param updateCtx The current update context providing entity views.
          * @param cmdBuffer The command buffer receiving the emitted pool commands.
          */
+        template<typename TUpdateContextType, typename TCommandBuffer>
+        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, world::UpdateContext> &&
+                 ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
         bool update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) {
 
             auto& updateContext = updateCtx.updateContext();

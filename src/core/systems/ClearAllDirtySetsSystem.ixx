@@ -4,8 +4,6 @@
  */
 module;
 
-#include <concepts>
-
 export module helios.engine.core.systems.ClearAllDirtySetsSystem;
 
 import helios.ecs.system.tags;
@@ -28,8 +26,6 @@ export namespace helios::engine::core::systems {
     /**
      * @brief Generic ECS system that clears engine wide dirty sets.
      */
-    template<typename TUpdateContextType = types::SystemUpdateContext>
-    requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
     class ClearAllDirtySetsSystem {
 
     public:
@@ -38,14 +34,15 @@ export namespace helios::engine::core::systems {
          * @brief Runtime role tag used for system registration.
          */
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
-        using UpdateContextType = TUpdateContextType;
 
         /**
          * @brief Executes one dirty-clear pass for all configured component specifications.
          *
-         * @param updateContext Frame-local update context with ECS access.
+         * @param updateCtx Frame-local update context with ECS access.
          * @return true if successful, false otherwise.
          */
+        template<typename TUpdateContextType>
+        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
         bool update(TUpdateContextType& updateCtx) noexcept {
 
             auto& updateContext = updateCtx.updateContext();

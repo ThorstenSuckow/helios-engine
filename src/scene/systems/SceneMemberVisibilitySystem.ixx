@@ -81,18 +81,15 @@ export namespace helios::engine::scene::systems {
      * @tparam TMemberHandle Scene member handle type.
      * @tparam TSubmissionMode Submission mode (`Instanced` oder `NonInstanced`).
      * @tparam TCullingStrategy Strategy used to decide member visibility.
-     * @tparam TUpdateContextType Type of the UpdateContext to use.
      */
     template<
         typename TMemberHandle,
         typename TSubmissionMode,
-        typename TCullingStrategy,
-        typename TUpdateContextType = helios::engine::runtime::world::types::SystemUpdateContext
+        typename TCullingStrategy
     >
     requires IsFrustumCullerLike<TCullingStrategy, typename TCullingStrategy::MemberHandle_type> &&
              std::same_as<typename TCullingStrategy::MemberHandle_type, TMemberHandle> &&
-            (std::same_as<TSubmissionMode, Instanced> || std::same_as<TSubmissionMode, NonInstanced>) &&
-             runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
+            (std::same_as<TSubmissionMode, Instanced> || std::same_as<TSubmissionMode, NonInstanced>)
     class SceneMemberVisibilitySystem {
 
         /**
@@ -168,7 +165,6 @@ export namespace helios::engine::scene::systems {
          * @brief Runtime role tag used for engine system registration.
          */
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
-        using UpdateContextType = TUpdateContextType;
 
 
         /**
@@ -190,6 +186,8 @@ export namespace helios::engine::scene::systems {
          *
          * @param updateCtx ECS/world update context.
          */
+        template<typename TUpdateContextType>
+        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
         bool update(TUpdateContextType& updateCtx) noexcept {
 
             auto& updateContext = updateCtx.updateContext();

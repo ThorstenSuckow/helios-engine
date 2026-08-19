@@ -22,11 +22,7 @@ export namespace helios::engine::platform::lifecycle::systems {
      *
      * This system is typically executed during shutdown handling to stop further
      * world processing in subsequent frames.
-     *
-     * @tparam TUpdateContextType Type of the UpdateContext to use.
      */
-    template<typename TUpdateContextType = types::SystemUpdateContext>
-    requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
     class DestroySessionSystem {
 
     public:
@@ -35,7 +31,6 @@ export namespace helios::engine::platform::lifecycle::systems {
          * @brief Engine role marker used by runtime system registries.
          */
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
-        using UpdateContextType = TUpdateContextType;
 
         /**
          * @brief Destroys the active session in the current update context.
@@ -43,6 +38,8 @@ export namespace helios::engine::platform::lifecycle::systems {
          * @param updateCtx Frame-local update context.
          * @return true if the session was destroyed, false otherwise.
          */
+        template<typename TUpdateContextType>
+        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
         bool update(TUpdateContextType& updateCtx) noexcept {
             /**
              * @todo should be command

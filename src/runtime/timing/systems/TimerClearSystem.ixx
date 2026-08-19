@@ -4,8 +4,6 @@
  */
 module;
 
-#include <span>
-
 export module helios.engine.runtime.timing.systems.TimerClearSystem;
 
 import helios.engine.runtime.timing.Timer;
@@ -37,9 +35,7 @@ export namespace helios::engine::runtime::timing::systems {
      * @see TimerManager
      * @see Timer
      */
-    template<typename TTimerManager,
-             typename TUpdateContextType = helios::engine::runtime::world::types::SystemUpdateContext>
-    requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, helios::engine::runtime::world::UpdateContext>
+    template<typename TTimerManager>
     class TimerClearSystem {
 
         /**
@@ -51,7 +47,6 @@ export namespace helios::engine::runtime::timing::systems {
 
 
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
-        using UpdateContextType = TUpdateContextType;
 
         /**
          * @brief Constructs the system with a reference to the TimerManager.
@@ -66,6 +61,8 @@ export namespace helios::engine::runtime::timing::systems {
          *
          * @param updateCtx The current frame's update context.
          */
+        template<typename TUpdateContextType>
+        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, helios::engine::runtime::world::UpdateContext>
         bool update(TUpdateContextType& updateCtx) noexcept {
 
             (void)updateCtx.updateContext();

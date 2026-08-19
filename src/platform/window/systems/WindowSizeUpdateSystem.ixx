@@ -4,8 +4,6 @@
  */
 module;
 
-#include <cassert>
-
 export module helios.engine.platform.window.systems.WindowSizeUpdateSystem;
 
 import helios.ecs.system.tags;
@@ -39,12 +37,9 @@ export namespace helios::engine::platform::window::systems {
      * @brief System that reacts to dirty window size components.
      *
      * @tparam TMemberHandle Window entity handle type.
-     * @tparam TUpdateContextType Type of the UpdateContext to use.
      */
-    template<typename TMemberHandle,
-             typename TUpdateContextType = types::SystemUpdateContext>
-    requires IsWindowHandle<TMemberHandle> &&
-             runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
+    template<typename TMemberHandle>
+    requires IsWindowHandle<TMemberHandle>
     class WindowSizeUpdateSystem {
 
         static inline auto& logger_ = helios::core::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
@@ -53,13 +48,14 @@ export namespace helios::engine::platform::window::systems {
 
         /** @brief Runtime role tag used for engine system registration. */
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
-        using UpdateContextType = TUpdateContextType;
 
         /**
          * @brief Processes active windows with dirty size state.
          *
          * @param updateCtx Frame update context.
          */
+        template<typename TUpdateContextType>
+        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
         bool update(TUpdateContextType& updateCtx) noexcept {
             auto& updateContext = updateCtx.updateContext();
             for (auto [entity, wc, wsc, fbc] : updateContext.template view<

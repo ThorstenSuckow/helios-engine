@@ -33,12 +33,8 @@ using namespace helios::ecs::components;
 export namespace helios::engine::rendering::mesh::systems {
 
 
-    template<typename THandle,
-             typename TCommandBuffer = ecs::command::NullCommandBuffer,
-             typename TUpdateContextType = types::SystemUpdateContext>
-    requires IsMeshHandle<THandle> &&
-             ecs::command::concepts::IsCommandBufferLike<TCommandBuffer> &&
-             runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
+    template<typename THandle>
+    requires IsMeshHandle<THandle>
     class MeshUploadSystem {
 
         std::vector<THandle> meshHandles_;
@@ -48,18 +44,14 @@ export namespace helios::engine::rendering::mesh::systems {
     public:
 
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
-        using CommandBuffer_type = TCommandBuffer;
-        using UpdateContextType = TUpdateContextType;
 
         explicit MeshUploadSystem(size_t capacity = MESH_INITIAL_STORAGE_CAPACITY) : capacity_(capacity) {
             meshHandles_.reserve(capacity);
         }
 
-        /**
-         * @brief Collects mesh handles and queues one batch upload command.
-         *
-         * @param updateCtx Frame update context.
-         */
+        template<typename TUpdateContextType, typename TCommandBuffer>
+        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext> &&
+                 ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
         bool update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
 
             auto& updateContext = updateCtx.updateContext();

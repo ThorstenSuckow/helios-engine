@@ -42,11 +42,7 @@ export namespace helios::engine::runtime::timing::systems {
      * @see TimerManager
      * @see Timer
      */
-    template<typename TTimerManager,
-             typename TCommandBuffer = ecs::command::NullCommandBuffer,
-             typename TUpdateContextType = helios::engine::runtime::world::types::SystemUpdateContext>
-    requires ecs::command::concepts::IsCommandBufferLike<TCommandBuffer> &&
-             runtime::concepts::ProvidesUpdateContext<TUpdateContextType, helios::engine::runtime::world::UpdateContext>
+    template<typename TTimerManager>
     class TimerUpdateSystem {
 
         /**
@@ -58,8 +54,6 @@ export namespace helios::engine::runtime::timing::systems {
 
 
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
-        using CommandBuffer_type = TCommandBuffer;
-        using UpdateContextType = TUpdateContextType;
 
 
         /**
@@ -75,6 +69,9 @@ export namespace helios::engine::runtime::timing::systems {
          *
          * @param updateCtx The current frame's update context.
          */
+        template<typename TUpdateContextType, typename TCommandBuffer>
+        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, helios::engine::runtime::world::UpdateContext> &&
+                 ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
         bool update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
 
             auto& updateContext = updateCtx.updateContext();

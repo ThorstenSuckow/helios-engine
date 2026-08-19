@@ -105,10 +105,11 @@ export namespace helios::engine::runtime::gameloop {
                         auto updateCtx = contextProvider_.get(updateTypeId, updateContext);
                         system->update(updateCtx);
 
-
-                        const auto flushTypeId = system->expectedFlushContextTypeId();
-                        auto ctx = contextProvider_.get(flushTypeId);
-                        system->flush(ctx);
+                        if (auto* commandBuffer = system->commandBuffer()) {
+                            const auto flushTypeId = commandBuffer->expectedFlushContextTypeId();
+                            auto ctx = contextProvider_.get(flushTypeId);
+                            commandBuffer->flush(ctx);
+                        }
                     }
                     continue;
                 }
@@ -132,9 +133,11 @@ export namespace helios::engine::runtime::gameloop {
                     for (const auto& serialSystem : parallelSystem) {
                         auto* system = systemRegistry_.item(serialSystem);
 
-                        const auto flushTypeId = system->expectedFlushContextTypeId();
-                        auto flushCtx = contextProvider_.get(flushTypeId);
-                        system->flush(flushCtx);
+                        if (auto* commandBuffer = system->commandBuffer()) {
+                            const auto flushTypeId = commandBuffer->expectedFlushContextTypeId();
+                            auto ctx = contextProvider_.get(flushTypeId);
+                            commandBuffer->flush(ctx);
+                        }
                     }
                 }
 
@@ -163,8 +166,8 @@ export namespace helios::engine::runtime::gameloop {
                         manager->executeCommands(contextRef);
                     }
 
-                    for (auto* commandBuffer : manager->commandBuffers()) {
-                        auto flushCtxTypeId = commandBuffer->expectedFlushContextTypeId();
+                    if (auto* commandBuffer = manager->commandBuffer()) {
+                        const auto flushCtxTypeId = commandBuffer->expectedFlushContextTypeId();
                         auto flushContextRef = contextProvider_.get(flushCtxTypeId);
                         commandBuffer->flush(flushContextRef);
                     }
@@ -185,9 +188,11 @@ export namespace helios::engine::runtime::gameloop {
             jobSystem_ = &gameWorld_.jobSystem();
 
             for (auto* system : systemRegistry_.items()) {
-                auto typeId = system->expectedInitContextTypeId();
-                auto ctx = contextProvider_.get(typeId);
-                system->init(ctx);
+                if (auto* commandBuffer = system->commandBuffer()) {
+                    const auto flushTypeId = commandBuffer->expectedFlushContextTypeId();
+                    auto ctx = contextProvider_.get(flushTypeId);
+                    commandBuffer->flush(ctx);
+                }
             }
         }
 

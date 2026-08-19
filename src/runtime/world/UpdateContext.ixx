@@ -34,7 +34,7 @@ export namespace helios::engine::runtime::world {
      * event-bus read/write channels, and typed ECS access.
      *
      * Command submission is handled by systems through injected command buffers
-     * (`CommandBuffer_type`) using `cmdBuffer.template add<TCommand>(...)`.
+     * (`CommandBufferType`) using `cmdBuffer.template add<TCommand>(...)`.
      *
      * @see GameLoop
      * @see Session

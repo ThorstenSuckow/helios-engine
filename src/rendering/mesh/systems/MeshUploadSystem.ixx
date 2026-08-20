@@ -12,6 +12,7 @@ export module helios.engine.rendering.mesh.systems.MeshUploadSystem;
 import helios.engine.rendering.mesh.concepts;
 import helios.ecs.command.NullCommandBuffer;
 import helios.ecs.command.concepts;
+import helios.ecs.command.types;
 import helios.engine.rendering.mesh.components;
 import helios.engine.rendering.mesh.commands;
 import helios.ecs.system.tags;
@@ -44,6 +45,7 @@ export namespace helios::engine::rendering::mesh::systems {
     public:
 
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
+        using CommandTypes = ecs::command::types::CommandTypeList<MeshBatchUploadCommand<THandle>>;
 
         explicit MeshUploadSystem(size_t capacity = MESH_INITIAL_STORAGE_CAPACITY) : capacity_(capacity) {
             meshHandles_.reserve(capacity);

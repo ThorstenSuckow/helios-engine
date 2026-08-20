@@ -11,6 +11,8 @@ export module helios.engine.platform.lifecycle.systems.WarmupDoneSystem;
 
 import helios.ecs;
 
+import helios.ecs.command.types;
+
 import helios.engine.runtime;
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.types;
@@ -44,6 +46,7 @@ export namespace helios::engine::platform::lifecycle::systems {
          * @brief Engine role marker used by runtime registries.
          */
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
+        using CommandTypes = ecs::command::types::CommandTypeList<StateCommand<EngineState>>;
 
         /**
          * @brief Queues `StateCommand<EngineState>` with `WarmupDoneSignal` when warmup resources are consumed.

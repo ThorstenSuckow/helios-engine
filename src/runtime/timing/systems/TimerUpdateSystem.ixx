@@ -15,6 +15,7 @@ import helios.engine.runtime.timing.TimerManager;
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.types;
 import helios.engine.runtime.concepts;
+import helios.ecs.command.types;
 import helios.ecs.command;
 import helios.ecs.common.concepts;
 
@@ -54,6 +55,7 @@ export namespace helios::engine::runtime::timing::systems {
 
 
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
+        using CommandTypes = ecs::command::types::CommandTypeList<TimerControlCommand>;
 
 
         /**

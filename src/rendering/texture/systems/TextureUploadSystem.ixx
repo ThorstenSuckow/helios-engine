@@ -16,6 +16,7 @@ import helios.engine.rendering.texture.commands;
 import helios.engine.rendering.texture.components;
 
 import helios.ecs.command.NullCommandBuffer;
+import helios.ecs.command.types;
 import helios.ecs.common.concepts;
 import helios.ecs.system.tags;
 import helios.engine.runtime.world.UpdateContext;
@@ -31,7 +32,6 @@ using namespace helios::ecs::command;
 using namespace helios::ecs::components;
 export namespace helios::engine::rendering::texture::systems {
 
-struct Meh{};
     template<typename THandle>
     class TextureUploadSystem {
 
@@ -42,6 +42,7 @@ struct Meh{};
     public:
 
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
+        using CommandTypes = ecs::command::types::CommandTypeList<texture::commands::TextureBatchUploadCommand<THandle>>;
 
 
         explicit TextureUploadSystem(size_t capacity = TEXTURE_INITIAL_STORAGE_CAPACITY) : capacity_(capacity) {

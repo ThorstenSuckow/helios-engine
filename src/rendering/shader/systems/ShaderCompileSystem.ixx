@@ -12,6 +12,7 @@ module;
 export module helios.engine.rendering.shader.systems.ShaderCompileSystem;
 
 import helios.ecs.command;
+import helios.ecs.command.types;
 
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.types;
@@ -54,6 +55,7 @@ export namespace helios::engine::rendering::shader::systems {
     public:
 
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
+        using CommandTypes = ecs::command::types::CommandTypeList<ShaderBatchCompileCommand<THandle>>;
 
         explicit ShaderCompileSystem(size_t capacity = SHADER_INITIAL_STORAGE_CAPACITY) : capacity_(capacity) {
             shaderHandles_.reserve(capacity);

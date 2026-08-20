@@ -204,26 +204,26 @@ export namespace helios::engine::scene::systems {
                 const auto sceneHandle  = sbc->targetHandle();
                 const auto cameraHandle = cbc->targetHandle();
 
-                const auto camera = updateContext.template find<CameraHandle>(cameraHandle);
+                const auto camera = updateContext.find(cameraHandle);
                 if (!camera) {
                     assert(false && "Camera not found");
                     logger_.error("Camera not found");
                     continue;
                 }
-                auto* pmc = camera->template get<ProjectionMatrixComponent<CameraHandle>>();
+                auto* pmc = camera->template get<ProjectionMatrixComponent>();
                 if (!pmc) {
                     assert(pmc && "Camera had no ProjectionMatrixComponent");
                     logger_.error("Camera had no ProjectionMatrixComponent");
                     continue;
                 }
-                auto* lac = camera->template get<ViewMatrixComponent<CameraHandle>>();
+                auto* lac = camera->template get<ViewMatrixComponent>();
                 if (!lac) {
                     assert(lac && "Camera had no ViewMatrixComponent");
                     logger_.error("Camera had no ViewMatrixComponent");
                     continue;
                 }
 
-                auto* pcc = camera->template get<PerspectiveCameraComponent<CameraHandle>>();
+                auto* pcc = camera->template get<PerspectiveCameraComponent>();
                 auto frustumPlanes = helios::math::frustumPlanes(
                     pcc->fovY(), pcc->aspectRatio(), pcc->zNear(), pcc->zFar(), lac->value()
                 );

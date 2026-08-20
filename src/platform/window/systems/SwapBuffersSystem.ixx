@@ -15,6 +15,7 @@ import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.types;
 import helios.engine.runtime.concepts;
 
+import helios.ecs.command.types;
 import helios.ecs.system.tags;
 
 import helios.engine.runtime.world;
@@ -49,6 +50,7 @@ export namespace helios::engine::platform::window::systems {
          * @brief Engine role marker used by runtime registries.
          */
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
+        using CommandTypes = ecs::command::types::CommandTypeList<SwapBuffersCommand<THandle>>;
 
         /**
          * @brief Enqueues swap-buffer commands for the current frame.

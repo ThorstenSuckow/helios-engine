@@ -9,6 +9,7 @@ export module helios.engine.runtime.enginestate.systems.EngineFlowSystem;
 import helios.engine.runtime.enginestate.types;
 
 import helios.ecs.common.concepts;
+import helios.ecs.command.types;
 
 import helios.engine.state.commands;
 import helios.engine.state.types.StateTransitionRequest;
@@ -61,6 +62,8 @@ export namespace helios::engine::runtime::enginestate::systems {
     public:
 
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
+
+        using CommandTypes = ecs::command::types::CommandTypeList<StateCommand<EngineState>>;
 
         /**
          * @brief Updates the game flow and emits state transition commands.

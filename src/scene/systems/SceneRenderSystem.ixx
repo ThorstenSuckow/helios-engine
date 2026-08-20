@@ -37,6 +37,7 @@ import helios.engine.rendering.viewport.ViewportEntity;
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.types;
 import helios.engine.runtime.concepts;
+import helios.ecs.command.types;
 import helios.ecs;
 import helios.ecs.system.tags;
 
@@ -228,6 +229,11 @@ export namespace helios::engine::scene::systems {
          * @brief Runtime role tag used for engine system registration.
          */
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
+        using CommandTypes = ecs::command::types::CommandTypeList<
+            RenderSceneCommand<TMemberHandle>,
+            RenderSceneMemberCommand<TMemberHandle>,
+            RenderInstanceBatchCommand<TMemberHandle>
+        >;
 
         /**
          * @brief Constructs the system with the visibility snapshot registry.

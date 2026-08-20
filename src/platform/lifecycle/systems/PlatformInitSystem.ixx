@@ -13,6 +13,7 @@ import helios.engine.runtime.world.types;
 import helios.engine.runtime.concepts;
 
 import helios.ecs.system.tags;
+import helios.ecs.command.types;
 
 import helios.engine.runtime.world;
 import helios.ecs;
@@ -38,6 +39,7 @@ export namespace helios::engine::platform::lifecycle::systems {
          * @brief Engine role marker used by runtime system registries.
          */
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
+        using CommandTypes = ecs::command::types::CommandTypeList<PlatformInitCommand>;
 
         /**
          * @brief Queues platform initialization command when required.

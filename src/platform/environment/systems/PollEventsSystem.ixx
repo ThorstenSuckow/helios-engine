@@ -12,6 +12,7 @@ import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.types;
 import helios.engine.runtime.concepts;
 import helios.ecs.command.NullCommandBuffer;
+import helios.ecs.command.types;
 import helios.ecs.command.concepts;
 import helios.ecs.system.tags;
 
@@ -35,6 +36,7 @@ export namespace helios::engine::platform::environment::systems {
          * @brief Engine role marker used by runtime system registries.
          */
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
+        using CommandTypes = ecs::command::types::CommandTypeList<PollEventsCommand>;
 
         /**
          * @brief Enqueues polling of native platform/window events.

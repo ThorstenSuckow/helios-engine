@@ -61,6 +61,11 @@ export namespace helios::engine::runtime::gameloop {
     class Pass {
 
         friend class helios::engine::runtime::gameloop::Phase;
+
+        using DefaultCommandBufferFactory = ecs::command::CommandBufferFactory<
+            ecs::command::TypedCommandBuffer, DefaultInitContext, CommandBufferFlushContext
+        >;
+
     protected:
         /**
          * @brief Registry holding all systems for this pass.
@@ -112,48 +117,31 @@ export namespace helios::engine::runtime::gameloop {
          *
          * @tparam T The type of the manager to register.
          */
-        template<typename T>
-        requires ecs::manager::concepts::HasExecuteCommandsParallel<T>
+        template<typename TManager>
         void registerManagerExecuteCommandsParallel() {
-            assert(gameWorld_.template tryManager<T>() && "Manager not found for system's manager");
-            parallelManagerTypeIds_.push_back(ecs::manager::types::ManagerTypeId::template id<T>());
+            assert(gameWorld_.template tryManager<TManager>() && "Manager not found for system's manager");
+            parallelManagerTypeIds_.push_back(ecs::manager::types::ManagerTypeId::template id<TManager>());
         }
 
 
-        template<typename TCommandBuffer, typename TSystem>
+        template<typename TCommandBufferFactory, typename TSystem>
         Pass& registerTypedSystem(TSystem&& system) {
             using SystemType = std::remove_cvref_t<TSystem>;
             systemRegistry_.template add<SystemType>(
-                ecs::system::System::make<TCommandBuffer, SystemUpdateContext, SystemType>(std::forward<TSystem>(system))
-            );
+                ecs::system::System::make<SystemType, SystemUpdateContext, TCommandBufferFactory>(
+                     std::forward<TSystem>(system)
+            ));
             return *this;
         }
 
-        template<typename TCommandBuffer, typename TSystem>
-        Pass& registerTypedSystem(TSystem&& system, TCommandBuffer& commandBuffer) {
-            using SystemType = std::remove_cvref_t<TSystem>;
-            using CommandBufferType = std::remove_cvref_t<TCommandBuffer>;
-            systemRegistry_.template add<SystemType>(
-                ecs::system::System::make<CommandBufferType, SystemUpdateContext, SystemType>(std::forward<TSystem>(system), commandBuffer)
-            );
-            return *this;
-        }
 
-        template<typename TCommandBuffer, typename TSystem>
+        template<typename TCommandBufferFactory, typename TSystem>
         Pass& registerCallableSystem(TSystem&& system) {
             using SystemType = std::remove_cvref_t<TSystem>;
             systemRegistry_.template add<SystemType>(
-                ecs::system::System::make<TCommandBuffer, SystemUpdateContext>(std::forward<TSystem>(system))
-            );
-            return *this;
-        }
-
-        template<typename TCommandBuffer, typename TSystem>
-        Pass& registerCallableSystem(TSystem&& system, TCommandBuffer& commandBuffer) {
-            using SystemType = std::remove_cvref_t<TSystem>;
-            using CommandBufferType = std::remove_cvref_t<TCommandBuffer>;
-            systemRegistry_.template add<SystemType>(
-                ecs::system::System::make<CommandBufferType, SystemUpdateContext>(std::forward<TSystem>(system), commandBuffer)
+                ecs::system::System::make<SystemType, SystemUpdateContext, TCommandBufferFactory>(
+                    std::move(system)
+                    )
             );
             return *this;
         }
@@ -161,7 +149,7 @@ export namespace helios::engine::runtime::gameloop {
         /**
          * @brief Registers a system instance for parallel typed systems.
          */
-        template<typename TSystem>
+        template<typename TCommandBufferFactory, typename TSystem>
         requires ecs::system::concepts::IsTypedSystemLike<std::remove_cvref_t<TSystem>>
         Pass& registerParallelTypedSystemInstance(TSystem&& system) {
 
@@ -171,7 +159,7 @@ export namespace helios::engine::runtime::gameloop {
             using UpdateContextType = runtime::world::types::SystemUpdateContext;
 
             systemRegistry_.add<SystemType>(
-                ecs::system::System::make<CommandBufferType, UpdateContextType>(std::forward<TSystem>(system))
+                ecs::system::System::make<SystemType, UpdateContextType, TCommandBufferFactory>(std::move(system))
             );
 
             return *this;
@@ -279,62 +267,51 @@ export namespace helios::engine::runtime::gameloop {
         // +---------------------------------
         // | Typed Systems
         // +---------------------------------
-        template<typename TSystem>
+        template<
+            typename TSystem,
+            typename TCommandBufferFactory = DefaultCommandBufferFactory,
+            typename ... TArgs
+        >
         requires ecs::system::concepts::IsTypedSystemLike<TSystem>
-        Pass& addSystem(TSystem&& system) {
-            using TCommandBuffer = ecs::command::NullCommandBuffer;
-            registerTypedSystem<TCommandBuffer>(std::forward<TSystem>(system));
-            systemTypeIdQueue_.push_back({{ecs::system::types::SystemTypeId::template id<TSystem>()}});
+        Pass& addSystem(TArgs&&... args) {
+            using SystemType = std::remove_cvref_t<TSystem>;
+            registerTypedSystem<TCommandBufferFactory>(SystemType{std::forward<TArgs>(args) ...});
+            systemTypeIdQueue_.push_back({{ecs::system::types::SystemTypeId::template id<SystemType>()}});
             return *this;
         }
 
-        template<typename TCommandBuffer, typename TSystem>
-        requires ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
-                && ecs::system::concepts::IsTypedSystemLike<TSystem>
-        Pass& addSystem(TSystem&& system) {
-            registerTypedSystem<TCommandBuffer>(std::forward<TSystem>(system));
-            systemTypeIdQueue_.push_back({{ecs::system::types::SystemTypeId::template id<TSystem>()}});
+        template<
+            typename TSystem,
+            typename TCommandBufferFactory = DefaultCommandBufferFactory
+        >
+        requires ecs::system::concepts::IsTypedSystemLike<TSystem>
+        Pass& addSystem() {
+            using SystemType = std::remove_cvref_t<TSystem>;
+            registerTypedSystem<TCommandBufferFactory>(SystemType{});
+            systemTypeIdQueue_.push_back({{ecs::system::types::SystemTypeId::template id<SystemType>()}});
             return *this;
         }
 
-        template<typename TCommandBuffer, typename TSystem>
-        requires ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
-                && ecs::system::concepts::IsTypedSystemLike<TSystem>
-        Pass& addSystem(TSystem&& system, TCommandBuffer& commandBuffer) {
-            registerTypedSystem<std::remove_cvref_t<TCommandBuffer>>(std::forward<TSystem>(system), commandBuffer);
-            systemTypeIdQueue_.push_back({{ecs::system::types::SystemTypeId::template id<TSystem>()}});
-            return *this;
-        }
+
         // +---------------------------------
         // +---------------------------------
 
         // +---------------------------------
         // | Callable Systems
         // +---------------------------------
-        template<typename TSystem>
+        template<
+            typename TCommandBufferFactory = DefaultCommandBufferFactory,
+            typename TSystem
+        >
         requires ecs::system::concepts::IsCallableSystemLike<std::remove_cvref_t<TSystem>>
         Pass& addSystem(TSystem&& system) {
-            using TCommandBuffer = ecs::command::NullCommandBuffer;
-            registerCallableSystem<TCommandBuffer>(std::forward<TSystem>(system));
+            using SystemType = std::remove_cvref_t<TSystem>;
+            registerCallableSystem<TCommandBufferFactory>(std::forward<TSystem>(system));
             systemTypeIdQueue_.push_back({{ecs::system::types::SystemTypeId::template id<TSystem>()}});
             return *this;
         }
 
-        template<typename TCommandBuffer, typename TSystem>
-        requires ecs::system::concepts::IsCallableSystemLike<std::remove_cvref_t<TSystem>>
-        Pass& addSystem(TSystem&& system) {
-            registerCallableSystem<TCommandBuffer>(std::forward<TSystem>(system));
-            systemTypeIdQueue_.push_back({{ecs::system::types::SystemTypeId::template id<TSystem>()}});
-            return *this;
-        }
 
-        template<typename TCommandBuffer, typename TSystem>
-        requires ecs::system::concepts::IsCallableSystemLike<std::remove_cvref_t<TSystem>>
-        Pass& addSystem(TSystem&& system, TCommandBuffer& commandBuffer) {
-            registerCallableSystem<std::remove_cvref_t<TCommandBuffer>>(std::forward<TSystem>(system), commandBuffer);
-            systemTypeIdQueue_.push_back({{ecs::system::types::SystemTypeId::template id<TSystem>()}});
-            return *this;
-        }
         // +---------------------------------
         // +---------------------------------
 
@@ -431,7 +408,10 @@ export namespace helios::engine::runtime::gameloop {
          *                  At least one type is required.
          * @return Reference to this pass for method chaining.
          */
-        template <typename ... TSerials>
+        template <
+            typename ... TSerials,
+            typename TCommandBufferFactory = DefaultCommandBufferFactory
+        >
         requires (sizeof ...(TSerials) >= 1) && ((ecs::system::concepts::IsSerialLike<TSerials>) && ...)
         Pass& addParallelSystems() {
 
@@ -441,7 +421,7 @@ export namespace helios::engine::runtime::gameloop {
             auto addSystemInstance = [this]
             <typename TSystem>
             (auto& serialGroup) {
-                registerParallelTypedSystemInstance<TSystem>(TSystem{});
+                registerParallelTypedSystemInstance<TCommandBufferFactory, TSystem>(TSystem{});
                 serialGroup.push_back({{ecs::system::types::SystemTypeId::template id<TSystem>()}});
             };
 
@@ -479,8 +459,9 @@ export namespace helios::engine::runtime::gameloop {
          * @tparam TManager The type of the Manager to flush in parallel.
          * @return Reference to this Pass for method chaining.
          */
-        template<typename TManager>
-        requires (ecs::manager::concepts::IsManagerLike<TManager> && ecs::manager::concepts::HasExecuteCommandsParallel<TManager>)
+        template<typename TManager, typename TExecutionContext = ManagerExecutionContext>
+        requires (ecs::manager::concepts::IsManagerLike<TManager> &&
+            ecs::manager::concepts::HasExecuteCommandsParallel<TManager, TExecutionContext>)
         Pass& executeCommandsParallel() {
 
             registerManagerExecuteCommandsParallel<TManager>();

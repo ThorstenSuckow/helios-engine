@@ -26,8 +26,7 @@ import helios.ecs;
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.GameObject;
 import helios.engine.runtime.world.ContextProvider;
-import helios.engine.runtime.world.types.GameObjectId;
-import helios.engine.runtime.world.types.GameObjectHandle;
+import helios.engine.runtime.world.types;
 
 import helios.core.log.Logger;
 import helios.core.log.LogManager;
@@ -179,19 +178,29 @@ export namespace helios::engine::runtime::world {
 
 
         /**
-         * @brief Registers and constructs a Manager of type T.
-         *
-         * @tparam T The Manager type. Must satisfy IsManagerLike.
-         * @tparam Args Constructor argument types.
-         *
-         * @param args Arguments forwarded to the T constructor.
-         *
-         * @return Reference to the newly registered Manager.
+         * @brief Registers and constructs a Manager of type TConcreteManager.
          */
-        template<typename T, typename... Args>
-        requires helios::ecs::manager::concepts::IsManagerLike<T>
-        T& registerManager(Args&&... args) {
-            return managerRegistry_.add<T>(std::forward<Args>(args)...);
+        template<
+            typename TConcreteManager,
+            typename TCommandBufferFactory = ecs::command::CommandBufferFactory<
+                ecs::command::TypedCommandBuffer,
+                DefaultInitContext,
+                CommandBufferFlushContext
+            >,
+            typename TInitContext = DefaultInitContext,
+            typename TExecutionContext = ManagerExecutionContext,
+        typename... Args>
+        requires helios::ecs::manager::concepts::IsManagerLike<TConcreteManager>
+        TConcreteManager& registerManager(Args&&... args) {
+
+            using ManagerType = std::remove_cvref_t<TConcreteManager>;
+            return managerRegistry_.add<ManagerType>(
+                manager::Manager::make<
+                    ManagerType,
+                    TInitContext, TExecutionContext,
+                    TCommandBufferFactory
+                >(TConcreteManager{std::forward<Args>(args)...})
+            );
         }
 
 

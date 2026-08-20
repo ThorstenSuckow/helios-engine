@@ -75,10 +75,8 @@ export namespace helios::engine::rendering {
      */
     template<
         typename TRenderBackend,
-        typename TInitContext,
-        typename TExecutionContext,
         typename ...TMemberHandles>
-    requires IsRenderBackendLike<TRenderBackend> && ecs::common::concepts::ProvidesCommandHandlerRegistry<TInitContext, ecs::command::CommandHandlerRegistry>
+    requires IsRenderBackendLike<TRenderBackend>
     class RenderManager {
 
         /**
@@ -329,9 +327,6 @@ export namespace helios::engine::rendering {
          */
         using EcsRoleTag = ecs::manager::tags::ManagerRole;
 
-        using ExecutionContextType = TExecutionContext;
-        using InitContextType = TInitContext;
-
         /**
          * @brief Constructs the manager for a specific render backend.
          *
@@ -352,6 +347,7 @@ export namespace helios::engine::rendering {
          * and clears all active batch indices afterwards.
 
          */
+        template<typename TExecutionContext>
         bool executeCommands(TExecutionContext&) {
 
 
@@ -506,6 +502,8 @@ export namespace helios::engine::rendering {
          *
          * @param commandHandlerRegistry Command handler registry used at runtime.
          */
+        template<typename TInitContext>
+        requires ecs::common::concepts::ProvidesCommandHandlerRegistry<TInitContext, ecs::command::CommandHandlerRegistry>
         bool init(TInitContext& initContext) noexcept {
 
             auto& commandHandlerRegistry = initContext.commandHandlerRegistry();

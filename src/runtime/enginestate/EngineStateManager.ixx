@@ -24,6 +24,5 @@ export namespace helios::engine::runtime::enginestate {
      * @see helios::engine::state::StateManager
      * @see types::EngineState
      */
-    template<typename TInitContext, typename TExecutionContext>
-    using EngineStateManager = helios::engine::state::StateManager<types::EngineState, TInitContext, TExecutionContext>;
+    using EngineStateManager = helios::engine::state::StateManager<types::EngineState>;
 }

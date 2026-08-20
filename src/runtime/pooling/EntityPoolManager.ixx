@@ -53,18 +53,15 @@ export namespace helios::engine::runtime::pooling {
      *
      * @tparam TMemberHandles  Pack of handle types whose pools are managed by this instance.
      */
-    template<typename TEntityPoolRegistry, typename TInitContext, typename TExecutionContext>
+    template<typename TEntityPoolRegistry>
     class EntityPoolManager;
 
 
     template<
-        typename TInitContext,
-        typename TExecutionContext,
         template<typename> typename TLookupStrategy,
         typename... TMemberHandles
     >
-    requires ecs::common::concepts::ProvidesCommandHandlerRegistry<TInitContext, ecs::command::CommandHandlerRegistry>
-   class EntityPoolManager<TypedEntityPoolRegistry<TLookupStrategy, TMemberHandles...>, TInitContext, TExecutionContext> {
+   class EntityPoolManager<TypedEntityPoolRegistry<TLookupStrategy, TMemberHandles...>> {
         /**
          * @brief Registry holding all managed pools, keyed by `EntityPoolKey`.
          */
@@ -226,8 +223,6 @@ export namespace helios::engine::runtime::pooling {
         /** @brief Engine role tag identifying this class as a manager. */
         using EcsRoleTag = ecs::manager::tags::ManagerRole;
 
-        using ExecutionContextType = TExecutionContext;
-        using InitContextType = TInitContext;
 
         /**
          * @brief Constructs an `EntityPoolManager`.
@@ -248,6 +243,7 @@ export namespace helios::engine::runtime::pooling {
          *
          * @param updateContext  Current frame update context (unused directly, passed for API symmetry).
          */
+        template<typename TExecutionContext>
         bool executeCommands(TExecutionContext&) noexcept {
 
             (processCommandsForHandle<TMemberHandles>(),...);
@@ -263,6 +259,7 @@ export namespace helios::engine::runtime::pooling {
          *
          * @param updateContext  Current frame update context (unused directly, passed for API symmetry).
          */
+        template<typename TExecutionContext>
         bool executeCommandsParallel(TExecutionContext&) noexcept {
             std::array<std::function<void()>, sizeof ...(TMemberHandles)> jobs{
                 [this]() {
@@ -308,6 +305,8 @@ export namespace helios::engine::runtime::pooling {
          *
          * @param commandHandlerRegistry  Registry to register handlers with.
          */
+        template<typename TInitContext>
+        requires ecs::common::concepts::ProvidesCommandHandlerRegistry<TInitContext, ecs::command::CommandHandlerRegistry>
         bool init(TInitContext& initContext) noexcept {
 
             auto& commandHandlerRegistry = initContext.commandHandlerRegistry();

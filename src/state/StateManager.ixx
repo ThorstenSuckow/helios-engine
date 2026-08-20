@@ -25,6 +25,7 @@ import helios.ecs.common.concepts;
 import helios.engine.runtime.world.UpdateContext;
 
 import helios.ecs.command.CommandHandlerRegistry;
+import helios.ecs.command.types;
 import helios.engine.runtime.world.Session;
 import helios.engine.runtime.world.concepts;
 import helios.engine.runtime.concepts;
@@ -66,9 +67,7 @@ export namespace helios::engine::state {
      * @see StateTransitionListener
      * @see StateCommand
      */
-    template<typename StateType, typename TInitContext, typename TExecutionContext>
-requires ecs::common::concepts::ProvidesCommandHandlerRegistry<TInitContext, ecs::command::CommandHandlerRegistry>
-    && engine::runtime::concepts::ProvidesUpdateContext<TExecutionContext, runtime::world::UpdateContext>
+    template<typename StateType>
     class StateManager {
 
         /**
@@ -151,9 +150,6 @@ requires ecs::common::concepts::ProvidesCommandHandlerRegistry<TInitContext, ecs
     public:
         using EcsRoleTag = helios::ecs::manager::tags::ManagerRole;
 
-        using ExecutionContextType = TExecutionContext;
-        using InitContextType = TInitContext;
-
         /**
          * @brief Constructs a state manager with transition rules.
          *
@@ -182,6 +178,8 @@ requires ecs::common::concepts::ProvidesCommandHandlerRegistry<TInitContext, ecs
          *
          * @param updateContext The current frame's update context.
          */
+        template<typename TExecutionContext>
+        requires engine::runtime::concepts::ProvidesUpdateContext<TExecutionContext, engine::runtime::world::UpdateContext>
         bool executeCommands(TExecutionContext& executionContext) noexcept {
 
             auto& updateContext = executionContext.updateContext();
@@ -266,6 +264,8 @@ requires ecs::common::concepts::ProvidesCommandHandlerRegistry<TInitContext, ecs
          *
          * @param commandHandlerRegistry The command-handler registry to register with.
          */
+        template<typename TInitContext>
+        requires ecs::common::concepts::ProvidesCommandHandlerRegistry<TInitContext, ecs::command::CommandHandlerRegistry>
         bool init(TInitContext& initContext) {
             auto& commandHandlerRegistry = initContext.commandHandlerRegistry();
 

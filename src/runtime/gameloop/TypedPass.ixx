@@ -89,8 +89,10 @@ export namespace helios::engine::runtime::gameloop {
          * @brief Updates all systems registered in this pass.
          *
          * @param updateContext The current update context.
+         * @param frameResults The map of results from the current frame's system executions.
          */
-        void update(helios::engine::runtime::world::UpdateContext& updateContext) override {
+        void update(helios::engine::runtime::world::UpdateContext& updateContext,
+            ecs::system::types::SystemResultMap& frameResults) override {
 
             assert(jobSystem_ && "Job system not initialized");
 
@@ -103,7 +105,12 @@ export namespace helios::engine::runtime::gameloop {
                         // update, then immediately flush the buffer contents
                         const auto updateTypeId = system->expectedUpdateContextTypeId();
                         auto updateCtx = contextProvider_.get(updateTypeId, updateContext);
-                        system->update(updateCtx);
+
+                        // consume frame results
+                        system->update(updateCtx, frameResults);
+
+                        // produce frame results
+                        system->flush(frameResults);
 
                         if (auto* commandBuffer = system->commandBuffer()) {
                             const auto flushTypeId = commandBuffer->expectedFlushContextTypeId();
@@ -124,7 +131,7 @@ export namespace helios::engine::runtime::gameloop {
 
                             const auto updateTypeId = system->expectedUpdateContextTypeId();
                             auto updateCtx = contextProvider_.get(updateTypeId, updateContext);
-                            system->update(updateCtx);
+                            system->update(updateCtx, frameResults);
                         }
                 });
 
@@ -132,6 +139,8 @@ export namespace helios::engine::runtime::gameloop {
                 for (const auto& parallelSystem : parallelSystems) {
                     for (const auto& serialSystem : parallelSystem) {
                         auto* system = systemRegistry_.item(serialSystem);
+
+                        system->flush(frameResults);
 
                         if (auto* commandBuffer = system->commandBuffer()) {
                             const auto flushTypeId = commandBuffer->expectedFlushContextTypeId();

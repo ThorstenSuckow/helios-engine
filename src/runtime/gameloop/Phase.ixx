@@ -68,13 +68,15 @@ export namespace helios::engine::runtime::gameloop {
          * @brief Updates all passes within this phase.
          *
          * @param updateContext The current update context.
+         * @param frameResults The map of results from the current frame's system executions.
          */
-        void update(runtime::world::UpdateContext& updateContext){
+        void update(runtime::world::UpdateContext& updateContext,
+            ecs::system::types::SystemResultMap& frameResults){
 
             for (auto& pass : passEntries_) {
 
                 if (pass->shouldRun(updateContext)) {
-                    pass->update(updateContext);
+                    pass->update(updateContext, frameResults);
                     pass->onPassEnd(updateContext);
                 }
             }

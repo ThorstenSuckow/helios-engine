@@ -197,8 +197,11 @@ export namespace helios::engine::runtime::gameloop {
          * @brief Updates all systems in this pass.
          *
          * @param updateContext The current update context.
+         * @param frameResults The map of results from the current frame's system executions.
          */
-        virtual void update(helios::engine::runtime::world::UpdateContext& updateContext) = 0;
+        virtual void update(
+            helios::engine::runtime::world::UpdateContext& updateContext,
+            ecs::system::types::SystemResultMap& frameResults) = 0;
 
 
         /**

@@ -55,6 +55,8 @@ export namespace helios::engine::runtime::gameloop {
         ContextProvider& contextProvider_;
 
 
+        ecs::system::types::SystemResultMap frameResults_;
+
         Phase prePhase_;
         Phase mainPhase_;
         Phase postPhase_;
@@ -144,8 +146,9 @@ export namespace helios::engine::runtime::gameloop {
         void update(const float deltaTime, const helios::engine::input::InputSnapshot& inputSnapshot
         ) noexcept {
 
-            // clear the ContextProvider
+            // clear the ContextProvider and previous frameResults
             contextProvider_.clear();
+            frameResults_.clear();
 
             assert(initialized_ && "GameLoop not initialized");
 
@@ -165,13 +168,13 @@ export namespace helios::engine::runtime::gameloop {
             auto& session = gameWorld_.session();
 
             // gameloop phases
-            prePhase_.update(updateContext);
+            prePhase_.update(updateContext, frameResults_);
             phaseEnd(updateContext);
 
-            mainPhase_.update(updateContext);
+            mainPhase_.update(updateContext, frameResults_);
             phaseEnd(updateContext);
 
-            postPhase_.update(updateContext);
+            postPhase_.update(updateContext, frameResults_);
             phaseEnd(updateContext);
         }
 

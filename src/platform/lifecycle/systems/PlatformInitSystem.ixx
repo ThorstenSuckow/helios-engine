@@ -49,14 +49,13 @@ export namespace helios::engine::platform::lifecycle::systems {
         template<typename TUpdateContextType, typename TCommandBuffer>
         requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext> &&
                  ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
-        bool update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
+        void update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
 
             auto& updateContext = updateCtx.updateContext();
 
             if (!updateContext.session().isInitialized()) {
                  cmdBuffer.template add<PlatformInitCommand>();
             }
-            return true;
         }
 
     };

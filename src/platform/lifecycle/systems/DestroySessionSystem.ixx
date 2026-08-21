@@ -40,13 +40,12 @@ export namespace helios::engine::platform::lifecycle::systems {
          */
         template<typename TUpdateContextType>
         requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
-        bool update(TUpdateContextType& updateCtx) noexcept {
+        void update(TUpdateContextType& updateCtx) noexcept {
             /**
              * @todo should be command
              */
             auto& updateContext = updateCtx.updateContext();
             updateContext.session().destroy();
-            return true;
         }
     };
 

@@ -54,7 +54,7 @@ export namespace helios::engine::scene::systems {
          */
         template<typename TUpdateContextType>
         requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
-        bool update(TUpdateContextType& updateCtx) noexcept {
+        void update(TUpdateContextType& updateCtx) noexcept {
 
             auto& updateContext = updateCtx.updateContext();
 
@@ -74,8 +74,6 @@ export namespace helios::engine::scene::systems {
                 entity.setTrackedValue(boundsWorld, boundsLocal->value().applyTransform(worldTransform->value()));
 
             }
-
-            return true;
         }
 
 

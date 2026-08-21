@@ -57,7 +57,7 @@ export namespace helios::engine::platform::lifecycle::systems {
         requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext> &&
                  ecs::command::concepts::IsCommandBufferLike<TCommandBuffer> &&
                  (!std::is_same_v<TCommandBuffer, NullCommandBuffer>)
-        bool update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
+        void update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
 
             auto& updateContext = updateCtx.updateContext();
 
@@ -80,8 +80,6 @@ export namespace helios::engine::platform::lifecycle::systems {
 
             }
 
-
-            return true;
         }
 
     };

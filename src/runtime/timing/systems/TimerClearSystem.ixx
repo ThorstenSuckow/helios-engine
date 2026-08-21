@@ -63,7 +63,7 @@ export namespace helios::engine::runtime::timing::systems {
          */
         template<typename TUpdateContextType>
         requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, helios::engine::runtime::world::UpdateContext>
-        bool update(TUpdateContextType& updateCtx) noexcept {
+        void update(TUpdateContextType& updateCtx) noexcept {
 
             (void)updateCtx.updateContext();
 
@@ -72,7 +72,6 @@ export namespace helios::engine::runtime::timing::systems {
                     timer.setState(TimerState::Undefined);
                 }
             }
-            return true;
         }
 
     };

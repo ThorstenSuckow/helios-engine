@@ -56,7 +56,7 @@ export namespace helios::engine::platform::window::systems {
          */
         template<typename TUpdateContextType>
         requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
-        bool update(TUpdateContextType& updateCtx) noexcept {
+        void update(TUpdateContextType& updateCtx) noexcept {
             auto& updateContext = updateCtx.updateContext();
             for (auto [entity, wc, wsc, fbc] : updateContext.template view<
                 TMemberHandle,
@@ -68,7 +68,6 @@ export namespace helios::engine::platform::window::systems {
                 // c'mon now do something
 
             }
-            return true;
         };
 
     };

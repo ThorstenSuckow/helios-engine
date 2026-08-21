@@ -64,7 +64,7 @@ export namespace helios::engine::rendering::shader::systems {
         template<typename TUpdateContextType, typename TCommandBuffer>
         requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext> &&
                  ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
-        bool update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
+        void update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
 
             auto& updateContext = updateCtx.updateContext();
 
@@ -80,8 +80,6 @@ export namespace helios::engine::rendering::shader::systems {
             shaderHandles_.clear();
             shaderHandles_.reserve(capacity_);
 
-
-            return true;
         }
 
     };

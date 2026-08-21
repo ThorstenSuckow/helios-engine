@@ -58,7 +58,7 @@ export namespace helios::engine::rendering::texture::systems {
         template<typename TUpdateContextType, typename TCommandBuffer>
         requires ecs::command::concepts::IsCommandBufferLike<TCommandBuffer> &&
             engine::runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
-        bool update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
+        void update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
 
             auto& updateContext = updateCtx.updateContext();
 
@@ -73,7 +73,6 @@ export namespace helios::engine::rendering::texture::systems {
 
             textureHandles_.clear();
             textureHandles_.reserve(capacity_);
-            return true;
         }
 
     };

@@ -77,7 +77,7 @@ export namespace helios::engine::runtime::enginestate::systems {
         template<typename TUpdateContextType, typename TCommandBuffer>
         requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, runtime::world::UpdateContext> &&
                  ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
-        bool update(TUpdateContextType& updateCtx, TCommandBuffer& buffer) noexcept {
+        void update(TUpdateContextType& updateCtx, TCommandBuffer& buffer) noexcept {
 
             auto& updateContext = updateCtx.updateContext();
 
@@ -91,7 +91,7 @@ export namespace helios::engine::runtime::enginestate::systems {
             // the previous state is the same as the current one, in case any guard
             // did veto the next state
             if (engineState == EngineState::Undefined) {// && prevMatchState_ == engineState && prevEngineStateTransitionId_ == engineStateTransitionId) {
-                return false;
+                return;
             }
 
             prevMatchState_= engineState;
@@ -116,7 +116,6 @@ export namespace helios::engine::runtime::enginestate::systems {
                 default:
                     break;
             }
-            return true;
         }
     };
 }

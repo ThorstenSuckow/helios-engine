@@ -46,10 +46,9 @@ export namespace helios::engine::platform::environment::systems {
         template<typename TUpdateContextType, typename TCommandBuffer>
         requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext> &&
                  ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
-        bool update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
+        void update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
             (void)updateCtx.updateContext();
             cmdBuffer.template add<PollEventsCommand>();
-            return true;
         }
 
     };

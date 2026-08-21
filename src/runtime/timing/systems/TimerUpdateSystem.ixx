@@ -74,7 +74,7 @@ export namespace helios::engine::runtime::timing::systems {
         template<typename TUpdateContextType, typename TCommandBuffer>
         requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, helios::engine::runtime::world::UpdateContext> &&
                  ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
-        bool update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
+        void update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
 
             auto& updateContext = updateCtx.updateContext();
 
@@ -89,7 +89,6 @@ export namespace helios::engine::runtime::timing::systems {
                     }
                 }
             }
-            return true;
         }
 
     };

@@ -52,7 +52,7 @@ export namespace helios::engine::runtime::pooling::systems {
         template<typename TUpdateContextType, typename TCommandBuffer>
         requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, world::UpdateContext> &&
                  ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
-        bool update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) {
+        void update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
 
             auto& updateContext = updateCtx.updateContext();
 
@@ -69,7 +69,6 @@ export namespace helios::engine::runtime::pooling::systems {
                 );
 
             }
-            return true;
         }
 
     };

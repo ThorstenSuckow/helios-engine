@@ -47,10 +47,9 @@ export namespace helios::engine::core::systems {
          */
         template<typename TUpdateContextType>
         requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
-        bool update(TUpdateContextType& updateCtx) noexcept {
+        void update(TUpdateContextType& updateCtx) noexcept {
             auto& updateContext = updateCtx.updateContext();
             updateContext.template clearDirtySets<TMemberHandle, TComponents...>();
-            return true;
         }
     };
 }

@@ -99,11 +99,6 @@ export namespace helios::engine::scene::systems {
 
         static inline auto& logger_ = helios::core::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
 
-        /**
-         * @brief Tracks visible and culled members per viewport for diagnostics/debugging.
-         */
-        SceneMemberVisibilityRegistry<TMemberHandle, TSubmissionMode>& visibilityRegistry_;
-
 
         /**
          * @brief Evaluates all members for one submission mode and one viewport.
@@ -121,7 +116,8 @@ export namespace helios::engine::scene::systems {
             CullingContext<TMemberHandle>& cullingContext,
             const SceneHandle sceneHandle,
             const RenderTargetBindingComponent<ViewportHandle>& renderTargetBindingComponent,
-            const ViewportEntity &viewportEntity
+            const ViewportEntity &viewportEntity,
+            SceneMemberVisibilityRegistry<TMemberHandle, TSubmissionMode>& visibilityRegistry
         ) {
 
             for (auto [
@@ -150,9 +146,9 @@ export namespace helios::engine::scene::systems {
                 };
 
                 if (smc->targetHandle() == sceneHandle && cullingStrategy_.shouldRender(cullingContext)) {
-                    visibilityRegistry_.addVisibleMember(viewportEntity.handle(), std::move(memberContext));
+                    visibilityRegistry.addVisibleMember(viewportEntity.handle(), std::move(memberContext));
                 } else {
-                    visibilityRegistry_.addCulledMember(viewportEntity.handle(), std::move(memberContext));
+                    visibilityRegistry.addCulledMember(viewportEntity.handle(), std::move(memberContext));
                 }
             }
         }
@@ -172,8 +168,8 @@ export namespace helios::engine::scene::systems {
          * @param cullingStrategy Culling strategy instance.
          * @param visibilityRegistry Registry receiving per-frame visibility results.
          */
-        explicit SceneMemberVisibilitySystem(TCullingStrategy cullingStrategy, SceneMemberVisibilityRegistry<TMemberHandle, TSubmissionMode>& visibilityRegistry)
-        : cullingStrategy_(std::move(cullingStrategy)), visibilityRegistry_(visibilityRegistry) {
+        explicit SceneMemberVisibilitySystem(TCullingStrategy cullingStrategy)
+        : cullingStrategy_(std::move(cullingStrategy)) {
         }
 
 
@@ -188,11 +184,11 @@ export namespace helios::engine::scene::systems {
          */
         template<typename TUpdateContextType>
         requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
-        bool update(TUpdateContextType& updateCtx) noexcept {
+        SceneMemberVisibilityRegistry<TMemberHandle, TSubmissionMode> update(TUpdateContextType& updateCtx) noexcept {
 
             auto& updateContext = updateCtx.updateContext();
 
-            visibilityRegistry_.clear();
+            auto visibilityRegistry = SceneMemberVisibilityRegistry<TMemberHandle, TSubmissionMode>{};
 
             for (auto [viewportEntity, renderTargetBindingComponent, sbc, cbc] : updateContext.template view<
                 ViewportHandle,
@@ -237,14 +233,15 @@ export namespace helios::engine::scene::systems {
                  * Moved from processMembers() to make sure a scene gets re-rendered (i.e. framebuffer cleared)
                  * even if no members are visible. Otherwise the last frame's contents would remain in the framebuffer.
                  */
-                visibilityRegistry_.addSceneRenderContext({
+                visibilityRegistry.addSceneRenderContext({
                     renderTargetBindingComponent->targetHandle(), viewportEntity.handle(), sceneHandle
                 });
 
                 processMembers(
-                    updateContext, cullingContext, sceneHandle, *renderTargetBindingComponent, viewportEntity);
+                    updateContext, cullingContext, sceneHandle, *renderTargetBindingComponent, viewportEntity, visibilityRegistry);
+
+                return visibilityRegistry;
             }
-            return true;
         }
 
 

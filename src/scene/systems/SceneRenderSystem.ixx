@@ -91,14 +91,10 @@ export namespace helios::engine::scene::systems {
     requires (std::is_same_v<TSubmissionMode, Instanced> || std::is_same_v<TSubmissionMode, NonInstanced>)
     class SceneRenderSystem {
 
+        using SceneMemberVisibilityRegistry = SceneMemberVisibilityRegistry<TMemberHandle, TSubmissionMode>;
+
         static inline auto& logger_ = helios::core::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
 
-        /**
-         * @brief Central per-frame visibility snapshot consumed by this system.
-         *
-         * Filled by `SceneMemberVisibilitySystem` and read-only in this stage.
-         */
-        const SceneMemberVisibilityRegistry<TMemberHandle, TSubmissionMode>& visibilityRegistry_;
 
 
         /**
@@ -235,14 +231,7 @@ export namespace helios::engine::scene::systems {
             RenderInstanceBatchCommand<TMemberHandle>
         >;
 
-        /**
-         * @brief Constructs the system with the visibility snapshot registry.
-         *
-         * @param visibilityRegistry Registry containing per-frame visible/culled members.
-         */
-        explicit SceneRenderSystem(const SceneMemberVisibilityRegistry<TMemberHandle, TSubmissionMode>& visibilityRegistry)
-        : visibilityRegistry_(visibilityRegistry) {
-        }
+        SceneRenderSystem() = default;
 
         /**
          * @brief Dispatches render commands from the current visibility snapshot.
@@ -257,16 +246,16 @@ export namespace helios::engine::scene::systems {
         template<typename TUpdateContextType, typename TCommandBuffer>
         requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext> &&
                  ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
-        bool update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
+        void update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer, const SceneMemberVisibilityRegistry& visibilityRegistry) noexcept {
 
             auto& updateContext = updateCtx.updateContext();
 
-            for (auto sceneRenderContexts = visibilityRegistry_.sceneRenderContexts();
+            for (auto sceneRenderContexts = visibilityRegistry.sceneRenderContexts();
                 auto& sceneRenderContext : sceneRenderContexts) {
                 cmdBuffer.template add<RenderSceneCommand<TMemberHandle>>(sceneRenderContext);
             }
 
-            const auto members = visibilityRegistry_.visibleMembers();
+            const auto members = visibilityRegistry.visibleMembers();
 
             if constexpr (std::is_same_v<TSubmissionMode, Instanced>) {
                 dispatchInstancedRenderCommands(updateContext, members, cmdBuffer);
@@ -275,7 +264,6 @@ export namespace helios::engine::scene::systems {
             } else {
                 static_assert(false, "Unsupported submission mode");
             }
-            return true;
         }
 
     };

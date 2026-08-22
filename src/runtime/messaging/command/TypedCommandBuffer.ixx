@@ -247,7 +247,6 @@ export namespace helios::engine::runtime::messaging::command {
 
     public:
 
-        using EcsRoleTag = helios::ecs::command::tags::CommandBufferRole;
 
         /**
          * @brief Enqueues a command of the specified type.

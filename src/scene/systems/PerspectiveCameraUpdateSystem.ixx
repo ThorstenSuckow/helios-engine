@@ -6,7 +6,7 @@ module;
 
 export module helios.engine.scene.systems.PerspectiveCameraUpdateSystem;
 
-import helios.ecs.system.tags;
+
 
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.types;
@@ -45,11 +45,6 @@ export namespace helios::engine::scene::systems {
 
         using Handle_type = TMemberHandle;
 
-
-        /**
-         * @brief Role tag used for runtime registration as a system.
-         */
-        using EcsRoleTag = ecs::system::tags::TypedSystemRole;
 
         /**
          * @brief Executes the camera update pass for all active camera entities.

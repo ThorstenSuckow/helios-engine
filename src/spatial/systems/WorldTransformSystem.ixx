@@ -6,7 +6,7 @@ module;
 
 export module helios.engine.spatial.systems.WorldTransformSystem;
 
-import helios.ecs.system.tags;
+
 
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.types;
@@ -38,10 +38,6 @@ export namespace helios::engine::scene::systems {
 
         using Handle_type = TMemberHandle;
 
-        /**
-         * @brief Runtime role tag used for system registration.
-         */
-        using EcsRoleTag = ecs::system::tags::TypedSystemRole;
 
         /**
          * @brief Executes one update pass over active transform tuples.

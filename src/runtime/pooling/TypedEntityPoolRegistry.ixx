@@ -18,7 +18,7 @@ import helios.engine.runtime.pooling.EntityPool;
 import helios.engine.runtime.pooling.types;
 import helios.core.log;
 
-import helios.core.concepts;
+import helios.core.common.concepts;
 
 using namespace helios::engine::runtime::pooling::types;
 #define HELIOS_LOG_SCOPE "helios::engine::runtime::pooling::TypedEntityPoolRegistry"
@@ -36,7 +36,7 @@ export namespace helios::engine::runtime::pooling {
     template<
         template<typename> typename TStrongIdLookupStrategy,
         typename ...TManagedHandles>
-    requires (helios::core::concepts::IsStrongIdCollisionResolverLike<TStrongIdLookupStrategy<TManagedHandles>> && ...)
+    requires (helios::core::common::concepts::IsStrongIdCollisionResolverLike<TStrongIdLookupStrategy<TManagedHandles>> && ...)
         && (sizeof ...(TManagedHandles) > 0)
     class TypedEntityPoolRegistry {
 

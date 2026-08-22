@@ -14,7 +14,7 @@ import helios.ecs.command.NullCommandBuffer;
 import helios.ecs.command;
 import helios.engine.rendering.mesh.components;
 import helios.engine.rendering.mesh.commands;
-import helios.ecs.system.tags;
+
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.types;
 import helios.engine.runtime.concepts;
@@ -43,7 +43,6 @@ export namespace helios::engine::rendering::mesh::systems {
 
     public:
 
-        using EcsRoleTag = ecs::system::tags::TypedSystemRole;
         using CommandBuffer = ecs::command::TypedCommandBuffer<MeshBatchUploadCommand<THandle>>;
 
         explicit MeshUploadSystem(size_t capacity = MESH_INITIAL_STORAGE_CAPACITY) : capacity_(capacity) {

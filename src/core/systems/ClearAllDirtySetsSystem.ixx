@@ -6,7 +6,6 @@ module;
 
 export module helios.engine.core.systems.ClearAllDirtySetsSystem;
 
-import helios.ecs.system.tags;
 import helios.engine.runtime.world.UpdateContext;
 
 import helios.engine.runtime.world.types;
@@ -30,10 +29,6 @@ export namespace helios::engine::core::systems {
 
     public:
 
-        /**
-         * @brief Runtime role tag used for system registration.
-         */
-        using EcsRoleTag = ecs::system::tags::TypedSystemRole;
 
         /**
          * @brief Executes one dirty-clear pass for all configured component specifications.

@@ -19,7 +19,7 @@ import helios.ecs.command.types;
 import helios.ecs.command;
 import helios.ecs.common.concepts;
 
-import helios.ecs.system.tags;
+
 
 import helios.engine.runtime.timing.types;
 import helios.engine.runtime.timing.commands;
@@ -53,8 +53,6 @@ export namespace helios::engine::runtime::timing::systems {
 
     public:
 
-
-        using EcsRoleTag = ecs::system::tags::TypedSystemRole;
         using CommandBuffer = ecs::command::TypedCommandBuffer<TimerControlCommand>;
 
 

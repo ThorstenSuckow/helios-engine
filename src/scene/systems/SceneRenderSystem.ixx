@@ -39,7 +39,7 @@ import helios.engine.runtime.world.types;
 import helios.engine.runtime.concepts;
 import helios.ecs.command.types;
 import helios.ecs;
-import helios.ecs.system.tags;
+
 
 import helios.ecs.component;
 
@@ -221,10 +221,7 @@ export namespace helios::engine::scene::systems {
 
     public:
 
-        /**
-         * @brief Runtime role tag used for engine system registration.
-         */
-        using EcsRoleTag = ecs::system::tags::TypedSystemRole;
+
         using CommandBuffer = ecs::command::TypedCommandBuffer<
             RenderSceneCommand<TMemberHandle>,
             RenderSceneMemberCommand<TMemberHandle>,

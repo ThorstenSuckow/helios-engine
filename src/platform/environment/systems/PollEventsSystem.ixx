@@ -12,7 +12,7 @@ import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.types;
 import helios.engine.runtime.concepts;
 import helios.ecs.command;
-import helios.ecs.system.tags;
+
 
 import helios.engine.platform.environment.commands.PollEventsCommand;
 
@@ -30,10 +30,6 @@ export namespace helios::engine::platform::environment::systems {
 
         public:
 
-        /**
-         * @brief Engine role marker used by runtime system registries.
-         */
-        using EcsRoleTag = ecs::system::tags::TypedSystemRole;
         using CommandBuffer = ecs::command::TypedCommandBuffer<PollEventsCommand>;
 
         /**

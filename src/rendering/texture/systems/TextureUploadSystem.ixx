@@ -18,7 +18,7 @@ import helios.engine.rendering.texture.components;
 import helios.ecs.command.NullCommandBuffer;
 import helios.ecs.command.types;
 import helios.ecs.common.concepts;
-import helios.ecs.system.tags;
+
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.types;
 import helios.engine.runtime.concepts;
@@ -41,7 +41,6 @@ export namespace helios::engine::rendering::texture::systems {
 
     public:
 
-        using EcsRoleTag = ecs::system::tags::TypedSystemRole;
         using CommandBuffer = ecs::command::TypedCommandBuffer<texture::commands::TextureBatchUploadCommand<THandle>>;
 
 

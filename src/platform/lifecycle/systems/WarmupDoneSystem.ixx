@@ -42,10 +42,7 @@ export namespace helios::engine::platform::lifecycle::systems {
 
     public:
 
-        /**
-         * @brief Engine role marker used by runtime registries.
-         */
-        using EcsRoleTag = ecs::system::tags::TypedSystemRole;
+
         using CommandBuffer = ecs::command::TypedCommandBuffer<StateCommand<EngineState>>;
 
         /**

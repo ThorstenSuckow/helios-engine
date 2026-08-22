@@ -11,7 +11,7 @@ import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.types;
 import helios.engine.runtime.concepts;
 import helios.engine.runtime.world.Session;
-import helios.ecs.system.tags;
+
 
 using namespace helios::engine::runtime::world;
 
@@ -27,10 +27,6 @@ export namespace helios::engine::platform::lifecycle::systems {
 
     public:
 
-        /**
-         * @brief Engine role marker used by runtime system registries.
-         */
-        using EcsRoleTag = ecs::system::tags::TypedSystemRole;
 
         /**
          * @brief Destroys the active session in the current update context.

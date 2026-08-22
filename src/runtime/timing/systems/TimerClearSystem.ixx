@@ -13,7 +13,7 @@ import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.types;
 import helios.engine.runtime.concepts;
 
-import helios.ecs.system.tags;
+
 
 import helios.engine.runtime.timing.types;
 
@@ -46,7 +46,6 @@ export namespace helios::engine::runtime::timing::systems {
     public:
 
 
-        using EcsRoleTag = ecs::system::tags::TypedSystemRole;
 
         /**
          * @brief Constructs the system with a reference to the TimerManager.

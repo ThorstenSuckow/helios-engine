@@ -13,7 +13,7 @@ import helios.engine.runtime.world.types;
 import helios.engine.runtime.concepts;
 import helios.ecs.command;
 
-import helios.ecs.system.tags;
+
 
 import helios.engine.platform.window.components.WindowCreateRequestComponent;
 import helios.engine.platform.window.commands.WindowCreateCommand;
@@ -43,10 +43,7 @@ export namespace helios::engine::platform::window::systems {
 
         public:
 
-        /**
-         * @brief Engine role marker used by runtime registries.
-         */
-        using EcsRoleTag = ecs::system::tags::TypedSystemRole;
+
         using CommandBuffer = ecs::command::TypedCommandBuffer<WindowCreateCommand<THandle>>;
 
         /**

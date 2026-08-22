@@ -6,7 +6,7 @@ module;
 
 export module helios.engine.platform.window.systems.WindowSizeUpdateSystem;
 
-import helios.ecs.system.tags;
+
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.types;
 import helios.engine.runtime.concepts;
@@ -46,8 +46,6 @@ export namespace helios::engine::platform::window::systems {
 
     public:
 
-        /** @brief Runtime role tag used for engine system registration. */
-        using EcsRoleTag = ecs::system::tags::TypedSystemRole;
 
         /**
          * @brief Processes active windows with dirty size state.

@@ -24,7 +24,7 @@ import helios.engine.runtime.world.types;
 import helios.engine.runtime.concepts;
 import helios.engine.runtime.world.Session;
 
-import helios.ecs.system.tags;
+
 
 using namespace helios::engine::state::commands;
 using namespace helios::ecs::common::concepts;
@@ -60,8 +60,6 @@ export namespace helios::engine::runtime::enginestate::systems {
         StateTransitionIdType<EngineState> prevEngineStateTransitionId_ = StateTransitionIdType<EngineState>::Undefined;
 
     public:
-
-        using EcsRoleTag = ecs::system::tags::TypedSystemRole;
 
         using CommandBuffer = ecs::command::TypedCommandBuffer<StateCommand<EngineState>>;
 

@@ -7,7 +7,7 @@ module;
 
 export module helios.engine.runtime.pooling.systems:EntityPoolWarmupSystem;
 
-import helios.ecs.system.tags;
+
 import helios.ecs.common;
 import helios.ecs.command;
 
@@ -32,10 +32,6 @@ export namespace helios::engine::runtime::pooling::systems {
 
     public:
 
-        /**
-         * @brief Marks this system as a typed system role.
-         */
-        using EcsRoleTag = ecs::system::tags::TypedSystemRole;
         using CommandBuffer = ecs::command::TypedCommandBuffer<commands::PrefabEntityPoolCommand<TMemberHandle>>;
 
 

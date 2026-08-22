@@ -65,14 +65,10 @@ export namespace helios::engine::scene::systems {
          * @details Reads yaw/pitch/roll angles, wraps them to `[-pi, +pi]`,
          * builds axis-angle quaternions and writes the composed local rotation.
          *
-         * @param updateCtx Frame-local update context with ECS access.
+         * @param updateContext Frame-local update context with ECS access.
          * @return true if the update was successful, false otherwise.
          */
-        template<typename TUpdateContextType>
-        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
-        void update(TUpdateContextType& updateCtx) noexcept {
-
-            auto& updateContext = updateCtx.updateContext();
+        void update(UpdateContext& updateContext) noexcept {
 
             for (auto [entity, yawPitchRoll, localRotation] : updateContext.template view<
                 TMemberHandle,

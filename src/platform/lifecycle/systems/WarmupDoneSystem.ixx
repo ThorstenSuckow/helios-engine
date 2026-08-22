@@ -46,20 +46,14 @@ export namespace helios::engine::platform::lifecycle::systems {
          * @brief Engine role marker used by runtime registries.
          */
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
-        using CommandTypes = ecs::command::types::CommandTypeList<StateCommand<EngineState>>;
+        using CommandBuffer = ecs::command::TypedCommandBuffer<StateCommand<EngineState>>;
 
         /**
          * @brief Queues `StateCommand<EngineState>` with `WarmupDoneSignal` when warmup resources are consumed.
          *
-         * @param updateCtx Frame-local update context.
+         * @param updateContext Frame-local update context.
          */
-        template<typename TUpdateContextType, typename TCommandBuffer>
-        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext> &&
-                 ecs::command::concepts::IsCommandBufferLike<TCommandBuffer> &&
-                 (!std::is_same_v<TCommandBuffer, NullCommandBuffer>)
-        void update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
-
-            auto& updateContext = updateCtx.updateContext();
+        void update(UpdateContext& updateContext, CommandBuffer& cmdBuffer) noexcept {
 
             if (updateContext.template view<
                 ShaderHandle,

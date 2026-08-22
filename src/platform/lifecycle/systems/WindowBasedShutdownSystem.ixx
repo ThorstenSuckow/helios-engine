@@ -53,20 +53,15 @@ export namespace helios::engine::platform::lifecycle::systems {
          * @brief Engine role marker used by runtime registries.
          */
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
-        using CommandTypes = ecs::command::types::CommandTypeList<ShutdownCommand>;
+        using CommandBuffer = ecs::command::TypedCommandBuffer<ShutdownCommand>;
 
         /**
          * @brief Checks window activity and queues shutdown when the set is empty.
          *
-         * @param updateCtx Frame-local update context.
+         * @param updateContext Frame-local update context.
          * @param cmdBuffer Command buffer for submitting shutdown commands.
          */
-        template<typename TUpdateContextType, typename TCommandBuffer>
-        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext> &&
-                 ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
-        void update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
-
-            auto& updateContext = updateCtx.updateContext();
+        void update(UpdateContext& updateContext, CommandBuffer& cmdBuffer) noexcept {
 
             if (updateContext.template view<THandle, WindowComponent<THandle>>().withActive().empty()) {
                cmdBuffer.template add<ShutdownCommand>();

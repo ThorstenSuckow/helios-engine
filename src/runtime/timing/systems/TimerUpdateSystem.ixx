@@ -55,7 +55,7 @@ export namespace helios::engine::runtime::timing::systems {
 
 
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
-        using CommandTypes = ecs::command::types::CommandTypeList<TimerControlCommand>;
+        using CommandBuffer = ecs::command::TypedCommandBuffer<TimerControlCommand>;
 
 
         /**
@@ -69,14 +69,9 @@ export namespace helios::engine::runtime::timing::systems {
         /**
          * @brief Advances all game timers by the current delta time.
          *
-         * @param updateCtx The current frame's update context.
+         * @param updateContext The current frame's update context.
          */
-        template<typename TUpdateContextType, typename TCommandBuffer>
-        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, helios::engine::runtime::world::UpdateContext> &&
-                 ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
-        void update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
-
-            auto& updateContext = updateCtx.updateContext();
+        void update(helios::engine::runtime::world::UpdateContext& updateContext, CommandBuffer& cmdBuffer) noexcept {
 
             for (auto& timer : timerManager_.timers()) {
                 if (timer.state() == TimerState::Running) {

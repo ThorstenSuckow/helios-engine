@@ -11,9 +11,7 @@ export module helios.engine.platform.window.systems.WindowCreateSystem;
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.types;
 import helios.engine.runtime.concepts;
-import helios.ecs.command.NullCommandBuffer;
-import helios.ecs.command.concepts;
-import helios.ecs.command.types;
+import helios.ecs.command;
 
 import helios.ecs.system.tags;
 
@@ -49,19 +47,14 @@ export namespace helios::engine::platform::window::systems {
          * @brief Engine role marker used by runtime registries.
          */
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
-        using CommandTypes = ecs::command::types::CommandTypeList<WindowCreateCommand<THandle>>;
+        using CommandBuffer = ecs::command::TypedCommandBuffer<WindowCreateCommand<THandle>>;
 
         /**
          * @brief Scans create requests and submits create commands.
          *
-         * @param updateCtx Frame-local update context.
+         * @param updateContext Frame-local update context.
          */
-        template<typename TUpdateContextType, typename TCommandBuffer>
-        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext> &&
-                 ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
-        void update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
-
-            auto& updateContext = updateCtx.updateContext();
+        void update(UpdateContext& updateContext, CommandBuffer& cmdBuffer) noexcept {
 
             for (auto [entity, win]: updateContext.template view<
                 THandle,

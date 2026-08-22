@@ -35,16 +35,13 @@ export namespace helios::engine::platform::lifecycle::systems {
         /**
          * @brief Destroys the active session in the current update context.
          *
-         * @param updateCtx Frame-local update context.
+         * @param updateContext Frame-local update context.
          * @return true if the session was destroyed, false otherwise.
          */
-        template<typename TUpdateContextType>
-        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
-        void update(TUpdateContextType& updateCtx) noexcept {
+        void update(UpdateContext& updateContext) noexcept {
             /**
              * @todo should be command
              */
-            auto& updateContext = updateCtx.updateContext();
             updateContext.session().destroy();
         }
     };

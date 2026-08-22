@@ -180,13 +180,9 @@ export namespace helios::engine::scene::systems {
          * traversed. For each viewport, members are tested and classified into
          * visible/culled buckets per submission mode.
          *
-         * @param updateCtx ECS/world update context.
+         * @param updateContext ECS/world update context.
          */
-        template<typename TUpdateContextType>
-        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
-        SceneMemberVisibilityRegistry<TMemberHandle, TSubmissionMode> update(TUpdateContextType& updateCtx) noexcept {
-
-            auto& updateContext = updateCtx.updateContext();
+        SceneMemberVisibilityRegistry<TMemberHandle, TSubmissionMode> update(UpdateContext& updateContext) noexcept {
 
             auto visibilityRegistry = SceneMemberVisibilityRegistry<TMemberHandle, TSubmissionMode>{};
 

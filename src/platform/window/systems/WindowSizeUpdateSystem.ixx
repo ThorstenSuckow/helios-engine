@@ -52,12 +52,9 @@ export namespace helios::engine::platform::window::systems {
         /**
          * @brief Processes active windows with dirty size state.
          *
-         * @param updateCtx Frame update context.
+         * @param updateContext Frame update context.
          */
-        template<typename TUpdateContextType>
-        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
-        void update(TUpdateContextType& updateCtx) noexcept {
-            auto& updateContext = updateCtx.updateContext();
+        void update(UpdateContext& updateContext) noexcept {
             for (auto [entity, wc, wsc, fbc] : updateContext.template view<
                 TMemberHandle,
                 WindowComponent<TMemberHandle>,

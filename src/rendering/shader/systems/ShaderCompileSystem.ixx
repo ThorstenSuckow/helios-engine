@@ -55,18 +55,13 @@ export namespace helios::engine::rendering::shader::systems {
     public:
 
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
-        using CommandTypes = ecs::command::types::CommandTypeList<ShaderBatchCompileCommand<THandle>>;
+        using CommandBuffer = ecs::command::TypedCommandBuffer<ShaderBatchCompileCommand<THandle>>;
 
         explicit ShaderCompileSystem(size_t capacity = SHADER_INITIAL_STORAGE_CAPACITY) : capacity_(capacity) {
             shaderHandles_.reserve(capacity);
         }
 
-        template<typename TUpdateContextType, typename TCommandBuffer>
-        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext> &&
-                 ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
-        void update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
-
-            auto& updateContext = updateCtx.updateContext();
+        void update(UpdateContext& updateContext, CommandBuffer& cmdBuffer) noexcept {
 
             for (auto [entity, scc] : updateContext.template view<
                 THandle,

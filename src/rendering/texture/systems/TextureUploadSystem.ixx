@@ -42,7 +42,7 @@ export namespace helios::engine::rendering::texture::systems {
     public:
 
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
-        using CommandTypes = ecs::command::types::CommandTypeList<texture::commands::TextureBatchUploadCommand<THandle>>;
+        using CommandBuffer = ecs::command::TypedCommandBuffer<texture::commands::TextureBatchUploadCommand<THandle>>;
 
 
         explicit TextureUploadSystem(size_t capacity = TEXTURE_INITIAL_STORAGE_CAPACITY) : capacity_(capacity) {
@@ -52,15 +52,10 @@ export namespace helios::engine::rendering::texture::systems {
         /**
          * @brief Collects texture handles and queues one batch upload command.
          *
-         * @param updateCtx Frame update context.
+         * @param updateContext Frame update context.
          * @return true if the update was successful.
          */
-        template<typename TUpdateContextType, typename TCommandBuffer>
-        requires ecs::command::concepts::IsCommandBufferLike<TCommandBuffer> &&
-            engine::runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
-        void update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
-
-            auto& updateContext = updateCtx.updateContext();
+        void update(UpdateContext& updateContext, CommandBuffer& cmdBuffer) noexcept {
 
             for (auto [entity, textureSource] : updateContext.template view<
                 THandle,

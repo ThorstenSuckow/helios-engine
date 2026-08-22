@@ -8,9 +8,8 @@ module;
 export module helios.engine.runtime.pooling.systems:EntityPoolWarmupSystem;
 
 import helios.ecs.system.tags;
-import helios.ecs.common.concepts;
-import helios.ecs.command.concepts;
-import helios.ecs.command.types;
+import helios.ecs.common;
+import helios.ecs.command;
 
 import helios.engine.runtime.pooling.commands;
 import helios.engine.runtime.pooling.types;
@@ -37,7 +36,7 @@ export namespace helios::engine::runtime::pooling::systems {
          * @brief Marks this system as a typed system role.
          */
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
-        using CommandTypes = ecs::command::types::CommandTypeList<commands::PrefabEntityPoolCommand<TMemberHandle>>;
+        using CommandBuffer = ecs::command::TypedCommandBuffer<commands::PrefabEntityPoolCommand<TMemberHandle>>;
 
 
         /**
@@ -46,15 +45,10 @@ export namespace helios::engine::runtime::pooling::systems {
          * @details Subsequent managers are responsible for removing the component to
          * prevent multiple prefabs from being registered.
          *
-         * @param updateCtx The current update context providing entity views.
+         * @param updateContext The current update context providing entity views.
          * @param cmdBuffer The command buffer receiving the emitted pool commands.
          */
-        template<typename TUpdateContextType, typename TCommandBuffer>
-        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, world::UpdateContext> &&
-                 ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
-        void update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
-
-            auto& updateContext = updateCtx.updateContext();
+        void update(world::UpdateContext& updateContext, CommandBuffer& cmdBuffer) noexcept {
 
             for (auto [entity, requestComponent, keyComponent] : updateContext.template view<
                 TMemberHandle,

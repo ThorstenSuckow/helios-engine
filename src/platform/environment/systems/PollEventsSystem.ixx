@@ -11,9 +11,7 @@ export module helios.engine.platform.environment.systems.PollEventsSystem;
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.types;
 import helios.engine.runtime.concepts;
-import helios.ecs.command.NullCommandBuffer;
-import helios.ecs.command.types;
-import helios.ecs.command.concepts;
+import helios.ecs.command;
 import helios.ecs.system.tags;
 
 import helios.engine.platform.environment.commands.PollEventsCommand;
@@ -36,18 +34,15 @@ export namespace helios::engine::platform::environment::systems {
          * @brief Engine role marker used by runtime system registries.
          */
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
-        using CommandTypes = ecs::command::types::CommandTypeList<PollEventsCommand>;
+        using CommandBuffer = ecs::command::TypedCommandBuffer<PollEventsCommand>;
 
         /**
          * @brief Enqueues polling of native platform/window events.
          *
-         * @param updateCtx Frame-local update context.
+         * @param updateContext Frame-local update context.
          */
-        template<typename TUpdateContextType, typename TCommandBuffer>
-        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext> &&
-                 ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
-        void update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
-            (void)updateCtx.updateContext();
+        void update(UpdateContext& updateContext, CommandBuffer& cmdBuffer) noexcept {
+            (void)updateContext;
             cmdBuffer.template add<PollEventsCommand>();
         }
 

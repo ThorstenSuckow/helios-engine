@@ -50,19 +50,14 @@ export namespace helios::engine::platform::window::systems {
          * @brief Engine role marker used by runtime registries.
          */
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
-        using CommandTypes = ecs::command::types::CommandTypeList<SwapBuffersCommand<THandle>>;
+        using CommandBuffer = ecs::command::TypedCommandBuffer<SwapBuffersCommand<THandle>>;
 
         /**
          * @brief Enqueues swap-buffer commands for the current frame.
          *
-         * @param updateCtx Frame-local update context.
+         * @param updateContext Frame-local update context.
          */
-        template<typename TUpdateContextType, typename TCommandBuffer>
-        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext> &&
-                 ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
-        void update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
-
-            auto& updateContext = updateCtx.updateContext();
+        void update(UpdateContext& updateContext, CommandBuffer& cmdBuffer) noexcept {
 
             for (auto [entity, wc, wsc]: updateContext.template view<
                 THandle,

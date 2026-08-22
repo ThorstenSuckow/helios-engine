@@ -59,13 +59,11 @@ export namespace helios::engine::runtime::timing::systems {
         /**
          * @brief Resets all finished timers to TimerState::Undefined.
          *
-         * @param updateCtx The current frame's update context.
+         * @param updateContext The current frame's update context.
          */
-        template<typename TUpdateContextType>
-        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, helios::engine::runtime::world::UpdateContext>
-        void update(TUpdateContextType& updateCtx) noexcept {
+        void update(helios::engine::runtime::world::UpdateContext& updateContext) noexcept {
 
-            (void)updateCtx.updateContext();
+            (void)updateContext;
 
             for (auto& timer : timerManager_.timers()) {
                 if (timer.state() == TimerState::Finished || timer.state() == TimerState::Cancelled) {

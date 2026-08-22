@@ -39,19 +39,14 @@ export namespace helios::engine::platform::lifecycle::systems {
          * @brief Engine role marker used by runtime system registries.
          */
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
-        using CommandTypes = ecs::command::types::CommandTypeList<PlatformInitCommand>;
+        using CommandBuffer = ecs::command::TypedCommandBuffer<PlatformInitCommand>;
 
         /**
          * @brief Queues platform initialization command when required.
          *
-         * @param updateCtx Frame-local update context.
+         * @param updateContext Frame-local update context.
          */
-        template<typename TUpdateContextType, typename TCommandBuffer>
-        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext> &&
-                 ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
-        void update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
-
-            auto& updateContext = updateCtx.updateContext();
+        void update(UpdateContext& updateContext, CommandBuffer& cmdBuffer) noexcept {
 
             if (!updateContext.session().isInitialized()) {
                  cmdBuffer.template add<PlatformInitCommand>();

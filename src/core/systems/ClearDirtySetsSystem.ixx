@@ -42,13 +42,10 @@ export namespace helios::engine::core::systems {
         /**
          * @brief Executes one dirty-clear pass for all configured component specifications.
          *
-         * @param updateCtx Frame-local update context with ECS access.
+         * @param updateContext Frame-local update context with ECS access.
          * @return true if the update was successful, false otherwise.
          */
-        template<typename TUpdateContextType>
-        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
-        void update(TUpdateContextType& updateCtx) noexcept {
-            auto& updateContext = updateCtx.updateContext();
+        void update(UpdateContext& updateContext) noexcept {
             updateContext.template clearDirtySets<TMemberHandle, TComponents...>();
         }
     };

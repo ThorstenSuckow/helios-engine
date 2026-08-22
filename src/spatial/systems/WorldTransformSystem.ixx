@@ -49,13 +49,9 @@ export namespace helios::engine::scene::systems {
          * @details For each active entity, the world transform translation is updated
          * only when the local position component is marked dirty.
          *
-         * @param updateCtx Frame-local update context with ECS access.
+         * @param updateContext Frame-local update context with ECS access.
          */
-        template<typename TUpdateContextType>
-        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
-        void update(TUpdateContextType& updateCtx) noexcept {
-
-            auto& updateContext = updateCtx.updateContext();
+        void update(UpdateContext& updateContext) noexcept {
 
             for (auto [
                 entity,

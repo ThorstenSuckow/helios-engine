@@ -50,13 +50,9 @@ export namespace helios::engine::scene::systems {
          * @details For each active entity, world-space bounds are recomputed only
          * when the world transform component is marked dirty.
          *
-         * @param updateCtx Frame-local update context with ECS access.
+         * @param updateContext Frame-local update context with ECS access.
          */
-        template<typename TUpdateContextType>
-        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
-        void update(TUpdateContextType& updateCtx) noexcept {
-
-            auto& updateContext = updateCtx.updateContext();
+        void update(UpdateContext& updateContext) noexcept {
 
             for (auto [entity, boundsLocal, boundsWorld, worldTransform] : updateContext.template view<
                 TMemberHandle,

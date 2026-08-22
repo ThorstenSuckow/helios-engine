@@ -11,8 +11,7 @@ export module helios.engine.rendering.mesh.systems.MeshUploadSystem;
 
 import helios.engine.rendering.mesh.concepts;
 import helios.ecs.command.NullCommandBuffer;
-import helios.ecs.command.concepts;
-import helios.ecs.command.types;
+import helios.ecs.command;
 import helios.engine.rendering.mesh.components;
 import helios.engine.rendering.mesh.commands;
 import helios.ecs.system.tags;
@@ -45,18 +44,13 @@ export namespace helios::engine::rendering::mesh::systems {
     public:
 
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
-        using CommandTypes = ecs::command::types::CommandTypeList<MeshBatchUploadCommand<THandle>>;
+        using CommandBuffer = ecs::command::TypedCommandBuffer<MeshBatchUploadCommand<THandle>>;
 
         explicit MeshUploadSystem(size_t capacity = MESH_INITIAL_STORAGE_CAPACITY) : capacity_(capacity) {
             meshHandles_.reserve(capacity);
         }
 
-        template<typename TUpdateContextType, typename TCommandBuffer>
-        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext> &&
-                 ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
-        void update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer) noexcept {
-
-            auto& updateContext = updateCtx.updateContext();
+        void update(UpdateContext& updateContext, CommandBuffer& cmdBuffer) noexcept {
 
             for (auto [entity, mdc, murc] : updateContext.template view<
                 THandle,

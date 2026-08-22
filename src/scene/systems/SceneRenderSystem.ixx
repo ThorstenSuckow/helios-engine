@@ -225,7 +225,7 @@ export namespace helios::engine::scene::systems {
          * @brief Runtime role tag used for engine system registration.
          */
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
-        using CommandTypes = ecs::command::types::CommandTypeList<
+        using CommandBuffer = ecs::command::TypedCommandBuffer<
             RenderSceneCommand<TMemberHandle>,
             RenderSceneMemberCommand<TMemberHandle>,
             RenderInstanceBatchCommand<TMemberHandle>
@@ -240,15 +240,10 @@ export namespace helios::engine::scene::systems {
          * then emits member commands for instanced and non-instanced visible
          * members stored in `SceneMemberVisibilityRegistry`.
          *
-         * @param updateCtx Current frame update context.
+         * @param updateContext Current frame update context.
          * @param cmdBuffer Command buffer receiving extracted render commands.
          */
-        template<typename TUpdateContextType, typename TCommandBuffer>
-        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext> &&
-                 ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
-        void update(TUpdateContextType& updateCtx, TCommandBuffer& cmdBuffer, const SceneMemberVisibilityRegistry& visibilityRegistry) noexcept {
-
-            auto& updateContext = updateCtx.updateContext();
+        void update(UpdateContext& updateContext, CommandBuffer& cmdBuffer, const SceneMemberVisibilityRegistry& visibilityRegistry) noexcept {
 
             for (auto sceneRenderContexts = visibilityRegistry.sceneRenderContexts();
                 auto& sceneRenderContext : sceneRenderContexts) {

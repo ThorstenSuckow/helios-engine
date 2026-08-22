@@ -54,13 +54,9 @@ export namespace helios::engine::scene::systems {
         /**
          * @brief Executes the camera update pass for all active camera entities.
          *
-         * @param updateCtx Frame-local update context with ECS access.
+         * @param updateContext Frame-local update context with ECS access.
          */
-        template<typename TUpdateContextType>
-        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, UpdateContext>
-        void update(TUpdateContextType& updateCtx) noexcept {
-
-            auto& updateContext = updateCtx.updateContext();
+        void update(UpdateContext& updateContext) noexcept {
 
             for (auto [entity, tcw, vmc] : updateContext.template view<
                 TMemberHandle,

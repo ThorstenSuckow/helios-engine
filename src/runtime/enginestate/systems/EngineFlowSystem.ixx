@@ -63,7 +63,7 @@ export namespace helios::engine::runtime::enginestate::systems {
 
         using EcsRoleTag = ecs::system::tags::TypedSystemRole;
 
-        using CommandTypes = ecs::command::types::CommandTypeList<StateCommand<EngineState>>;
+        using CommandBuffer = ecs::command::TypedCommandBuffer<StateCommand<EngineState>>;
 
         /**
          * @brief Updates the game flow and emits state transition commands.
@@ -72,14 +72,9 @@ export namespace helios::engine::runtime::enginestate::systems {
          * the previously observed state. If a transition is required, a
          * StateCommand is added to the command buffer.
          *
-         * @param updateCtx The update context providing session and command buffer access.
+         * @param updateContext The update context providing session and command buffer access.
          */
-        template<typename TUpdateContextType, typename TCommandBuffer>
-        requires runtime::concepts::ProvidesUpdateContext<TUpdateContextType, runtime::world::UpdateContext> &&
-                 ecs::command::concepts::IsCommandBufferLike<TCommandBuffer>
-        void update(TUpdateContextType& updateCtx, TCommandBuffer& buffer) noexcept {
-
-            auto& updateContext = updateCtx.updateContext();
+        void update(runtime::world::UpdateContext& updateContext, CommandBuffer& buffer) noexcept {
 
             auto& session = updateContext.session();
 

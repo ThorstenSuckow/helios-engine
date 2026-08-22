@@ -16,7 +16,7 @@ export module helios.engine.runtime.world.GameWorld;
 import helios.engine.runtime.world.Session;
 
 import helios.core.thread.JobSystem;
-import helios.core.container;
+import helios.core.common.container;
 
 import helios.engine.runtime.world.RuntimeEnvironment;
 import helios.engine.platform.environment.types;
@@ -63,9 +63,6 @@ export namespace helios::engine::runtime::world {
 
         EcsWorld ecsWorld_;
 
-        ecs::manager::ManagerRegistry managerRegistry_{};
-
-        ecs::command::CommandHandlerRegistry commandHandlerRegistry_{};
 
         /**
          * @brief Session object storing runtime/game state.
@@ -82,7 +79,7 @@ export namespace helios::engine::runtime::world {
          */
         JobSystem& jobSystem_;
 
-        helios::core::container::TypeMap<GameWorldResources> resourceRegistry_;
+        helios::ecs::common::container::EcsDataContainer resourceRegistry_;
 
 
     public:
@@ -94,8 +91,11 @@ export namespace helios::engine::runtime::world {
         : ecsWorld_(std::move(ecsWorld)),
           session_(Session(ecsWorld_.add<GameObjectHandle>())),
           runtimeEnvironment_(RuntimeEnvironment(ecsWorld_.add<PlatformHandle>())),
-          jobSystem_(jobSystem)
-        {};
+          jobSystem_(jobSystem) {
+
+            resourceRegistry_.emplace<ecs::manager::ManagerRegistry>();
+            resourceRegistry_.emplace<ecs::command::CommandHandlerRegistry>();
+        };
 
         /**
          * @brief Non-copyable, non-movable.
@@ -137,10 +137,17 @@ export namespace helios::engine::runtime::world {
         }
 
         template<typename TResource, typename ... TArgs>
-        TResource& addResource(TArgs&&... args) {
-            return resourceRegistry_.add<TResource>(std::forward<TArgs>(args)...);
+        TResource& emplaceResource(TArgs&&... args) {
+            return resourceRegistry_.emplace<TResource>(std::forward<TArgs>(args)...);
         }
 
+        auto& resourceRegistry() {
+            return resourceRegistry_;
+        }
+
+        [[nodiscard]] const auto& resourceRegistry() const noexcept {
+            return resourceRegistry_;
+        }
 
         template<typename TResource>
         TResource& resource() {
@@ -151,7 +158,7 @@ export namespace helios::engine::runtime::world {
          * @brief Initializes managers and command buffers.
          */
         GameWorld& init(ContextProvider& contextProvider) {
-            for (auto& manager : managerRegistry_.items()) {
+            for (auto& manager : managerRegistry().items()) {
                 auto initContextTypeId = manager->expectedInitContextTypeId();
 
                 auto contextRef = contextProvider.get(initContextTypeId);
@@ -172,7 +179,7 @@ export namespace helios::engine::runtime::world {
         template<typename T>
         requires ecs::manager::concepts::IsManagerLike<T>
         [[nodiscard]] bool hasManager() const {
-            return managerRegistry_.has<T>();
+            return managerRegistry().has<T>();
         }
 
 
@@ -194,7 +201,7 @@ export namespace helios::engine::runtime::world {
         TConcreteManager& registerManager(Args&&... args) {
 
             using ManagerType = std::remove_cvref_t<TConcreteManager>;
-            return managerRegistry_.add<ManagerType>(
+            return managerRegistry().add<ManagerType>(
                 manager::Manager::make<
                     ManagerType,
                     TInitContext, TExecutionContext,
@@ -214,7 +221,7 @@ export namespace helios::engine::runtime::world {
         template<typename T>
         requires helios::ecs::manager::concepts::IsManagerLike<T>
         T* tryManager() noexcept {
-            return managerRegistry_.item<T>();
+            return managerRegistry().item<T>();
         }
 
         /**
@@ -227,7 +234,7 @@ export namespace helios::engine::runtime::world {
         template<typename T>
         requires helios::ecs::manager::concepts::IsManagerLike<T>
         const T* tryManager() const noexcept {
-            return managerRegistry_.item<T>();
+            return managerRegistry().item<T>();
         }
 
 
@@ -237,7 +244,7 @@ export namespace helios::engine::runtime::world {
          * @return Reference to the CommandHandlerRegistry.
          */
         [[nodiscard]] ecs::command::CommandHandlerRegistry& commandHandlerRegistry() noexcept {
-            return commandHandlerRegistry_;
+            return resourceRegistry_.get<ecs::command::CommandHandlerRegistry>();
         }
 
         /**
@@ -246,7 +253,11 @@ export namespace helios::engine::runtime::world {
          * @return Reference to the ManagerRegistry.
          */
         [[nodiscard]] ecs::manager::ManagerRegistry& managerRegistry() noexcept {
-            return managerRegistry_;
+            return resourceRegistry().get<ecs::manager::ManagerRegistry>();
+        }
+
+        [[nodiscard]] const ecs::manager::ManagerRegistry& managerRegistry() const noexcept {
+            return resourceRegistry().get<ecs::manager::ManagerRegistry>();
         }
 
 
@@ -257,7 +268,7 @@ export namespace helios::engine::runtime::world {
          * accumulated state. Invokes reset() on all managers and the session.
          */
         void reset() {
-            for (auto& mgr : managerRegistry_.items()) {
+            for (auto& mgr : managerRegistry().items()) {
                 mgr->reset();
             }
         }

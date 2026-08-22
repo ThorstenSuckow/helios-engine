@@ -89,10 +89,10 @@ export namespace helios::engine::runtime::gameloop {
          * @brief Updates all systems registered in this pass.
          *
          * @param updateContext The current update context.
-         * @param frameResults The map of results from the current frame's system executions.
+         * @param ecsDataContainer The map of results from the current frame's system executions.
          */
         void update(helios::engine::runtime::world::UpdateContext& updateContext,
-            ecs::system::types::SystemResultMap& frameResults) override {
+            ecs::common::container::EcsDataContainer& ecsDataContainer) override {
 
             assert(jobSystem_ && "Job system not initialized");
 
@@ -103,19 +103,14 @@ export namespace helios::engine::runtime::gameloop {
                     for (const auto& serialSystem : parallelSystems[0]) {
                         auto* system = systemRegistry_.item(serialSystem);
                         // update, then immediately flush the buffer contents
-                        const auto updateTypeId = system->expectedUpdateContextTypeId();
-                        auto updateCtx = contextProvider_.get(updateTypeId, updateContext);
-
                         // consume frame results
-                        system->update(updateCtx, frameResults);
+                        system->update(ecsDataContainer);
 
                         // produce frame results
-                        system->flush(frameResults);
+                        system->flush(ecsDataContainer);
 
                         if (auto* commandBuffer = system->commandBuffer()) {
-                            const auto flushTypeId = commandBuffer->expectedFlushContextTypeId();
-                            auto ctx = contextProvider_.get(flushTypeId);
-                            commandBuffer->flush(ctx);
+                            commandBuffer->flush(ecsDataContainer);
                         }
                     }
                     continue;
@@ -128,10 +123,7 @@ export namespace helios::engine::runtime::gameloop {
                         // a parallel system owns more ore more serial systems
                         for (const auto& serialSystem : parallelSystems[i]) {
                             auto* system = systemRegistry_.item(serialSystem);
-
-                            const auto updateTypeId = system->expectedUpdateContextTypeId();
-                            auto updateCtx = contextProvider_.get(updateTypeId, updateContext);
-                            system->update(updateCtx, frameResults);
+                            system->update(ecsDataContainer);
                         }
                 });
 
@@ -139,13 +131,10 @@ export namespace helios::engine::runtime::gameloop {
                 for (const auto& parallelSystem : parallelSystems) {
                     for (const auto& serialSystem : parallelSystem) {
                         auto* system = systemRegistry_.item(serialSystem);
-
-                        system->flush(frameResults);
+                        system->flush(ecsDataContainer);
 
                         if (auto* commandBuffer = system->commandBuffer()) {
-                            const auto flushTypeId = commandBuffer->expectedFlushContextTypeId();
-                            auto ctx = contextProvider_.get(flushTypeId);
-                            commandBuffer->flush(ctx);
+                            commandBuffer->flush(ecsDataContainer);
                         }
                     }
                 }
@@ -154,37 +143,25 @@ export namespace helios::engine::runtime::gameloop {
 
         }
 
-        void onPassEnd(runtime::world::UpdateContext& updateContext) noexcept override {
+        void onPassEnd(runtime::world::UpdateContext& updateContext, ecs::common::container::EcsDataContainer& ecsDataContainer) noexcept override {
 
-            auto exec = [&, this](auto& typeIds, const bool isParallel = false) {
-
-                for (const auto typeId : typeIds) {
-                    auto* manager = gameWorld_.managerRegistry().item(typeId);
-                    #if HELIOS_DEBUG
-                    if (!manager) {
-                        assert(manager && "Manager not found in registry");
-                    }
-                    #endif
-
-                    auto ctxTypeId = manager->expectedExecutionContextTypeId();
-                    auto contextRef = contextProvider_.get(ctxTypeId, updateContext);
-
-                    if (isParallel) {
-                        manager->executeCommandsParallel(contextRef);
-                    } else {
-                        manager->executeCommands(contextRef);
-                    }
-
-                    if (auto* commandBuffer = manager->commandBuffer()) {
-                        const auto flushCtxTypeId = commandBuffer->expectedFlushContextTypeId();
-                        auto flushContextRef = contextProvider_.get(flushCtxTypeId);
-                        commandBuffer->flush(flushContextRef);
-                    }
+            for (const auto typeId : managerTypeIds_) {
+                auto* manager = gameWorld_.managerRegistry().item(typeId);
+                #if HELIOS_DEBUG
+                if (!manager) {
+                    assert(manager && "Manager not found in registry");
                 }
-            };
+                #endif
 
-            exec(managerTypeIds_, false);
-            exec(parallelManagerTypeIds_,true);
+                auto ctxTypeId = manager->expectedExecutionContextTypeId();
+                auto contextRef = contextProvider_.get(ctxTypeId, updateContext);
+
+                manager->executeCommands(contextRef);
+
+                if (auto* commandBuffer = manager->commandBuffer()) {
+                    commandBuffer->flush(ecsDataContainer);
+                }
+            }
         }
 
 
@@ -195,14 +172,6 @@ export namespace helios::engine::runtime::gameloop {
          */
         void init() override {
             jobSystem_ = &gameWorld_.jobSystem();
-
-            for (auto* system : systemRegistry_.items()) {
-                if (auto* commandBuffer = system->commandBuffer()) {
-                    const auto flushTypeId = commandBuffer->expectedFlushContextTypeId();
-                    auto ctx = contextProvider_.get(flushTypeId);
-                    commandBuffer->flush(ctx);
-                }
-            }
         }
 
        /**

@@ -55,7 +55,7 @@ export namespace helios::engine::runtime::gameloop {
         ContextProvider& contextProvider_;
 
 
-        ecs::system::types::SystemResultMap frameResults_;
+        ecs::common::container::EcsDataContainer ecsDataContainer_{true};
 
         Phase prePhase_;
         Phase mainPhase_;
@@ -123,6 +123,8 @@ export namespace helios::engine::runtime::gameloop {
             mainPhase_.init();
             postPhase_.init();
 
+            ecsDataContainer_.borrow(gameWorld_.resourceRegistry());
+
             initialized_ = true;
         }
 
@@ -146,9 +148,9 @@ export namespace helios::engine::runtime::gameloop {
         void update(const float deltaTime, const helios::engine::input::InputSnapshot& inputSnapshot
         ) noexcept {
 
-            // clear the ContextProvider and previous frameResults
+            // clear the ContextProvider and previous ecsDataContainer
             contextProvider_.clear();
-            frameResults_.clear();
+            ecsDataContainer_.clear();
 
             assert(initialized_ && "GameLoop not initialized");
 
@@ -165,16 +167,18 @@ export namespace helios::engine::runtime::gameloop {
                   gameWorld_.ecsWorld()
             );
 
+            ecsDataContainer_.emplace<UpdateContext>(updateContext);
+
             auto& session = gameWorld_.session();
 
             // gameloop phases
-            prePhase_.update(updateContext, frameResults_);
+            prePhase_.update(updateContext, ecsDataContainer_);
             phaseEnd(updateContext);
 
-            mainPhase_.update(updateContext, frameResults_);
+            mainPhase_.update(updateContext, ecsDataContainer_);
             phaseEnd(updateContext);
 
-            postPhase_.update(updateContext, frameResults_);
+            postPhase_.update(updateContext, ecsDataContainer_);
             phaseEnd(updateContext);
         }
 

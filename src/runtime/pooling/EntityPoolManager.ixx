@@ -220,8 +220,6 @@ export namespace helios::engine::runtime::pooling {
 
     public:
 
-        /** @brief Engine role tag identifying this class as a manager. */
-        using EcsRoleTag = ecs::manager::tags::ManagerRole;
 
 
         /**
@@ -243,8 +241,7 @@ export namespace helios::engine::runtime::pooling {
          *
          * @param updateContext  Current frame update context (unused directly, passed for API symmetry).
          */
-        template<typename TExecutionContext>
-        bool executeCommands(TExecutionContext&) noexcept {
+        bool executeCommands() noexcept {
 
             (processCommandsForHandle<TMemberHandles>(),...);
 
@@ -259,8 +256,7 @@ export namespace helios::engine::runtime::pooling {
          *
          * @param updateContext  Current frame update context (unused directly, passed for API symmetry).
          */
-        template<typename TExecutionContext>
-        bool executeCommandsParallel(TExecutionContext&) noexcept {
+        bool executeCommandsParallel() noexcept {
             std::array<std::function<void()>, sizeof ...(TMemberHandles)> jobs{
                 [this]() {
                     this->template processCommandsForHandle<TMemberHandles>();
@@ -305,11 +301,7 @@ export namespace helios::engine::runtime::pooling {
          *
          * @param commandHandlerRegistry  Registry to register handlers with.
          */
-        template<typename TInitContext>
-        requires ecs::common::concepts::ProvidesCommandHandlerRegistry<TInitContext, ecs::command::CommandHandlerRegistry>
-        bool init(TInitContext& initContext) noexcept {
-
-            auto& commandHandlerRegistry = initContext.commandHandlerRegistry();
+        bool init(CommandHandlerRegistry& commandHandlerRegistry) noexcept {
 
             (commandHandlerRegistry.template handleCommands<
                PrefabEntityPoolCommand<TMemberHandles>,

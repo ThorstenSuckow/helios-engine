@@ -29,7 +29,7 @@ import helios.ecs.common.concepts;
 
 import helios.engine.core.types;
 import helios.core.common;
-import helios.ecs.manager.tags;
+
 
 using namespace helios::engine::runtime::timing::commands;
 using namespace helios::engine::runtime::timing::types;
@@ -86,7 +86,7 @@ export namespace helios::engine::runtime::timing {
         }
 
     public:
-        using EcsRoleTag = helios::ecs::manager::tags::ManagerRole;
+
 
         /**
          * @brief Registers a new game timer.
@@ -140,8 +140,7 @@ export namespace helios::engine::runtime::timing {
          *
          * @param executionContext Reference to the current execution context.
          */
-        template<typename TExecutionContext>
-        bool executeCommands(TExecutionContext& executionContext) noexcept {
+        bool executeCommands() noexcept {
 
             for (const auto& controlContext : pendingControlContexts_) {
                 auto* timer = getTimer(controlContext.timerId);
@@ -175,10 +174,7 @@ export namespace helios::engine::runtime::timing {
          *
          * @param gameWorld The game world to register with.
          */
-        template<typename TInitContext>
-        requires ecs::common::concepts::ProvidesCommandHandlerRegistry<TInitContext, ecs::command::CommandHandlerRegistry>
-        bool init(TInitContext& initContext) {
-            ecs::command::CommandHandlerRegistry& commandHandlerRegistry = initContext.commandHandlerRegistry();
+        bool init(ecs::command::CommandHandlerRegistry& commandHandlerRegistry) noexcept {
             commandHandlerRegistry.registerHandler<TimerControlCommand>(*this);
             return true;
         }

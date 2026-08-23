@@ -13,7 +13,7 @@ module;
 
 export module helios.engine.rendering.RenderManager;
 
-import helios.ecs.manager.tags;
+
 
 import helios.engine.rendering.renderTarget.types.RenderTargetHandle;
 import helios.engine.rendering.viewport.types.ViewportHandle;
@@ -322,10 +322,7 @@ export namespace helios::engine::rendering {
 
     public:
 
-        /**
-         * @brief Runtime role tag used for engine manager registration.
-         */
-        using EcsRoleTag = ecs::manager::tags::ManagerRole;
+
 
         /**
          * @brief Constructs the manager for a specific render backend.
@@ -347,8 +344,7 @@ export namespace helios::engine::rendering {
          * and clears all active batch indices afterwards.
 
          */
-        template<typename TExecutionContext>
-        bool executeCommands(TExecutionContext&) {
+        bool executeCommands() noexcept {
 
 
             for (auto renderTargetIdx : activeRenderTargetIndices_) {
@@ -502,11 +498,7 @@ export namespace helios::engine::rendering {
          *
          * @param commandHandlerRegistry Command handler registry used at runtime.
          */
-        template<typename TInitContext>
-        requires ecs::common::concepts::ProvidesCommandHandlerRegistry<TInitContext, ecs::command::CommandHandlerRegistry>
-        bool init(TInitContext& initContext) noexcept {
-
-            auto& commandHandlerRegistry = initContext.commandHandlerRegistry();
+        bool init(ecs::command::CommandHandlerRegistry& commandHandlerRegistry) noexcept {
 
             (commandHandlerRegistry.template handleCommands<
                 RenderSceneMemberCommand<TMemberHandles>,

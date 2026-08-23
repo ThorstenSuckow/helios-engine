@@ -148,7 +148,7 @@ export namespace helios::engine::state {
 
 
     public:
-        using EcsRoleTag = helios::ecs::manager::tags::ManagerRole;
+
 
         /**
          * @brief Constructs a state manager with transition rules.
@@ -178,11 +178,7 @@ export namespace helios::engine::state {
          *
          * @param updateContext The current frame's update context.
          */
-        template<typename TExecutionContext>
-        requires engine::runtime::concepts::ProvidesUpdateContext<TExecutionContext, engine::runtime::world::UpdateContext>
-        bool executeCommands(TExecutionContext& executionContext) noexcept {
-
-            auto& updateContext = executionContext.updateContext();
+        bool executeCommands(engine::runtime::world::UpdateContext& updateContext) noexcept {
 
             if (pending_.empty()) {
                 return true;
@@ -264,10 +260,7 @@ export namespace helios::engine::state {
          *
          * @param commandHandlerRegistry The command-handler registry to register with.
          */
-        template<typename TInitContext>
-        requires ecs::common::concepts::ProvidesCommandHandlerRegistry<TInitContext, ecs::command::CommandHandlerRegistry>
-        bool init(TInitContext& initContext) {
-            auto& commandHandlerRegistry = initContext.commandHandlerRegistry();
+        bool init(ecs::command::CommandHandlerRegistry& commandHandlerRegistry) noexcept {
 
             commandHandlerRegistry.template registerHandler<StateCommand<StateType>>(*this);
             commandHandlerRegistry.template registerHandler<DelayedStateCommand<StateType>>(*this);

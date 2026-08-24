@@ -65,10 +65,7 @@ export namespace helios::engine::runtime::gameloop {
 
     protected:
         /**
-         * @brief Updates all systems registered in this pass.
-         *
-         * @param ecsDataContainer The map of results from the current frame's system executions.
-         * @param jobSystem The job system used for parallel execution of systems.
+         * @copydoc Pass::update
          */
         void update(EcsDataContainer& ecsDataContainer, JobSystem& jobSystem) override {
 
@@ -121,10 +118,7 @@ export namespace helios::engine::runtime::gameloop {
         }
 
         /**
-         * @brief Called whenever a pass ends, advising the configured managers to execute their commands.
-         *
-         * @param updateContext The current update context.
-         * @param ecsDataContainer The ECS data container.
+         * @copydoc Pass::onPassEnd
          */
         void onPassEnd(EcsDataContainer& ecsDataContainer) noexcept override {
 
@@ -145,11 +139,7 @@ export namespace helios::engine::runtime::gameloop {
         }
 
        /**
-        * @brief Checks if this pass should execute based on current state.
-        *
-        * @param ecsDataContainer The ECS data container.
-        *
-        * @return True if the pass should execute.
+        * @copydoc Pass::shouldRun
         */
         [[nodiscard]] bool shouldRun(EcsDataContainer& ecsDataContainer) const noexcept override {
             auto& updateContext = ecsDataContainer.get<UpdateContext>();

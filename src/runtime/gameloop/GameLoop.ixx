@@ -12,7 +12,6 @@ module;
 export module helios.engine.runtime.gameloop:GameLoop;
 
 import helios.engine.runtime.world.GameWorld;
-import helios.engine.runtime.world.ContextProvider;
 
 import helios.engine.runtime.world.UpdateContext;
 import helios.core.log.Logger;
@@ -51,8 +50,7 @@ export namespace helios::engine::runtime::gameloop {
         inline static const helios::core::log::Logger& logger_ = helios::core::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
 
         GameWorld& gameWorld_;
-        
-        ContextProvider& contextProvider_;
+
 
 
         ecs::common::container::EcsDataContainer ecsDataContainer_{true};
@@ -65,26 +63,20 @@ export namespace helios::engine::runtime::gameloop {
 
         std::size_t frameCount_ = 0;
 
-        void phaseEnd(runtime::world::UpdateContext& updateContext) {
-            /*intentionally noop*/
-        }
-
 
     public:
 
         /**
-         * @brief Constructs a GameLoop bound to a GameWorld and a ContextProvider.
+         * @brief Constructs a GameLoop bound to a GameWorld.
          *
          * @param gameWorld The GameWorld associated with this GameLoop.
-         * @param contextProvider The ContextProvider associated with this GameLoop.
          *
          */
-        GameLoop(GameWorld& gameWorld, ContextProvider& contextProvider) :
+        GameLoop(GameWorld& gameWorld) :
             gameWorld_(gameWorld),
-            contextProvider_(contextProvider),
-            prePhase_(gameWorld_, contextProvider_),
-            mainPhase_(gameWorld_, contextProvider_),
-            postPhase_(gameWorld_, contextProvider_) {};
+            prePhase_(gameWorld_),
+            mainPhase_(gameWorld_),
+            postPhase_(gameWorld_) {};
 
 
         /**
@@ -119,10 +111,6 @@ export namespace helios::engine::runtime::gameloop {
 
             assert(!initialized_ && "init() already called");
 
-            prePhase_.init();
-            mainPhase_.init();
-            postPhase_.init();
-
             ecsDataContainer_.borrow(gameWorld_.resourceRegistry());
 
             initialized_ = true;
@@ -139,18 +127,12 @@ export namespace helios::engine::runtime::gameloop {
          * @param deltaTime Time elapsed since the last frame in seconds.
          * @param inputSnapshot Snapshot of the current input state.
          *
-         * @pre init() must have been called before the first update.
-         *
-         * @see Phase
-         * @see phaseEnd()
-         * @see UpdateContext
          */
         void update(const float deltaTime, const helios::engine::input::InputSnapshot& inputSnapshot
         ) noexcept {
 
             // clear the ContextProvider and previous ecsDataContainer
-            contextProvider_.clear();
-            ecsDataContainer_.clear();
+            ecsDataContainer_.clearOwned();
 
             assert(initialized_ && "GameLoop not initialized");
 
@@ -172,14 +154,9 @@ export namespace helios::engine::runtime::gameloop {
             auto& session = gameWorld_.session();
 
             // gameloop phases
-            prePhase_.update(updateContext, ecsDataContainer_);
-            phaseEnd(updateContext);
-
-            mainPhase_.update(updateContext, ecsDataContainer_);
-            phaseEnd(updateContext);
-
-            postPhase_.update(updateContext, ecsDataContainer_);
-            phaseEnd(updateContext);
+            prePhase_.update(ecsDataContainer_, gameWorld_.jobSystem());
+            mainPhase_.update(ecsDataContainer_, gameWorld_.jobSystem());
+            postPhase_.update(ecsDataContainer_, gameWorld_.jobSystem());
         }
 
         [[nodiscard]] bool isRunning() const noexcept {

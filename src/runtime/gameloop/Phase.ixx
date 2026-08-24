@@ -12,6 +12,8 @@ export module helios.engine.runtime.gameloop:Phase;
 import :Pass;
 import :TypedPass;
 
+import helios.core.thread.JobSystem;
+
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.GameWorld;
 import helios.engine.runtime.world.ContextProvider;
@@ -45,6 +47,9 @@ export namespace helios::engine::runtime::gameloop {
 
         friend class helios::engine::runtime::gameloop::GameLoop;
 
+        using EcsDataContainer =  ecs::common::container::EcsDataContainer;
+        using JobSystem = helios::core::thread::JobSystem;
+
         /**
          * @brief Collection of passes belonging to this phase.
          */
@@ -52,32 +57,21 @@ export namespace helios::engine::runtime::gameloop {
 
         GameWorld& gameWorld_;
 
-        ContextProvider& contextProvider_;
-
-        /**
-         * @brief Initializes all passes within this phase.
-         */
-        void init(){
-            for (auto& pass : passEntries_) {
-                // every pass contains systems that are updated here
-                pass->init();
-            }
-        };
 
         /**
          * @brief Updates all passes within this phase.
          *
          * @param updateContext The current update context.
          * @param ecsDataContainer The map of results from the current frame's system executions.
+         * @param jobSystem The job system used for parallel execution of systems.
          */
-        void update(runtime::world::UpdateContext& updateContext,
-            ecs::common::container::EcsDataContainer& ecsDataContainer){
+        void update(ecs::common::container::EcsDataContainer& ecsDataContainer, JobSystem& jobSystem){
 
             for (auto& pass : passEntries_) {
 
-                if (pass->shouldRun(updateContext)) {
-                    pass->update(updateContext, ecsDataContainer);;
-                    pass->onPassEnd(updateContext, ecsDataContainer);
+                if (pass->shouldRun(ecsDataContainer)) {
+                    pass->update(ecsDataContainer, jobSystem);
+                    pass->onPassEnd(ecsDataContainer);
                 }
             }
         };
@@ -91,8 +85,8 @@ export namespace helios::engine::runtime::gameloop {
          * @param gameloop Reference to the parent GameLoop.
          * @param gameWorld Shared GameWorld used by passes in this phase.
          */
-        explicit Phase(GameWorld& gameWorld, ContextProvider& contextProvider)
-        : gameWorld_(gameWorld), contextProvider_(contextProvider) {
+        explicit Phase(GameWorld& gameWorld)
+        : gameWorld_(gameWorld) {
         }
 
 
@@ -110,7 +104,7 @@ export namespace helios::engine::runtime::gameloop {
          */
         template<typename StateType>
         Pass& beginPass(const StateType t) {
-            auto entry = std::make_unique<TypedPass<StateType>>(*this, t, gameWorld_, contextProvider_);
+            auto entry = std::make_unique<TypedPass<StateType>>(*this, t, gameWorld_);
             auto* raw = entry.get();
             passEntries_.emplace_back(std::move(entry));
 

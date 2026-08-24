@@ -17,11 +17,11 @@ module;
 export module helios.engine.runtime.gameloop:Pass;
 
 import helios.engine.runtime.world.GameWorld;
-import helios.engine.runtime.world.ContextProvider;
 import helios.engine.runtime.world.concepts;
 import helios.engine.runtime.world.types;
 
 import helios.core.common.concepts;
+import helios.core.thread.JobSystem;
 
 import helios.ecs.common.types;
 import helios.ecs.common.concepts;
@@ -65,6 +65,9 @@ export namespace helios::engine::runtime::gameloop {
 
         friend class helios::engine::runtime::gameloop::Phase;
 
+        using EcsDataContainer = ecs::common::container::EcsDataContainer;
+        using JobSystem = helios::core::thread::JobSystem;
+
     protected:
         /**
          * @brief Registry holding all systems for this pass.
@@ -81,7 +84,6 @@ export namespace helios::engine::runtime::gameloop {
          */
         GameWorld& gameWorld_;
 
-        ContextProvider& contextProvider_;
 
         /**
          * @brief List of ManagerTypeIds.
@@ -110,18 +112,6 @@ export namespace helios::engine::runtime::gameloop {
 
             managerTypeIds_.push_back(ecs::manager::types::ManagerTypeId::template id<T>());
         }
-
-        /**
-         * @brief Registers the ManagerTypeIds for the Managers this pass should flush in parallel.
-         *
-         * @tparam T The type of the manager to register.
-         */
-        template<typename TManager>
-        void registerManagerExecuteCommandsParallel() {
-            assert(gameWorld_.template tryManager<TManager>() && "Manager not found for system's manager");
-            parallelManagerTypeIds_.push_back(ecs::manager::types::ManagerTypeId::template id<TManager>());
-        }
-
 
         template<typename TSystem>
         Pass& registerCallOperatorSystem(TSystem&& system) {
@@ -162,32 +152,29 @@ export namespace helios::engine::runtime::gameloop {
             return *this;
         }
 
-        virtual void onPassEnd(helios::engine::runtime::world::UpdateContext& updateContext, ecs::common::container::EcsDataContainer& ecsDataContainer) = 0;
-
         /**
-         * @brief Initializes all systems in this pass.
+         * @brief Called on pass end.
+         * @param ecsDataContainer The ECS data container.
          */
-        virtual void init() = 0;
+        virtual void onPassEnd(EcsDataContainer& ecsDataContainer) = 0;
 
         /**
          * @brief Updates all systems in this pass.
          *
-         * @param updateContext The current update context.
          * @param ecsDataContainer The map of results from the current frame's system executions.
+         * @param jobSystem The job system used for parallel execution of systems.
          */
-        virtual void update(
-            helios::engine::runtime::world::UpdateContext& updateContext,
-            ecs::common::container::EcsDataContainer& ecsDataContainer) = 0;
+        virtual void update(EcsDataContainer& ecsDataContainer, JobSystem& jobSystem) = 0;
 
 
         /**
          * @brief Determines if this pass should execute.
          *
-         * @param updateContext The current update context.
+         * @param ecsDataContainer
          *
          * @return True if the pass should run.
          */
-        virtual bool shouldRun(helios::engine::runtime::world::UpdateContext& updateContext) const noexcept = 0;
+        virtual bool shouldRun(EcsDataContainer& ecsDataContainer) const noexcept = 0;
 
         /**
          * @brief Returns a span of the ManagerTypeIds this pass is flushing.
@@ -198,14 +185,6 @@ export namespace helios::engine::runtime::gameloop {
             return managerTypeIds_;
         }
 
-        /**
-         * @brief Returns a span of the ManagerTypeIds this pass is flushing in parallel.
-         *
-         * @return A span of ManagerTypeIds.
-         */
-        [[nodiscard]] std::span<const ecs::manager::types::ManagerTypeId> parallelManagerTypeIds() noexcept {
-            return parallelManagerTypeIds_;
-        }
 
     public:
 
@@ -220,9 +199,8 @@ export namespace helios::engine::runtime::gameloop {
          * @param gameWorld GameWorld used for system initialization and
          *        command buffer lookup.
          */
-        explicit Pass(GameWorld& gameWorld, ContextProvider& contextProvider)
-        : gameWorld_(gameWorld), contextProvider_(contextProvider) {};
-
+        explicit Pass(GameWorld& gameWorld)
+        : gameWorld_(gameWorld) {};
 
 
         /**
@@ -398,23 +376,6 @@ export namespace helios::engine::runtime::gameloop {
 
             return *this;
         }
-
-        /**
-         * @brief Register the Manager this pass should flush in parallel.
-         *
-         * @tparam TManager The type of the Manager to flush in parallel.
-         * @return Reference to this Pass for method chaining.
-         */
-        template<typename TManager, typename TExecutionContext = ManagerExecutionContext>
-        requires (ecs::manager::concepts::IsManagerLike<TManager> &&
-            ecs::manager::concepts::HasExecuteCommandsParallel<TManager, TExecutionContext>)
-        Pass& executeCommandsParallel() {
-
-            registerManagerExecuteCommandsParallel<TManager>();
-
-            return *this;
-        }
-
 
     };
 

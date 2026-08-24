@@ -27,26 +27,7 @@ export namespace helios::engine::runtime::gameloop {
     class Phase;
 
     /**
-     * @brief State-filtered pass that only executes in specific states.
-     *
-     * @details TypedPass extends the base Pass class with state-based filtering.
-     * The pass only executes when the current state (queried from Session)
-     * matches the configured state mask using bitwise AND.
-     *
-     * ## State Filtering
-     *
-     * The state mask is a bitfield where each bit represents a state value.
-     * A pass runs if any bit in the mask matches the current state:
-     *
-     * ```cpp
-     * // Run only in Running state
-     * phase.beginPass<GameState>(GameState::Running)
-     *     .addSystem<MovementSystem>();
-     *
-     * // Run in multiple states (bitwise OR)
-     * phase.beginPass<GameState>(GameState::Running | GameState::Paused)
-     *     .addSystem<InputSystem>();
-     * ```
+     * @brief State-filtered pass that only executes in specific states and if arbitrary conditions are satisifed.
      *
      * @tparam StateType The state enum type (e.g., GameState, MatchState).
      *
@@ -69,32 +50,28 @@ export namespace helios::engine::runtime::gameloop {
          */
         StateType mask_;
 
+
         /**
-         * @brief Pointer to the job system used for parallel execution.
+         * @brief List of run conditions that must be satisfied for this pass to be executed.
          */
-        JobSystem* jobSystem_;
-
-        using RunCondition = typename Pass::RunCondition;
-
-        std::vector<RunCondition> runConditions_;
+        std::vector<RunCondition> runConditions_{};
 
         using Pass::systemRegistry_;
         using Pass::systemTypeIdQueue_;
         using Pass::managerTypeIds;
-        using Pass::parallelManagerTypeIds;
         using Pass::gameWorld_;
-        using Pass::contextProvider_;
+        using EcsDataContainer = ecs::common::container::EcsDataContainer;
+        using JobSystem = helios::core::thread::JobSystem;
 
+    protected:
         /**
          * @brief Updates all systems registered in this pass.
          *
-         * @param updateContext The current update context.
          * @param ecsDataContainer The map of results from the current frame's system executions.
+         * @param jobSystem The job system used for parallel execution of systems.
          */
-        void update(helios::engine::runtime::world::UpdateContext& updateContext,
-            ecs::common::container::EcsDataContainer& ecsDataContainer) override {
+        void update(EcsDataContainer& ecsDataContainer, JobSystem& jobSystem) override {
 
-            assert(jobSystem_ && "Job system not initialized");
 
             for (auto& parallelSystems : systemTypeIdQueue_) {
 
@@ -117,7 +94,7 @@ export namespace helios::engine::runtime::gameloop {
                 }
 
                 // parallelSystems > 1 will be queued with the JobSystems
-                jobSystem_->runAndWait(
+                jobSystem.runAndWait(
                     parallelSystems.size(),
                     [&] (const std::size_t i) {
                         // a parallel system owns more ore more serial systems
@@ -143,7 +120,13 @@ export namespace helios::engine::runtime::gameloop {
 
         }
 
-        void onPassEnd(runtime::world::UpdateContext& updateContext, ecs::common::container::EcsDataContainer& ecsDataContainer) noexcept override {
+        /**
+         * @brief Called whenever a pass ends, advising the configured managers to execute their commands.
+         *
+         * @param updateContext The current update context.
+         * @param ecsDataContainer The ECS data container.
+         */
+        void onPassEnd(EcsDataContainer& ecsDataContainer) noexcept override {
 
             for (const auto typeId : managerTypeIds_) {
                 auto* manager = gameWorld_.managerRegistry().item(typeId);
@@ -153,10 +136,7 @@ export namespace helios::engine::runtime::gameloop {
                 }
                 #endif
 
-                auto ctxTypeId = manager->expectedExecutionContextTypeId();
-                auto contextRef = contextProvider_.get(ctxTypeId, updateContext);
-
-                manager->executeCommands(contextRef);
+                manager->executeCommands(ecsDataContainer);
 
                 if (auto* commandBuffer = manager->commandBuffer()) {
                     commandBuffer->flush(ecsDataContainer);
@@ -164,28 +144,15 @@ export namespace helios::engine::runtime::gameloop {
             }
         }
 
-
-        /**
-         * @brief Initializes all systems registered in this pass.
-         *
-         * @param gameWorld Reference to the game world.
-         */
-        void init() override {
-            jobSystem_ = &gameWorld_.jobSystem();
-        }
-
        /**
         * @brief Checks if this pass should execute based on current state.
         *
-        * @details Queries the current state from the Session and compares it
-        * against the configured mask using bitwise AND. The pass runs if
-        * any bit in the mask matches the current state.
-        *
-        * @param updateContext The current update context.
+        * @param ecsDataContainer The ECS data container.
         *
         * @return True if the pass should execute.
         */
-        [[nodiscard]] bool shouldRun(helios::engine::runtime::world::UpdateContext& updateContext) const noexcept override {
+        [[nodiscard]] bool shouldRun(EcsDataContainer& ecsDataContainer) const noexcept override {
+            auto& updateContext = ecsDataContainer.get<UpdateContext>();
             auto state = updateContext.session().state<StateType>();
             if (!hasFlag(mask_, state)) {
                 return false;
@@ -222,11 +189,8 @@ export namespace helios::engine::runtime::gameloop {
          * @param mask State mask controlling when this pass runs.
          * @param gameWorld GameWorld used by the base Pass for buffer injection.
          */
-        explicit TypedPass(
-            Phase& owner, const StateType mask,
-            helios::engine::runtime::world::GameWorld& gameWorld,
-            helios::engine::runtime::world::ContextProvider& contextProvider
-        ) : owner_(owner), mask_(mask), Pass(gameWorld, contextProvider) {}
+        explicit TypedPass(Phase& owner, const StateType mask, GameWorld& gameWorld)
+        : owner_(owner), mask_(mask), Pass(gameWorld) {}
 
         /**
          * @copydoc Pass::endPass
@@ -242,8 +206,6 @@ export namespace helios::engine::runtime::gameloop {
             runConditions_.push_back(std::move(fn));
             return *this;
         }
-
-
 
 
     };

@@ -25,7 +25,6 @@ import helios.ecs;
 
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.GameObject;
-import helios.engine.runtime.world.ContextProvider;
 import helios.engine.runtime.world.types;
 
 import helios.core.log.Logger;

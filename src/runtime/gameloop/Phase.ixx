@@ -16,7 +16,6 @@ import helios.core.thread.JobSystem;
 
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.GameWorld;
-import helios.engine.runtime.world.ContextProvider;
 
 import helios.engine.runtime.world.Session;
 

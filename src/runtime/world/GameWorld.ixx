@@ -61,7 +61,12 @@ export namespace helios::engine::runtime::world {
         inline static const helios::core::log::Logger& logger_ = helios::core::log::LogManager::loggerForScope(
             HELIOS_LOG_SCOPE);
 
+
+
         EcsWorld ecsWorld_;
+
+
+        helios::ecs::common::container::EcsDataContainer resourceRegistry_;
 
 
         /**
@@ -78,8 +83,6 @@ export namespace helios::engine::runtime::world {
          * @brief Reference to the job system used for parallel task execution.
          */
         JobSystem& jobSystem_;
-
-        helios::ecs::common::container::EcsDataContainer resourceRegistry_;
 
 
     public:
@@ -157,12 +160,9 @@ export namespace helios::engine::runtime::world {
         /**
          * @brief Initializes managers and command buffers.
          */
-        GameWorld& init(ContextProvider& contextProvider) {
+        GameWorld& init() {
             for (auto& manager : managerRegistry().items()) {
-                auto initContextTypeId = manager->expectedInitContextTypeId();
-
-                auto contextRef = contextProvider.get(initContextTypeId);
-                manager->init(contextRef);
+                manager->init(resourceRegistry_);
             }
 
             return *this;
@@ -182,32 +182,13 @@ export namespace helios::engine::runtime::world {
             return managerRegistry().has<T>();
         }
 
-
-
         /**
          * @brief Registers and constructs a Manager of type TConcreteManager.
          */
-        template<
-            typename TConcreteManager,
-            typename TCommandBufferFactory = ecs::command::CommandBufferFactory<
-                ecs::command::TypedCommandBuffer,
-                DefaultInitContext,
-                CommandBufferFlushContext
-            >,
-            typename TInitContext = DefaultInitContext,
-            typename TExecutionContext = ManagerExecutionContext,
-        typename... Args>
+        template<typename TConcreteManager, typename... Args>
         requires helios::ecs::manager::concepts::IsManagerLike<TConcreteManager>
         TConcreteManager& registerManager(Args&&... args) {
-
-            using ManagerType = std::remove_cvref_t<TConcreteManager>;
-            return managerRegistry().add<ManagerType>(
-                manager::Manager::make<
-                    ManagerType,
-                    TInitContext, TExecutionContext,
-                    TCommandBufferFactory
-                >(TConcreteManager{std::forward<Args>(args)...})
-            );
+            return managerRegistry().add<TConcreteManager>(std::forward<Args>(args)...);
         }
 
 

@@ -48,9 +48,24 @@ export namespace helios::engine::runtime::pooling {
          * @tparam THandle  Handle type of the managed pool.
          */
         template<typename THandle>
-        struct EntityPoolSlot {
-            EntityPoolKey<THandle> key;
-            EntityPool<THandle> pool;
+        class  EntityPoolSlot {
+            EntityPoolKey<THandle> key_;
+            EntityPool<THandle> pool_;
+            public:
+                EntityPoolSlot(EntityPoolKey<THandle> key, EntityPool<THandle>&& pool)
+                    : key_(key), pool_(std::move(pool)) {}
+
+            [[nodiscard]] EntityPool<THandle>& pool() noexcept {
+                return pool_;
+            }
+
+            [[nodiscard]] const EntityPool<THandle>& pool() const noexcept {
+                return pool_;
+            }
+
+            [[nodiscard]] const EntityPoolKey<THandle>& key() const noexcept {
+                return key_;
+            }
         };
 
         /**
@@ -107,17 +122,17 @@ export namespace helios::engine::runtime::pooling {
          * @tparam THandle   Handle type of the pool.
          * @param entityPoolId Strong ID of the pool to create.
          *
-         * @return EntityPoolKey, which might be invalid if creating the pool failed.
+         * @return Pointer to the created EntityPoolSlot, or nullptr if creating the pool failed.
          */
         template<typename THandle>
-        EntityPoolKey<THandle> createPool(const EntityPoolId<THandle> entityPoolId) {
+        EntityPoolSlot<THandle>* createPool(const EntityPoolId<THandle> entityPoolId) {
 
             auto& lookupStrategy = strongIdLookupStrategy<THandle>();
 
             if (lookupStrategy.has(entityPoolId.value())) {
                 logger_.error("EntityPoolKey with this strong ID already registered.");
                 assert(false && "EntityPoolKey with this strong ID already registered.");
-                return EntityPoolKey<THandle>{};
+                return nullptr;
             }
 
             auto& poolSlots = managedPoolVector<THandle>();
@@ -132,7 +147,7 @@ export namespace helios::engine::runtime::pooling {
                 assert(false && "Failed to add StringId to lookup strategy.");
             }
 
-            return key;
+            return &*poolSlots.back();
         }
 
         /**
@@ -145,7 +160,8 @@ export namespace helios::engine::runtime::pooling {
          */
         template<typename THandle, typename TFunc>
         requires std::invocable<TFunc&, EntityPool<THandle>&>
-        void forEach(TFunc&& func) noexcept(std::is_nothrow_invocable_v<TFunc&, EntityPool<THandle>&>) {
+        && std::is_nothrow_invocable_v<TFunc&, EntityPool<THandle>&>
+        void forEach(TFunc&& func) noexcept {
 
             auto& poolSlots = managedPoolVector<THandle>();
             const auto& availablePoolKeys = std::get<std::vector<EntityPoolKey<THandle>>>(availablePoolKeys_);
@@ -157,7 +173,7 @@ export namespace helios::engine::runtime::pooling {
                     assert(false && "pool slot was not valid");
                     continue;
                 }
-                std::invoke(func, poolSlot->pool);
+                std::invoke(func, poolSlot->pool());
             }
         }
 
@@ -183,13 +199,13 @@ export namespace helios::engine::runtime::pooling {
 
             if (poolSlots.size() <= idx ||
                 !poolSlots[idx] ||
-                poolSlots[idx]->key != key) {
+                poolSlots[idx]->key() != key) {
                 logger_.error("EntityPoolKey not registered with this registry");
                 assert(false && "EntityPoolKey not registered with this registry");
                 return nullptr;
             }
 
-            return &poolSlots[idx]->pool;
+            return &poolSlots[idx]->pool();
         }
 
         /**

@@ -142,6 +142,11 @@ export namespace helios::engine::runtime::pooling {
             return ecs::Entity<ecs::EntityManager<THandle>>{prefabHandle_, &entityManager_};
         }
 
+        [[nodiscard]] ecs::Entity<const ecs::EntityManager<THandle>> prefab() const noexcept {
+            return ecs::Entity<const ecs::EntityManager<THandle>>{prefabHandle_, &entityManager_};
+        }
+
+
         /**
          * @brief Sets the pool size.
          *

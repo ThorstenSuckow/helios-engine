@@ -95,6 +95,7 @@ export namespace helios::engine::runtime::world {
           runtimeEnvironment_(RuntimeEnvironment(ecsWorld_.add<PlatformHandle>())),
           jobSystem_(jobSystem) {
 
+            resourceRegistry_.bind<EcsWorld>(ecsWorld_);
             resourceRegistry_.emplace<ecs::manager::ManagerRegistry>();
             resourceRegistry_.emplace<ecs::command::CommandHandlerRegistry>();
         };
@@ -104,7 +105,7 @@ export namespace helios::engine::runtime::world {
          */
         GameWorld(const GameWorld&) = delete;
         GameWorld& operator=(const GameWorld&) = delete;
-        GameWorld(GameWorld&&) = default;
+        GameWorld(GameWorld&&) = delete;
         GameWorld& operator=(GameWorld&&) = delete;
 
         [[nodiscard]] EcsWorld& ecsWorld() {

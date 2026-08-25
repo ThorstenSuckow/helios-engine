@@ -23,6 +23,8 @@ import helios.ecs.common.types;
 
 import helios.core.log;
 
+import helios.ecs;
+
 #define HELIOS_LOG_SCOPE "helios::engine::runtime::pooling::EntityPool"
 export namespace helios::engine::runtime::pooling {
 
@@ -97,20 +99,12 @@ export namespace helios::engine::runtime::pooling {
          */
         bool locked_ = false;
 
-    public:
-        /**
-         * @brief Move only.
-         */
-        EntityPool(const EntityPool<THandle>&) = delete;
-        EntityPool& operator=(const EntityPool<THandle>&) = delete;
-        EntityPool(EntityPool<THandle>&&) noexcept = default;
-        EntityPool& operator=(EntityPool<THandle>&&) noexcept = default;
+        ecs::EntityManager<THandle> entityManager_;
 
-        /**
-         * @brief default constructor for the EntityPool.
-         *
-         * @details Use setPoolSize() in a separate call.
-         */
+        THandle prefabHandle_;
+
+    public:
+
         EntityPool() = default;
 
         /**
@@ -126,10 +120,30 @@ export namespace helios::engine::runtime::pooling {
         }
 
         /**
-         * @brief Sets the pool size.
+         * @brief Move only.
+         */
+        EntityPool(const EntityPool<THandle>&) = delete;
+        EntityPool& operator=(const EntityPool<THandle>&) = delete;
+        EntityPool(EntityPool<THandle>&&) noexcept = default;
+        EntityPool& operator=(EntityPool<THandle>&&) noexcept = default;
+
+        /**
+         * @brief Returns a prefab for editing.
          *
-         * @details Sets pool size and reserves vector capacities according to it. Must be done
-         * before pool is locked.
+         * @todo Check if pool is locked to prevent editing.
+         *
+         * @return A prefab for editing.
+         */
+        [[nodiscard]] ecs::Entity<ecs::EntityManager<THandle>> prefabEditor() noexcept {
+            if (!prefabHandle_.isValid()) {
+                prefabHandle_ = entityManager_.create();
+            }
+
+            return ecs::Entity<ecs::EntityManager<THandle>>{prefabHandle_, &entityManager_};
+        }
+
+        /**
+         * @brief Sets the pool size.
          *
          * @param poolSize The maximum number of Entities this pool can manage.
          *
@@ -146,6 +160,46 @@ export namespace helios::engine::runtime::pooling {
             poolSize_ = poolSize;
             activeEntities_.reserve(poolSize);
             inactiveEntities_.reserve(poolSize);
+            return true;
+        }
+
+        /**
+         * @brief Warms this pool and the related entitymanager up.
+         *
+         * @param targetEntityManager The target entity manager that should hold the copies
+         * of this pool's prefab.
+         *
+         * @return true on success, false on failure
+         */
+        bool prewarm(ecs::EntityManager<THandle>& targetEntityManager)  {
+
+            if (isLocked()) {
+                assert(false && "Entity pool is already locked.");
+                return false;
+            }
+            const size_t used  = activeCount() + inactiveCount();
+            const size_t space = used < size() ? size() - used : 0;
+
+            if (space == 0) {
+                assert(false && "No space in pool remaining");
+                return false;
+            }
+
+            for (size_t i = 0; i < space; i++) {
+                if (auto targetHandle = targetEntityManager.copyFrom(entityManager_, prefabHandle_);
+                    targetHandle.isValid()) {
+                    ecs::Entity<ecs::EntityManager<THandle>> targetEntity{targetHandle, &targetEntityManager};
+                    targetEntity.setActive(false);
+                    addInactive(targetHandle);
+                }
+            }
+
+            if (!lock()) {
+                logger_.error("Failed to lock entity pool.");
+                assert(false && "Entity pool could not be locked.");
+                return false;
+            }
+
             return true;
         }
 

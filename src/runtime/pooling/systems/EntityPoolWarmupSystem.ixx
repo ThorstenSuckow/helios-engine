@@ -22,7 +22,7 @@ import helios.engine.runtime.concepts;
 export namespace helios::engine::runtime::pooling::systems {
 
     /**
-     * @brief System for creating PrefabEntityPoolCommand from PrefabEntityPoolRequestComponent.
+     * @brief System for creating PrewarmEntityPoolCommand from PrefabEntityPoolRequestComponent.
      *
      * @tparam TMemberHandle The type of the member handle.
      */
@@ -32,14 +32,14 @@ export namespace helios::engine::runtime::pooling::systems {
 
     public:
 
-        using CommandBuffer = ecs::command::TypedCommandBuffer<commands::PrefabEntityPoolCommand<TMemberHandle>>;
+        using CommandBuffer = ecs::command::TypedCommandBuffer<commands::PrewarmEntityPoolCommand<TMemberHandle>>;
 
 
         /**
-         * @brief Picks up any PrefabEntityPoolRequestComponent and creates a PrefabEntityPoolCommand.
+         * @brief Picks up any PrefabEntityPoolRequestComponent and creates a PrewarmEntityPoolCommand.
          *
-         * @details Subsequent managers are responsible for removing the component to
-         * prevent multiple prefabs from being registered.
+         * @details Subsequent managers are responsible for removing the entity to
+         * prevent multiple warmup attempts.
          *
          * @param updateContext The current update context providing entity views.
          * @param cmdBuffer The command buffer receiving the emitted pool commands.
@@ -51,8 +51,7 @@ export namespace helios::engine::runtime::pooling::systems {
                 components::PrefabEntityPoolRequestComponent<TMemberHandle>,
                 components::EntityPoolKeyComponent<TMemberHandle>
             >()) {
-
-                cmdBuffer.template add<commands::PrefabEntityPoolCommand<TMemberHandle>>(
+                cmdBuffer.template add<commands::PrewarmEntityPoolCommand<TMemberHandle>>(
                     keyComponent->entityPoolKey,
                     entity.handle(),
                     requestComponent->value()

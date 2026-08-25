@@ -14,21 +14,19 @@ module;
 export module helios.engine.runtime.pooling.EntityPoolManager;
 
 import helios.ecs;
-import helios.engine.runtime.pooling.types;
+
+import helios.engine.core.types;
 
 import helios.engine.runtime.world.UpdateContext;
+
+import helios.engine.runtime.pooling.types;
+import helios.engine.runtime.pooling.commands;
+import helios.engine.runtime.pooling.components;
 
 import helios.engine.runtime.pooling.EntityPool;
 import helios.engine.runtime.pooling.TypedEntityPoolRegistry;
 
-import helios.engine.runtime.pooling.commands;
-import helios.engine.runtime.pooling.components;
-
-import helios.ecs.command;
-
 import helios.core.thread;
-import helios.engine.core.types;
-
 import helios.core.log;
 
 using namespace helios::engine::runtime::pooling::types;
@@ -70,7 +68,7 @@ export namespace helios::engine::runtime::pooling {
         /**
          * @brief Pending pool-creation commands, one vector per handle type.
          */
-        std::tuple<std::vector<PrefabEntityPoolCommand<TMemberHandles>>...> prefabEntityPoolCommands_;
+        std::tuple<std::vector<PrewarmEntityPoolCommand<TMemberHandles>>...> prefabEntityPoolCommands_;
 
         std::tuple<std::vector<ReleaseEntityCommand<TMemberHandles>>...> releaseEntityCommands_;
 
@@ -83,8 +81,8 @@ export namespace helios::engine::runtime::pooling {
          * @brief Returns the mutable command queue for `THandle`.
          */
         template<typename THandle>
-        std::vector<PrefabEntityPoolCommand<THandle>>& prefabEntityPoolCommands() noexcept {
-            return std::get<std::vector<PrefabEntityPoolCommand<THandle>>>(prefabEntityPoolCommands_);
+        std::vector<PrewarmEntityPoolCommand<THandle>>& prewarmEntityPoolCommands() noexcept {
+            return std::get<std::vector<PrewarmEntityPoolCommand<THandle>>>(prefabEntityPoolCommands_);
         }
 
         template<typename THandle>
@@ -108,9 +106,9 @@ export namespace helios::engine::runtime::pooling {
          * it in `entityPoolRegistry_`. Clears the command queue on completion.
          */
         template<typename THandle>
-        void processPrefabEntityPoolCommands() noexcept {
+        void processPrewarmEntityPoolCommands(EntityManager<THandle>& entityManager) noexcept {
 
-            auto& commands = prefabEntityPoolCommands<THandle>();
+            auto& commands = prewarmEntityPoolCommands<THandle>();
 
             for (auto& command : commands) {
 
@@ -137,18 +135,11 @@ export namespace helios::engine::runtime::pooling {
                 }
 
                 entityPool->setPoolSize(command.amount);
+                entityPool->prewarm(entityManager);
 
-                const size_t used  = entityPool->activeCount() + entityPool->inactiveCount();
-                const size_t space = used < entityPool->size() ? entityPool->size() - used : 0;
-                const auto prefabHandle = command.prefabHandle;
-
-                auto source = ecsWorld_.find(prefabHandle);
-                source->template remove<PrefabEntityPoolRequestComponent<THandle>>();
-
-                for (size_t i = 0; i < space; i++) {
-                    auto go = ecsWorld_.copy(prefabHandle);
-                    go.setActive(false);
-                    entityPool->addInactive(go.handle());
+                if (!entityManager.destroy(command.ownerHandle)) {
+                    logger_.error("Failed to destroy owner handle.");
+                    assert(false && "Owner handle could not be destroyed.");
                 }
 
                 if (!entityPool->lock()) {
@@ -193,8 +184,8 @@ export namespace helios::engine::runtime::pooling {
          * @brief Dispatches all command-processing steps for `THandle`.
          */
         template<typename THandle>
-        void processCommandsForHandle() noexcept {
-            processPrefabEntityPoolCommands<THandle>();
+        void processCommandsForHandle(EntityManager<THandle>& entityManager) noexcept {
+            processPrewarmEntityPoolCommands<THandle>(entityManager);
             processReleaseEntityCommands<THandle>();
         }
 
@@ -208,7 +199,7 @@ export namespace helios::engine::runtime::pooling {
         */
         template<typename THandle>
         void releaseAll() {
-            entityPoolRegistry_.template forEach<THandle>([&ecsWorld = ecsWorld_](EntityPool<THandle>& entityPool) {
+            entityPoolRegistry_.template forEach<THandle>([&ecsWorld = ecsWorld_](EntityPool<THandle>& entityPool) noexcept {
                 for (auto entityHandle : entityPool.activeEntities()) {
                     entityPool.release(entityHandle);
                     if (auto go = ecsWorld.find(entityHandle)) {
@@ -241,9 +232,9 @@ export namespace helios::engine::runtime::pooling {
          *
          * @param updateContext  Current frame update context (unused directly, passed for API symmetry).
          */
-        bool executeCommands() noexcept {
+        bool executeCommands(EcsWorld& ecsWorld) noexcept {
 
-            (processCommandsForHandle<TMemberHandles>(),...);
+            (processCommandsForHandle<TMemberHandles>(ecsWorld.entityManager<TMemberHandles>()),...);
 
             return true;
         }
@@ -282,8 +273,8 @@ export namespace helios::engine::runtime::pooling {
          * @return `true` (always; reserved for future error propagation).
          */
         template<typename THandle>
-        bool submit(PrefabEntityPoolCommand<THandle>&& prefabEntityPoolCommand) noexcept {
-            prefabEntityPoolCommands<THandle>().emplace_back(std::move(prefabEntityPoolCommand));
+        bool submit(PrewarmEntityPoolCommand<THandle>&& prewarmEntityPoolCommand) noexcept {
+            prewarmEntityPoolCommands<THandle>().emplace_back(std::move(prewarmEntityPoolCommand));
             return true;
         }
 
@@ -304,7 +295,7 @@ export namespace helios::engine::runtime::pooling {
         bool init(CommandHandlerRegistry& commandHandlerRegistry) noexcept {
 
             (commandHandlerRegistry.template handleCommands<
-               PrefabEntityPoolCommand<TMemberHandles>,
+               PrewarmEntityPoolCommand<TMemberHandles>,
                ReleaseEntityCommand<TMemberHandles>
            >(*this), ...);
 

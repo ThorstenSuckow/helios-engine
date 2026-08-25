@@ -5,6 +5,7 @@
 module;
 
 #include <utility>
+#include <concepts>
 
 export module helios.engine.rendering.mesh.components.MeshDataComponent;
 
@@ -16,12 +17,13 @@ export namespace helios::engine::rendering::mesh::components {
     /**
      * @brief Component that provides raw MeshData.
      */
-    template<typename TWOwnerHandle>
+    template<typename TOwnerHandle>
     struct MeshDataComponent {
 
         MeshData meshData;
 
         template<typename ... TArgs>
+        requires std::constructible_from<MeshData, TArgs...>
         explicit MeshDataComponent(TArgs&& ... args)
         : meshData(std::forward<TArgs>(args)...)
         {}

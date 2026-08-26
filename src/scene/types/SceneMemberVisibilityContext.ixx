@@ -52,6 +52,10 @@ export namespace helios::engine::scene::types {
         /** @brief World transform used for rendering the scene member. */
         helios::math::mat4f worldMatrix;
 
+        /**
+         * @brief Normalized age value to pass to shaders. 0.0 is begin of life, 1.0 is end of life.
+         */
+        float normalizedAge = 0.0f;
 
     };
 

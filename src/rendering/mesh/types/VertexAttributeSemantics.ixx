@@ -31,6 +31,11 @@ export namespace helios::engine::rendering::mesh::types {
         InstancedModelMatrix,
 
         /**
+         * @brief Per-instance normalized age data.
+         */
+        InstancedNormalizedAge,
+
+        /**
          * @brief Number of semantics (sentinel, not a real semantic).
          */
         size_

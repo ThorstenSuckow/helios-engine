@@ -209,8 +209,12 @@ export namespace helios::engine::scene::systems {
                             );
                         }
 
-                    renderBatchContext->memberHandles.push_back(memberContext.memberHandle);
-                    renderBatchContext->instanceData.push_back({memberContext.worldMatrix});
+                    renderBatchContext->memberHandles.push_back(
+                        memberContext.memberHandle
+                    );
+                    renderBatchContext->instanceData.push_back({
+                        memberContext.worldMatrix, memberContext.normalizedAge
+                    });
                 }
             }
 

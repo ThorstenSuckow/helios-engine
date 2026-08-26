@@ -19,6 +19,11 @@ export namespace helios::engine::rendering::common::types {
          * @brief Model transform matrix for one rendered instance.
          */
         math::mat4f modelMatrix;
+
+        /**
+         * @brief Normalized age value. 0.0 begin of life, 1.0 end of life.
+         */
+        float normalizedAge = 0.0f;
     };
 }
 

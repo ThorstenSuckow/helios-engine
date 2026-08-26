@@ -179,6 +179,22 @@ export namespace helios::engine::scene {
         }
 
         /**
+         * @brief Apply the function to each visible member tracked in this registry.
+         *
+         * @tparam TFunc The function type to apply to each visible member.
+         *
+         * @param func The function-like operation to apply to each visible member.
+         */
+        template<typename TFunc>
+        void forEachVisibleMember(TFunc&& func) {
+            for (auto& viewports : visibilityContexts_) {
+                for (auto& context : viewports) {
+                    std::invoke(func, context);
+                }
+            }
+        }
+
+        /**
          * @brief Clears all accumulated render and visibility state.
          */
         void clear () {

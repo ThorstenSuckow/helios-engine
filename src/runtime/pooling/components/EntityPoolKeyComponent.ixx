@@ -20,7 +20,7 @@ export namespace helios::engine::runtime::pooling::components {
         /**
          * @brief The pool key identifying the target pool for this entity.
          */
-        types::EntityPoolKey<TOwnerHandle> entityPoolKey;
+        types::EntityPoolKey entityPoolKey;
 
     };
 

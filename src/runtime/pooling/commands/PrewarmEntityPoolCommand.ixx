@@ -22,7 +22,7 @@ export namespace helios::engine::runtime::pooling::commands {
         /**
          * @brief The key of the pool that should be used for prefabrication.
          */
-        types::EntityPoolKey<TOwnerHandle> entityPoolKey;
+        types::EntityPoolKey entityPoolKey;
 
         /**
          * @brief The handle that initiated the command.

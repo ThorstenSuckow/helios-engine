@@ -10,6 +10,6 @@ export import helios.engine.runtime.pooling.commands;
 export import helios.engine.runtime.pooling.systems;
 
 export import helios.engine.runtime.pooling.EntityPool;
+export import helios.engine.runtime.pooling.EntityPoolRegistry;
 export import helios.engine.runtime.pooling.EntityPoolManager;
-export import helios.engine.runtime.pooling.TypedEntityPoolRegistry;
 

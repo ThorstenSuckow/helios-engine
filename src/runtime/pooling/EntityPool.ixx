@@ -13,8 +13,9 @@ module;
 
 export module helios.engine.runtime.pooling.EntityPool;
 
+import helios.core.common.types;
 import helios.ecs;
-
+import helios.engine.runtime.pooling.types;
 import helios.core.log;
 
 
@@ -27,12 +28,13 @@ export namespace helios::engine::runtime::pooling {
     class EntityPool {
 
         using HandleTypeId = ecs::common::types::HandleTypeId;
-
-        using HandleRef = ecs::common::types::HandleRef;
+        using EntityHandleValue = ecs::common::types::EntityHandleValue;
         using HandleSpanRef = ecs::common::types::HandleSpanRef;
         using EntityRef = ecs::EntityRef;
         using ConstEntityRef = ecs::ConstEntityRef;
         using EntityManagerRef = ecs::EntityManagerRef;
+        using EntityPoolTypeId = types::EntityPoolTypeId;
+        using TypeId_t = core::common::types::TypeId_t;
 
         class Concept {
 
@@ -48,9 +50,8 @@ export namespace helios::engine::runtime::pooling {
             [[nodiscard]] virtual HandleSpanRef acquire(std::size_t amount) = 0;
             [[nodiscard]] virtual bool isLocked() const noexcept = 0;
             [[nodiscard]] virtual bool lock() noexcept = 0;
-            virtual bool addInactive(HandleRef handleRef) = 0;
-            virtual bool release(HandleRef handleRef) = 0;
-            virtual bool releaseAndRemove(HandleRef handleRef) = 0;
+            virtual bool release(EntityHandleValue handleValue) = 0;
+            virtual bool releaseAndRemove(EntityHandleValue handleValue) = 0;
             [[nodiscard]] virtual size_t activeCount() const noexcept = 0;
             [[nodiscard]] virtual size_t inactiveCount() const noexcept = 0;
             [[nodiscard]] virtual HandleSpanRef inactiveEntities() const noexcept = 0;
@@ -79,6 +80,7 @@ export namespace helios::engine::runtime::pooling {
             size_t delta_ = 0;
             bool locked_ = false;
             THandle prefabHandle_;
+
 
             HandleSpanRef acquireImpl(std::size_t amount) {
 
@@ -120,6 +122,33 @@ export namespace helios::engine::runtime::pooling {
                 };
             }
 
+            bool addInactive(const THandle entityHandle) {
+
+                if (locked_) {
+                    logger_.warn("Cannot add inactive entity, pool is locked.");
+                    assert(false && "Pool is locked");
+                    return false;
+                }
+
+                if (!entityHandle.isValid()) {
+                    logger_.warn("Cannot add inactive entity, invalid entityHandle.");
+                    assert(false && "Unexpected invalid entityHandle");
+                    return false;
+                }
+
+                const size_t used = (activeCount() + inactiveCount());
+
+                minEntityId_ = std::min(minEntityId_, entityHandle.entityId());
+                maxEntityId_ = std::max(maxEntityId_, entityHandle.entityId());
+
+                if (used < size()) {
+                    inactiveEntities_.push_back(entityHandle);
+                    return true;
+                }
+
+                return false;
+            }
+
         public:
 
             explicit Model(std::optional<std::size_t> poolSize = std::nullopt) {
@@ -133,11 +162,11 @@ export namespace helios::engine::runtime::pooling {
                     prefabHandle_ = entityManager_.create();
                 }
 
-                return EntityRef{prefabHandle_, &entityManager_};
+                return EntityRef{prefabHandle_, entityManager_};
             }
 
             [[nodiscard]] ConstEntityRef prefab() const noexcept {
-                return ConstEntityRef{prefabHandle_, &entityManager_};
+                return ConstEntityRef{prefabHandle_, entityManager_};
             }
 
             bool setPoolSize(const std::size_t poolSize) override {
@@ -237,39 +266,12 @@ export namespace helios::engine::runtime::pooling {
             }
 
 
-            bool addInactive(const HandleRef handleRef) override {
-
-                THandle entityHandle = handleRef.get<THandle>();
-
-                if (locked_) {
-                    logger_.warn("Cannot add inactive entity, pool is locked.");
-                    assert(false && "Pool is locked");
-                    return false;
-                }
-
-                if (!entityHandle.isValid()) {
-                    logger_.warn("Cannot add inactive entity, invalid entityHandle.");
-                    assert(false && "Unexpected invalid entityHandle");
-                    return false;
-                }
-
-                const size_t used = (activeCount() + inactiveCount());
-
-                minEntityId_ = std::min(minEntityId_, entityHandle.entityId());
-                maxEntityId_ = std::max(maxEntityId_, entityHandle.entityId());
-
-                if (used < size()) {
-                    inactiveEntities_.push_back(entityHandle);
-                    return true;
-                }
-
-                return false;
-            }
 
 
-            bool release(const HandleRef handleRef) override {
 
-                THandle entityHandle = handleRef.get<THandle>();
+            bool release(const EntityHandleValue handleValue) override {
+
+                THandle entityHandle = handleValue.get<THandle>();
 
 
                 if (!locked_) {
@@ -319,9 +321,9 @@ export namespace helios::engine::runtime::pooling {
                 return true;
             }
 
-            bool releaseAndRemove(const HandleRef handleRef) override {
+            bool releaseAndRemove(const EntityHandleValue handleValue) override {
 
-                THandle entityHandle = handleRef.get<THandle>();
+                THandle entityHandle = handleValue.get<THandle>();
 
                 if (!locked_) {
                     logger_.warn("Cannot release and remove entity, pool is not locked.");
@@ -380,10 +382,6 @@ export namespace helios::engine::runtime::pooling {
         };
 
 
-        std::unique_ptr<Concept> model_;
-
-        HandleTypeId handleTypeId_;
-
         template<typename THandle>
         void assertTypeId() const {
             assert(handleTypeId_ == HandleTypeId::id<THandle>() && "HandleTypeId not maintained by this pool.");
@@ -394,6 +392,11 @@ export namespace helios::engine::runtime::pooling {
         : model_(std::make_unique<Model<THandle>>(poolSize)),
         handleTypeId_(HandleTypeId::id<THandle>()) {}
 
+        std::unique_ptr<Concept> model_;
+
+
+        HandleTypeId handleTypeId_;
+
     public:
 
         EntityPool(const EntityPool&) = delete;
@@ -403,7 +406,7 @@ export namespace helios::engine::runtime::pooling {
 
         template<typename THandle>
         static constexpr EntityPool make(std::optional<std::size_t> poolSize = std::nullopt) {
-            return EntityPool{std::in_place_type<THandle>}(poolSize);
+            return EntityPool{std::in_place_type<THandle>, poolSize};
         }
 
 
@@ -446,22 +449,17 @@ export namespace helios::engine::runtime::pooling {
             return model_->lock();
         }
 
-        template<typename THandle>
-        bool addInactive(const THandle entityHandle) {
-            assertTypeId<THandle>();
-            return model_->addInactive(HandleRef{entityHandle});
-        }
 
         template<typename THandle>
         bool release(const THandle entityHandle) {
             assertTypeId<THandle>();
-            return model_->release(HandleRef{entityHandle});
+            return model_->release(EntityHandleValue{entityHandle});
         }
 
         template<typename THandle>
         bool releaseAndRemove(const THandle entityHandle) {
             assertTypeId<THandle>();
-            return model_->releaseAndRemove(HandleRef{entityHandle});
+            return model_->releaseAndRemove(EntityHandleValue{entityHandle});
         }
 
         [[nodiscard]] size_t activeCount() const noexcept {
@@ -483,6 +481,10 @@ export namespace helios::engine::runtime::pooling {
             assertTypeId<THandle>();
             return model_->inactiveEntities().get<THandle>();
         };
+
+        [[nodiscard]] EntityPoolTypeId typeId() const noexcept {
+            return EntityPoolTypeId{handleTypeId_.value()};
+        }
 
 
     };

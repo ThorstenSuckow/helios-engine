@@ -15,7 +15,7 @@ export namespace helios::engine::runtime::particle::components {
      */
     template<typename TOwnerHandle>
     struct ParticleEmitterComponent {
-        pooling::types::EntityPoolKey<TOwnerHandle> entityPoolKey;
+        pooling::types::EntityPoolKey entityPoolKey;
         std::size_t amount = 0;
     };
 }

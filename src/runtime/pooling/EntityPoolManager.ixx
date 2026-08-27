@@ -6,8 +6,7 @@ module;
 
 #include <cassert>
 #include <optional>
-#include <unordered_map>
-#include <cstddef>
+#include <exception>
 #include <functional>
 
 
@@ -24,7 +23,7 @@ import helios.engine.runtime.pooling.commands;
 import helios.engine.runtime.pooling.components;
 
 import helios.engine.runtime.pooling.EntityPool;
-import helios.engine.runtime.pooling.TypedEntityPoolRegistry;
+import helios.engine.runtime.pooling.EntityPoolRegistry;
 
 import helios.core.thread;
 import helios.core.log;
@@ -42,85 +41,37 @@ using namespace helios::engine::runtime::world;
 export namespace helios::engine::runtime::pooling {
 
     /**
-     * @brief Manages the lifecycle of `EntityPool` instances for one or more handle types.
-     *
-     * @details Processes `PrefabComponentPoolCommand`s to clone prefab entities into pools,
-     * locks the pools after population, and registers them in the internal
-     * `TypedEntityPoolRegistry`. Supports sequential (`flush`) and parallel
-     * (`flushParallel`) command processing.
-     *
-     * @tparam TMemberHandles  Pack of handle types whose pools are managed by this instance.
+     * @brief Manages the lifecycle of `EntityPool` instances for a specific handle type.
      */
-    template<typename TEntityPoolRegistry>
-    class EntityPoolManager;
-
-
-    template<
-        template<typename> typename TLookupStrategy,
-        typename... TMemberHandles
-    >
-   class EntityPoolManager<TypedEntityPoolRegistry<TLookupStrategy, TMemberHandles...>> {
-        /**
-         * @brief Registry holding all managed pools, keyed by `EntityPoolKey`.
-         */
-        TypedEntityPoolRegistry<TLookupStrategy, TMemberHandles...>& entityPoolRegistry_;
-
+    template<typename THandle>
+    class EntityPoolManager {
+        
         /**
          * @brief Pending pool-creation commands, one vector per handle type.
          */
-        std::tuple<std::vector<PrewarmEntityPoolCommand<TMemberHandles>>...> prefabEntityPoolCommands_;
+        std::vector<PrewarmEntityPoolCommand<THandle>> prewarmEntityPoolCommands_;
 
-        std::tuple<std::vector<ReleaseEntityCommand<TMemberHandles>>...> releaseEntityCommands_;
+        std::vector<ReleaseEntityCommand<THandle>> releaseEntityCommands_;
 
-        /**
-         * @brief Reference to the engine world used for cloning prefab entities.
-         */
-        ecs::EcsWorld& ecsWorld_;
-
-        /**
-         * @brief Returns the mutable command queue for `THandle`.
-         */
-        template<typename THandle>
-        std::vector<PrewarmEntityPoolCommand<THandle>>& prewarmEntityPoolCommands() noexcept {
-            return std::get<std::vector<PrewarmEntityPoolCommand<THandle>>>(prefabEntityPoolCommands_);
-        }
-
-        template<typename THandle>
-        std::vector<ReleaseEntityCommand<THandle>>& releaseEntityCommands() noexcept {
-            return std::get<std::vector<ReleaseEntityCommand<THandle>>>(releaseEntityCommands_);
-        }
 
         static inline auto& logger_ = helios::core::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
-
-        /**
-         * @brief Job system used for parallel command processing in `flushParallel()`.
-         */
-        JobSystem& jobSystem_;
 
 
         /**
          * @brief Processes all pending `PrefabComponentPoolCommand`s for `THandle`.
-         *
-         * @details For each command, clones the prefab entity `command.amount` times,
-         * marks the clones inactive, populates an `EntityPool`, locks it, and registers
-         * it in `entityPoolRegistry_`. Clears the command queue on completion.
          */
-        template<typename THandle>
-        void processPrewarmEntityPoolCommands(EntityManager<THandle>& entityManager) noexcept {
+        void processPrewarmEntityPoolCommands(
+            EntityManager<THandle>& entityManager,
+            EntityPoolRegistry& entityPoolRegistry) noexcept {
 
-            auto& commands = prewarmEntityPoolCommands<THandle>();
+            auto& commands = prewarmEntityPoolCommands_;
 
             for (auto& command : commands) {
 
                 auto key = command.entityPoolKey;
 
-                if (!key.isValid()) {
-                    assert(false && "Invalid key passed with command.");
-                    logger_.error("Invalid key passed with command.");
-                    continue;
-                }
 
-                auto* entityPool = entityPoolRegistry_.template pool<THandle>(key);
+                auto* entityPool = entityPoolRegistry.item(key);
 
                 if (!entityPool) {
                     logger_.error("Failed to retrieve entity pool.");
@@ -153,17 +104,16 @@ export namespace helios::engine::runtime::pooling {
             commands.clear();
         }
 
-        template<typename THandle>
-        void processReleaseEntityCommands() noexcept {
+        void processReleaseEntityCommands(EntityManager<THandle>& entityManager, EntityPoolRegistry& entityPoolRegistry) noexcept {
 
-            auto& commands = releaseEntityCommands<THandle>();
+            auto& commands = releaseEntityCommands_;
 
             for (auto& command : commands) {
 
                 auto key = command.entityPoolKey;
                 auto handle = command.entityHandle;
 
-                auto* entityPool = entityPoolRegistry_.template pool<THandle>(key);
+                auto* entityPool = entityPoolRegistry.item(key);
 
                 if (!entityPool || !entityPool->isLocked()) {
                     logger_.error("Failed to retrieve entity pool, or pool is in invalid state.");
@@ -171,8 +121,8 @@ export namespace helios::engine::runtime::pooling {
                     continue;
                 }
 
-                entityPool->release(handle);
-                if (auto entity = ecsWorld_.find(handle)) {
+                entityPool->template release<THandle>(handle);
+                if (auto entity = entityManager.entity(handle)) {
                     entity->setActive(false);
                 }
             }
@@ -180,51 +130,20 @@ export namespace helios::engine::runtime::pooling {
             commands.clear();
         }
 
-        /**
-         * @brief Dispatches all command-processing steps for `THandle`.
-         */
-        template<typename THandle>
-        void processCommandsForHandle(EntityManager<THandle>& entityManager) noexcept {
-            processPrewarmEntityPoolCommands<THandle>(entityManager);
-            processReleaseEntityCommands<THandle>();
-        }
 
-        /**
-        * @brief Resets this manager and releases all active entities back to their pool for `THandle`.
-        *
-        * @details Iterates over every pool registered for `THandle`, calls `release()` on each
-        * active entity, and deactivates it in the engine world.
-        *
-        * @tparam THandle  Handle type whose pools should be reset.
-        */
-        template<typename THandle>
-        void releaseAll() {
-            entityPoolRegistry_.template forEach<THandle>([&ecsWorld = ecsWorld_](EntityPool<THandle>& entityPool) noexcept {
-                for (auto entityHandle : entityPool.activeEntities()) {
-                    entityPool.release(entityHandle);
-                    if (auto go = ecsWorld.find(entityHandle)) {
-                        go->setActive(false);
-                    }
-                }
-            });
+        bool releaseAll() {
+            assert(false && "TBD");
+            return false;
         }
 
     public:
 
+        EntityPoolManager(const EntityPoolManager&) = delete;
+        EntityPoolManager& operator=(const EntityPoolManager&) = delete;
+        EntityPoolManager(EntityPoolManager&&) noexcept = default;
+        EntityPoolManager& operator=(EntityPoolManager&&) noexcept = default;
 
-
-        /**
-         * @brief Constructs an `EntityPoolManager`.
-         *
-         * @param entityPoolRegistry
-         * @param ecsWorld  Engine world used for cloning prefab entities.
-         * @param jobSystem    Job system used by `flushParallel()`.
-         */
-        explicit EntityPoolManager(
-        TypedEntityPoolRegistry<TLookupStrategy, TMemberHandles...>&  entityPoolRegistry,
-        EcsWorld& ecsWorld, JobSystem& jobSystem)
-        : entityPoolRegistry_(entityPoolRegistry), ecsWorld_(ecsWorld), jobSystem_(jobSystem) {}
-
+        EntityPoolManager() = default;
 
 
         /**
@@ -232,72 +151,29 @@ export namespace helios::engine::runtime::pooling {
          *
          * @param updateContext  Current frame update context (unused directly, passed for API symmetry).
          */
-        bool executeCommands(EcsWorld& ecsWorld) noexcept {
+        bool executeCommands(EntityManager<THandle>& entityManager, EntityPoolRegistry& entityPoolRegistry) noexcept {
 
-            (processCommandsForHandle<TMemberHandles>(ecsWorld.entityManager<TMemberHandles>()),...);
-
-            return true;
-        }
-
-
-        /**
-         * @brief Processes pending commands for all handle types in parallel via the `JobSystem`.
-         *
-         * @details Spawns one job per handle type and waits for all to complete before returning.
-         *
-         * @param updateContext  Current frame update context (unused directly, passed for API symmetry).
-         */
-        bool executeCommandsParallel() noexcept {
-            std::array<std::function<void()>, sizeof ...(TMemberHandles)> jobs{
-                [this]() {
-                    this->template processCommandsForHandle<TMemberHandles>();
-                }...
-            };
-
-            jobSystem_.runAndWait(jobs.size(), [&jobs](const std::size_t jobsIndex) {
-                jobs[jobsIndex]();
-            });
+            processPrewarmEntityPoolCommands(entityManager, entityPoolRegistry);
+            processReleaseEntityCommands(entityManager, entityPoolRegistry);
 
             return true;
         }
 
-
-        /**
-         * @brief Enqueues a pool-creation command for deferred processing.
-         *
-         * @details The command will be consumed during the next `flush()` or `flushParallel()` call.
-         *
-         * @tparam THandle                   Handle type of the pool to create.
-         * @param prefabComponentPoolCommand  Command describing the prefab and pool size.
-         *
-         * @return `true` (always; reserved for future error propagation).
-         */
-        template<typename THandle>
         bool submit(PrewarmEntityPoolCommand<THandle>&& prewarmEntityPoolCommand) noexcept {
-            prewarmEntityPoolCommands<THandle>().emplace_back(std::move(prewarmEntityPoolCommand));
+            prewarmEntityPoolCommands_.emplace_back(std::move(prewarmEntityPoolCommand));
             return true;
         }
 
-        template<typename THandle>
         bool submit(ReleaseEntityCommand<THandle>&& releaseEntityCommand) noexcept {
-            releaseEntityCommands<THandle>().emplace_back(std::move(releaseEntityCommand));
+            releaseEntityCommands_.emplace_back(std::move(releaseEntityCommand));
             return true;
         }
 
-        /**
-         * @brief Registers command handlers for all managed handle types in the given registry.
-         *
-         * @details Must be called once during engine initialisation so that
-         * `PrefabComponentPoolCommand`s are routed to this manager.
-         *
-         * @param commandHandlerRegistry  Registry to register handlers with.
-         */
         bool init(CommandHandlerRegistry& commandHandlerRegistry) noexcept {
-
-            (commandHandlerRegistry.template handleCommands<
-               PrewarmEntityPoolCommand<TMemberHandles>,
-               ReleaseEntityCommand<TMemberHandles>
-           >(*this), ...);
+            commandHandlerRegistry.template handleCommands<
+               PrewarmEntityPoolCommand<THandle>,
+               ReleaseEntityCommand<THandle>
+           >(*this);
 
             return true;
         };
@@ -306,7 +182,9 @@ export namespace helios::engine::runtime::pooling {
          * @brief Resets this manager and releases all active entities back to their respective pools for every handle type.
          */
         void reset() {
-            (releaseAll<TMemberHandles>(), ...);
+            if (!releaseAll()) {
+                std::terminate();
+            }
         }
 
     };

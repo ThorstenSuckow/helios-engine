@@ -26,7 +26,7 @@ export namespace helios::engine::runtime::pooling::commands {
         /**
          * @brief The key of the pool that should be used for releasing the entity.
          */
-        types::EntityPoolKey<TOwnerHandle> entityPoolKey;
+        types::EntityPoolKey entityPoolKey;
 
         /**
          * @brief The handle of the entity to release.

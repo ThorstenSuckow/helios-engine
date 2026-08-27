@@ -103,11 +103,16 @@ export namespace helios::engine::runtime::gameloop {
         template<typename T>
         void registerManagerExecuteCommands() {
             if (!gameWorld_.tryManager<T>()) {
-                #if HELIOS_DEBUG
-                std::cerr << "Manager not found for system's manager: " << typeid(T).name() << '\n';
-                assert(gameWorld_.template tryManager<T>() && "Manager not found for system's manager");
-                #endif
-                std::terminate();
+
+                if constexpr (std::is_default_constructible_v<T>) {
+                    gameWorld_.registerManager<T>(T{});
+                } else {
+                    #if HELIOS_DEBUG
+                    std::cerr << "Manager not found for system's manager: " << typeid(T).name() << '\n';
+                    assert(gameWorld_.template tryManager<T>() && "Manager not found for system's manager");
+                    #endif
+                    std::terminate();
+                }
             }
 
             managerTypeIds_.push_back(ecs::manager::types::ManagerTypeId::template id<T>());

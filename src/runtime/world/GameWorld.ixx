@@ -23,6 +23,8 @@ import helios.engine.platform.environment.types;
 
 import helios.ecs;
 
+import helios.engine.runtime.pooling.EntityPoolRegistry;
+
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.GameObject;
 import helios.engine.runtime.world.types;
@@ -98,6 +100,7 @@ export namespace helios::engine::runtime::world {
             resourceRegistry_.bind<EcsWorld>(ecsWorld_);
             resourceRegistry_.emplace<ecs::manager::ManagerRegistry>();
             resourceRegistry_.emplace<ecs::command::CommandHandlerRegistry>();
+            resourceRegistry_.emplace<runtime::pooling::EntityPoolRegistry>();
         };
 
         /**

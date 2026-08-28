@@ -10,3 +10,6 @@ export import helios.engine.rendering.common.types.ClearFlags;
 export import helios.engine.rendering.common.types.DrawContext;
 export import helios.engine.rendering.common.types.Vertex;
 export import helios.engine.rendering.common.types.InstanceData;
+
+export import :RenderData;
+export import :RenderDataTypeId;

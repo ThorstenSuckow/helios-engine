@@ -13,7 +13,8 @@ module;
 
 export module helios.engine.rendering.RenderManager;
 
-
+import helios.engine.rendering.RenderDataResolver;
+import helios.engine.rendering.RenderBackend;
 
 import helios.engine.rendering.renderTarget.types.RenderTargetHandle;
 import helios.engine.rendering.viewport.types.ViewportHandle;
@@ -66,17 +67,9 @@ export namespace helios::engine::rendering {
     /**
      * @brief Collects render commands into hierarchical batches and forwards them to the backend.
      *
-     * @details
-     * Commands are grouped by render-target, viewport, shader, material, and mesh.
-     * `flush(...)` iterates this hierarchy and calls the corresponding backend batch hooks.
-     *
-     * @tparam TRenderBackend Rendering backend type.
      * @tparam TMemberHandle Renderable scene member handle type.
      */
-    template<
-        typename TRenderBackend,
-        typename ...TMemberHandles>
-    requires IsRenderBackendLike<TRenderBackend>
+    template<typename ...TMemberHandles>
     class RenderManager {
 
         /**
@@ -264,10 +257,6 @@ export namespace helios::engine::rendering {
          */
         std::vector<EntityId> activeRenderTargetIndices_;
 
-        /**
-         * @brief Backend instance that receives begin/end hooks and draw submissions.
-         */
-        TRenderBackend& renderBackend_;
 
         /**
          * @brief Ensures that the render-target and viewport batch nodes exist and are active.
@@ -325,42 +314,44 @@ export namespace helios::engine::rendering {
 
 
         /**
-         * @brief Constructs the manager for a specific render backend.
-         *
-         * @param renderBackend Backend used to execute render passes.
-         */
-        explicit RenderManager(TRenderBackend& renderBackend) : renderBackend_(renderBackend) {
-
-            renderTargetBatches_.reserve(RENDERTARGET_INITIAL_STORAGE_CAPACITY);
-
-        }
-
-
-        /**
          * @brief Flushes all active render-target batches to the backend.
-         *
-         * @details Traverses active render targets and nested viewport/shader/material/mesh batches,
-         * executes backend begin/end hooks for each level, renders queued draw contexts,
-         * and clears all active batch indices afterwards.
-
          */
-        bool executeCommands() noexcept {
+        bool executeCommands(ecs::common::container::EcsDataContainer& ecsDataContainer,
+            RenderDataResolver& renderDataResolver, RenderBackend& renderBackend) noexcept {
 
 
             for (auto renderTargetIdx : activeRenderTargetIndices_) {
                 auto& renderTargetBatch = renderTargetBatches_[renderTargetIdx];
 
-                renderBackend_.beginRenderTargetBatch(renderTargetBatch.handle);
+                if (auto renderData = renderDataResolver.resolveRenderTargetData(ecsDataContainer, renderTargetBatch.handle.value())) {
+                    renderBackend.beginRenderTargetBatch(*renderData);
+                } else {
+                    logger_.error("Failed to resolve render target data for batch");
+                    assert(false && "Failed to resolve render target data for batch");
+                    continue;
+                }
 
                 for (auto viewportIdx : renderTargetBatch.activeBatchIndices) {
                     auto& viewportBatch = renderTargetBatch.batches[viewportIdx];
 
-                    renderBackend_.beginViewportBatch(viewportBatch.handle);
+                    if (auto renderData = renderDataResolver.resolveViewportData(ecsDataContainer, viewportBatch.handle.value())) {
+                        renderBackend.beginViewportBatch(*renderData);
+                    } else {
+                        logger_.error("Failed to resolve viewport data for batch");
+                        assert(false && "Failed to resolve viewport data for batch");
+                        continue;
+                    }
 
                     for (auto shaderIdx : viewportBatch.activeBatchIndices ) {
                         auto& shaderBatch = viewportBatch.batches[shaderIdx];
 
-                        renderBackend_.beginShaderBatch(shaderBatch.handle);
+                        if (auto renderData = renderDataResolver.resolveShaderData(ecsDataContainer, shaderBatch.handle.value())) {
+                            renderBackend.beginShaderBatch(*renderData);
+                        } else {
+                            logger_.error("Failed to resolve shader data for batch");
+                            assert(false && "Failed to resolve shader data for batch");
+                            continue;
+                        }
 
                         for (auto textureIdx : shaderBatch.activeBatchIndices ) {
                             auto& textureBatch = shaderBatch.batches[textureIdx];
@@ -368,40 +359,61 @@ export namespace helios::engine::rendering {
                             auto validTextureBatch = textureBatch.handle.isValid();
                             // consider invalid (intentionally missing) textures
                             if (validTextureBatch) {
-                                renderBackend_.beginTextureBatch(textureBatch.handle);
+
+                                if (auto renderData = renderDataResolver.resolveTextureData(ecsDataContainer, textureBatch.handle.value())) {
+                                    renderBackend.beginTextureBatch(*renderData);
+                                } else {
+                                    logger_.error("Failed to resolve texture data for batch");
+                                    assert(false && "Failed to resolve texture data for batch");
+                                    continue;
+                                }
+
                             }
 
                             for (auto materialIdx : textureBatch.activeBatchIndices) {
                                 auto& materialBatch = textureBatch.batches[materialIdx];
 
-                                renderBackend_.beginMaterialBatch(materialBatch.handle);
+                                if (auto renderData = renderDataResolver.resolveMaterialData(ecsDataContainer, materialBatch.handle.value())) {
+                                    renderBackend.beginMaterialBatch(*renderData);
+                                } else {
+                                    logger_.error("Failed to resolve material data for batch");
+                                    assert(false && "Failed to resolve material data for batch");
+                                    continue;
+                                }
 
                                 for (auto meshIdx : materialBatch.activeBatchIndices) {
                                     auto& meshBatch = materialBatch.batches[meshIdx];
 
-                                    renderBackend_.beginMeshBatch(meshBatch.handle);
+                                    if (auto renderData = renderDataResolver.resolveMeshData(ecsDataContainer, meshBatch.handle.value())) {
+                                        renderBackend.beginMeshBatch(*renderData);
+                                    } else {
+                                        logger_.error("Failed to resolve mesh data for batch");
+                                        assert(false && "Failed to resolve mesh data for batch");
+                                        continue;
+                                    }
 
-                                    renderBackend_.renderBatch(meshBatch.drawContexts);
-                                    renderBackend_.renderBatch(meshBatch.instanceData);
 
-                                    renderBackend_.endMeshBatch(meshBatch.handle);
+                                    renderBackend.renderBatch(meshBatch.drawContexts);
+                                    renderBackend.renderBatch(meshBatch.instanceData);
+
+                                    renderBackend.endMeshBatch();
                                 } // materialBatch
 
-                                renderBackend_.endMaterialBatch(materialBatch.handle);
+                                renderBackend.endMaterialBatch();
                             } //textureBatch
 
                             if (validTextureBatch) {
-                                renderBackend_.endTextureBatch(textureBatch.handle);
+                                renderBackend.endTextureBatch();
                             }
                         } // shader batch
 
-                        renderBackend_.endShaderBatch(shaderBatch.handle);
+                        renderBackend.endShaderBatch();
                     } // viewportBatch
 
-                    renderBackend_.endViewportBatch(viewportBatch.handle);
+                    renderBackend.endViewportBatch();
                 } //renderTargetBatch
 
-                renderBackend_.endRenderTargetBatch(renderTargetBatch.handle);
+                renderBackend.endRenderTargetBatch();
             }
 
             for (auto idx : activeRenderTargetIndices_ ) {

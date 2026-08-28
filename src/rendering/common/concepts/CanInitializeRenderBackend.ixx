@@ -24,7 +24,7 @@ export namespace helios::engine::rendering::common::concepts {
     template<typename T>
     concept CanInitializeRenderBackend = requires(T& t)
     {
-        {t.init()} -> std::same_as<bool>;
+        {t.finalizeSetup()} -> std::same_as<bool>;
         {t.isInitialized()}->std::same_as<bool>;
     };
 

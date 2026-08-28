@@ -20,7 +20,7 @@ export namespace helios::engine::rendering::common::concepts {
     template<typename T>
     concept CanProvideWindowHints = requires(T& t)
     {
-        {t.provideWindowHints()}->std::same_as<void>;
+        {t.configureWindowCreationHints()}->std::same_as<void>;
     };
 
 

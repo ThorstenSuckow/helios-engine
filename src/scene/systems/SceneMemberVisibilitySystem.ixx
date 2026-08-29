@@ -112,7 +112,7 @@ export namespace helios::engine::scene::systems {
             UpdateContext& updateContext,
             CullingContext<TMemberHandle>& cullingContext,
             const SceneHandle sceneHandle,
-            const RenderTargetBindingComponent<ViewportHandle, RenderTargetHandle>& renderTargetBindingComponent,
+            const RenderTargetBindingComponent<ViewportHandle, TRenderHandles>& renderTargetBindingComponent,
             const ViewportEntity &viewportEntity,
             SceneMemberVisibilityRegistry& visibilityRegistry
         ) {
@@ -125,7 +125,7 @@ export namespace helios::engine::scene::systems {
                 boundsWorld
                 ] : updateContext.view<
                 TMemberHandle,
-                SceneMemberComponent<TMemberHandle, SceneHandle>,
+                SceneMemberComponent<TMemberHandle, TRenderHandles>,
                 RenderPrototypeComponent<TMemberHandle, TSubmissionMode, TRenderHandles>,
                 TransformComponent<TMemberHandle, World>,
                 BoundsComponent<TMemberHandle, World>
@@ -181,9 +181,9 @@ export namespace helios::engine::scene::systems {
 
             for (auto [viewportEntity, renderTargetBindingComponent, sbc, cbc] : updateContext.template view<
                 ViewportHandle,
-                RenderTargetBindingComponent<ViewportHandle, RenderTargetHandle>,
-                SceneBindingComponent<ViewportHandle, SceneHandle>,
-                CameraBindingComponent<ViewportHandle, CameraHandle>
+                RenderTargetBindingComponent<ViewportHandle, TRenderHandles>,
+                SceneBindingComponent<ViewportHandle, TRenderHandles>,
+                CameraBindingComponent<ViewportHandle, TRenderHandles>
             >().withActive()) {
 
                 const auto sceneHandle  = sbc->targetHandle();

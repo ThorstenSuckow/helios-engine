@@ -13,7 +13,7 @@ using namespace helios::ecs::components;
 export namespace helios::engine::scene::components {
 
     struct SceneMemberComponentTag;
-    template<typename TOwnerHandle, typename TTargetHandle>
-    using SceneMemberComponent = BindingComponent<TOwnerHandle, TTargetHandle, SceneMemberComponentTag>;
+    template<typename TOwnerHandle, typename TRenderHandles>
+    using SceneMemberComponent = BindingComponent<TOwnerHandle, typename TRenderHandles::SceneHandle, SceneMemberComponentTag>;
 
 }

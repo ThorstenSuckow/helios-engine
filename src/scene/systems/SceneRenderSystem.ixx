@@ -92,6 +92,12 @@ export namespace helios::engine::scene::systems {
         using RenderSceneCommand = RenderSceneCommand<TMemberHandle, TRenderHandles>;
         using RenderPrototypeComponent = RenderPrototypeComponent<TMemberHandle, TSubmissionMode, TRenderHandles>;
 
+        using CommandBuffer = ecs::command::TypedCommandBuffer<
+            RenderSceneCommand,
+            RenderSceneMemberCommand,
+            RenderInstanceBatchCommand
+        >;
+
         static inline auto& logger_ = helios::core::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
 
 
@@ -106,11 +112,10 @@ export namespace helios::engine::scene::systems {
          * @param visibilityContexts Visible non-instanced members grouped by viewport.
          * @param cmdBuffer Command buffer receiving render commands.
          */
-        template<typename TCommandBuffer>
         void dispatchNonInstancedRenderCommands(
             UpdateContext& updateContext,
              std::span<const std::vector<SceneMemberVisibilityContext>> visibilityContexts,
-             TCommandBuffer& cmdBuffer) requires std::is_same_v<TSubmissionMode, NonInstanced>  {
+             CommandBuffer& cmdBuffer) requires std::is_same_v<TSubmissionMode, NonInstanced>  {
 
 
             for (const auto& viewportContexts : visibilityContexts) {
@@ -152,11 +157,10 @@ export namespace helios::engine::scene::systems {
          * @param visibilityContexts Visible instanced members grouped by viewport.
          * @param cmdBuffer Command buffer receiving render commands.
          */
-        template<typename TCommandBuffer>
         void dispatchInstancedRenderCommands (
             UpdateContext& updateContext,
             std::span<const std::vector<SceneMemberVisibilityContext>> visibilityContexts,
-            TCommandBuffer& cmdBuffer) requires std::is_same_v<TSubmissionMode, Instanced> {
+            CommandBuffer& cmdBuffer) requires std::is_same_v<TSubmissionMode, Instanced> {
 
             std::optional<RenderInstanceBatchContext> renderBatchContext;
 
@@ -224,12 +228,6 @@ export namespace helios::engine::scene::systems {
 
     public:
 
-
-        using CommandBuffer = ecs::command::TypedCommandBuffer<
-            RenderSceneCommand,
-            RenderSceneMemberCommand,
-            RenderInstanceBatchCommand
-        >;
 
         SceneRenderSystem() = default;
 

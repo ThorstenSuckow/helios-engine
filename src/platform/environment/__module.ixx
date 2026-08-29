@@ -6,6 +6,4 @@ export module helios.engine.platform.environment;
 
 export import helios.engine.platform.environment.commands;
 export import helios.engine.platform.environment.components;
-export import helios.engine.platform.environment.types;
 export import helios.engine.platform.environment.systems;
-export import helios.engine.platform.environment.concepts;

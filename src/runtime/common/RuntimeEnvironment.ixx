@@ -8,20 +8,18 @@ module;
 #include <vector>
 #include <cassert>
 
-export module helios.engine.runtime.world.RuntimeEnvironment;
+export module helios.engine.runtime.common.RuntimeEnvironment;
 
 import helios.ecs;
 
-import helios.engine.platform.environment.types;
 import helios.engine.platform.environment.components;
 
 
 using namespace helios::ecs;
 using namespace helios::engine::platform::environment;
-using namespace helios::engine::platform::environment::types;
 using namespace helios::engine::platform::environment::components;
 
-export namespace helios::engine::runtime::world {
+export namespace helios::engine::runtime::common {
 
 
     /**
@@ -31,24 +29,30 @@ export namespace helios::engine::runtime::world {
 
     private:
 
-        using PlatformEntity = Entity<EntityManager<platform::environment::types::PlatformHandle>>;
 
-        using Handle_type = typename PlatformEntity::Handle_type;
+        struct RuntimeDomainTag{};
+        using RuntimeHandle = ecs::common::types::EntityHandle<RuntimeDomainTag>;
+        using EntityManager = ecs::EntityManager<RuntimeHandle>;
+        using RuntimeObject = ecs::Entity<ecs::EntityManager<RuntimeHandle>>;
+        using ConstRuntimeObject = ecs::Entity<const ecs::EntityManager<RuntimeHandle>>;
 
-        /**
-         * @brief The underlying Entity storing system components.
-         */
-        PlatformEntity entity_;
+        EntityManager entityManager_;
+
+        RuntimeHandle runtimeHandle_;
+        
+        [[nodiscard]] RuntimeObject runtimeObject() noexcept {
+            return RuntimeObject{runtimeHandle_, &entityManager_};
+        };
+
+        [[nodiscard]] ConstRuntimeObject runtimeObject() const noexcept {
+            return ConstRuntimeObject{runtimeHandle_, &entityManager_};
+        }
 
     
     public:
 
-        /**
-         * @brief Constructs a runtime-environment facade from an existing platform entity.
-         *
-         * @param entity Platform environment entity.
-         */
-        explicit RuntimeEnvironment(const PlatformEntity& entity) : entity_(entity) {}
+
+        RuntimeEnvironment() : runtimeHandle_(entityManager_.create()) {}
 
         /**
          * @brief Checks whether GPU context readiness was marked.
@@ -56,7 +60,7 @@ export namespace helios::engine::runtime::world {
          * @return `true` if GPU context is ready, otherwise `false`.
          */
         [[nodiscard]] bool isGPUReady() const noexcept {
-            return entity_.has<GPUContextReadyComponent<Handle_type>>();
+            return runtimeObject().has<GPUContextReadyComponent<RuntimeHandle>>();
         }
 
         /**
@@ -69,7 +73,7 @@ export namespace helios::engine::runtime::world {
                 assert(false && "RuntimeEnvironment already initialized");
                 return false;
             }
-            entity_.add<PlatformInitializedComponent<Handle_type>>();
+            runtimeObject().add<PlatformInitializedComponent<RuntimeHandle>>();
             return true;
         }
 
@@ -79,7 +83,7 @@ export namespace helios::engine::runtime::world {
          * @return `true` if initialized, otherwise `false`.
          */
         [[nodiscard]] bool isInitialized() const noexcept {
-            return entity_.has<PlatformInitializedComponent<Handle_type>>();
+            return runtimeObject().has<PlatformInitializedComponent<RuntimeHandle>>();
         }
 
         /**
@@ -96,7 +100,7 @@ export namespace helios::engine::runtime::world {
          */
         void setGPUReady() noexcept {
             assert(!isGPUReady() && "GPUContextReadyComponent already set");
-            entity_.add<GPUContextReadyComponent<Handle_type>>();
+            runtimeObject().add<GPUContextReadyComponent<RuntimeHandle>>();
         }
 
         /**

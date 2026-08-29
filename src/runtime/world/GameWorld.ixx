@@ -13,14 +13,12 @@ module;
 export module helios.engine.runtime.world.GameWorld;
 
 import helios.engine.runtime.common.Session;
+import helios.engine.runtime.common.RuntimeEnvironment;
 
 import helios.engine.runtime.enginestate;
 
 import helios.core.thread.JobSystem;
 import helios.core.common.container;
-
-import helios.engine.runtime.world.RuntimeEnvironment;
-import helios.engine.platform.environment.types;
 
 import helios.ecs;
 
@@ -38,7 +36,6 @@ using namespace helios::core::thread;
 using namespace helios::ecs::common::concepts;
 using namespace helios::ecs;
 using namespace helios::engine::runtime::world::concepts;
-using namespace helios::engine::platform::environment::types;
 #define HELIOS_LOG_SCOPE "GameWorld"
 export namespace helios::engine::runtime::world {
 
@@ -67,10 +64,6 @@ export namespace helios::engine::runtime::world {
 
         helios::ecs::common::container::EcsDataContainer resourceRegistry_{};
 
-        /**
-         * @brief Runtime environment facade for platform readiness state.
-         */
-        RuntimeEnvironment runtimeEnvironment_;
 
         /**
          * @brief Reference to the job system used for parallel task execution.
@@ -85,7 +78,6 @@ export namespace helios::engine::runtime::world {
          */
         explicit GameWorld(EcsWorld&& ecsWorld, JobSystem& jobSystem)
         : ecsWorld_(std::move(ecsWorld)),
-          runtimeEnvironment_(RuntimeEnvironment(ecsWorld_.add<PlatformHandle>())),
           jobSystem_(jobSystem) {
 
             resourceRegistry_.bind<EcsWorld>(ecsWorld_);
@@ -93,6 +85,7 @@ export namespace helios::engine::runtime::world {
             resourceRegistry_.emplace<ecs::command::CommandHandlerRegistry>();
             resourceRegistry_.emplace<runtime::pooling::EntityPoolRegistry>();
             resourceRegistry_.emplace<helios::engine::runtime::common::Session>();
+            resourceRegistry_.emplace<helios::engine::runtime::common::RuntimeEnvironment>();
         };
 
         /**
@@ -130,8 +123,8 @@ export namespace helios::engine::runtime::world {
          *
          * @return Reference to the Platform.
          */
-        [[nodiscard]] RuntimeEnvironment& runtimeEnvironment() {
-            return runtimeEnvironment_;
+        [[nodiscard]] common::RuntimeEnvironment& runtimeEnvironment() {
+            return resourceRegistry_.get<common::RuntimeEnvironment>();
         }
 
         template<typename TResource, typename ... TArgs>

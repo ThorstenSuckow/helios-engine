@@ -11,7 +11,6 @@ export import helios.engine.runtime.world.GameWorld;
 
 export import helios.engine.runtime.world.Level;
 export import helios.engine.runtime.world.UpdateContext;
-export import helios.engine.runtime.world.RuntimeEnvironment;
 
 
 

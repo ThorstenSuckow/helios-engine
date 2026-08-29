@@ -13,7 +13,6 @@ import helios.engine.input.InputSnapshot;
 
 import helios.engine.runtime.world.Level;
 
-import helios.engine.runtime.world.RuntimeEnvironment;
 import helios.ecs.common.types;
 
 
@@ -64,10 +63,6 @@ export namespace helios::engine::runtime::world {
          */
         const helios::engine::input::InputSnapshot& inputSnapshot_;
 
-        /**
-         * @brief Reference to the current platform entity.
-         */
-        helios::engine::runtime::world::RuntimeEnvironment& runtimeEnvironment_;
 
         /**
          * @brief Pointer to the active Level, or nullptr if no level is loaded.
@@ -97,14 +92,12 @@ export namespace helios::engine::runtime::world {
          * @param ecsWorld Aggregate typed world for entity operations.
          */
         UpdateContext(
-            helios::engine::runtime::world::RuntimeEnvironment& runtimeEnvironment,
             const float deltaTime,
             const float totalTime,
             const std::size_t frameCount,
             const helios::engine::input::InputSnapshot& inputSnapshot,
             helios::ecs::EcsWorld& ecsWorld
         ) :
-        runtimeEnvironment_(runtimeEnvironment),
         deltaTime_(deltaTime),
         totalTime_(totalTime),
         frameCount_(frameCount),
@@ -176,15 +169,6 @@ export namespace helios::engine::runtime::world {
             return level_;
         }
 
-
-        /**
-         * @brief Returns the runtime environment for platform/runtime readiness state.
-         *
-         * @return Reference to runtime environment.
-         */
-        [[nodiscard]] helios::engine::runtime::world::RuntimeEnvironment& runtimeEnvironment() const noexcept {
-            return runtimeEnvironment_;
-        }
 
         /**
          * @brief Builds a typed ECS view for a handle domain and component set.

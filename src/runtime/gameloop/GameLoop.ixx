@@ -140,7 +140,6 @@ export namespace helios::engine::runtime::gameloop {
             frameCount_++;
 
             auto updateContext = runtime::world::UpdateContext(
-                  gameWorld_.runtimeEnvironment(),
                   deltaTime,
                   totalTime_,
                   frameCount_,

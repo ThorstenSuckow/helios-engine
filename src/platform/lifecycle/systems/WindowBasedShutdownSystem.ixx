@@ -22,7 +22,6 @@ import helios.engine.platform.window.concepts;
 
 import helios.engine.platform.lifecycle.commands;
 import helios.engine.platform.environment.components;
-import helios.engine.platform.environment.concepts;
 
 
 using namespace helios::engine::runtime::world;
@@ -31,7 +30,6 @@ using namespace helios::ecs::common::concepts;
 using namespace helios::engine::platform::environment::components;
 using namespace helios::engine::platform::window::components;
 using namespace helios::engine::platform::window::concepts;
-using namespace helios::engine::platform::environment::concepts;
 using namespace helios::engine::platform::lifecycle::commands;
 using namespace helios::ecs::components;
 

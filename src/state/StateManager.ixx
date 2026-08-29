@@ -26,7 +26,7 @@ import helios.ecs.command.CommandHandlerRegistry;
 import helios.ecs.command.types;
 import helios.engine.runtime.world.concepts;
 import helios.engine.runtime.concepts;
-import helios.engine.runtime.common.Session;
+import helios.engine.runtime.common;
 
 import helios.ecs.manager;
 import helios.ecs.EntityManager;
@@ -65,6 +65,9 @@ export namespace helios::engine::state {
      */
     template<typename StateType>
     class StateManager {
+
+        using Session = runtime::common::Session;
+        using RuntimeEnvironment = runtime::common::RuntimeEnvironment;
 
         /**
          * @brief Queue of pending state commands.
@@ -174,7 +177,9 @@ export namespace helios::engine::state {
          *
          * @param updateContext The current frame's update context.
          */
-        bool executeCommands(engine::runtime::world::UpdateContext& updateContext, runtime::common::Session& session) noexcept {
+        bool executeCommands(
+            engine::runtime::world::UpdateContext& updateContext,
+            RuntimeEnvironment& runtimeEnvironment, Session& session) noexcept {
 
             if (pending_.empty()) {
                 return true;
@@ -199,7 +204,7 @@ export namespace helios::engine::state {
                 if (rule.from() == from && rule.transitionId() == transitionId) {
 
                     if (rule.guard()) {
-                        if (!rule.guard()(updateContext, transitionRequest)) {
+                        if (!rule.guard()(runtimeEnvironment, transitionRequest)) {
                             break;
                         }
                     }

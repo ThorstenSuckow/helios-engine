@@ -10,6 +10,8 @@ export module helios.engine.runtime.enginestate.rules.guards.DefaultEngineStateT
 
 import helios.engine.runtime.world.UpdateContext;
 
+import helios.engine.runtime.common.RuntimeEnvironment;
+
 import helios.engine.runtime.enginestate.EngineStateBindings;
 import helios.engine.runtime.enginestate.types;
 import helios.engine.state.types;
@@ -29,31 +31,31 @@ export namespace helios::engine::runtime::enginestate::rules::guards {
         /**
          * @brief Guard that checks if a current context component is available.
          *
-         * @param updateContext The current frame's update context.
+         * @param runtimeEnvironment
          * @param transitionRequest The requested state transition.
          *
          * @return True if an entity with a CurrentContext exists.
          */
         static bool isPlatformInitialized(
-            helios::engine::runtime::world::UpdateContext& updateContext,
+            const common::RuntimeEnvironment& runtimeEnvironment,
             const StateTransitionRequest<EngineState> transitionRequest
         ) {
-            return updateContext.runtimeEnvironment().isInitialized();
+            return runtimeEnvironment.isInitialized();
         }
 
         /**
          * @brief Guard that checks if the runtime infrastructure is available.
          *
-         * @param updateContext The current frame's update context.
+         * @param runtimeEnvironment
          * @param transitionRequest The requested state transition.
          *
          * @return True if the infrastructure can be considered in a ready-state.
          */
         static bool isRuntimeInfrastructureReady(
-            helios::engine::runtime::world::UpdateContext& updateContext,
+            const common::RuntimeEnvironment& runtimeEnvironment,
             const StateTransitionRequest<EngineState> transitionRequest
         ) {
-            return updateContext.runtimeEnvironment().isRuntimeInfrastructureReady();
+            return runtimeEnvironment.isRuntimeInfrastructureReady();
         }
 
 

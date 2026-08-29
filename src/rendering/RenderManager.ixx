@@ -139,7 +139,7 @@ export namespace helios::engine::rendering {
             std::vector<InstanceData> instanceData;
             MeshBatch() {
                 drawData.reserve(GAMEOBJECT_INITIAL_STORAGE_CAPACITY);
-               // instanceData.reserve(DEFAULT_INSTANCE_DATA_CAPACITY);
+                instanceData.reserve(DEFAULT_INSTANCE_DATA_CAPACITY);
             }
             void clear() {
                 isActive = false;

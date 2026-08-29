@@ -9,11 +9,8 @@ module;
 export module helios.engine.rendering.mesh.commands.MeshBatchUploadCommand;
 
 import helios.engine.rendering.mesh.types.MeshDataIndex;
-import helios.engine.rendering.mesh.types.MeshHandle;
-import helios.engine.rendering.mesh.concepts.IsMeshHandle;
 
 using namespace helios::engine::rendering::mesh::types;
-using namespace helios::engine::rendering::mesh::concepts;
 export namespace helios::engine::rendering::mesh::commands {
 
     /**
@@ -21,13 +18,12 @@ export namespace helios::engine::rendering::mesh::commands {
      * @tparam THandle Handle type constrained to mesh handles.
      */
     template<typename THandle>
-    requires IsMeshHandle<THandle>
     struct MeshBatchUploadCommand {
 
         /**
          * @brief Handles of meshes that should be uploaded.
          */
-        std::vector<MeshHandle> meshHandles{};
+        std::vector<THandle> meshHandles{};
 
     };
 

@@ -11,25 +11,17 @@ module;
 export module helios.engine.scene.types.InstanceRenderBatchContext;
 
 import helios.ecs.common.types;
-import helios.engine.scene.types.SceneHandle;
 import helios.engine.rendering.mesh.types;
-import helios.engine.rendering.material.types;
-import helios.engine.rendering.texture.types;
 import helios.engine.rendering.shader.types;
 import helios.engine.rendering.common.types;
-import helios.engine.rendering.viewport.types;
 import helios.engine.rendering.renderTarget.types;
 import helios.math.types;
 
 using namespace helios::ecs::common::types;
-using namespace helios::engine::rendering::viewport::types;
 using namespace helios::engine::rendering::renderTarget::types;
 using namespace helios::engine::rendering::mesh::types;
-using namespace helios::engine::rendering::material::types;
-using namespace helios::engine::rendering::texture::types;
 using namespace helios::engine::rendering::shader::types;
 using namespace helios::engine::rendering::common::types;
-using namespace helios::engine::scene;
 
 export namespace helios::engine::scene::types {
 
@@ -38,43 +30,43 @@ export namespace helios::engine::scene::types {
      *
      * @tparam TMemberHandle Scene member/entity handle type.
      */
-    template<typename TMemberHandle>
+    template<typename TMemberHandle, typename TRenderHandles>
     struct InstanceRenderBatchContext {
 
         /**
          * @brief Target render target for rendering.
          */
-        RenderTargetHandle renderTargetHandle;
+        typename TRenderHandles::RenderTargetHandle renderTargetHandle;
 
         /**
          * @brief Target viewport for rendering.
          */
-        ViewportHandle viewportHandle;
+        typename TRenderHandles::ViewportHandle viewportHandle;
 
         /**
          * @brief Owning scene handle.
          */
-        SceneHandle sceneHandle;
+        typename TRenderHandles::SceneHandle sceneHandle;
 
         /**
          * @brief Mesh resource handle to render.
          */
-        MeshHandle meshHandle;
+        typename TRenderHandles::MeshHandle meshHandle;
 
         /**
          * @brief Texture resource handle to apply.
          */
-        TextureHandle textureHandle;
+        typename TRenderHandles::TextureHandle textureHandle;
 
         /**
          * @brief Material resource handle to apply.
          */
-        MaterialHandle materialHandle;
+        typename TRenderHandles::MaterialHandle materialHandle;
 
         /**
          * @brief Shader resource handle used for draw submission.
          */
-        ShaderHandle shaderHandle;
+        typename TRenderHandles::ShaderHandle shaderHandle;
 
         /**
          * @brief Scene member handles contained in this instance batch.
@@ -98,13 +90,13 @@ export namespace helios::engine::scene::types {
          * @param shaderHdl Shader handle used for the batch.
          */
         InstanceRenderBatchContext(
-            const RenderTargetHandle renderTargetHdl,
-            const ViewportHandle viewportHdl,
-            const SceneHandle sceneHdl,
-            const MeshHandle meshHdl,
-            const TextureHandle textureHdl,
-            const MaterialHandle materialHdl,
-            const ShaderHandle shaderHdl
+            const typename TRenderHandles::RenderTargetHandle renderTargetHdl,
+            const typename TRenderHandles::ViewportHandle viewportHdl,
+            const typename TRenderHandles::SceneHandle sceneHdl,
+            const typename TRenderHandles::MeshHandle meshHdl,
+            const typename TRenderHandles::TextureHandle textureHdl,
+            const typename TRenderHandles::MaterialHandle materialHdl,
+            const typename TRenderHandles::ShaderHandle shaderHdl
         ) : renderTargetHandle(renderTargetHdl),
             viewportHandle(viewportHdl),
             sceneHandle(sceneHdl),

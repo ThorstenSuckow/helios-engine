@@ -19,7 +19,6 @@ import helios.engine.runtime.concepts;
 
 
 import helios.engine.rendering.shader.components;
-import helios.engine.rendering.shader.concepts;
 import helios.engine.rendering.shader.commands;
 
 import helios.ecs.common.concepts;
@@ -34,7 +33,6 @@ using namespace helios::ecs::common::concepts;
 using namespace helios::engine::rendering::shader::components;
 using namespace helios::engine::rendering::shader::commands;
 using namespace helios::ecs::components;
-using namespace helios::engine::rendering::shader::concepts;
 export namespace helios::engine::rendering::shader::systems {
 
     /**
@@ -44,7 +42,6 @@ export namespace helios::engine::rendering::shader::systems {
      * @tparam TCapacity Initial reserve size for the internal handle cache.
      */
     template<typename THandle>
-    requires IsShaderHandle<THandle>
     class ShaderCompileSystem {
 
         std::vector<THandle> shaderHandles_;

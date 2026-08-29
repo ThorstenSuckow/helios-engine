@@ -8,9 +8,6 @@ module;
 
 export module helios.engine.rendering.shader.components.ShaderSourceComponent;
 
-import helios.engine.rendering.shader.concepts.IsShaderHandle;
-
-using namespace helios::engine::rendering::shader::concepts;
 export namespace helios::engine::rendering::shader::components {
 
     /**
@@ -19,7 +16,6 @@ export namespace helios::engine::rendering::shader::components {
      * @tparam THandle Shader handle type.
      */
     template<typename THandle>
-    requires IsShaderHandle<THandle>
     struct ShaderSourceComponent {
 
         /**

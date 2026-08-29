@@ -9,7 +9,6 @@ module;
 
 export module helios.engine.rendering.mesh.systems.MeshUploadSystem;
 
-import helios.engine.rendering.mesh.concepts;
 import helios.ecs.command.NullCommandBuffer;
 import helios.ecs.command;
 import helios.engine.rendering.mesh.components;
@@ -20,7 +19,6 @@ import helios.engine.runtime.concepts;
 
 import helios.ecs.component;
 
-using namespace helios::engine::rendering::mesh::concepts;
 using namespace helios::engine::rendering::mesh::commands;
 using namespace helios::engine::rendering::mesh::components;
 using namespace helios::ecs;
@@ -33,7 +31,6 @@ export namespace helios::engine::rendering::mesh::systems {
 
 
     template<typename THandle>
-    requires IsMeshHandle<THandle>
     class MeshUploadSystem {
 
         std::vector<THandle> meshHandles_;

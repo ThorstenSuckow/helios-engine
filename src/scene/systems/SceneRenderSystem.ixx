@@ -14,8 +14,6 @@ module;
 
 export module helios.engine.scene.systems.SceneRenderSystem;
 
-import helios.engine.rendering.viewport.concepts.IsViewportHandle;
-
 import helios.engine.scene.SceneMemberVisibilityRegistry;
 import helios.engine.scene.types;
 import helios.engine.scene.components;
@@ -26,13 +24,10 @@ import helios.engine.rendering.common.commands;
 import helios.engine.rendering.common.types;
 
 import helios.engine.rendering.renderTarget.types;
-import helios.engine.rendering.viewport.types;
 
 import helios.engine.rendering.renderTarget.components.RenderTargetBindingComponent;
 
 import helios.engine.spatial.components;
-
-import helios.engine.rendering.viewport.ViewportEntity;
 
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.concepts;
@@ -55,8 +50,6 @@ using namespace helios::engine::scene::concepts;
 using namespace helios::engine::scene::components;
 using namespace helios::ecs::components;
 using namespace helios::engine::rendering::common::components;
-using namespace helios::engine::rendering::viewport::concepts;
-using namespace helios::engine::rendering::viewport;
 using namespace helios::engine::rendering::renderTarget::components;
 using namespace helios::engine::scene::types;
 using namespace helios::ecs::common::concepts;
@@ -67,7 +60,6 @@ using namespace helios::engine::rendering::common::components;
 using namespace helios::ecs;
 using namespace helios::engine::runtime::world;
 using namespace helios::engine::rendering::renderTarget::types;
-using namespace helios::engine::rendering::viewport::types;
 
 #define HELIOS_LOG_SCOPE "helios::engine::scene::systems::SceneRenderSystem"
 export namespace helios::engine::scene::systems {
@@ -85,12 +77,20 @@ export namespace helios::engine::scene::systems {
      */
     template<
         typename TMemberHandle,
-        typename TSubmissionMode
+        typename TSubmissionMode,
+        typename TRenderHandles
     >
     requires (std::is_same_v<TSubmissionMode, Instanced> || std::is_same_v<TSubmissionMode, NonInstanced>)
     class SceneRenderSystem {
 
-        using SceneMemberVisibilityRegistry = SceneMemberVisibilityRegistry<TMemberHandle, TSubmissionMode>;
+        using SceneMemberVisibilityRegistry = SceneMemberVisibilityRegistry<TMemberHandle, TSubmissionMode, TRenderHandles>;
+        using SceneMemberVisibilityContext = SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode, TRenderHandles>;
+        using RenderSceneMemberCommand = RenderSceneMemberCommand<TMemberHandle, TRenderHandles>;
+        using SceneMemberRenderContext = SceneMemberRenderContext<TMemberHandle, TRenderHandles>;
+        using RenderInstanceBatchCommand = RenderInstanceBatchCommand<TMemberHandle, TRenderHandles>;
+        using RenderInstanceBatchContext = InstanceRenderBatchContext<TMemberHandle, TRenderHandles>;
+        using RenderSceneCommand = RenderSceneCommand<TMemberHandle, TRenderHandles>;
+        using RenderPrototypeComponent = RenderPrototypeComponent<TMemberHandle, TSubmissionMode, TRenderHandles>;
 
         static inline auto& logger_ = helios::core::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
 
@@ -109,7 +109,7 @@ export namespace helios::engine::scene::systems {
         template<typename TCommandBuffer>
         void dispatchNonInstancedRenderCommands(
             UpdateContext& updateContext,
-             std::span<const std::vector<SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>>> visibilityContexts,
+             std::span<const std::vector<SceneMemberVisibilityContext>> visibilityContexts,
              TCommandBuffer& cmdBuffer) requires std::is_same_v<TSubmissionMode, NonInstanced>  {
 
 
@@ -123,10 +123,10 @@ export namespace helios::engine::scene::systems {
                     const auto entity = updateContext.find<TMemberHandle>(memberContext.memberHandle);
                     assert(entity && "Unexpected missing entity");
 
-                    const auto* renderPrototype = entity->template get<RenderPrototypeComponent<TMemberHandle, TSubmissionMode>>();
+                    const auto* renderPrototype = entity->template get<RenderPrototypeComponent>();
                     assert(renderPrototype && "Unexpected missing RenderPrototypeComponent");
 
-                    cmdBuffer.template add<RenderSceneMemberCommand<TMemberHandle>>(SceneMemberRenderContext<TMemberHandle>{
+                    cmdBuffer.template add<RenderSceneMemberCommand>(SceneMemberRenderContext{
                         memberContext.memberHandle,
                         renderTargetHandle,
                         viewportHandle,
@@ -155,10 +155,10 @@ export namespace helios::engine::scene::systems {
         template<typename TCommandBuffer>
         void dispatchInstancedRenderCommands (
             UpdateContext& updateContext,
-            std::span<const std::vector<SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>>> visibilityContexts,
+            std::span<const std::vector<SceneMemberVisibilityContext>> visibilityContexts,
             TCommandBuffer& cmdBuffer) requires std::is_same_v<TSubmissionMode, Instanced> {
 
-            std::optional<InstanceRenderBatchContext<TMemberHandle>> renderBatchContext;
+            std::optional<RenderInstanceBatchContext> renderBatchContext;
 
             auto flushCurrentBatch = [&]() {
                 if (!renderBatchContext || renderBatchContext->memberHandles.empty()) {
@@ -166,7 +166,7 @@ export namespace helios::engine::scene::systems {
                     return;
                 }
 
-                cmdBuffer.template add<RenderInstanceBatchCommand<TMemberHandle>>(
+                cmdBuffer.template add<RenderInstanceBatchCommand>(
                     std::move(*renderBatchContext)
                 );
 
@@ -183,7 +183,7 @@ export namespace helios::engine::scene::systems {
                     const auto entity = updateContext.find<TMemberHandle>(memberContext.memberHandle);
                     assert(entity && "Unexpected missing entity");
 
-                    const auto* renderPrototype = entity->template get<RenderPrototypeComponent<TMemberHandle, Instanced>>();
+                    const auto* renderPrototype = entity->template get<RenderPrototypeComponent>();
                     assert(renderPrototype && "Unexpected missing RenderPrototypeComponent");
 
                     if (!renderBatchContext ||
@@ -226,9 +226,9 @@ export namespace helios::engine::scene::systems {
 
 
         using CommandBuffer = ecs::command::TypedCommandBuffer<
-            RenderSceneCommand<TMemberHandle>,
-            RenderSceneMemberCommand<TMemberHandle>,
-            RenderInstanceBatchCommand<TMemberHandle>
+            RenderSceneCommand,
+            RenderSceneMemberCommand,
+            RenderInstanceBatchCommand
         >;
 
         SceneRenderSystem() = default;
@@ -247,7 +247,9 @@ export namespace helios::engine::scene::systems {
 
             for (auto sceneRenderContexts = visibilityRegistry.sceneRenderContexts();
                 auto& sceneRenderContext : sceneRenderContexts) {
-                cmdBuffer.template add<RenderSceneCommand<TMemberHandle>>(sceneRenderContext);
+                cmdBuffer.template add<RenderSceneCommand>(
+                    sceneRenderContext
+                );
             }
 
             const auto members = visibilityRegistry.visibleMembers();

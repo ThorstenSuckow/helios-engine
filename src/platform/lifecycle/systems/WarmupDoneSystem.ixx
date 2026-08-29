@@ -21,7 +21,6 @@ import helios.engine.rendering;
 import helios.engine.state;
 
 using namespace helios::engine::runtime::enginestate::types;
-using namespace helios::engine::rendering::shader::concepts;
 using namespace helios::engine::rendering::shader::types;
 using namespace helios::ecs::common::concepts;
 using namespace helios::ecs::command;
@@ -38,7 +37,11 @@ export namespace helios::engine::platform::lifecycle::systems {
     /**
      * @brief Signals warmup completion through a typed state command buffer.
      */
+    template<typename TRenderHandles>
     class WarmupDoneSystem {
+
+        using ShaderHandle = typename TRenderHandles::ShaderHandle;
+        using TextureHandle = typename TRenderHandles::TextureHandle;
 
     public:
 
@@ -57,8 +60,8 @@ export namespace helios::engine::platform::lifecycle::systems {
                 ShaderSourceComponent<ShaderHandle>
                 >().withActive().empty() &&
                 updateContext.template view<
-                rendering::texture::types::TextureHandle,
-                rendering::texture::components::TextureSourceComponent<rendering::texture::types::TextureHandle>
+                TextureHandle,
+                rendering::texture::components::TextureSourceComponent<TextureHandle>
                 >().withActive().empty()
                 ) {
 

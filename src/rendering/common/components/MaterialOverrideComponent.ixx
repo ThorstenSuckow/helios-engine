@@ -6,39 +6,12 @@ module;
 
 export module helios.engine.rendering.common.components.MaterialOverrideComponent;
 
-import helios.engine.rendering.material;
+import helios.ecs.component.components;
 
-using namespace helios::engine::rendering::material;
-using namespace helios::engine::rendering::material::types;
 export namespace helios::engine::rendering::common::components {
 
-    /**
-     * @brief Component that stores a replacement material handle.
-     *
-     * @tparam THandle Owning entity handle type.
-     */
-    template<typename THandle>
-    class MaterialOverrideComponent {
+    struct MaterialOverrideComponentDomainTag;
+    template<typename TOwnerHandle, typename TMaterialHandle>
+    using MaterialOverrideComponent = ecs::components::BindingComponent<TOwnerHandle, TMaterialHandle,MaterialOverrideComponentDomainTag>;
 
-
-        MaterialHandle materialHandle_{};
-
-
-    public:
-
-        /**
-         * @brief Constructs the component from a material handle.
-         *
-         * @param materialHandle Override material handle.
-         */
-        explicit MaterialOverrideComponent(const MaterialHandle materialHandle)
-            : materialHandle_(materialHandle) {}
-
-        /** @brief Returns the stored override material handle. */
-        [[nodiscard]] MaterialHandle materialHandle() const noexcept {
-            return materialHandle_;
-        }
-
-    };
-
-}
+};

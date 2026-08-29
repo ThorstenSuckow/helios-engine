@@ -7,20 +7,13 @@ module;
 
 export module helios.engine.scene.components.SceneMemberComponent;
 
-import helios.engine.scene.types.SceneHandle;
-
 import helios.ecs.component;
 
-using namespace helios::engine::scene::types;
 using namespace helios::ecs::components;
 export namespace helios::engine::scene::components {
 
-    /**
-     * @brief Marks an owning entity as a member of a scene.
-     *
-     * @tparam TOwnerHandle Owning entity handle type.
-     */
-    template<typename TOwnerHandle>
-    using SceneMemberComponent = BindingComponent<TOwnerHandle, SceneHandle>;
+    struct SceneMemberComponentTag;
+    template<typename TOwnerHandle, typename TTargetHandle>
+    using SceneMemberComponent = BindingComponent<TOwnerHandle, TTargetHandle, SceneMemberComponentTag>;
 
 }

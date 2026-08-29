@@ -9,9 +9,6 @@ module;
 
 export module helios.engine.rendering.texture.systems:TextureUploadSystem;
 
-import helios.engine.rendering.texture.types;
-
-import helios.engine.rendering.texture.concepts;
 import helios.engine.rendering.texture.commands;
 import helios.engine.rendering.texture.components;
 

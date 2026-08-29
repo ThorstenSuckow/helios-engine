@@ -4,13 +4,12 @@
  */
 module;
 
-
+#include <memory>
 
 export module helios.engine.rendering.common.commands.RenderSceneCommand;
 
 import helios.engine.scene.types.SceneRenderContext;
 
-using namespace helios::engine::scene::types;
 export namespace helios::engine::rendering::common::commands {
 
 
@@ -19,11 +18,11 @@ export namespace helios::engine::rendering::common::commands {
      *
      * @tparam THandle Scene member handle type.
      */
-    template<typename THandle>
+    template<typename THandle, typename TRenderHandles>
     struct RenderSceneCommand {
 
         /** @brief Render context for the submitted scene. */
-        const SceneRenderContext<THandle> sceneRenderContext;
+        const scene::types::SceneRenderContext<THandle, TRenderHandles> sceneRenderContext;
 
     };
 

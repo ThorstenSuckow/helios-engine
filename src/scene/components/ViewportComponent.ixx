@@ -9,11 +9,9 @@ export module helios.engine.scene.components.ViewportComponent;
 
 import helios.ecs.common.types;
 import helios.engine.scene.types;
-import helios.engine.rendering.viewport.types;
 
 using namespace helios::ecs::common::types;
 using namespace helios::engine::scene::types;
-using namespace helios::engine::rendering::viewport::types;
 export namespace helios::engine::scene::components {
 
     /**
@@ -21,8 +19,11 @@ export namespace helios::engine::scene::components {
      *
      * @tparam THandle Camera entity handle type.
      */
-    template<typename THandle>
+    template<typename THandle, typename TRenderHandles>
     class ViewportComponent {
+
+        using SceneHandle = typename TRenderHandles::SceneHandle;
+        using ViewportHandle = typename TRenderHandles::ViewportHandle;
 
         SceneHandle sceneHandle_{};
 

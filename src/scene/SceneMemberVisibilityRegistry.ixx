@@ -14,10 +14,8 @@ export module helios.engine.scene.SceneMemberVisibilityRegistry;
 import helios.engine.scene.types;
 
 import helios.engine.rendering.common.types;
-import helios.engine.rendering.viewport.types;
 import helios.engine.rendering.renderTarget.types;
 
-using namespace helios::engine::rendering::viewport::types;
 using namespace helios::engine::rendering::common::types;
 using namespace helios::engine::scene::types;
 using namespace helios::engine::rendering::common::types;
@@ -41,9 +39,13 @@ export namespace helios::engine::scene {
      * @tparam TMemberHandle Handle type used to reference scene members.
      * @tparam TSubmissionMode Submission mode (`Instanced` oder `NonInstanced`).
      */
-    template<typename TMemberHandle, typename TSubmissionMode>
+    template<typename TMemberHandle, typename TSubmissionMode, typename TRenderHandles>
     class SceneMemberVisibilityRegistry {
 
+
+        using ViewportHandle = typename TRenderHandles::ViewportHandle;
+
+        using SceneMemberVisibilityContext = SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode, TRenderHandles>;
 
         struct RenderTargetViewportSceneKey {
             std::uint32_t a;
@@ -55,10 +57,10 @@ export namespace helios::engine::scene {
 
         std::vector<RenderTargetViewportSceneKey> renderTargetViewportSceneKeys_;
 
-        std::vector<std::vector<SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>>> visibilityContexts_;
-        std::vector<std::vector<SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>>> culledContexts_;
+        std::vector<std::vector<SceneMemberVisibilityContext>> visibilityContexts_;
+        std::vector<std::vector<SceneMemberVisibilityContext>> culledContexts_;
 
-        std::vector<SceneRenderContext<TMemberHandle>> sceneRenderContexts_;
+        std::vector<SceneRenderContext<TMemberHandle, TRenderHandles>> sceneRenderContexts_;
 
 
     public:
@@ -85,7 +87,7 @@ export namespace helios::engine::scene {
          * @brief Adds a scene render context if it is not already present.
          * @param context Render context to insert.
          */
-        void addSceneRenderContext(SceneRenderContext<TMemberHandle>&& context) {
+        void addSceneRenderContext(SceneRenderContext<TMemberHandle, TRenderHandles>&& context) {
 
             for (const auto& existingContext : sceneRenderContexts_) {
                 if (existingContext == context) {
@@ -99,7 +101,7 @@ export namespace helios::engine::scene {
         /**
          * @brief Returns all registered scene render contexts.
          */
-        [[nodiscard]] std::span<const SceneRenderContext<TMemberHandle>> sceneRenderContexts() const noexcept {
+        [[nodiscard]] std::span<const SceneRenderContext<TMemberHandle, TRenderHandles>> sceneRenderContexts() const noexcept {
             return sceneRenderContexts_;
         }
 
@@ -111,7 +113,7 @@ export namespace helios::engine::scene {
          * @param viewportHandle Target viewport.
          * @param context Visibility context to append.
          */
-        void addCulledMember(const ViewportHandle viewportHandle, SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>&& context) {
+        void addCulledMember(const ViewportHandle viewportHandle, SceneMemberVisibilityContext&& context) {
             const auto idx = viewportHandle.entityId();
             if (culledContexts_.size() <= idx) {
                 culledContexts_.resize(idx + 1);
@@ -127,7 +129,7 @@ export namespace helios::engine::scene {
          * @param viewportHandle Target viewport.
          * @param context Visibility context to append.
          */
-        void addVisibleMember(const ViewportHandle viewportHandle, SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>&& context) {
+        void addVisibleMember(const ViewportHandle viewportHandle, SceneMemberVisibilityContext&& context) {
             const auto idx = viewportHandle.entityId();
             if (visibilityContexts_.size() <= idx) {
                 visibilityContexts_.resize(idx + 1);
@@ -141,7 +143,7 @@ export namespace helios::engine::scene {
          * @tparam TSubmissionMode Submission mode (`Instanced` or `NonInstanced`).
          * @param viewportHandle Viewport to query.
          */
-        [[nodiscard]] std::span<SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>> culledMembers(const ViewportHandle viewportHandle = {})  {
+        [[nodiscard]] std::span<SceneMemberVisibilityContext> culledMembers(const ViewportHandle viewportHandle = {})  {
             const auto idx = viewportHandle.entityId();
             if (idx >= culledContexts_.size()) {
                 return {};
@@ -153,7 +155,7 @@ export namespace helios::engine::scene {
          * @brief Returns culled member context buckets for all viewports.
          * @tparam TSubmissionMode Submission mode (`Instanced` or `NonInstanced`).
          */
-        [[nodiscard]] std::span<std::vector<SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>>> culledMembers() const {
+        [[nodiscard]] std::span<std::vector<SceneMemberVisibilityContext>> culledMembers() const {
             return culledContexts_;
         }
 
@@ -162,7 +164,7 @@ export namespace helios::engine::scene {
          * @tparam TSubmissionMode Submission mode (`Instanced` or `NonInstanced`).
          * @param viewportHandle Viewport to query.
          */
-        [[nodiscard]] std::span<const SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>> visibleMembers(const ViewportHandle viewportHandle) const noexcept {
+        [[nodiscard]] std::span<const SceneMemberVisibilityContext> visibleMembers(const ViewportHandle viewportHandle) const noexcept {
             const auto idx = viewportHandle.entityId();
             if (idx >= visibilityContexts_.size()) {
                 return {};
@@ -174,7 +176,7 @@ export namespace helios::engine::scene {
          * @brief Returns visible member context buckets for all viewports.
          * @tparam TSubmissionMode Submission mode (`Instanced` or `NonInstanced`).
          */
-        [[nodiscard]] std::span<const std::vector<SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>>> visibleMembers() const noexcept {
+        [[nodiscard]] std::span<const std::vector<SceneMemberVisibilityContext>> visibleMembers() const noexcept {
             return visibilityContexts_;
         }
 

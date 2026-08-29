@@ -8,10 +8,6 @@ module;
 
 export module helios.engine.rendering.shader.commands.ShaderBatchCompileCommand;
 
-import helios.engine.rendering.shader.types.ShaderHandle;
-import helios.engine.rendering.shader.concepts.IsShaderHandle;
-
-using namespace helios::engine::rendering::shader::concepts;
 export namespace helios::engine::rendering::shader::commands {
 
     /**
@@ -20,7 +16,6 @@ export namespace helios::engine::rendering::shader::commands {
      * @tparam THandle Shader handle type.
      */
     template<typename THandle>
-    requires IsShaderHandle<THandle>
     struct ShaderBatchCompileCommand {
         std::vector<THandle> shaderHandles{};
     };

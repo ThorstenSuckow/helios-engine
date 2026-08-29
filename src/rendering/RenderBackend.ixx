@@ -21,7 +21,7 @@ export namespace helios::engine::rendering {
 
         using EntityHandleValue = helios::ecs::common::types::EntityHandleValue;
         using EcsDataContainer = helios::ecs::common::container::EcsDataContainer;
-        using DrawContext = helios::engine::rendering::common::types::DrawContext;
+        using DrawData = helios::engine::rendering::common::types::DrawData;
         using InstanceData = helios::engine::rendering::common::types::InstanceData;
         using RenderData = helios::engine::rendering::common::types::RenderData;
 
@@ -49,7 +49,7 @@ export namespace helios::engine::rendering {
             virtual void beginMeshBatch(const RenderData& renderData) noexcept = 0;
             virtual void endMeshBatch() noexcept = 0;
 
-            virtual void renderBatch(std::span<const DrawContext> sceneMemberRenderContexts) noexcept = 0;
+            virtual void renderBatch(std::span<const DrawData> drawData) noexcept = 0;
 
             virtual void renderBatch(std::span<const InstanceData> instanceData) noexcept = 0;
 
@@ -126,8 +126,8 @@ export namespace helios::engine::rendering {
                 concreteBackend_.endMeshBatch();
             }
             
-            void renderBatch(std::span<const DrawContext> sceneMemberRenderContexts) noexcept override {
-                concreteBackend_.renderBatch(sceneMemberRenderContexts);
+            void renderBatch(std::span<const DrawData> drawData) noexcept override {
+                concreteBackend_.renderBatch(drawData);
             }
 
             void renderBatch(std::span<const InstanceData> instanceData) noexcept override {
@@ -200,8 +200,8 @@ export namespace helios::engine::rendering {
             model_->endMeshBatch();
         }
 
-        void renderBatch(std::span<const DrawContext> drawContexts) {
-            model_->renderBatch(drawContexts);
+        void renderBatch(std::span<const DrawData> drawData) {
+            model_->renderBatch(drawData);
         }
 
         void renderBatch(std::span<const InstanceData> instanceData) {

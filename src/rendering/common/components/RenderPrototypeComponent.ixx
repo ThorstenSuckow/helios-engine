@@ -6,18 +6,8 @@ module;
 
 export module helios.engine.rendering.common.components.RenderPrototypeComponent;
 
-import helios.engine.rendering.mesh;
-import helios.engine.rendering.shader;
-import helios.engine.rendering.material;
-import helios.engine.rendering.texture;
+import helios.ecs;
 
-
-using namespace helios::engine::rendering::mesh::types;
-using namespace helios::engine::rendering::shader::types;
-using namespace helios::engine::rendering::material::types;
-using namespace helios::engine::rendering::mesh;
-using namespace helios::engine::rendering::shader;
-using namespace helios::engine::rendering::material;
 export namespace helios::engine::rendering::common::components {
 
     /**
@@ -25,16 +15,23 @@ export namespace helios::engine::rendering::common::components {
      *
      * @tparam TOwnerHandle Owning entity handle type.
      */
-    template<typename TOwnerHandle, typename TSubmissionMode>
+    template<typename TOwnerHandle, typename TSubmissionMode, typename TRenderHandles>
     class RenderPrototypeComponent {
 
+        using ShaderHandle = typename TRenderHandles::ShaderHandle;
+        using MaterialHandle = typename TRenderHandles::MaterialHandle;
+        using MeshHandle = typename TRenderHandles::MeshHandle;
+        using TextureHandle = typename TRenderHandles::TextureHandle;
+
         ShaderHandle shaderHandle_;
-
         MaterialHandle materialHandle_;
-
         MeshHandle meshHandle_;
+        TextureHandle textureHandle_;
 
-        texture::types::TextureHandle textureHandle_;
+        using ShaderEntity = ecs::Entity<ecs::EntityManager<ShaderHandle>>;
+        using MaterialEntity = ecs::Entity<ecs::EntityManager<MaterialHandle>>;
+        using MeshEntity = ecs::Entity<ecs::EntityManager<MeshHandle>>;
+        using TextureEntity = ecs::Entity<ecs::EntityManager<TextureHandle>>;
 
     public:
 
@@ -50,7 +47,7 @@ export namespace helios::engine::rendering::common::components {
             const ShaderHandle shaderHandle,
             const MaterialHandle materialHandle,
             const MeshHandle meshHandle,
-            const texture::types::TextureHandle textureHandle = {}
+            const TextureHandle textureHandle = {}
         )
             : shaderHandle_(shaderHandle),
               materialHandle_(materialHandle),
@@ -68,7 +65,7 @@ export namespace helios::engine::rendering::common::components {
             const ShaderEntity shader,
             const MaterialEntity material,
             const MeshEntity mesh,
-            const texture::TextureEntity texture
+            const TextureEntity texture
         )
             : shaderHandle_(shader.handle()),
               materialHandle_(material.handle()),
@@ -107,7 +104,7 @@ export namespace helios::engine::rendering::common::components {
          *
          * @return Texture resource handle.
          */
-        [[nodiscard]] texture::types::TextureHandle textureHandle() const noexcept {
+        [[nodiscard]] TextureHandle textureHandle() const noexcept {
             return textureHandle_;
         }
 
@@ -143,7 +140,7 @@ export namespace helios::engine::rendering::common::components {
          *
          * @param textureHandle Texture resource handle.
          */
-        void setTextureHandle(const texture::types::TextureHandle textureHandle) noexcept {
+        void setTextureHandle(const TextureHandle textureHandle) noexcept {
             textureHandle_ = textureHandle;
         }
 

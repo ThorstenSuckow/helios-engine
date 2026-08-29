@@ -14,8 +14,6 @@ module;
 
 export module helios.engine.scene.systems.SceneMemberVisibilitySystem;
 
-import helios.engine.rendering.viewport.concepts.IsViewportHandle;
-
 import helios.engine.scene.SceneMemberVisibilityRegistry;
 import helios.engine.scene.types;
 import helios.engine.scene.components;
@@ -29,17 +27,10 @@ import helios.engine.rendering.renderTarget.components.RenderTargetBindingCompon
 
 import helios.engine.spatial.components;
 
-import helios.engine.rendering.viewport.types;
-import helios.engine.rendering.viewport.ViewportEntity;
-
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.concepts;
-import helios.ecs.command.NullCommandBuffer;
-import helios.ecs.common.concepts;
 
-
-import helios.ecs.component;
-
+import helios.ecs;
 
 import helios.core.log;
 
@@ -53,9 +44,6 @@ using namespace helios::engine::scene::concepts;
 using namespace helios::engine::scene::components;
 using namespace helios::ecs::components;
 using namespace helios::engine::rendering::common::components;
-using namespace helios::engine::rendering::viewport::concepts;
-using namespace helios::engine::rendering::viewport;
-using namespace helios::engine::rendering::viewport::types;
 using namespace helios::engine::rendering::renderTarget::components;
 using namespace helios::engine::scene::types;
 using namespace helios::ecs::common::concepts;
@@ -84,12 +72,22 @@ export namespace helios::engine::scene::systems {
     template<
         typename TMemberHandle,
         typename TSubmissionMode,
-        typename TCullingStrategy
+        typename TCullingStrategy,
+        typename TRenderHandles
     >
     requires IsFrustumCullerLike<TCullingStrategy, typename TCullingStrategy::MemberHandle_type> &&
              std::same_as<typename TCullingStrategy::MemberHandle_type, TMemberHandle> &&
             (std::same_as<TSubmissionMode, Instanced> || std::same_as<TSubmissionMode, NonInstanced>)
     class SceneMemberVisibilitySystem {
+
+        using SceneMemberVisibilityRegistry = SceneMemberVisibilityRegistry<TMemberHandle, TSubmissionMode, TRenderHandles>;
+        using SceneMemberVisibilityContext = SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode, TRenderHandles>;
+
+        using SceneHandle = typename TRenderHandles::SceneHandle;
+        using CameraHandle = typename TRenderHandles::CameraHandle;
+        using ViewportHandle = typename TRenderHandles::ViewportHandle;
+        using RenderTargetHandle = typename TRenderHandles::RenderTargetHandle;
+        using ViewportEntity = ecs::Entity<EntityManager<ViewportHandle>>;
 
         /**
          * @brief Culling strategy used to decide member visibility per viewport.
@@ -114,9 +112,9 @@ export namespace helios::engine::scene::systems {
             UpdateContext& updateContext,
             CullingContext<TMemberHandle>& cullingContext,
             const SceneHandle sceneHandle,
-            const RenderTargetBindingComponent<ViewportHandle>& renderTargetBindingComponent,
+            const RenderTargetBindingComponent<ViewportHandle, RenderTargetHandle>& renderTargetBindingComponent,
             const ViewportEntity &viewportEntity,
-            SceneMemberVisibilityRegistry<TMemberHandle, TSubmissionMode>& visibilityRegistry
+            SceneMemberVisibilityRegistry& visibilityRegistry
         ) {
 
             for (auto [
@@ -127,8 +125,8 @@ export namespace helios::engine::scene::systems {
                 boundsWorld
                 ] : updateContext.view<
                 TMemberHandle,
-                SceneMemberComponent<TMemberHandle>,
-                RenderPrototypeComponent<TMemberHandle, TSubmissionMode>,
+                SceneMemberComponent<TMemberHandle, SceneHandle>,
+                RenderPrototypeComponent<TMemberHandle, TSubmissionMode, TRenderHandles>,
                 TransformComponent<TMemberHandle, World>,
                 BoundsComponent<TMemberHandle, World>
             >().withActive()) {
@@ -136,7 +134,7 @@ export namespace helios::engine::scene::systems {
                 cullingContext.bounds = boundsWorld->value();
                 cullingContext.handle = memberEntity.handle();
 
-                auto memberContext = SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode>{
+                auto memberContext = SceneMemberVisibilityContext{
                     memberEntity.handle(),
                     renderTargetBindingComponent.targetHandle(),
                     viewportEntity.handle(),
@@ -177,15 +175,15 @@ export namespace helios::engine::scene::systems {
          *
          * @param updateContext ECS/world update context.
          */
-        SceneMemberVisibilityRegistry<TMemberHandle, TSubmissionMode> update(UpdateContext& updateContext) noexcept {
+        SceneMemberVisibilityRegistry update(UpdateContext& updateContext) noexcept {
 
-            auto visibilityRegistry = SceneMemberVisibilityRegistry<TMemberHandle, TSubmissionMode>{};
+            auto visibilityRegistry = SceneMemberVisibilityRegistry{};
 
             for (auto [viewportEntity, renderTargetBindingComponent, sbc, cbc] : updateContext.template view<
                 ViewportHandle,
-                RenderTargetBindingComponent<ViewportHandle>,
-                SceneBindingComponent<ViewportHandle>,
-                CameraBindingComponent<ViewportHandle>
+                RenderTargetBindingComponent<ViewportHandle, RenderTargetHandle>,
+                SceneBindingComponent<ViewportHandle, SceneHandle>,
+                CameraBindingComponent<ViewportHandle, CameraHandle>
             >().withActive()) {
 
                 const auto sceneHandle  = sbc->targetHandle();
@@ -225,7 +223,9 @@ export namespace helios::engine::scene::systems {
                  * even if no members are visible. Otherwise the last frame's contents would remain in the framebuffer.
                  */
                 visibilityRegistry.addSceneRenderContext({
-                    renderTargetBindingComponent->targetHandle(), viewportEntity.handle(), sceneHandle
+                    renderTargetBindingComponent->targetHandle(),
+                    viewportEntity.handle(),
+                    sceneHandle
                 });
 
                 processMembers(

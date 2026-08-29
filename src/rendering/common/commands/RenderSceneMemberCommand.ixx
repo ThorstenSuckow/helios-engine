@@ -18,12 +18,13 @@ export namespace helios::engine::rendering::common::commands {
      * @brief Command that carries one scene-member render context.
      *
      * @tparam THandle Scene member handle type.
+     * @tparam TRenderHandles Render handle type.
      */
-    template<typename THandle>
+    template<typename THandle, typename TRenderHandles>
     struct RenderSceneMemberCommand {
 
         /** @brief Render context for the submitted scene member. */
-        const SceneMemberRenderContext<THandle> sceneMemberRenderContext;
+        const SceneMemberRenderContext<THandle, TRenderHandles> sceneMemberRenderContext;
 
     };
 

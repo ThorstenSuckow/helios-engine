@@ -7,24 +7,8 @@ module;
 
 export module helios.engine.scene.types.SceneMemberRenderContext;
 
-import helios.ecs.common.types;
-import helios.engine.scene.types.SceneHandle;
-import helios.engine.rendering.mesh.types;
-import helios.engine.rendering.material.types;
-import helios.engine.rendering.shader.types;
-import helios.engine.rendering.texture.types;
-import helios.engine.rendering.viewport.types;
-import helios.engine.rendering.renderTarget.types;
 import helios.math.types;
 
-using namespace helios::ecs::common::types;
-using namespace helios::engine::rendering::viewport::types;
-using namespace helios::engine::rendering::renderTarget::types;
-using namespace helios::engine::rendering::mesh::types;
-using namespace helios::engine::rendering::material::types;
-using namespace helios::engine::rendering::shader::types;
-using namespace helios::engine::rendering::texture::types;
-using namespace helios::engine::scene;
 
 export namespace helios::engine::scene::types {
 
@@ -33,7 +17,7 @@ export namespace helios::engine::scene::types {
      *
      * @tparam THandle Scene-member handle type (for example game-object handle).
      */
-    template<typename TMemberHandle>
+    template<typename TMemberHandle, typename TRenderHandles>
     struct SceneMemberRenderContext {
         /**
          * @brief Handle of the scene member origin entity.
@@ -41,25 +25,25 @@ export namespace helios::engine::scene::types {
         TMemberHandle memberHandle;
 
         /** @brief Target viewport for rendering. */
-        RenderTargetHandle renderTargetHandle;
+        typename TRenderHandles::RenderTargetHandle renderTargetHandle;
 
         /** @brief Target viewport for rendering. */
-        ViewportHandle viewportHandle;
+        typename TRenderHandles::ViewportHandle viewportHandle;
 
         /** @brief Owning scene handle. */
-        SceneHandle sceneHandle;
+        typename TRenderHandles::SceneHandle sceneHandle;
 
         /** @brief Mesh resource handle to render. */
-        MeshHandle meshHandle;
+        typename TRenderHandles::MeshHandle meshHandle;
 
         /** @brief Texture resource handle to apply. */
-        TextureHandle textureHandle;
+        typename TRenderHandles::TextureHandle textureHandle;
 
         /** @brief Material resource handle to apply. */
-        MaterialHandle materialHandle;
+        typename TRenderHandles::MaterialHandle materialHandle;
 
         /** @brief Shader resource handle used for draw submission. */
-        ShaderHandle shaderHandle;
+        typename TRenderHandles::ShaderHandle shaderHandle;
 
         /** @brief World transform used for rendering the scene member. */
         helios::math::mat4f worldMatrix;

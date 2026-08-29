@@ -16,13 +16,8 @@ export module helios.engine.rendering.RenderManager;
 import helios.engine.rendering.RenderDataResolver;
 import helios.engine.rendering.RenderBackend;
 
-import helios.engine.rendering.renderTarget.types.RenderTargetHandle;
-import helios.engine.rendering.viewport.types.ViewportHandle;
-import helios.engine.scene.types.SceneHandle;
-
 import helios.engine.scene.components;
 
-import helios.engine.rendering.texture.types;
 import helios.engine.rendering.common.commands;
 import helios.engine.rendering.common.types;
 import helios.engine.scene.types;
@@ -31,14 +26,11 @@ import helios.ecs;
 import helios.core.log;
 import helios.engine.runtime.world.UpdateContext;
 
-import helios.engine.rendering.common.concepts;
-
 import helios.engine.core.container;
 
 import helios.math;
 
 import helios.engine.rendering.mesh.types;
-import helios.engine.rendering.material.types;
 import helios.engine.rendering.shader.types;
 
 using namespace helios::engine::scene::components;
@@ -48,19 +40,11 @@ using namespace helios::ecs;
 using namespace helios::engine::rendering::common::commands;
 using namespace helios::engine::rendering::common::types;
 using namespace helios::engine::rendering::mesh::types;
-using namespace helios::engine::rendering::material::types;
 using namespace helios::engine::rendering::shader::types;
-using namespace helios::engine::rendering::viewport::types;
-using namespace helios::engine::rendering::texture::types;
-
-using namespace helios::engine::rendering::renderTarget::types;
-using namespace helios::engine::rendering::viewport::types;
 using namespace helios::engine::scene::types;
 using namespace helios::ecs::common::types;
 using namespace helios::engine::scene::types;
 using namespace helios::core::log;
-using namespace helios::engine::rendering::common::concepts;
-
 #define HELIOS_LOG_SCOPE "helios::engine::rendering::RenderManager"
 export namespace helios::engine::rendering {
 
@@ -69,8 +53,17 @@ export namespace helios::engine::rendering {
      *
      * @tparam TMemberHandle Renderable scene member handle type.
      */
-    template<typename ...TMemberHandles>
+    template<typename TRenderHandles, typename ...TMemberHandles>
     class RenderManager {
+
+        using RenderTargetHandle = TRenderHandles::RenderTargetHandle;
+        using ViewportHandle = TRenderHandles::ViewportHandle;
+        using SceneHandle = TRenderHandles::SceneHandle;
+        using TextureHandle = TRenderHandles::TextureHandle;
+        using MaterialHandle = TRenderHandles::MaterialHandle;
+        using ShaderHandle = TRenderHandles::ShaderHandle;
+        using MeshHandle = TRenderHandles::MeshHandle;
+
 
         /**
          * @brief Converts an entity handle to a batch index.
@@ -142,15 +135,15 @@ export namespace helios::engine::rendering {
         struct MeshBatch {
             bool isActive{false};
             MeshHandle handle;
-            std::vector<DrawContext> drawContexts;
+            std::vector<DrawData> drawData;
             std::vector<InstanceData> instanceData;
             MeshBatch() {
-                drawContexts.reserve(GAMEOBJECT_INITIAL_STORAGE_CAPACITY);
+                drawData.reserve(GAMEOBJECT_INITIAL_STORAGE_CAPACITY);
                // instanceData.reserve(DEFAULT_INSTANCE_DATA_CAPACITY);
             }
             void clear() {
                 isActive = false;
-                drawContexts.clear();
+                drawData.clear();
                 instanceData.clear();
             }
         };
@@ -393,7 +386,7 @@ export namespace helios::engine::rendering {
                                     }
 
 
-                                    renderBackend.renderBatch(meshBatch.drawContexts);
+                                    renderBackend.renderBatch(meshBatch.drawData);
                                     renderBackend.renderBatch(meshBatch.instanceData);
 
                                     renderBackend.endMeshBatch();
@@ -437,7 +430,7 @@ export namespace helios::engine::rendering {
          * @return `true` if the command was accepted.
          */
         template<typename TMemberHandle>
-        bool submit(RenderSceneCommand<TMemberHandle>&& renderSceneCommand) noexcept {
+        bool submit(RenderSceneCommand<TMemberHandle, TRenderHandles>&& renderSceneCommand) noexcept {
 
             std::ignore = ensureViewportBatch(
                 renderSceneCommand.sceneRenderContext.renderTargetHandle,
@@ -458,20 +451,13 @@ export namespace helios::engine::rendering {
          * @return `true` if the command was accepted.
          */
         template<typename TMemberHandle>
-        bool submit(RenderSceneMemberCommand<TMemberHandle>&& renderCommand) noexcept {
+        bool submit(RenderSceneMemberCommand<TMemberHandle, TRenderHandles>&& renderCommand) noexcept {
 
             auto renderContext = std::move(renderCommand.sceneMemberRenderContext);
 
             auto& meshBatch = meshBatchFor(renderContext);
 
-            meshBatch.drawContexts.push_back({
-                renderContext.renderTargetHandle,
-                renderContext.viewportHandle,
-                renderContext.sceneHandle,
-                renderContext.meshHandle,
-                renderContext.textureHandle,
-                renderContext.materialHandle,
-                renderContext.shaderHandle,
+            meshBatch.drawData.push_back({
                 renderContext.worldMatrix
             });
 
@@ -488,7 +474,7 @@ export namespace helios::engine::rendering {
          * @return `true` if the command was accepted.
          */
         template<typename TMemberHandle>
-        bool submit(RenderInstanceBatchCommand<TMemberHandle>&& renderCommand) noexcept {
+        bool submit(RenderInstanceBatchCommand<TMemberHandle, TRenderHandles>&& renderCommand) noexcept {
 
             auto renderContext = std::move(renderCommand.instanceRenderBatchContext);
 
@@ -513,9 +499,9 @@ export namespace helios::engine::rendering {
         bool init(ecs::command::CommandHandlerRegistry& commandHandlerRegistry) noexcept {
 
             (commandHandlerRegistry.template handleCommands<
-                RenderSceneMemberCommand<TMemberHandles>,
-                RenderInstanceBatchCommand<TMemberHandles>,
-                RenderSceneCommand<TMemberHandles>
+                RenderSceneMemberCommand<TMemberHandles, TRenderHandles>,
+                RenderInstanceBatchCommand<TMemberHandles, TRenderHandles>,
+                RenderSceneCommand<TMemberHandles, TRenderHandles>
             >(*this), ...);
 
             return true;

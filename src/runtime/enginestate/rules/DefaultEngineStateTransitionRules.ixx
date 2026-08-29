@@ -20,10 +20,8 @@ import helios.engine.runtime.enginestate.rules.guards;
 import helios.engine.runtime.enginestate.EngineStateBindings;
 import helios.engine.state.types.StateTransitionRule;
 import helios.engine.state.types.StateTransitionId;
-import helios.engine.rendering.shader.types.ShaderHandle;
 
 using namespace helios::engine::state::types;
-using namespace helios::engine::rendering::shader::types;
 using namespace helios::engine::runtime::world;
 using namespace helios::engine::runtime::enginestate::rules::guards;
 export namespace helios::engine::runtime::enginestate::rules {

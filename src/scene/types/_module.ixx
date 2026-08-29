@@ -10,8 +10,4 @@ export import helios.engine.scene.types.CullingContext;
 export import helios.engine.scene.types.SceneMemberRenderContext;
 export import helios.engine.scene.types.SceneMemberVisibilityContext;
 export import helios.engine.scene.types.SceneRenderContext;
-export import helios.engine.scene.types.CameraDomainTag;
-export import helios.engine.scene.types.CameraHandle;
-export import helios.engine.scene.types.SceneDomainTag;
-export import helios.engine.scene.types.SceneHandle;
 export import helios.engine.scene.types.InstanceRenderBatchContext;

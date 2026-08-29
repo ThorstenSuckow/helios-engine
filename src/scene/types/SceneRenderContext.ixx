@@ -7,37 +7,26 @@ module;
 
 export module helios.engine.scene.types.SceneRenderContext;
 
-import helios.ecs.common.types;
-import helios.engine.scene.types.SceneHandle;
-import helios.engine.rendering.viewport.types;
-import helios.engine.rendering.renderTarget.types;
-import helios.math.types;
-
-using namespace helios::ecs::common::types;
-using namespace helios::engine::rendering::viewport::types;
-using namespace helios::engine::rendering::renderTarget::types;
-using namespace helios::engine::scene;
 
 export namespace helios::engine::scene::types {
 
     /**
-     * @brief Immutable render context for a viewport, representing a scene.
-     *
-     * @tparam THandle Scene handle type (for example game-object handle).
+     * @brief Render context for a viewport, representing a scene.
      */
-    template<typename TMemberHandle>
+    template<typename TMemberHandle, typename TRenderHandles>
     struct SceneRenderContext {
 
-        /** @brief Render target for rendering. */
+        using RenderTargetHandle = typename TRenderHandles::RenderTargetHandle;
+        using ViewportHandle = typename TRenderHandles::ViewportHandle;
+        using SceneHandle = typename TRenderHandles::SceneHandle;
+
         RenderTargetHandle renderTargetHandle;
 
-        /** @brief Target viewport for rendering. */
         ViewportHandle viewportHandle;
 
-        /** @brief Owning scene handle. */
         SceneHandle sceneHandle;
 
-        friend bool operator==(const SceneRenderContext<TMemberHandle>&, const SceneRenderContext<TMemberHandle>&) = default;
+        friend bool operator==(const SceneRenderContext&, const SceneRenderContext&) = default;
     };
 
 }

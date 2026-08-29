@@ -20,14 +20,14 @@ export namespace helios::engine::rendering::common::commands {
      *
      * @tparam THandle Scene member/entity handle type.
      */
-    template<typename THandle>
+    template<typename THandle, typename TRenderHandles>
     struct RenderInstanceBatchCommand {
 
 
         /**
          * @brief Instance batch context consumed by `RenderManager`.
          */
-        InstanceRenderBatchContext<THandle> instanceRenderBatchContext;
+        InstanceRenderBatchContext<THandle, TRenderHandles> instanceRenderBatchContext;
 
     };
 

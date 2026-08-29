@@ -43,12 +43,12 @@ export namespace helios::engine::rendering {
         template<typename TConcreteDataResolver>
         class Model final: public Concept {
 
-            using RenderTargetHandleType = TConcreteDataResolver::RenderTargetHandleType;
-            using MaterialHandleType = TConcreteDataResolver::MaterialHandleType;
-            using MeshHandleType = TConcreteDataResolver::MeshHandleType;
-            using TextureHandleType = TConcreteDataResolver::TextureHandleType;
-            using ShaderHandleType = TConcreteDataResolver::ShaderHandleType;
-            using ViewportHandleType = TConcreteDataResolver::ViewportHandleType;
+            using RenderTargetHandleType = TConcreteDataResolver::RenderTargetHandle;
+            using MaterialHandleType = TConcreteDataResolver::MaterialHandle;
+            using MeshHandleType = TConcreteDataResolver::MeshHandle;
+            using TextureHandleType = TConcreteDataResolver::TextureHandle;
+            using ShaderHandleType = TConcreteDataResolver::ShaderHandle;
+            using ViewportHandleType = TConcreteDataResolver::ViewportHandle;
 
 
             TConcreteDataResolver dataResolver_;

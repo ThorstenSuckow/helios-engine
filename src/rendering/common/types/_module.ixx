@@ -8,6 +8,7 @@ export import helios.engine.rendering.common.types.submissionModes;
 
 export import helios.engine.rendering.common.types.ClearFlags;
 export import helios.engine.rendering.common.types.DrawContext;
+export import helios.engine.rendering.common.types.DrawData;
 export import helios.engine.rendering.common.types.Vertex;
 export import helios.engine.rendering.common.types.InstanceData;
 

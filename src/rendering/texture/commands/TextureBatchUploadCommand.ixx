@@ -8,9 +8,6 @@ module;
 
 export module helios.engine.rendering.texture.commands:TextureBatchUploadCommand;
 
-import helios.engine.rendering.texture.types;
-import helios.engine.rendering.texture.concepts;
-
 export namespace helios::engine::rendering::texture::commands {
 
     /**

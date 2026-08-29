@@ -8,9 +8,6 @@ module;
 
 export module helios.engine.rendering.texture.components:TextureSourceComponent;
 
-import helios.engine.rendering.texture.concepts;
-
-
 export namespace helios::engine::rendering::texture::components {
 
     /**
@@ -19,7 +16,6 @@ export namespace helios::engine::rendering::texture::components {
      * @tparam THandle Texture handle type.
      */
     template<typename THandle>
-    requires texture::concepts::IsTextureHandle<THandle>
     struct TextureSourceComponent {
 
         /**

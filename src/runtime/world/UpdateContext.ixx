@@ -6,6 +6,7 @@ module;
 
 #include <span>
 #include <cassert>
+#include <utility>
 
 export module helios.engine.runtime.world.UpdateContext;
 
@@ -192,7 +193,7 @@ export namespace helios::engine::runtime::world {
          * @return Pointer to the sparse set for the specified handle and component types.
          */
         template <typename THandle, typename TComponent>
-        [[nodiscard]] const auto* sparseSet() const {
+        [[nodiscard]] auto* sparseSet() const {
             return ecsWorld_.template sparseSet<THandle, TComponent>();
         }
 
@@ -208,7 +209,7 @@ export namespace helios::engine::runtime::world {
          */
         template <typename THandle>
         [[nodiscard]] bool isValid(THandle handle) const {
-            return ecsWorld_.template isValid<THandle>(handle);
+            return ecsWorld_.isValid<THandle>(handle);
         }
 
         /**

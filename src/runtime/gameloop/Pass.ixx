@@ -268,7 +268,7 @@ export namespace helios::engine::runtime::gameloop {
         requires (ecs::system::concepts::IsCallableSystem<std::remove_cvref_t<TSystem>> && ...)
            && (sizeof...(TSystem) >= 2)
         Pass& addParallelSystems(TSystem&&... system) {
-            (registerCallableSystem(std::forward<TSystem>(system)), ...);
+            (registerCallOperatorSystem<std::remove_cvref_t<TSystem>>(std::forward<TSystem>(system)), ...);
 
             auto& group = systemTypeIdQueue_.emplace_back();
             group.reserve(sizeof...(TSystem));

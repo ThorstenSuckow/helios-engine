@@ -10,11 +10,7 @@ export module helios.engine.platform.window.commands.WindowCreateCommand;
 
 import helios.engine.platform.window.types.WindowConfig;
 
-import helios.engine.platform.window.types.WindowHandle;
-import helios.engine.platform.window.concepts.IsWindowHandle;
-
 using namespace helios::engine::platform::window::types;
-using namespace helios::engine::platform::window::concepts;
 export namespace helios::engine::platform::window::commands {
 
     /**
@@ -23,7 +19,6 @@ export namespace helios::engine::platform::window::commands {
      * @tparam THandle Window handle type.
      */
     template<typename THandle>
-    requires IsWindowHandle<THandle>
     struct WindowCreateCommand {
         /** @brief Target window entity handle. */
         THandle windowHandle;

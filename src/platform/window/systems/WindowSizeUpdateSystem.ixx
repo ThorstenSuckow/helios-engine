@@ -12,7 +12,6 @@ import helios.engine.runtime.concepts;
 
 import helios.engine.platform.window.components;
 import helios.ecs.component;
-import helios.engine.platform.window.concepts.IsWindowHandle;
 
 import helios.engine.rendering.renderTarget;
 
@@ -24,7 +23,6 @@ using namespace helios::engine::spatial::components;
 using namespace helios::engine::rendering::renderTarget::components;
 using namespace helios::engine::rendering::renderTarget::types;
 
-using namespace helios::engine::platform::window::concepts;
 using namespace helios::engine::runtime::world;
 using namespace helios::engine::platform::window::components;
 using namespace helios::ecs::components;
@@ -38,7 +36,6 @@ export namespace helios::engine::platform::window::systems {
      * @tparam TMemberHandle Window entity handle type.
      */
     template<typename TMemberHandle>
-    requires IsWindowHandle<TMemberHandle>
     class WindowSizeUpdateSystem {
 
         static inline auto& logger_ = helios::core::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);

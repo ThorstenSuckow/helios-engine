@@ -18,9 +18,6 @@ import helios.engine.platform.window.components.WindowCreateRequestComponent;
 import helios.engine.platform.window.commands.WindowCreateCommand;
 
 import helios.ecs.component;
-import helios.engine.platform.window.concepts.IsWindowHandle;
-
-using namespace helios::engine::platform::window::concepts;
 
 using namespace helios::engine::runtime::world;
 using namespace helios::ecs::command::concepts;
@@ -37,7 +34,6 @@ export namespace helios::engine::platform::window::systems {
      * @tparam THandle Window-domain entity handle type.
      */
     template<typename THandle>
-    requires IsWindowHandle<THandle>
     class WindowCreateSystem {
 
         public:

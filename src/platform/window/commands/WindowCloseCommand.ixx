@@ -6,11 +6,6 @@ module;
 
 export module helios.engine.platform.window.commands.WindowCloseCommand;
 
-import helios.engine.platform.window.types.WindowHandle;
-import helios.engine.platform.window.concepts.IsWindowHandle;
-
-using namespace helios::engine::platform::window::types;
-using namespace helios::engine::platform::window::concepts;
 export namespace helios::engine::platform::window::commands {
 
     /**
@@ -19,7 +14,6 @@ export namespace helios::engine::platform::window::commands {
      * @tparam THandle Window handle type.
      */
     template<typename THandle>
-    requires IsWindowHandle<THandle>
     struct WindowCloseCommand {
 
         /** @brief Target window entity handle. */

@@ -8,10 +8,6 @@ module;
 
 export module helios.engine.platform.window.components.WindowComponent;
 
-import helios.engine.platform.window.concepts.IsWindowHandle;
-
-
-using namespace helios::engine::platform::window::concepts;
 export namespace helios::engine::platform::window::components {
 
     /**
@@ -20,7 +16,6 @@ export namespace helios::engine::platform::window::components {
      * @tparam THandle Window handle type.
      */
     template<typename THandle>
-    requires IsWindowHandle<THandle>
     struct WindowComponent {
 
         /** @brief Runtime title used by the window backend. */

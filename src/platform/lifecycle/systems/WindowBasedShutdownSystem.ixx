@@ -18,7 +18,6 @@ import helios.engine.runtime.world;
 import helios.ecs;
 
 import helios.engine.platform.window.components;
-import helios.engine.platform.window.concepts;
 
 import helios.engine.platform.lifecycle.commands;
 import helios.engine.platform.environment.components;
@@ -29,7 +28,6 @@ using namespace helios::ecs;
 using namespace helios::ecs::common::concepts;
 using namespace helios::engine::platform::environment::components;
 using namespace helios::engine::platform::window::components;
-using namespace helios::engine::platform::window::concepts;
 using namespace helios::engine::platform::lifecycle::commands;
 using namespace helios::ecs::components;
 
@@ -41,7 +39,6 @@ export namespace helios::engine::platform::lifecycle::systems {
      * @tparam THandle Window handle type.
      */
     template<typename THandle>
-    requires IsWindowHandle<THandle>
     class WindowBasedShutdownSystem {
 
     public:

@@ -16,7 +16,6 @@ import helios.engine.runtime.pooling.types;
 import helios.engine.runtime.pooling.components;
 
 import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.world.types;
 import helios.engine.runtime.concepts;
 
 export namespace helios::engine::runtime::pooling::systems {

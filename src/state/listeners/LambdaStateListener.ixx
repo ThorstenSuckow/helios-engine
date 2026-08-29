@@ -15,7 +15,6 @@ import helios.engine.runtime.world.UpdateContext;
 
 import helios.engine.state.types;
 
-import helios.engine.runtime.world.GameObject;
 
 using namespace helios::engine::state::types;
 export namespace helios::engine::state::listeners {

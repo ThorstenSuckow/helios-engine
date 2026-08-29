@@ -9,7 +9,6 @@ export module helios.engine.core.systems.ClearDirtySetsSystem;
 
 import helios.engine.runtime.world.UpdateContext;
 
-import helios.engine.runtime.world.types;
 import helios.engine.runtime.concepts;
 
 import helios.ecs.component;

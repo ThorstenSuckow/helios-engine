@@ -33,7 +33,6 @@ import helios.engine.rendering.viewport.types;
 import helios.engine.rendering.viewport.ViewportEntity;
 
 import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.world.types;
 import helios.engine.runtime.concepts;
 import helios.ecs.command.NullCommandBuffer;
 import helios.ecs.common.concepts;

@@ -19,7 +19,6 @@ import helios.ecs.common.types;
 
 import helios.ecs.EcsWorld;
 import helios.ecs.View;
-import helios.engine.runtime.world.Session;
 
 
 export namespace helios::engine::runtime::world {
@@ -66,11 +65,6 @@ export namespace helios::engine::runtime::world {
         const helios::engine::input::InputSnapshot& inputSnapshot_;
 
         /**
-         * @brief Reference to the current game session for state tracking.
-         */
-        helios::engine::runtime::world::Session& session_;
-
-        /**
          * @brief Reference to the current platform entity.
          */
         helios::engine::runtime::world::RuntimeEnvironment& runtimeEnvironment_;
@@ -103,7 +97,6 @@ export namespace helios::engine::runtime::world {
          * @param ecsWorld Aggregate typed world for entity operations.
          */
         UpdateContext(
-            helios::engine::runtime::world::Session& session,
             helios::engine::runtime::world::RuntimeEnvironment& runtimeEnvironment,
             const float deltaTime,
             const float totalTime,
@@ -111,7 +104,6 @@ export namespace helios::engine::runtime::world {
             const helios::engine::input::InputSnapshot& inputSnapshot,
             helios::ecs::EcsWorld& ecsWorld
         ) :
-        session_(session),
         runtimeEnvironment_(runtimeEnvironment),
         deltaTime_(deltaTime),
         totalTime_(totalTime),
@@ -184,15 +176,6 @@ export namespace helios::engine::runtime::world {
             return level_;
         }
 
-
-        /**
-         * @brief Returns the session for game/match state access.
-         *
-         * @return Ref to the Session used with this UpdateContext.
-         */
-        [[nodiscard]] helios::engine::runtime::world::Session& session() const noexcept {
-            return session_;
-        }
 
         /**
          * @brief Returns the runtime environment for platform/runtime readiness state.

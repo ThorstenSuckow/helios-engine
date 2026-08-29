@@ -10,7 +10,6 @@ import helios.engine.runtime.timing.Timer;
 import helios.engine.runtime.timing.TimerManager;
 
 import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.world.types;
 import helios.engine.runtime.concepts;
 
 

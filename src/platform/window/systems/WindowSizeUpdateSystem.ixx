@@ -8,7 +8,6 @@ export module helios.engine.platform.window.systems.WindowSizeUpdateSystem;
 
 
 import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.world.types;
 import helios.engine.runtime.concepts;
 
 import helios.engine.platform.window.components;

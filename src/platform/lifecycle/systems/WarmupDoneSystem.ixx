@@ -15,7 +15,7 @@ import helios.ecs.command.types;
 
 import helios.engine.runtime;
 import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.world.types;
+import helios.engine.runtime.common.Session;
 import helios.engine.runtime.concepts;
 import helios.engine.rendering;
 import helios.engine.state;
@@ -50,7 +50,7 @@ export namespace helios::engine::platform::lifecycle::systems {
          *
          * @param updateContext Frame-local update context.
          */
-        void update(UpdateContext& updateContext, CommandBuffer& cmdBuffer) noexcept {
+        void update(UpdateContext& updateContext, runtime::common::Session& session, CommandBuffer& cmdBuffer) noexcept {
 
             if (updateContext.template view<
                 ShaderHandle,
@@ -64,7 +64,7 @@ export namespace helios::engine::platform::lifecycle::systems {
 
                 cmdBuffer.template add<StateCommand<EngineState>>(
                     StateTransitionRequest<EngineState>(
-                        updateContext.session().template state<EngineState>(),
+                        session.state<EngineState>(),
                         EngineStateTransitionId::WarmupDone
                     )
                 );

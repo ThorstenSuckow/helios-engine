@@ -17,8 +17,6 @@ import helios.engine.state.types;
 import helios.engine.state.components;
 import helios.engine.state.commands;
 
-import helios.engine.runtime.world.GameObject;
-
 import helios.ecs.common.types;
 import helios.ecs.common.concepts;
 
@@ -26,11 +24,9 @@ import helios.engine.runtime.world.UpdateContext;
 
 import helios.ecs.command.CommandHandlerRegistry;
 import helios.ecs.command.types;
-import helios.engine.runtime.world.Session;
 import helios.engine.runtime.world.concepts;
 import helios.engine.runtime.concepts;
-
-import helios.engine.runtime.world.Session;
+import helios.engine.runtime.common.Session;
 
 import helios.ecs.manager;
 import helios.ecs.EntityManager;
@@ -178,7 +174,7 @@ export namespace helios::engine::state {
          *
          * @param updateContext The current frame's update context.
          */
-        bool executeCommands(engine::runtime::world::UpdateContext& updateContext) noexcept {
+        bool executeCommands(engine::runtime::world::UpdateContext& updateContext, runtime::common::Session& session) noexcept {
 
             if (pending_.empty()) {
                 return true;
@@ -188,7 +184,6 @@ export namespace helios::engine::state {
 
             auto transitionRequest = command.transitionRequest();
 
-            auto& session = updateContext.session();
             auto currentFrom = session.template state<StateType>();
             auto from = transitionRequest.from();
             auto transitionId = transitionRequest.transitionId();

@@ -17,7 +17,8 @@ import :Pass;
 
 import helios.core.thread.JobSystem;
 import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.world.Session;
+import helios.engine.runtime.common.Session;
+
 
 import helios.engine.runtime.enginestate.types;
 
@@ -141,9 +142,9 @@ export namespace helios::engine::runtime::gameloop {
        /**
         * @copydoc Pass::shouldRun
         */
-        [[nodiscard]] bool shouldRun(EcsDataContainer& ecsDataContainer) const noexcept override {
+        [[nodiscard]] bool shouldRun(EcsDataContainer& ecsDataContainer, runtime::common::Session& session) const noexcept override {
             auto& updateContext = ecsDataContainer.get<UpdateContext>();
-            auto state = updateContext.session().state<StateType>();
+            auto state = session.state<StateType>();
             if (!hasFlag(mask_, state)) {
                 return false;
             }

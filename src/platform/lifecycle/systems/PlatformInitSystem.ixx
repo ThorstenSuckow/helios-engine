@@ -9,13 +9,13 @@ export module helios.engine.platform.lifecycle.systems.PlatformInitSystem;
 
 
 import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.world.types;
 import helios.engine.runtime.concepts;
 
 
 import helios.ecs.command.types;
 
 import helios.engine.runtime.world;
+import helios.engine.runtime.common.Session;
 import helios.ecs;
 
 import helios.engine.platform.lifecycle.commands;
@@ -43,9 +43,9 @@ export namespace helios::engine::platform::lifecycle::systems {
          *
          * @param updateContext Frame-local update context.
          */
-        void update(UpdateContext& updateContext, CommandBuffer& cmdBuffer) noexcept {
+        void update(UpdateContext& updateContext, runtime::common::Session& session, CommandBuffer& cmdBuffer) noexcept {
 
-            if (!updateContext.session().isInitialized()) {
+            if (!session.isInitialized()) {
                  cmdBuffer.template add<PlatformInitCommand>();
             }
         }

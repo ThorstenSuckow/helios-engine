@@ -6,7 +6,7 @@ module;
 
 export module helios.engine.spatial.components.YawPitchRollComponent;
 
-import helios.engine.runtime.world.GameObject;
+
 import helios.math.types;
 
 import helios.engine.core.spatial;

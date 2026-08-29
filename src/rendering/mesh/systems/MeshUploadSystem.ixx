@@ -16,7 +16,6 @@ import helios.engine.rendering.mesh.components;
 import helios.engine.rendering.mesh.commands;
 
 import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.world.types;
 import helios.engine.runtime.concepts;
 
 import helios.ecs.component;

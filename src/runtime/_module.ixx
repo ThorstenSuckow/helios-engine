@@ -4,6 +4,7 @@
  */
 export module helios.engine.runtime;
 
+export import helios.engine.runtime.common;
 export import helios.engine.runtime.gameloop;
 export import helios.engine.runtime.world;
 export import helios.engine.runtime.particle;

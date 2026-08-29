@@ -17,9 +17,6 @@ import helios.core.thread.JobSystem;
 import helios.engine.runtime.world.UpdateContext;
 import helios.engine.runtime.world.GameWorld;
 
-import helios.engine.runtime.world.Session;
-
-
 import helios.engine.runtime.enginestate.types;
 
 using namespace helios::engine::runtime::enginestate::types;
@@ -64,11 +61,11 @@ export namespace helios::engine::runtime::gameloop {
          * @param ecsDataContainer The map of results from the current frame's system executions.
          * @param jobSystem The job system used for parallel execution of systems.
          */
-        void update(ecs::common::container::EcsDataContainer& ecsDataContainer, JobSystem& jobSystem){
+        void update(ecs::common::container::EcsDataContainer& ecsDataContainer, common::Session& session, JobSystem& jobSystem){
 
             for (auto& pass : passEntries_) {
 
-                if (pass->shouldRun(ecsDataContainer)) {
+                if (pass->shouldRun(ecsDataContainer, session)) {
                     pass->update(ecsDataContainer, jobSystem);
                     pass->onPassEnd(ecsDataContainer);
                 }
@@ -99,7 +96,6 @@ export namespace helios::engine::runtime::gameloop {
          * @return Reference to the newly created Pass for method chaining.
          *
          * @see TypedPass
-         * @see Session::state()
          */
         template<typename StateType>
         Pass& beginPass(const StateType t) {

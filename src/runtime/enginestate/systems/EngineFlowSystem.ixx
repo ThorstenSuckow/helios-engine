@@ -20,9 +20,8 @@ import helios.engine.runtime.enginestate.types;
 
 import helios.ecs;
 import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.world.types;
 import helios.engine.runtime.concepts;
-import helios.engine.runtime.world.Session;
+import helios.engine.runtime.common.Session;
 
 
 
@@ -72,12 +71,10 @@ export namespace helios::engine::runtime::enginestate::systems {
          *
          * @param updateContext The update context providing session and command buffer access.
          */
-        void update(runtime::world::UpdateContext& updateContext, CommandBuffer& buffer) noexcept {
+        void update(runtime::world::UpdateContext& updateContext, runtime::common::Session& session, CommandBuffer& buffer) noexcept {
 
-            auto& session = updateContext.session();
-
-            const auto engineState = session.template state<EngineState>();
-            auto engineStateTransitionId = session.template stateTransitionId<EngineState>();
+            const auto engineState = session.state<EngineState>();
+            auto engineStateTransitionId = session.stateTransitionId<EngineState>();
 
             // only return if the state is undefined.
             // in any other case, we allow to drive the state forward, even if
@@ -92,14 +89,14 @@ export namespace helios::engine::runtime::enginestate::systems {
 
             switch (engineState) {
                 case EngineState::Booting: {
-                    buffer.template add<StateCommand<EngineState>>(
+                    buffer.add<StateCommand<EngineState>>(
                         StateTransitionRequest<EngineState>(engineState, EngineStateTransitionId::BootRequest)
                     );
                     break;
                 }
 
                 case EngineState::Booted: {
-                    buffer.template add<StateCommand<EngineState>>(
+                    buffer.add<StateCommand<EngineState>>(
                         StateTransitionRequest<EngineState>(engineState, EngineStateTransitionId::WarmupRequest)
                     );
                     break;

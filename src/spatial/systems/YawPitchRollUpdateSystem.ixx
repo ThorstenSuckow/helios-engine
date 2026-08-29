@@ -12,7 +12,6 @@ export module helios.engine.spatial.systems.YawPitchRollUpdateSystem;
 
 
 import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.world.types;
 import helios.engine.runtime.concepts;
 
 import helios.ecs.component;

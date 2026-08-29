@@ -6,14 +6,15 @@ module;
 
 #include <cassert>
 #include <format>
-#include <helios-engine-config.h>
-#include <memory>
+
 #include <span>
 #include <string>
 
 export module helios.engine.runtime.world.GameWorld;
 
-import helios.engine.runtime.world.Session;
+import helios.engine.runtime.common.Session;
+
+import helios.engine.runtime.enginestate;
 
 import helios.core.thread.JobSystem;
 import helios.core.common.container;
@@ -26,8 +27,6 @@ import helios.ecs;
 import helios.engine.runtime.pooling.EntityPoolRegistry;
 
 import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.world.GameObject;
-import helios.engine.runtime.world.types;
 
 import helios.core.log.Logger;
 import helios.core.log.LogManager;
@@ -40,7 +39,6 @@ using namespace helios::ecs::common::concepts;
 using namespace helios::ecs;
 using namespace helios::engine::runtime::world::concepts;
 using namespace helios::engine::platform::environment::types;
-using namespace helios::engine::runtime::world::types;
 #define HELIOS_LOG_SCOPE "GameWorld"
 export namespace helios::engine::runtime::world {
 
@@ -67,13 +65,7 @@ export namespace helios::engine::runtime::world {
         EcsWorld ecsWorld_;
 
 
-        helios::ecs::common::container::EcsDataContainer resourceRegistry_;
-
-
-        /**
-         * @brief Session object storing runtime/game state.
-         */
-        Session session_;
+        helios::ecs::common::container::EcsDataContainer resourceRegistry_{};
 
         /**
          * @brief Runtime environment facade for platform readiness state.
@@ -93,7 +85,6 @@ export namespace helios::engine::runtime::world {
          */
         explicit GameWorld(EcsWorld&& ecsWorld, JobSystem& jobSystem)
         : ecsWorld_(std::move(ecsWorld)),
-          session_(Session(ecsWorld_.add<GameObjectHandle>())),
           runtimeEnvironment_(RuntimeEnvironment(ecsWorld_.add<PlatformHandle>())),
           jobSystem_(jobSystem) {
 
@@ -101,6 +92,7 @@ export namespace helios::engine::runtime::world {
             resourceRegistry_.emplace<ecs::manager::ManagerRegistry>();
             resourceRegistry_.emplace<ecs::command::CommandHandlerRegistry>();
             resourceRegistry_.emplace<runtime::pooling::EntityPoolRegistry>();
+            resourceRegistry_.emplace<helios::engine::runtime::common::Session>();
         };
 
         /**
@@ -120,8 +112,8 @@ export namespace helios::engine::runtime::world {
          *
          * @return Reference to the Session.
          */
-        [[nodiscard]] Session& session() {
-            return session_;
+        [[nodiscard]] common::Session& session() {
+            return resourceRegistry_.get<common::Session>();
         }
 
         /**
@@ -164,6 +156,9 @@ export namespace helios::engine::runtime::world {
          * @brief Initializes managers and command buffers.
          */
         GameWorld& init() {
+
+            session().trackState<runtime::enginestate::types::EngineState>();
+
             for (auto& manager : managerRegistry().items()) {
                 manager->init(resourceRegistry_);
             }

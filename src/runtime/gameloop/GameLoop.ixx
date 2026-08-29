@@ -140,7 +140,6 @@ export namespace helios::engine::runtime::gameloop {
             frameCount_++;
 
             auto updateContext = runtime::world::UpdateContext(
-                  gameWorld_.session(),
                   gameWorld_.runtimeEnvironment(),
                   deltaTime,
                   totalTime_,
@@ -154,9 +153,9 @@ export namespace helios::engine::runtime::gameloop {
             auto& session = gameWorld_.session();
 
             // gameloop phases
-            prePhase_.update(ecsDataContainer_, gameWorld_.jobSystem());
-            mainPhase_.update(ecsDataContainer_, gameWorld_.jobSystem());
-            postPhase_.update(ecsDataContainer_, gameWorld_.jobSystem());
+            prePhase_.update(ecsDataContainer_, session, gameWorld_.jobSystem());
+            mainPhase_.update(ecsDataContainer_, session, gameWorld_.jobSystem());
+            postPhase_.update(ecsDataContainer_, session, gameWorld_.jobSystem());
         }
 
         [[nodiscard]] bool isRunning() const noexcept {

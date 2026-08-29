@@ -230,9 +230,9 @@ export namespace helios::engine::scene::systems {
 
                 processMembers(
                     updateContext, cullingContext, sceneHandle, *renderTargetBindingComponent, viewportEntity, visibilityRegistry);
-
-                return visibilityRegistry;
             }
+
+            return visibilityRegistry;
         }
 
 

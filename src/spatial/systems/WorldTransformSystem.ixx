@@ -9,6 +9,7 @@ export module helios.engine.spatial.systems.WorldTransformSystem;
 
 
 import helios.engine.runtime.gameloop.types;
+import helios.ecs.EcsWorld;
 
 import helios.ecs.component;
 import helios.engine.spatial.components;
@@ -32,7 +33,7 @@ export namespace helios::engine::scene::systems {
     template<typename TMemberHandle>
     class WorldTransformSystem {
 
-        using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
+        using EcsWorld = ecs::EcsWorld;
 
     public:
 
@@ -45,16 +46,16 @@ export namespace helios::engine::scene::systems {
          * @details For each active entity, the world transform translation is updated
          * only when the local position component is marked dirty.
          *
-         * @param updateContext Frame-local update context with ECS access.
+         * @param ecsWorld Frame-local ECS world.
          */
-        void update(UpdateContext& updateContext) noexcept {
+        void update(EcsWorld& ecsWorld) noexcept {
 
             for (auto [
                 entity,
                 localPosition,
                 localRotation,
                 worldTransform
-                ] : updateContext.template view<
+                ] : ecsWorld.view<
                 TMemberHandle,
                 Position3DComponent<TMemberHandle, Local>,
                 Rotation3DComponent<TMemberHandle, Local>,

@@ -10,6 +10,7 @@ export module helios.engine.platform.lifecycle.systems.WarmupDoneSystem;
 
 
 import helios.ecs;
+import helios.ecs.EcsWorld;
 
 import helios.ecs.command.types;
 
@@ -42,7 +43,7 @@ export namespace helios::engine::platform::lifecycle::systems {
 
         using ShaderHandle = typename TRenderHandles::ShaderHandle;
         using TextureHandle = typename TRenderHandles::TextureHandle;
-        using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
+        using EcsWorld = ecs::EcsWorld;
 
     public:
 
@@ -52,15 +53,15 @@ export namespace helios::engine::platform::lifecycle::systems {
         /**
          * @brief Queues `StateCommand<EngineState>` with `WarmupDoneSignal` when warmup resources are consumed.
          *
-         * @param updateContext Frame-local update context.
+         * @param ecsWorld Frame-local ECS world.
          */
-        void update(UpdateContext& updateContext, runtime::Session& session, CommandBuffer& cmdBuffer) noexcept {
+        void update(EcsWorld& ecsWorld, runtime::Session& session, CommandBuffer& cmdBuffer) noexcept {
 
-            if (updateContext.template view<
+            if (ecsWorld.view<
                 ShaderHandle,
                 ShaderSourceComponent<ShaderHandle>
                 >().withActive().empty() &&
-                updateContext.template view<
+                ecsWorld.view<
                 TextureHandle,
                 rendering::texture::components::TextureSourceComponent<TextureHandle>
                 >().withActive().empty()

@@ -9,6 +9,7 @@ export module helios.engine.scene.systems.PerspectiveCameraUpdateSystem;
 
 
 import helios.engine.runtime.gameloop.types;
+import helios.ecs.EcsWorld;
 
 
 import helios.ecs.component;
@@ -40,7 +41,7 @@ export namespace helios::engine::scene::systems {
     template<typename TMemberHandle>
     class PerspectiveCameraUpdateSystem {
 
-        using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
+        using EcsWorld = ecs::EcsWorld;
 
         public:
 
@@ -50,11 +51,11 @@ export namespace helios::engine::scene::systems {
         /**
          * @brief Executes the camera update pass for all active camera entities.
          *
-         * @param updateContext Frame-local update context with ECS access.
+         * @param ecsWorld Frame-local ECS world.
          */
-        void update(UpdateContext& updateContext) noexcept {
+        void update(EcsWorld& ecsWorld) noexcept {
 
-            for (auto [entity, tcw, vmc] : updateContext.template view<
+            for (auto [entity, tcw, vmc] : ecsWorld.view<
                 TMemberHandle,
                 TransformComponent<TMemberHandle, World>,
                 ViewMatrixComponent<TMemberHandle>
@@ -74,7 +75,7 @@ export namespace helios::engine::scene::systems {
                 entity.setTrackedValue(vmc, helios::math::lookAt(eye, center, up));
             }
 
-            for (auto [entity, pcc, pmc] : updateContext.template view<
+            for (auto [entity, pcc, pmc] : ecsWorld.view<
                 TMemberHandle,
                 PerspectiveCameraComponent<TMemberHandle>,
                 ProjectionMatrixComponent<TMemberHandle>

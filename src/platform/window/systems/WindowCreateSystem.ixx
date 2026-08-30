@@ -11,7 +11,7 @@ export module helios.engine.platform.window.systems.WindowCreateSystem;
 import helios.engine.runtime.gameloop.types;
 import helios.ecs.command;
 
-
+import helios.ecs.EcsWorld;
 
 import helios.engine.platform.window.components.WindowCreateRequestComponent;
 import helios.engine.platform.window.commands.WindowCreateCommand;
@@ -42,14 +42,9 @@ export namespace helios::engine::platform::window::systems {
 
         using CommandBuffer = ecs::command::TypedCommandBuffer<WindowCreateCommand<THandle>>;
 
-        /**
-         * @brief Scans create requests and submits create commands.
-         *
-         * @param updateContext Frame-local update context.
-         */
-        void update(UpdateContext& updateContext, CommandBuffer& cmdBuffer) noexcept {
+        void update(EcsWorld& ecsWorld, CommandBuffer& cmdBuffer) noexcept {
 
-            for (auto [entity, win]: updateContext.template view<
+            for (auto [entity, win]: ecsWorld.view<
                 THandle,
                 WindowCreateRequestComponent<THandle>
                 >().withActive()) {

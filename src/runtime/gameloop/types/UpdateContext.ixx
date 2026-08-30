@@ -72,16 +72,10 @@ export namespace helios::engine::runtime::gameloop::types {
         /**
          * @brief Constructs an UpdateContext with all per-frame dependencies.
          *
-         * @param session Reference to current session state.
-         * @param runtimeEnvironment Reference to runtime-environment state.
          * @param deltaTime Time since last frame in seconds.
          * @param totalTime Accumulated time in seconds.
          * @param frameCount Accumulated frames.
-         * @param phaseEventBus Phase-level event bus.
-         * @param passEventBus Pass-level event bus.
-         * @param frameEventBus Frame-level event bus.
          * @param inputSnapshot Immutable frame input snapshot.
-         * @param level Active level pointer, or nullptr.
          * @param ecsWorld Aggregate typed world for entity operations.
          */
         UpdateContext(
@@ -138,74 +132,6 @@ export namespace helios::engine::runtime::gameloop::types {
             return inputSnapshot_;
         }
 
-        /**
-         * @brief Resolves an entity facade by typed handle.
-         *
-         * @tparam THandle Handle type.
-         *
-         * @param handle Entity handle to resolve.
-         *
-         * @return Domain-specific entity facade.
-         */
-        template<typename THandle>
-        [[nodiscard]] auto find(const THandle handle) noexcept {
-            return ecsWorld_.find<THandle>(handle);
-        }
-
-
-        /**
-         * @brief Builds a typed ECS view for a handle domain and component set.
-         *
-         * @tparam THandle Handle domain type.
-         * @tparam Components Component types to include.
-         *
-         * @return Domain-specific view.
-         */
-        template <typename THandle, typename... Components>
-        [[nodiscard]] auto view() {
-            return ecsWorld_.view<THandle, Components...>();
-        }
-
-        /**
-         * @brief Returns the sparse set for a handle domain and component type.
-         *
-         * @tparam THandle Handle domain type.
-         * @tparam TComponent Component type.
-         *
-         * @return Pointer to the sparse set for the specified handle and component types.
-         */
-        template <typename THandle, typename TComponent>
-        [[nodiscard]] auto* sparseSet() const {
-            return ecsWorld_.template sparseSet<THandle, TComponent>();
-        }
-
-        template <typename THandle>
-        [[nodiscard]] auto& entityManager() {
-            return ecsWorld_.template entityManager<THandle>();
-        }
-        /**
-         * @brief Checks whether a handle refers to a valid entity in the appropriate sub-world.
-         * @tparam THandle Handle domain type.
-         * @param handle The handle to check.
-         * @return True if the handle is valid, false otherwise.
-         */
-        template <typename THandle>
-        [[nodiscard]] bool isValid(THandle handle) const {
-            return ecsWorld_.isValid<THandle>(handle);
-        }
-
-        /**
-         * @brief Clears the specified dirty components for a handle domain and component set.
-         *
-         * @tparam THandle Handle domain type.
-         * @tparam Components Component types to include.
-         *
-         * @return Domain-specific view.
-         */
-        template <typename THandle = void, typename... Components>
-        void clearDirtySets() {
-            ecsWorld_.clearDirtySets<THandle, Components...>();
-        }
 
     };
 }

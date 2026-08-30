@@ -19,6 +19,7 @@ import helios.ecs.common.concepts;
 import helios.engine.runtime.gameloop.types;
 
 import helios.ecs;
+import helios.ecs.EcsWorld;
 
 using namespace helios::ecs;
 
@@ -31,7 +32,7 @@ export namespace helios::engine::rendering::texture::systems {
     template<typename THandle>
     class TextureUploadSystem {
 
-        using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
+        using EcsWorld = ecs::EcsWorld;
 
         std::vector<THandle> textureHandles_;
 
@@ -49,12 +50,12 @@ export namespace helios::engine::rendering::texture::systems {
         /**
          * @brief Collects texture handles and queues one batch upload command.
          *
-         * @param updateContext Frame update context.
+         * @param ecsWorld Frame ECS world.
          * @return true if the update was successful.
          */
-        void update(UpdateContext& updateContext, CommandBuffer& cmdBuffer) noexcept {
+        void update(EcsWorld& ecsWorld, CommandBuffer& cmdBuffer) noexcept {
 
-            for (auto [entity, textureSource] : updateContext.template view<
+            for (auto [entity, textureSource] : ecsWorld.view<
                 THandle,
                 texture::components::TextureSourceComponent<THandle>
             >().withActive()) {

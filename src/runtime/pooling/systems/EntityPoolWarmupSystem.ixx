@@ -10,12 +10,11 @@ export module helios.engine.runtime.pooling.systems:EntityPoolWarmupSystem;
 
 import helios.ecs.common;
 import helios.ecs.command;
+import helios.ecs.EcsWorld;
 
 import helios.engine.runtime.pooling.commands;
 import helios.engine.runtime.pooling.types;
 import helios.engine.runtime.pooling.components;
-
-import helios.engine.runtime.gameloop.types;
 
 export namespace helios::engine::runtime::pooling::systems {
 
@@ -26,8 +25,6 @@ export namespace helios::engine::runtime::pooling::systems {
      */
     template<typename TMemberHandle>
     class EntityPoolWarmupSystem {
-
-        using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
 
 
     public:
@@ -41,12 +38,12 @@ export namespace helios::engine::runtime::pooling::systems {
          * @details Subsequent managers are responsible for removing the entity to
          * prevent multiple warmup attempts.
          *
-         * @param updateContext The current update context providing entity views.
+         * @param ecsWorld The ECS world providing entity views.
          * @param cmdBuffer The command buffer receiving the emitted pool commands.
          */
-        void update(UpdateContext& updateContext, CommandBuffer& cmdBuffer) noexcept {
+        void update(ecs::EcsWorld& ecsWorld, CommandBuffer& cmdBuffer) noexcept {
 
-            for (auto [entity, requestComponent, keyComponent] : updateContext.template view<
+            for (auto [entity, requestComponent, keyComponent] : ecsWorld.view<
                 TMemberHandle,
                 components::PrefabEntityPoolRequestComponent<TMemberHandle>,
                 components::EntityPoolKeyComponent<TMemberHandle>

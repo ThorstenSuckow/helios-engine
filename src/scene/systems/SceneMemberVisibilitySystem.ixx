@@ -28,6 +28,7 @@ import helios.engine.rendering.common.components.RenderTargetBindingComponent;
 import helios.engine.spatial.components;
 
 import helios.engine.runtime.gameloop.types;
+import helios.ecs.EcsWorld;
 
 
 import helios.ecs;
@@ -80,7 +81,7 @@ export namespace helios::engine::scene::systems {
             (std::same_as<TSubmissionMode, Instanced> || std::same_as<TSubmissionMode, NonInstanced>)
     class SceneMemberVisibilitySystem {
 
-        using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
+        using EcsWorld = ecs::EcsWorld;
 
         using SceneMemberVisibilityRegistry = SceneMemberVisibilityRegistry<TMemberHandle, TSubmissionMode, TRenderHandles>;
         using SceneMemberVisibilityContext = SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode, TRenderHandles>;
@@ -104,14 +105,14 @@ export namespace helios::engine::scene::systems {
          *
          * Appends each member to the visibility registry as either visible or culled.
          *
-         * @param updateContext ECS/world update context.
+         * @param ecsWorld ECS world.
          * @param cullingContext Reusable culling context used per member.
          * @param sceneHandle Scene currently bound to the viewport.
          * @param renderTargetBindingComponent Render target bound to the viewport.
          * @param viewportEntity Viewport entity being processed.
          */
         void processMembers(
-            UpdateContext& updateContext,
+            EcsWorld& ecsWorld,
             CullingContext<TMemberHandle>& cullingContext,
             const SceneHandle sceneHandle,
             const RenderTargetBindingComponent<ViewportHandle, TRenderHandles>& renderTargetBindingComponent,
@@ -125,7 +126,7 @@ export namespace helios::engine::scene::systems {
                 rpc,
                 transformWorld,
                 boundsWorld
-                ] : updateContext.view<
+                ] : ecsWorld.view<
                 TMemberHandle,
                 SceneMemberComponent<TMemberHandle, TRenderHandles>,
                 RenderPrototypeComponent<TMemberHandle, TSubmissionMode, TRenderHandles>,
@@ -175,13 +176,13 @@ export namespace helios::engine::scene::systems {
          * traversed. For each viewport, members are tested and classified into
          * visible/culled buckets per submission mode.
          *
-         * @param updateContext ECS/world update context.
+         * @param ecsWorld ECS world.
          */
-        SceneMemberVisibilityRegistry update(UpdateContext& updateContext) noexcept {
+        SceneMemberVisibilityRegistry update(EcsWorld& ecsWorld) noexcept {
 
             auto visibilityRegistry = SceneMemberVisibilityRegistry{};
 
-            for (auto [viewportEntity, renderTargetBindingComponent, sbc, cbc] : updateContext.template view<
+            for (auto [viewportEntity, renderTargetBindingComponent, sbc, cbc] : ecsWorld.view<
                 ViewportHandle,
                 RenderTargetBindingComponent<ViewportHandle, TRenderHandles>,
                 SceneBindingComponent<ViewportHandle, TRenderHandles>,
@@ -191,7 +192,7 @@ export namespace helios::engine::scene::systems {
                 const auto sceneHandle  = sbc->targetHandle();
                 const auto cameraHandle = cbc->targetHandle();
 
-                const auto camera = updateContext.find(cameraHandle);
+                const auto camera = ecsWorld.find(cameraHandle);
                 if (!camera) {
                     assert(false && "Camera not found");
                     logger_.error("Camera not found");
@@ -231,7 +232,7 @@ export namespace helios::engine::scene::systems {
                 });
 
                 processMembers(
-                    updateContext, cullingContext, sceneHandle, *renderTargetBindingComponent, viewportEntity, visibilityRegistry);
+                    ecsWorld, cullingContext, sceneHandle, *renderTargetBindingComponent, viewportEntity, visibilityRegistry);
             }
 
             return visibilityRegistry;

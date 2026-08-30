@@ -81,8 +81,6 @@ export namespace helios::engine::scene::systems {
     requires (std::is_same_v<TSubmissionMode, Instanced> || std::is_same_v<TSubmissionMode, NonInstanced>)
     class SceneRenderSystem {
 
-        using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
-
         using SceneMemberVisibilityRegistry = SceneMemberVisibilityRegistry<TMemberHandle, TSubmissionMode, TRenderHandles>;
         using SceneMemberVisibilityContext = SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode, TRenderHandles>;
         using RenderSceneMemberCommand = RenderSceneMemberCommand<TMemberHandle, TRenderHandles>;
@@ -108,12 +106,11 @@ export namespace helios::engine::scene::systems {
          * Iterates visible non-instanced member contexts and emits one
          * `RenderSceneMemberCommand` per member.
          *
-         * @param updateContext Current frame update context.
          * @param visibilityContexts Visible non-instanced members grouped by viewport.
          * @param cmdBuffer Command buffer receiving render commands.
          */
         void dispatchNonInstancedRenderCommands(
-            UpdateContext& updateContext,
+            EntityManager<TMemberHandle>& entityManager,
              std::span<const std::vector<SceneMemberVisibilityContext>> visibilityContexts,
              CommandBuffer& cmdBuffer) requires std::is_same_v<TSubmissionMode, NonInstanced>  {
 
@@ -125,7 +122,7 @@ export namespace helios::engine::scene::systems {
                     const auto renderTargetHandle = memberContext.renderTargetHandle;
                     const auto viewportHandle = memberContext.viewportHandle;
 
-                    const auto entity = updateContext.find<TMemberHandle>(memberContext.memberHandle);
+                    const auto entity = entityManager.template entity<TMemberHandle>(memberContext.memberHandle);
                     assert(entity && "Unexpected missing entity");
 
                     const auto* renderPrototype = entity->template get<RenderPrototypeComponent>();
@@ -153,12 +150,11 @@ export namespace helios::engine::scene::systems {
          * Builds `InstanceRenderBatchContext` groups with matching render state
          * and emits `RenderInstanceBatchCommand` whenever a batch boundary is hit.
          *
-         * @param updateContext Current frame update context.
          * @param visibilityContexts Visible instanced members grouped by viewport.
          * @param cmdBuffer Command buffer receiving render commands.
          */
         void dispatchInstancedRenderCommands (
-            UpdateContext& updateContext,
+            EntityManager<TMemberHandle>& entityManager,
             std::span<const std::vector<SceneMemberVisibilityContext>> visibilityContexts,
             CommandBuffer& cmdBuffer) requires std::is_same_v<TSubmissionMode, Instanced> {
 
@@ -184,7 +180,7 @@ export namespace helios::engine::scene::systems {
                     const auto renderTargetHandle = memberContext.renderTargetHandle;
                     const auto viewportHandle = memberContext.viewportHandle;
 
-                    const auto entity = updateContext.find<TMemberHandle>(memberContext.memberHandle);
+                    const auto entity = entityManager.entity(memberContext.memberHandle);
                     assert(entity && "Unexpected missing entity");
 
                     const auto* renderPrototype = entity->template get<RenderPrototypeComponent>();
@@ -238,10 +234,12 @@ export namespace helios::engine::scene::systems {
          * then emits member commands for instanced and non-instanced visible
          * members stored in `SceneMemberVisibilityRegistry`.
          *
-         * @param updateContext Current frame update context.
          * @param cmdBuffer Command buffer receiving extracted render commands.
          */
-        void update(UpdateContext& updateContext, CommandBuffer& cmdBuffer, const SceneMemberVisibilityRegistry& visibilityRegistry) noexcept {
+        void update(
+            EntityManager<TMemberHandle>& entityManager,
+            CommandBuffer& cmdBuffer,
+            const SceneMemberVisibilityRegistry& visibilityRegistry) noexcept {
 
             for (auto sceneRenderContexts = visibilityRegistry.sceneRenderContexts();
                 auto& sceneRenderContext : sceneRenderContexts) {
@@ -253,9 +251,9 @@ export namespace helios::engine::scene::systems {
             const auto members = visibilityRegistry.visibleMembers();
 
             if constexpr (std::is_same_v<TSubmissionMode, Instanced>) {
-                dispatchInstancedRenderCommands(updateContext, members, cmdBuffer);
+                dispatchInstancedRenderCommands(entityManager, members, cmdBuffer);
             } else if constexpr (std::is_same_v<TSubmissionMode, NonInstanced>) {
-                dispatchNonInstancedRenderCommands(updateContext, members, cmdBuffer);
+                dispatchNonInstancedRenderCommands(entityManager, members, cmdBuffer);
             } else {
                 static_assert(false, "Unsupported submission mode");
             }

@@ -12,6 +12,7 @@ export module helios.engine.platform.window.systems.SwapBuffersSystem;
 
 
 import helios.engine.runtime.gameloop.types;
+import helios.ecs.EcsWorld;
 
 import helios.ecs.command.types;
 
@@ -38,7 +39,7 @@ export namespace helios::engine::platform::window::systems {
     template<typename THandle>
     class SwapBuffersSystem {
 
-        using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
+        using EcsWorld = ecs::EcsWorld;
 
     public:
 
@@ -48,11 +49,11 @@ export namespace helios::engine::platform::window::systems {
         /**
          * @brief Enqueues swap-buffer commands for the current frame.
          *
-         * @param updateContext Frame-local update context.
+         * @param ecsWorld Frame-local ECS world.
          */
-        void update(UpdateContext& updateContext, CommandBuffer& cmdBuffer) noexcept {
+        void update(EcsWorld& ecsWorld, CommandBuffer& cmdBuffer) noexcept {
 
-            for (auto [entity, wc, wsc]: updateContext.template view<
+            for (auto [entity, wc, wsc]: ecsWorld.view<
                 THandle,
                 WindowComponent<THandle>,
                 WindowShownComponent<THandle>

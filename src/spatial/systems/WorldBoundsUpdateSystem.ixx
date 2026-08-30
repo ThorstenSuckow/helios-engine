@@ -10,6 +10,7 @@ export module helios.engine.spatial.systems.WorldBoundsUpdateSystem;
 
 
 import helios.engine.runtime.gameloop.types;
+import helios.ecs.EcsWorld;
 
 import helios.ecs.component;
 import helios.engine.spatial.components;
@@ -33,7 +34,7 @@ export namespace helios::engine::scene::systems {
     template<typename TMemberHandle>
     class WorldBoundsUpdateSystem {
 
-        using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
+        using EcsWorld = ecs::EcsWorld;
 
     public:
 
@@ -47,11 +48,11 @@ export namespace helios::engine::scene::systems {
          * @details For each active entity, world-space bounds are recomputed only
          * when the world transform component is marked dirty.
          *
-         * @param updateContext Frame-local update context with ECS access.
+         * @param ecsWorld Frame-local ECS world.
          */
-        void update(UpdateContext& updateContext) noexcept {
+        void update(EcsWorld& ecsWorld) noexcept {
 
-            for (auto [entity, boundsLocal, boundsWorld, worldTransform] : updateContext.template view<
+            for (auto [entity, boundsLocal, boundsWorld, worldTransform] : ecsWorld.view<
                 TMemberHandle,
                 BoundsComponent<TMemberHandle, Local>,
                 BoundsComponent<TMemberHandle, World>,

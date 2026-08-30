@@ -11,9 +11,8 @@ import helios.engine.runtime.gameloop.types;
 
 
 import helios.ecs.component;
-
 import helios.ecs.common.concepts;
-
+import helios.ecs.EcsWorld;
 
 using namespace helios::ecs::common::concepts::traits;
 using namespace helios::ecs::components;
@@ -30,18 +29,14 @@ export namespace helios::engine::core::systems {
              typename ... TComponents>
     class ClearDirtySetsSystem {
 
-        using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
 
     public:
 
         /**
-         * @brief Executes one dirty-clear pass for all configured component specifications.
-         *
-         * @param updateContext Frame-local update context with ECS access.
-         * @return true if the update was successful, false otherwise.
+         * @brief Executes one dirty-clear pass for all configured component specifications.access.
          */
-        void update(UpdateContext& updateContext) noexcept {
-            updateContext.template clearDirtySets<TMemberHandle, TComponents...>();
+        void update(ecs::EcsWorld& ecsWorld) noexcept {
+            ecsWorld.clearDirtySets<TMemberHandle, TComponents...>();
         }
     };
 }

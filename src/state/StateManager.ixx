@@ -11,9 +11,8 @@ module;
 
 export module helios.engine.state.StateManager;
 
-
-import helios.engine.state.StateTransitionListener;
 import helios.engine.state.types;
+import helios.engine.state.StateTransitionRules;
 import helios.engine.state.components;
 import helios.engine.state.commands;
 
@@ -78,15 +77,6 @@ export namespace helios::engine::state {
          */
         std::vector<StateCommand<StateType>> pending_;
 
-        /**
-         * @brief Registered transition listeners.
-         */
-        std::vector<std::unique_ptr<StateTransitionListener<StateType>>> listeners_;
-
-        /**
-         * @brief Transition rules defining valid state changes.
-         */
-        std::vector<StateTransitionRule<StateType>> rules_;
 
         /**
          * @brief Notifies listeners of state exit.
@@ -102,9 +92,9 @@ export namespace helios::engine::state {
             const StateTransitionIdType<StateType> transitionId,
             UpdateContext& updateContext)  {
 
-            for (auto& listener : listeners_) {
+            /*for (auto& listener : listeners_) {
                 listener->onStateExit(updateContext, from);
-            }
+            }*/
         }
 
         /**
@@ -121,12 +111,13 @@ export namespace helios::engine::state {
            const StateTransitionIdType<StateType> transitionId,
            UpdateContext& updateContext)  {
 
-            for (auto& listener : listeners_) {
+            /*for (auto& listener : listeners_) {
                 listener->onStateTransition(
                     updateContext,
                     StateTransitionContext<StateType>{from, to, transitionId}
                 );
-            }
+            }*/
+
         }
 
         /**
@@ -143,35 +134,15 @@ export namespace helios::engine::state {
            const StateTransitionIdType<StateType> transitionId,
            UpdateContext& updateContext)  {
 
-            for (auto& listener : listeners_) {
+            /*for (auto& listener : listeners_) {
                 listener->onStateEnter(updateContext, to);
-
-            }
+            }*/
         }
 
 
     public:
 
 
-        /**
-         * @brief Constructs a state manager with transition rules.
-         *
-         * @param rules Span of valid transition rules.
-         */
-        explicit StateManager(std::span<const StateTransitionRule<StateType>> rules)
-        : rules_(rules.begin(), rules.end()) {}
-
-        /**
-         * @brief Registers a state transition listener.
-         *
-         * @param listener The listener to add.
-         *
-         * @return Reference to this manager for chaining.
-         */
-        StateManager& addStateListener(std::unique_ptr<StateTransitionListener<StateType>> listener) noexcept {
-            listeners_.push_back(std::move(listener));
-            return *this;
-        }
 
         /**
          * @brief Processes pending state commands.
@@ -183,6 +154,7 @@ export namespace helios::engine::state {
          */
         bool executeCommands(
             UpdateContext& updateContext,
+            StateTransitionRules<StateType>& rules,
             RuntimeEnvironment& runtimeEnvironment, Session& session) noexcept {
 
             if (pending_.empty()) {
@@ -203,8 +175,7 @@ export namespace helios::engine::state {
                 return true;
             }
 
-
-            for (auto& rule : rules_) {
+            for (auto& rule : rules) {
                 if (rule.from() == from && rule.transitionId() == transitionId) {
 
                     if (rule.guard()) {
@@ -215,7 +186,9 @@ export namespace helios::engine::state {
 
                     signalExit(from, rule.to(), transitionId, updateContext);
                     signalTransition(from, rule.to(), transitionId, updateContext);
-                    session.template setStateFrom<StateType>(StateTransitionContext<StateType>{rule.from(), rule.to(), transitionId});
+                    session.template setStateFrom<StateType>(
+                        StateTransitionContext<StateType>{rule.from(), rule.to(), transitionId}
+                    );
                     signalEnter(from, rule.to(), transitionId, updateContext);
                 }
             }

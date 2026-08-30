@@ -34,8 +34,9 @@ export namespace helios::engine::runtime::enginestate::rules {
      */
     class DefaultEngineStateTransitionRules {
 
+        static constexpr size_t ruleSize = 6;
 
-        static constexpr auto rules_ = [] {
+        std::array<StateTransitionRule<EngineState>, ruleSize> rules_ = [] {
             std::array baseRules = std::to_array<StateTransitionRule<EngineState>>({
 
             {EngineState::Undefined,  EngineStateTransitionId::BootRequest,       EngineState::Booting},
@@ -80,10 +81,11 @@ export namespace helios::engine::runtime::enginestate::rules {
          *
          * @return A span of the predefined transition rules.
          */
-        [[nodiscard]] static std::span<const StateTransitionRule<EngineState>> rules() {
+        [[nodiscard]] std::span<const StateTransitionRule<EngineState>> rules() const {
             return std::span{rules_};
         }
 
     };
-    }
+
+}
 

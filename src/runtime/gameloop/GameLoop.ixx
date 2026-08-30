@@ -11,9 +11,9 @@ module;
 
 export module helios.engine.runtime.gameloop:GameLoop;
 
-import helios.engine.runtime.world.GameWorld;
+import helios.engine.runtime.GameWorld;
 
-import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.gameloop.types;
 import helios.core.log.Logger;
 import helios.core.log.LogManager;
 
@@ -26,9 +26,9 @@ import :Phase;
 
 import helios.engine.input.InputSnapshot;
 
-import helios.engine.runtime.world.GameWorld;
+import helios.engine.runtime.GameWorld;
 
-using namespace helios::engine::runtime::world;
+
 
 #define HELIOS_LOG_SCOPE "GameLoop"
 export namespace helios::engine::runtime::gameloop {
@@ -37,6 +37,8 @@ export namespace helios::engine::runtime::gameloop {
      * @brief Central orchestrator for the game update cycle.
      */
     class GameLoop {
+
+        using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
 
 
         /**
@@ -139,7 +141,7 @@ export namespace helios::engine::runtime::gameloop {
             totalTime_ += deltaTime;
             frameCount_++;
 
-            auto updateContext = runtime::world::UpdateContext(
+            auto updateContext = UpdateContext(
                   deltaTime,
                   totalTime_,
                   frameCount_,

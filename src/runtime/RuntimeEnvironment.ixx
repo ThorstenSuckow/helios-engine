@@ -8,7 +8,7 @@ module;
 #include <vector>
 #include <cassert>
 
-export module helios.engine.runtime.common.RuntimeEnvironment;
+export module helios.engine.runtime.RuntimeEnvironment;
 
 import helios.ecs;
 
@@ -19,7 +19,7 @@ using namespace helios::ecs;
 using namespace helios::engine::platform::environment;
 using namespace helios::engine::platform::environment::components;
 
-export namespace helios::engine::runtime::common {
+export namespace helios::engine::runtime {
 
 
     /**

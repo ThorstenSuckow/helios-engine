@@ -8,9 +8,9 @@ module;
 
 export module helios.engine.runtime.enginestate.rules.guards.DefaultEngineStateTransitionGuards;
 
-import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.gameloop.types;
 
-import helios.engine.runtime.common.RuntimeEnvironment;
+import helios.engine.runtime.RuntimeEnvironment;
 
 import helios.engine.runtime.enginestate.EngineStateBindings;
 import helios.engine.runtime.enginestate.types;
@@ -37,7 +37,7 @@ export namespace helios::engine::runtime::enginestate::rules::guards {
          * @return True if an entity with a CurrentContext exists.
          */
         static bool isPlatformInitialized(
-            const common::RuntimeEnvironment& runtimeEnvironment,
+            const RuntimeEnvironment& runtimeEnvironment,
             const StateTransitionRequest<EngineState> transitionRequest
         ) {
             return runtimeEnvironment.isInitialized();
@@ -52,7 +52,7 @@ export namespace helios::engine::runtime::enginestate::rules::guards {
          * @return True if the infrastructure can be considered in a ready-state.
          */
         static bool isRuntimeInfrastructureReady(
-            const common::RuntimeEnvironment& runtimeEnvironment,
+            const RuntimeEnvironment& runtimeEnvironment,
             const StateTransitionRequest<EngineState> transitionRequest
         ) {
             return runtimeEnvironment.isRuntimeInfrastructureReady();

@@ -7,10 +7,10 @@ module;
 
 export module helios.engine.rendering.shader.NullUniformCacheStrategy;
 
-import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.gameloop.types;
 import helios.ecs.EcsWorld;
 
-using namespace helios::engine::runtime::world;
+
 export namespace helios::opengl {
 
     /**
@@ -22,6 +22,8 @@ export namespace helios::opengl {
      */
     template<typename TMemberHandle>
     class NullUniformCacheStrategy {
+
+        using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
 
 
     public:

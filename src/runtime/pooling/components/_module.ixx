@@ -6,4 +6,5 @@ export module helios.engine.runtime.pooling.components;
 
 export import :PrefabEntityPoolRequestComponent;
 export import :EntityPoolKeyComponent;
+export import :EmitterComponent;
 

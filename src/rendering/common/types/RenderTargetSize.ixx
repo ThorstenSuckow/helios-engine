@@ -4,12 +4,12 @@
  */
 module;
 
-export module helios.engine.rendering.renderTarget.types.RenderTargetSize;
+export module helios.engine.rendering.common.types:RenderTargetSize;
 
 import helios.math;
 
 using namespace helios::math;
-export namespace helios::engine::rendering::renderTarget::types {
+export namespace helios::engine::rendering::common::types {
 
     /**
      * @brief Width/height pair used for renderTarget resize operations.

@@ -12,7 +12,7 @@ module;
 #include <utility>
 #include <vector>
 
-export module helios.engine.runtime.messaging.command.TypedCommandBuffer;
+export module helios.engine.runtime.common.command:TypedCommandBuffer;
 
 import helios.engine.state.components;
 
@@ -22,7 +22,7 @@ import helios.engine.state.commands.DelayedStateCommand;
 
 import helios.engine.runtime.timing.TimerManager;
 import helios.engine.runtime.timing.types;
-import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.gameloop.types;
 
 
 using namespace helios::ecs::common::types;
@@ -30,7 +30,7 @@ using namespace helios::engine::state::commands;
 using namespace helios::engine::runtime::timing;
 using namespace helios::engine::runtime::timing::types;
 
-export namespace helios::engine::runtime::messaging::command {
+export namespace helios::engine::runtime::common::command {
 
 
     /**
@@ -80,6 +80,7 @@ export namespace helios::engine::runtime::messaging::command {
     class TypedCommandBuffer {
 
         using TimerManager = TTimerManager;
+        using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
 
 
         TimerManager* timerManager_ = nullptr;;
@@ -201,7 +202,7 @@ export namespace helios::engine::runtime::messaging::command {
          * @param updateContext The current frame's update context.
          */
         template<typename CommandType>
-        void flushCommandQueue(runtime::world::UpdateContext& updateContext) noexcept {
+        void flushCommandQueue(UpdateContext& updateContext) noexcept {
 
             auto& queue = commandQueue<CommandType>();
             auto& delayed = delayedQueue<CommandType>();
@@ -293,7 +294,7 @@ export namespace helios::engine::runtime::messaging::command {
          *
          * @param updateContext The current frame's update context.
          */
-        void flush(runtime::world::UpdateContext& updateContext) noexcept {
+        void flush(UpdateContext& updateContext) noexcept {
             (flushCommandQueue<CommandTypes>(updateContext), ...);
         }
 

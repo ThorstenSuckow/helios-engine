@@ -16,7 +16,7 @@ import helios.ecs;
 
 import helios.engine.core.types;
 
-import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.gameloop.types;
 
 import helios.engine.runtime.pooling.types;
 import helios.engine.runtime.pooling.commands;
@@ -34,7 +34,7 @@ using namespace helios::engine::runtime::pooling::components;
 using namespace helios::engine::runtime::pooling::commands;
 using namespace helios::ecs;
 using namespace helios::ecs::command;
-using namespace helios::engine::runtime::world;
+
 
 
 #define HELIOS_LOG_SCOPE "helios::engine::runtime::pooling::EntityPoolManager"

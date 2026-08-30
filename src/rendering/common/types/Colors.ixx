@@ -1,12 +1,12 @@
-/**
- * @file Colors.ixx
- * @brief Standard color constants as vec4f (RGBA).
- */
-export module helios.engine.util.Colors;
+ /**
+  * @file Colors.ixx
+  * @brief Standard color constants as vec4f (RGBA).
+  */
+export module helios.engine.rendering.common.types:Colors;
 
 import helios.math.types;
 
-export namespace helios::engine::util {
+export namespace helios::engine::rendering::common::types {
 
     /**
      * @brief Standard color palette providing commonly used colors as vec4f (RGBA).

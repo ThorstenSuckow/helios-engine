@@ -14,9 +14,9 @@ import helios.ecs;
 import helios.ecs.command.types;
 
 import helios.engine.runtime;
-import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.common.Session;
-import helios.engine.runtime.concepts;
+import helios.engine.runtime.gameloop.types;
+import helios.engine.runtime.Session;
+
 import helios.engine.rendering;
 import helios.engine.state;
 
@@ -27,7 +27,7 @@ using namespace helios::ecs::command;
 using namespace helios::ecs::components;
 using namespace helios::engine::rendering::shader::components;
 
-using namespace helios::engine::runtime::world;
+
 using namespace helios::ecs;
 using namespace helios::engine::state::types;
 using namespace helios::engine::state::commands;
@@ -42,6 +42,7 @@ export namespace helios::engine::platform::lifecycle::systems {
 
         using ShaderHandle = typename TRenderHandles::ShaderHandle;
         using TextureHandle = typename TRenderHandles::TextureHandle;
+        using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
 
     public:
 
@@ -53,7 +54,7 @@ export namespace helios::engine::platform::lifecycle::systems {
          *
          * @param updateContext Frame-local update context.
          */
-        void update(UpdateContext& updateContext, runtime::common::Session& session, CommandBuffer& cmdBuffer) noexcept {
+        void update(UpdateContext& updateContext, runtime::Session& session, CommandBuffer& cmdBuffer) noexcept {
 
             if (updateContext.template view<
                 ShaderHandle,

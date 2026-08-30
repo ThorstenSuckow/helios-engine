@@ -5,6 +5,7 @@
  */
 module;
 
+#include <cassert>
 
 export module helios.engine.core.spatial.Transform;
 
@@ -64,6 +65,7 @@ export namespace helios::engine::core::spatial {
          */
         helios::math::mat4f updateCache() const {
             needsUpdate_ = false;
+            assert(false && "Rotation matrix 3x3!");
             return math::translate(
                 helios::math::mat4f::identity(),
                 translation_)  *

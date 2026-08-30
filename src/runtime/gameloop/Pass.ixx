@@ -16,8 +16,8 @@ module;
 
 export module helios.engine.runtime.gameloop:Pass;
 
-import helios.engine.runtime.world.GameWorld;
-import helios.engine.runtime.world.concepts;
+import helios.engine.runtime.GameWorld;
+
 import helios.core.common.concepts;
 import helios.core.thread.JobSystem;
 
@@ -29,16 +29,15 @@ import helios.ecs.manager;
 import helios.ecs.system;
 import helios.ecs.command;
 
-import helios.engine.runtime.common.Session;
+import helios.engine.runtime.Session;
 
-import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.gameloop.types;
 
 import helios.engine.runtime.enginestate.types;
 
 using namespace helios::ecs::common::types;
 using namespace helios::ecs::common::concepts;
-using namespace helios::engine::runtime::world;
-using namespace helios::engine::runtime::world::concepts;
+
 export namespace helios::engine::runtime::gameloop {
 
     class Phase;
@@ -178,7 +177,7 @@ export namespace helios::engine::runtime::gameloop {
          *
          * @return True if the pass should run.
          */
-        virtual bool shouldRun(EcsDataContainer& ecsDataContainer, common::Session& session) const noexcept = 0;
+        virtual bool shouldRun(EcsDataContainer& ecsDataContainer, Session& session) const noexcept = 0;
 
         /**
          * @brief Returns a span of the ManagerTypeIds this pass is flushing.
@@ -192,7 +191,8 @@ export namespace helios::engine::runtime::gameloop {
 
     public:
 
-        using RunCondition = std::function<bool(helios::engine::runtime::world::UpdateContext&)>;
+        using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
+        using RunCondition = std::function<bool(UpdateContext&)>;
 
 
         virtual ~Pass() = default;

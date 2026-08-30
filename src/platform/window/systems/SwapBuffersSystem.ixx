@@ -11,20 +11,18 @@ export module helios.engine.platform.window.systems.SwapBuffersSystem;
 
 
 
-import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.concepts;
+import helios.engine.runtime.gameloop.types;
 
 import helios.ecs.command.types;
 
 
-import helios.engine.runtime.world;
 import helios.ecs;
 
 import helios.engine.platform.window.commands;
 import helios.engine.platform.window.components;
 
 
-using namespace helios::engine::runtime::world;
+
 using namespace helios::ecs;
 using namespace helios::ecs::common::concepts;
 using namespace helios::engine::platform::window::components;
@@ -39,6 +37,8 @@ export namespace helios::engine::platform::window::systems {
      */
     template<typename THandle>
     class SwapBuffersSystem {
+
+        using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
 
     public:
 

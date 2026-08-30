@@ -5,8 +5,6 @@
 
 export module helios.engine.core;
 
-export import helios.engine.core.TypedTupleCat;
-
 export import helios.engine.core.components;
 export import helios.engine.core.container;
 export import helios.engine.core.types;

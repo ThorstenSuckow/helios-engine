@@ -11,8 +11,8 @@ export module helios.engine.spatial.systems.YawPitchRollUpdateSystem;
 
 
 
-import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.concepts;
+import helios.engine.runtime.gameloop.types;
+
 
 import helios.ecs.component;
 import helios.engine.spatial.components;
@@ -24,7 +24,7 @@ import helios.engine.core.types;
 using namespace helios::engine::core::types;
 using namespace helios::ecs::components;
 using namespace helios::engine::spatial::components;
-using namespace helios::engine::runtime::world;
+
 
 export namespace helios::engine::scene::systems {
 
@@ -35,6 +35,8 @@ export namespace helios::engine::scene::systems {
      */
     template<typename TMemberHandle>
     class YawPitchRollUpdateSystem {
+
+        using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
 
         /**
          * @brief Wraps an angle to the interval `[-pi, +pi]`.

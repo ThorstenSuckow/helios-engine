@@ -19,9 +19,8 @@ import helios.engine.runtime.enginestate.EngineStateBindings;
 import helios.engine.runtime.enginestate.types;
 
 import helios.ecs;
-import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.concepts;
-import helios.engine.runtime.common.Session;
+import helios.engine.runtime.gameloop.types;
+import helios.engine.runtime.Session;
 
 
 
@@ -47,6 +46,8 @@ export namespace helios::engine::runtime::enginestate::systems {
      */
     class EngineFlowSystem {
 
+        using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
+
 
         /**
          * @brief The previously observed game state.
@@ -71,7 +72,7 @@ export namespace helios::engine::runtime::enginestate::systems {
          *
          * @param updateContext The update context providing session and command buffer access.
          */
-        void update(runtime::world::UpdateContext& updateContext, runtime::common::Session& session, CommandBuffer& buffer) noexcept {
+        void update(UpdateContext& updateContext, runtime::Session& session, CommandBuffer& buffer) noexcept {
 
             const auto engineState = session.state<EngineState>();
             auto engineStateTransitionId = session.stateTransitionId<EngineState>();

@@ -7,3 +7,4 @@ export module helios.engine.rendering.common.components;
 export import helios.engine.rendering.common.components.RenderPrototypeComponent;
 export import helios.engine.rendering.common.components.MaterialOverrideComponent;
 export import helios.engine.rendering.common.components.ClearComponent;
+export import helios.engine.rendering.common.components.RenderTargetBindingComponent;

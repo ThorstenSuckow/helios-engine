@@ -16,12 +16,12 @@ import helios.ecs.command.NullCommandBuffer;
 import helios.ecs.command.types;
 import helios.ecs.common.concepts;
 
-import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.concepts;
+import helios.engine.runtime.gameloop.types;
+
 import helios.ecs;
 
 using namespace helios::ecs;
-using namespace helios::engine::runtime::world;
+
 
 using namespace helios::ecs::command::concepts;
 using namespace helios::ecs::command;
@@ -30,6 +30,8 @@ export namespace helios::engine::rendering::texture::systems {
 
     template<typename THandle>
     class TextureUploadSystem {
+
+        using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
 
         std::vector<THandle> textureHandles_;
 

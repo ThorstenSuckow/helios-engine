@@ -8,15 +8,14 @@ export module helios.engine.platform.environment.systems.PollEventsSystem;
 
 
 
-import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.concepts;
+import helios.engine.runtime.gameloop.types;
 import helios.ecs.command;
 
 
 import helios.engine.platform.environment.commands.PollEventsCommand;
 
 
-using namespace helios::engine::runtime::world;
+
 using namespace helios::ecs;
 using namespace helios::ecs::command;
 using namespace helios::engine::platform::environment::commands;
@@ -26,6 +25,8 @@ export namespace helios::engine::platform::environment::systems {
      * @brief Queues `PollEventsCommand` once per update call.
      */
     class PollEventsSystem {
+
+        using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
 
         public:
 

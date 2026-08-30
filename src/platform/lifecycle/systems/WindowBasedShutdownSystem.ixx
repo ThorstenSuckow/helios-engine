@@ -8,13 +8,11 @@ export module helios.engine.platform.lifecycle.systems.WindowBasedShutdownSystem
 
 
 
-import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.concepts;
+import helios.engine.runtime.gameloop.types;
 
 
 import helios.ecs.command.types;
 
-import helios.engine.runtime.world;
 import helios.ecs;
 
 import helios.engine.platform.window.components;
@@ -23,7 +21,7 @@ import helios.engine.platform.lifecycle.commands;
 import helios.engine.platform.environment.components;
 
 
-using namespace helios::engine::runtime::world;
+
 using namespace helios::ecs;
 using namespace helios::ecs::common::concepts;
 using namespace helios::engine::platform::environment::components;
@@ -40,6 +38,8 @@ export namespace helios::engine::platform::lifecycle::systems {
      */
     template<typename THandle>
     class WindowBasedShutdownSystem {
+
+        using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
 
     public:
 

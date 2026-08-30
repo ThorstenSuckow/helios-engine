@@ -14,15 +14,15 @@ import helios.ecs.command;
 import helios.engine.rendering.mesh.components;
 import helios.engine.rendering.mesh.commands;
 
-import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.concepts;
+import helios.engine.runtime.gameloop.types;
+
 
 import helios.ecs.component;
 
 using namespace helios::engine::rendering::mesh::commands;
 using namespace helios::engine::rendering::mesh::components;
 using namespace helios::ecs;
-using namespace helios::engine::runtime::world;
+
 
 using namespace helios::ecs::command::concepts;
 using namespace helios::ecs::command;
@@ -32,6 +32,8 @@ export namespace helios::engine::rendering::mesh::systems {
 
     template<typename THandle>
     class MeshUploadSystem {
+
+        using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
 
         std::vector<THandle> meshHandles_;
 

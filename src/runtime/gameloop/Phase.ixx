@@ -14,13 +14,13 @@ import :TypedPass;
 
 import helios.core.thread.JobSystem;
 
-import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.world.GameWorld;
+import helios.engine.runtime.gameloop.types;
+import helios.engine.runtime.GameWorld;
 
 import helios.engine.runtime.enginestate.types;
 
 using namespace helios::engine::runtime::enginestate::types;
-using namespace helios::engine::runtime::world;
+
 
 export namespace helios::engine::runtime::gameloop {
 
@@ -61,7 +61,7 @@ export namespace helios::engine::runtime::gameloop {
          * @param ecsDataContainer The map of results from the current frame's system executions.
          * @param jobSystem The job system used for parallel execution of systems.
          */
-        void update(ecs::common::container::EcsDataContainer& ecsDataContainer, common::Session& session, JobSystem& jobSystem){
+        void update(ecs::common::container::EcsDataContainer& ecsDataContainer, Session& session, JobSystem& jobSystem){
 
             for (auto& pass : passEntries_) {
 

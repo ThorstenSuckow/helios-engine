@@ -10,10 +10,10 @@ module;
 #include <span>
 #include <string>
 
-export module helios.engine.runtime.world.GameWorld;
+export module helios.engine.runtime.GameWorld;
 
-import helios.engine.runtime.common.Session;
-import helios.engine.runtime.common.RuntimeEnvironment;
+import helios.engine.runtime.Session;
+import helios.engine.runtime.RuntimeEnvironment;
 
 import helios.engine.runtime.enginestate;
 
@@ -24,20 +24,18 @@ import helios.ecs;
 
 import helios.engine.runtime.pooling.EntityPoolRegistry;
 
-import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.gameloop.types;
 
 import helios.core.log.Logger;
 import helios.core.log.LogManager;
-import helios.engine.runtime.world.Level;
 
-import helios.engine.runtime.world.concepts;
+
 
 using namespace helios::core::thread;
 using namespace helios::ecs::common::concepts;
 using namespace helios::ecs;
-using namespace helios::engine::runtime::world::concepts;
 #define HELIOS_LOG_SCOPE "GameWorld"
-export namespace helios::engine::runtime::world {
+export namespace helios::engine::runtime {
 
     /**
      * @brief Engine-level representation of a runtime world.
@@ -84,8 +82,8 @@ export namespace helios::engine::runtime::world {
             resourceRegistry_.emplace<ecs::manager::ManagerRegistry>();
             resourceRegistry_.emplace<ecs::command::CommandHandlerRegistry>();
             resourceRegistry_.emplace<runtime::pooling::EntityPoolRegistry>();
-            resourceRegistry_.emplace<helios::engine::runtime::common::Session>();
-            resourceRegistry_.emplace<helios::engine::runtime::common::RuntimeEnvironment>();
+            resourceRegistry_.emplace<helios::engine::runtime::Session>();
+            resourceRegistry_.emplace<helios::engine::runtime::RuntimeEnvironment>();
         };
 
         /**
@@ -105,8 +103,8 @@ export namespace helios::engine::runtime::world {
          *
          * @return Reference to the Session.
          */
-        [[nodiscard]] common::Session& session() {
-            return resourceRegistry_.get<common::Session>();
+        [[nodiscard]] Session& session() {
+            return resourceRegistry_.get<Session>();
         }
 
         /**
@@ -123,8 +121,8 @@ export namespace helios::engine::runtime::world {
          *
          * @return Reference to the Platform.
          */
-        [[nodiscard]] common::RuntimeEnvironment& runtimeEnvironment() {
-            return resourceRegistry_.get<common::RuntimeEnvironment>();
+        [[nodiscard]] RuntimeEnvironment& runtimeEnvironment() {
+            return resourceRegistry_.get<RuntimeEnvironment>();
         }
 
         template<typename TResource, typename ... TArgs>

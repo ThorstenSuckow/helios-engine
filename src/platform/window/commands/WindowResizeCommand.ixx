@@ -7,12 +7,12 @@ module;
 export module helios.engine.platform.window.commands.WindowResizeCommand;
 
 
-import helios.engine.rendering.renderTarget.types.RenderTargetSize;
+import helios.engine.rendering.common.types;
 
 import helios.engine.platform.window.types.WindowSize;
 
 using namespace helios::engine::platform::window::types;
-using namespace helios::engine::rendering::renderTarget::types;
+using namespace helios::engine::rendering::common::types;
 export namespace helios::engine::platform::window::commands {
 
     /**

@@ -14,8 +14,8 @@ export module helios.engine.rendering.shader.systems.ShaderCompileSystem;
 import helios.ecs.command;
 import helios.ecs.command.types;
 
-import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.concepts;
+import helios.engine.runtime.gameloop.types;
+
 
 
 import helios.engine.rendering.shader.components;
@@ -26,7 +26,7 @@ import helios.ecs.common.concepts;
 import helios.ecs.component;
 
 
-using namespace helios::engine::runtime::world;
+using namespace helios::engine::runtime;
 using namespace helios::ecs;
 using namespace helios::engine::rendering::shader;
 using namespace helios::ecs::common::concepts;
@@ -43,6 +43,8 @@ export namespace helios::engine::rendering::shader::systems {
      */
     template<typename THandle>
     class ShaderCompileSystem {
+
+        using UpdateContext = runtime::gameloop::types::UpdateContext;
 
         std::vector<THandle> shaderHandles_;
 

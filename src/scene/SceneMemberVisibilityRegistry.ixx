@@ -14,18 +14,11 @@ export module helios.engine.scene.SceneMemberVisibilityRegistry;
 import helios.engine.scene.types;
 
 import helios.engine.rendering.common.types;
-import helios.engine.rendering.renderTarget.types;
 
 using namespace helios::engine::rendering::common::types;
 using namespace helios::engine::scene::types;
 using namespace helios::engine::rendering::common::types;
-using namespace helios::engine::rendering::renderTarget::types;
-
-
-namespace {
-    template<class>
-    inline constexpr bool always_false_v = false;
-}
+using namespace helios::engine::rendering::common::types;
 
 export namespace helios::engine::scene {
 

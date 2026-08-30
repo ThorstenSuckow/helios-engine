@@ -2,14 +2,14 @@ module;
 
 #include <utility>
 
-export module helios.engine.runtime.common.Session;
+export module helios.engine.runtime.Session;
 
 import helios.ecs;
 
 import helios.engine.state.components;
 import helios.engine.state.types;
 
-export namespace helios::engine::runtime::common {
+export namespace helios::engine::runtime {
 
     class Session {
 

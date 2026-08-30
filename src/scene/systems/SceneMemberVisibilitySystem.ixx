@@ -23,12 +23,12 @@ import helios.engine.rendering.common.components;
 import helios.engine.rendering.common.commands;
 import helios.engine.rendering.common.types;
 
-import helios.engine.rendering.renderTarget.components.RenderTargetBindingComponent;
+import helios.engine.rendering.common.components.RenderTargetBindingComponent;
 
 import helios.engine.spatial.components;
 
-import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.concepts;
+import helios.engine.runtime.gameloop.types;
+
 
 import helios.ecs;
 
@@ -44,7 +44,7 @@ using namespace helios::engine::scene::concepts;
 using namespace helios::engine::scene::components;
 using namespace helios::ecs::components;
 using namespace helios::engine::rendering::common::components;
-using namespace helios::engine::rendering::renderTarget::components;
+using namespace helios::engine::rendering::common::components;
 using namespace helios::engine::scene::types;
 using namespace helios::ecs::common::concepts;
 using namespace helios::engine::spatial::components;
@@ -52,7 +52,7 @@ using namespace helios::engine::rendering::common::commands;
 using namespace helios::engine::rendering::common::types;
 using namespace helios::engine::rendering::common::components;
 using namespace helios::ecs;
-using namespace helios::engine::runtime::world;
+
 
 #define HELIOS_LOG_SCOPE "helios::engine::scene::systems::SceneRenderSystem"
 export namespace helios::engine::scene::systems {
@@ -79,6 +79,8 @@ export namespace helios::engine::scene::systems {
              std::same_as<typename TCullingStrategy::MemberHandle_type, TMemberHandle> &&
             (std::same_as<TSubmissionMode, Instanced> || std::same_as<TSubmissionMode, NonInstanced>)
     class SceneMemberVisibilitySystem {
+
+        using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
 
         using SceneMemberVisibilityRegistry = SceneMemberVisibilityRegistry<TMemberHandle, TSubmissionMode, TRenderHandles>;
         using SceneMemberVisibilityContext = SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode, TRenderHandles>;

@@ -9,8 +9,7 @@ export module helios.engine.runtime.timing.systems.TimerClearSystem;
 import helios.engine.runtime.timing.Timer;
 import helios.engine.runtime.timing.TimerManager;
 
-import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.concepts;
+import helios.engine.runtime.gameloop.types;
 
 
 
@@ -37,6 +36,8 @@ export namespace helios::engine::runtime::timing::systems {
     template<typename TTimerManager>
     class TimerClearSystem {
 
+        using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
+
         /**
          * @brief Reference to the TimerManager owning the timers.
          */
@@ -59,7 +60,7 @@ export namespace helios::engine::runtime::timing::systems {
          *
          * @param updateContext The current frame's update context.
          */
-        void update(helios::engine::runtime::world::UpdateContext& updateContext) noexcept {
+        void update(UpdateContext& updateContext) noexcept {
 
             (void)updateContext;
 

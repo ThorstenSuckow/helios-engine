@@ -12,7 +12,7 @@ export module helios.engine.runtime.enginestate.rules.DefaultEngineStateTransiti
 
 
 
-import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.gameloop.types;
 
 import helios.engine.runtime.enginestate.types;
 import helios.engine.runtime.enginestate.rules.guards;
@@ -22,7 +22,7 @@ import helios.engine.state.types.StateTransitionRule;
 import helios.engine.state.types.StateTransitionId;
 
 using namespace helios::engine::state::types;
-using namespace helios::engine::runtime::world;
+
 using namespace helios::engine::runtime::enginestate::rules::guards;
 export namespace helios::engine::runtime::enginestate::rules {
 

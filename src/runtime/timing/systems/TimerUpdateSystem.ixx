@@ -12,8 +12,8 @@ import helios.engine.runtime.timing.Timer;
 import helios.engine.runtime.timing.TimerManager;
 
 
-import helios.engine.runtime.world.UpdateContext;
-import helios.engine.runtime.concepts;
+import helios.engine.runtime.gameloop.types;
+
 import helios.ecs.command.types;
 import helios.ecs.command;
 import helios.ecs.common.concepts;
@@ -27,7 +27,7 @@ using namespace helios::engine::runtime::timing;
 
 using namespace helios::engine::runtime::timing::types;
 using namespace helios::engine::runtime::timing::commands;
-using namespace helios::engine::runtime::world;
+
 using namespace helios::ecs;
 using namespace helios::ecs::common::concepts;
 
@@ -44,6 +44,8 @@ export namespace helios::engine::runtime::timing::systems {
      */
     template<typename TTimerManager>
     class TimerUpdateSystem {
+
+        using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
 
         /**
          * @brief Reference to the TimerManager owning the timers.
@@ -68,7 +70,7 @@ export namespace helios::engine::runtime::timing::systems {
          *
          * @param updateContext The current frame's update context.
          */
-        void update(helios::engine::runtime::world::UpdateContext& updateContext, CommandBuffer& cmdBuffer) noexcept {
+        void update(UpdateContext& updateContext, CommandBuffer& cmdBuffer) noexcept {
 
             for (auto& timer : timerManager_.timers()) {
                 if (timer.state() == TimerState::Running) {

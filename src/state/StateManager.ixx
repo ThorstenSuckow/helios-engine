@@ -20,12 +20,15 @@ import helios.engine.state.commands;
 import helios.ecs.common.types;
 import helios.ecs.common.concepts;
 
-import helios.engine.runtime.world.UpdateContext;
+
+import helios.engine.runtime.Session;
+import helios.engine.runtime.RuntimeEnvironment;
+import helios.engine.runtime.gameloop.types;
 
 import helios.ecs.command.CommandHandlerRegistry;
 import helios.ecs.command.types;
-import helios.engine.runtime.world.concepts;
-import helios.engine.runtime.concepts;
+
+
 import helios.engine.runtime.common;
 
 import helios.ecs.manager;
@@ -66,8 +69,9 @@ export namespace helios::engine::state {
     template<typename StateType>
     class StateManager {
 
-        using Session = runtime::common::Session;
-        using RuntimeEnvironment = runtime::common::RuntimeEnvironment;
+        using Session = runtime::Session;
+        using RuntimeEnvironment = runtime::RuntimeEnvironment;
+        using UpdateContext = runtime::gameloop::types::UpdateContext;
 
         /**
          * @brief Queue of pending state commands.
@@ -96,7 +100,7 @@ export namespace helios::engine::state {
             const StateType from,
             const StateType to,
             const StateTransitionIdType<StateType> transitionId,
-            helios::engine::runtime::world::UpdateContext& updateContext)  {
+            UpdateContext& updateContext)  {
 
             for (auto& listener : listeners_) {
                 listener->onStateExit(updateContext, from);
@@ -115,7 +119,7 @@ export namespace helios::engine::state {
            const StateType from,
            const StateType to,
            const StateTransitionIdType<StateType> transitionId,
-           helios::engine::runtime::world::UpdateContext& updateContext)  {
+           UpdateContext& updateContext)  {
 
             for (auto& listener : listeners_) {
                 listener->onStateTransition(
@@ -137,7 +141,7 @@ export namespace helios::engine::state {
            const StateType from,
            const StateType to,
            const StateTransitionIdType<StateType> transitionId,
-           helios::engine::runtime::world::UpdateContext& updateContext)  {
+           UpdateContext& updateContext)  {
 
             for (auto& listener : listeners_) {
                 listener->onStateEnter(updateContext, to);
@@ -178,7 +182,7 @@ export namespace helios::engine::state {
          * @param updateContext The current frame's update context.
          */
         bool executeCommands(
-            engine::runtime::world::UpdateContext& updateContext,
+            UpdateContext& updateContext,
             RuntimeEnvironment& runtimeEnvironment, Session& session) noexcept {
 
             if (pending_.empty()) {

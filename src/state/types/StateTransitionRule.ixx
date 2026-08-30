@@ -13,7 +13,7 @@ import helios.engine.state.types.StateTransitionId;
 import helios.engine.state.types.StateTransitionType;
 
 
-import helios.engine.runtime.common.RuntimeEnvironment;
+import helios.engine.runtime.RuntimeEnvironment;
 
 export namespace helios::engine::state::types {
 
@@ -27,7 +27,7 @@ export namespace helios::engine::state::types {
      */
     template<typename StateType>
     using GuardCallback = bool(*)(
-        const helios::engine::runtime::common::RuntimeEnvironment&,
+        const helios::engine::runtime::RuntimeEnvironment&,
         const StateTransitionRequest<StateType>
     );
 

@@ -4,5 +4,4 @@
  */
 export module helios.engine.runtime.common;
 
-export import helios.engine.runtime.common.Session;
-export import helios.engine.runtime.common.RuntimeEnvironment;
+export import helios.engine.runtime.common.command;

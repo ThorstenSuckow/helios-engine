@@ -14,11 +14,11 @@ import helios.ecs.common.types;
 import helios.engine.rendering.mesh.types;
 import helios.engine.rendering.shader.types;
 import helios.engine.rendering.common.types;
-import helios.engine.rendering.renderTarget.types;
+import helios.engine.rendering.common.types;
 import helios.math.types;
 
 using namespace helios::ecs::common::types;
-using namespace helios::engine::rendering::renderTarget::types;
+using namespace helios::engine::rendering::common::types;
 using namespace helios::engine::rendering::mesh::types;
 using namespace helios::engine::rendering::shader::types;
 using namespace helios::engine::rendering::common::types;

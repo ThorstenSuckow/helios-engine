@@ -17,7 +17,6 @@ export import helios.engine.core;
 export import helios.engine.rendering;
 export import helios.engine.scene;
 export import helios.engine.input;
-export import helios.engine.util;
 export import helios.engine.state;
 export import helios.engine.spatial;
 export import helios.engine.runtime;

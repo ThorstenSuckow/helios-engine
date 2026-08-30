@@ -20,7 +20,7 @@ import helios.engine.runtime.timing.Timer;
 
 import helios.engine.runtime.timing.types.TimerId;
 
-import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.gameloop.types;
 import helios.ecs.command.CommandHandlerRegistry;
 import helios.ecs.command.types;
 
@@ -34,7 +34,7 @@ import helios.core.common;
 using namespace helios::engine::runtime::timing::commands;
 using namespace helios::engine::runtime::timing::types;
 using namespace helios::engine::runtime::timing::types;
-using namespace helios::engine::runtime::world;
+
 export namespace helios::engine::runtime::timing {
 
     /**

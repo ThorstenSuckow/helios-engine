@@ -13,3 +13,5 @@ export import helios.engine.rendering.common.types.InstanceData;
 
 export import :RenderData;
 export import :RenderDataTypeId;
+export import :RenderTargetSize;
+export import :Colors;

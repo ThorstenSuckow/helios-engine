@@ -8,11 +8,9 @@ module;
 #include <cassert>
 #include <utility>
 
-export module helios.engine.runtime.world.UpdateContext;
+export module helios.engine.runtime.gameloop.types:UpdateContext;
 
 import helios.engine.input.InputSnapshot;
-
-import helios.engine.runtime.world.Level;
 
 import helios.ecs.common.types;
 
@@ -21,7 +19,7 @@ import helios.ecs.EcsWorld;
 import helios.ecs.View;
 
 
-export namespace helios::engine::runtime::world {
+export namespace helios::engine::runtime::gameloop::types {
 
 
     /**
@@ -63,12 +61,6 @@ export namespace helios::engine::runtime::world {
          * @brief Immutable snapshot of input state for the current frame.
          */
         const helios::engine::input::InputSnapshot& inputSnapshot_;
-
-
-        /**
-         * @brief Pointer to the active Level, or nullptr if no level is loaded.
-         */
-        const Level* level_;
 
         /**
          * @brief Aggregate typed world used for domain-routed ECS operations.
@@ -158,16 +150,6 @@ export namespace helios::engine::runtime::world {
         template<typename THandle>
         [[nodiscard]] auto find(const THandle handle) noexcept {
             return ecsWorld_.find<THandle>(handle);
-        }
-
-
-        /**
-         * @brief Returns the active Level.
-         *
-         * @return Pointer to the Level, or nullptr if no level is loaded.
-         */
-        [[nodiscard]] const Level* level() noexcept {
-            return level_;
         }
 
 

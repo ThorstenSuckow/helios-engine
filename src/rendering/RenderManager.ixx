@@ -24,7 +24,7 @@ import helios.engine.scene.types;
 import helios.ecs;
 
 import helios.core.log;
-import helios.engine.runtime.world.UpdateContext;
+import helios.engine.runtime.gameloop.types;
 
 import helios.engine.core.container;
 
@@ -35,7 +35,7 @@ import helios.engine.rendering.shader.types;
 
 using namespace helios::engine::scene::components;
 using namespace helios::engine::core::container;
-using namespace helios::engine::runtime::world;
+
 using namespace helios::ecs;
 using namespace helios::engine::rendering::common::commands;
 using namespace helios::engine::rendering::common::types;

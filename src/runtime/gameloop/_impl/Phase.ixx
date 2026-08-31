@@ -7,14 +7,13 @@ module;
 #include <memory>
 #include <vector>
 
-export module helios.engine.runtime.gameloop:Phase;
+export module helios.engine.runtime.gameloop.GameLoop:Phase;
 
 import :Pass;
 import :TypedPass;
 
 import helios.core.thread.JobSystem;
 
-import helios.engine.runtime.gameloop.types;
 import helios.engine.runtime.GameWorld;
 
 import helios.engine.runtime.enginestate.types;
@@ -26,15 +25,6 @@ export namespace helios::engine::runtime::gameloop {
 
     class GameLoop;
 
-
-    /**
-     * @brief Enumeration of game loop phase types.
-     */
-    enum class PhaseType {
-        Pre,
-        Main,
-        Post
-    };
 
     /**
      * @brief Represents a phase in the game loop containing multiple passes.

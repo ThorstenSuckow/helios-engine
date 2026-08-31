@@ -1,13 +1,13 @@
 /**
-* @file FrameStats.ixx
- * @brief Module defining the FrameStats structure for frame timing information.
+* @file FrameTiming.ixx
+ * @brief Module defining the FrameTiming structure for frame timing information.
  */
 
-export module helios.engine.tooling.FrameStats;
+export module helios.engine.runtime.gameloop.types:FrameTiming;
 
-export namespace helios::engine::tooling {
+export namespace helios::engine::runtime::gameloop::types {
     /**
-     * @struct FrameStats
+     * @struct FrameTiming
      * @brief Contains timing statistics for a single frame.
      *
      * This structure holds detailed timing information about a frame's execution,
@@ -16,7 +16,7 @@ export namespace helios::engine::tooling {
      *
      * @note All time values are specified in **seconds**.
      */
-    struct FrameStats {
+    struct FrameTiming {
         /**
          * @brief Total frame time in seconds.
          *

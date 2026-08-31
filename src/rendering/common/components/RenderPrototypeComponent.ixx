@@ -28,10 +28,10 @@ export namespace helios::engine::rendering::common::components {
         MeshHandle meshHandle_;
         TextureHandle textureHandle_;
 
-        using ShaderEntity = ecs::Entity<ecs::EntityManager<ShaderHandle>>;
-        using MaterialEntity = ecs::Entity<ecs::EntityManager<MaterialHandle>>;
-        using MeshEntity = ecs::Entity<ecs::EntityManager<MeshHandle>>;
-        using TextureEntity = ecs::Entity<ecs::EntityManager<TextureHandle>>;
+        using ShaderEntity = ecs::entity::Entity<ecs::entity::EntityManager<ShaderHandle>>;
+        using MaterialEntity = ecs::entity::Entity<ecs::entity::EntityManager<MaterialHandle>>;
+        using MeshEntity = ecs::entity::Entity<ecs::entity::EntityManager<MeshHandle>>;
+        using TextureEntity = ecs::entity::Entity<ecs::entity::EntityManager<TextureHandle>>;
 
     public:
 

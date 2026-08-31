@@ -15,9 +15,9 @@ export namespace helios::engine::runtime {
 
         struct SessionDomainTag{};
         using SessionHandle = ecs::common::types::EntityHandle<SessionDomainTag>;
-        using EntityManager = ecs::EntityManager<SessionHandle>;
-        using SessionObject = ecs::Entity<ecs::EntityManager<SessionHandle>>;
-        using ConstSessionObject = ecs::Entity<const ecs::EntityManager<SessionHandle>>;
+        using EntityManager = ecs::entity::EntityManager<SessionHandle>;
+        using SessionObject = ecs::entity::Entity<ecs::entity::EntityManager<SessionHandle>>;
+        using ConstSessionObject = ecs::entity::Entity<const ecs::entity::EntityManager<SessionHandle>>;
 
         EntityManager entityManager_;
 

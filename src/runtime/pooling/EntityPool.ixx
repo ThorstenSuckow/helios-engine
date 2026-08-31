@@ -68,7 +68,7 @@ export namespace helios::engine::runtime::pooling {
 
             using HandleType = THandle;
 
-            ecs::EntityManager<THandle> entityManager_;
+            ecs::entity::EntityManager<THandle> entityManager_;
 
             std::vector<size_t> activeIndex_;
             std::vector<size_t> versionIndex_;
@@ -202,7 +202,7 @@ export namespace helios::engine::runtime::pooling {
                 for (size_t i = 0; i < space; i++) {
                     if (auto targetHandle = targetEntityManager.copyFrom(entityManager_, prefabHandle_);
                         targetHandle.isValid()) {
-                        ecs::Entity<ecs::EntityManager<THandle>> targetEntity{targetHandle, &targetEntityManager};
+                        ecs::entity::Entity<ecs::entity::EntityManager<THandle>> targetEntity{targetHandle, &targetEntityManager};
                         targetEntity.setActive(false);
                         addInactive(targetHandle);
                     }
@@ -412,13 +412,13 @@ export namespace helios::engine::runtime::pooling {
 
 
         template<typename THandle>
-        [[nodiscard]] ecs::Entity<ecs::EntityManager<THandle>> prefabEditor() noexcept {
+        [[nodiscard]] ecs::entity::Entity<ecs::entity::EntityManager<THandle>> prefabEditor() noexcept {
             assertTypeId<THandle>();
             return model_->prefabEditor().get<THandle>();
         }
 
         template<typename THandle>
-        [[nodiscard]] ecs::Entity<const ecs::EntityManager<THandle>> prefab() const noexcept {
+        [[nodiscard]] ecs::entity::Entity<const ecs::entity::EntityManager<THandle>> prefab() const noexcept {
             assertTypeId<THandle>();
             return model_->prefab().get<THandle>();
         }

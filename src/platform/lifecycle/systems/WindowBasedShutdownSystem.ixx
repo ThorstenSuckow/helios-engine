@@ -9,7 +9,7 @@ export module helios.engine.platform.lifecycle.systems.WindowBasedShutdownSystem
 
 
 import helios.engine.runtime.gameloop.types;
-import helios.ecs.EcsWorld;
+import helios.ecs.entity.EntityWorld;
 
 
 import helios.ecs.command.types;
@@ -40,7 +40,7 @@ export namespace helios::engine::platform::lifecycle::systems {
     template<typename THandle>
     class WindowBasedShutdownSystem {
 
-        using EcsWorld = ecs::EcsWorld;
+        using EntityWorld = ecs::entity::EntityWorld;
 
     public:
 
@@ -53,7 +53,7 @@ export namespace helios::engine::platform::lifecycle::systems {
          * @param ecsWorld Frame-local ECS world.
          * @param cmdBuffer Command buffer for submitting shutdown commands.
          */
-        void update(EcsWorld& ecsWorld, CommandBuffer& cmdBuffer) noexcept {
+        void update(EntityWorld& ecsWorld, CommandBuffer& cmdBuffer) noexcept {
 
             if (ecsWorld.view<THandle, WindowComponent<THandle>>().withActive().empty()) {
                cmdBuffer.template add<ShutdownCommand>();

@@ -12,7 +12,7 @@ export module helios.engine.spatial.systems.YawPitchRollUpdateSystem;
 
 
 import helios.engine.runtime.gameloop.types;
-import helios.ecs.EcsWorld;
+import helios.ecs.entity.EntityWorld;
 
 
 import helios.ecs.component;
@@ -37,7 +37,7 @@ export namespace helios::engine::scene::systems {
     template<typename TMemberHandle>
     class YawPitchRollUpdateSystem {
 
-        using EcsWorld = ecs::EcsWorld;
+        using EntityWorld = ecs::entity::EntityWorld;
 
         /**
          * @brief Wraps an angle to the interval `[-pi, +pi]`.
@@ -65,7 +65,7 @@ export namespace helios::engine::scene::systems {
          * @param ecsWorld Frame-local ECS world.
          * @return true if the update was successful, false otherwise.
          */
-        void update(EcsWorld& ecsWorld) noexcept {
+        void update(EntityWorld& ecsWorld) noexcept {
 
             for (auto [entity, yawPitchRoll, localRotation] : ecsWorld.view<
                 TMemberHandle,

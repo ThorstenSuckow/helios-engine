@@ -10,7 +10,7 @@ import helios.engine.runtime.gameloop.types;
 
 
 import helios.ecs.component;
-import helios.ecs.EcsWorld;
+import helios.ecs.entity.EntityWorld;
 import helios.ecs.common.concepts;
 
 
@@ -37,7 +37,7 @@ export namespace helios::engine::core::systems {
          * @param ecsWorld Frame-local update context with ECS access.
          * @return true if successful, false otherwise.
          */
-        void update(ecs::EcsWorld& ecsWorld) noexcept {
+        void update(ecs::entity::EntityWorld& ecsWorld) noexcept {
 
             ecsWorld.clearDirtySets();
         }

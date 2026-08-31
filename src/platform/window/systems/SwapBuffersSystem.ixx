@@ -12,7 +12,7 @@ export module helios.engine.platform.window.systems.SwapBuffersSystem;
 
 
 import helios.engine.runtime.gameloop.types;
-import helios.ecs.EcsWorld;
+import helios.ecs.entity.EntityWorld;
 
 import helios.ecs.command.types;
 
@@ -39,7 +39,7 @@ export namespace helios::engine::platform::window::systems {
     template<typename THandle>
     class SwapBuffersSystem {
 
-        using EcsWorld = ecs::EcsWorld;
+        using EntityWorld = ecs::entity::EntityWorld;
 
     public:
 
@@ -51,7 +51,7 @@ export namespace helios::engine::platform::window::systems {
          *
          * @param ecsWorld Frame-local ECS world.
          */
-        void update(EcsWorld& ecsWorld, CommandBuffer& cmdBuffer) noexcept {
+        void update(EntityWorld& ecsWorld, CommandBuffer& cmdBuffer) noexcept {
 
             for (auto [entity, wc, wsc]: ecsWorld.view<
                 THandle,

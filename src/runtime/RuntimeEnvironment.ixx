@@ -32,9 +32,9 @@ export namespace helios::engine::runtime {
 
         struct RuntimeDomainTag{};
         using RuntimeHandle = ecs::common::types::EntityHandle<RuntimeDomainTag>;
-        using EntityManager = ecs::EntityManager<RuntimeHandle>;
-        using RuntimeObject = ecs::Entity<ecs::EntityManager<RuntimeHandle>>;
-        using ConstRuntimeObject = ecs::Entity<const ecs::EntityManager<RuntimeHandle>>;
+        using EntityManager = ecs::entity::EntityManager<RuntimeHandle>;
+        using RuntimeObject = ecs::entity::Entity<ecs::entity::EntityManager<RuntimeHandle>>;
+        using ConstRuntimeObject = ecs::entity::Entity<const ecs::entity::EntityManager<RuntimeHandle>>;
 
         EntityManager entityManager_;
 

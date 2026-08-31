@@ -19,7 +19,7 @@ import helios.ecs.common.concepts;
 import helios.engine.runtime.gameloop.types;
 
 import helios.ecs;
-import helios.ecs.EcsWorld;
+import helios.ecs.entity.EntityWorld;
 
 using namespace helios::ecs;
 
@@ -32,7 +32,7 @@ export namespace helios::engine::rendering::texture::systems {
     template<typename THandle>
     class TextureUploadSystem {
 
-        using EcsWorld = ecs::EcsWorld;
+        using EntityWorld = ecs::entity::EntityWorld;
 
         std::vector<THandle> textureHandles_;
 
@@ -53,7 +53,7 @@ export namespace helios::engine::rendering::texture::systems {
          * @param ecsWorld Frame ECS world.
          * @return true if the update was successful.
          */
-        void update(EcsWorld& ecsWorld, CommandBuffer& cmdBuffer) noexcept {
+        void update(EntityWorld& ecsWorld, CommandBuffer& cmdBuffer) noexcept {
 
             for (auto [entity, textureSource] : ecsWorld.view<
                 THandle,

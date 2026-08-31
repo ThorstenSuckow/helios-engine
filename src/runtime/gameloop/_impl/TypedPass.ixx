@@ -11,12 +11,11 @@ module;
 #include "helios-engine-config.h"
 
 
-export module helios.engine.runtime.gameloop:TypedPass;
+export module helios.engine.runtime.gameloop.GameLoop:TypedPass;
 
 import :Pass;
 
 import helios.core.thread.JobSystem;
-import helios.engine.runtime.gameloop.types;
 import helios.engine.runtime.Session;
 
 

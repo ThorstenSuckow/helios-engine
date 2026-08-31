@@ -10,7 +10,7 @@ export module helios.engine.platform.lifecycle.systems.WarmupDoneSystem;
 
 
 import helios.ecs;
-import helios.ecs.EcsWorld;
+import helios.ecs.entity.EntityWorld;
 
 import helios.ecs.command.types;
 
@@ -43,7 +43,7 @@ export namespace helios::engine::platform::lifecycle::systems {
 
         using ShaderHandle = typename TRenderHandles::ShaderHandle;
         using TextureHandle = typename TRenderHandles::TextureHandle;
-        using EcsWorld = ecs::EcsWorld;
+        using EntityWorld = ecs::entity::EntityWorld;
 
     public:
 
@@ -55,7 +55,7 @@ export namespace helios::engine::platform::lifecycle::systems {
          *
          * @param ecsWorld Frame-local ECS world.
          */
-        void update(EcsWorld& ecsWorld, runtime::Session& session, CommandBuffer& cmdBuffer) noexcept {
+        void update(EntityWorld& ecsWorld, runtime::Session& session, CommandBuffer& cmdBuffer) noexcept {
 
             if (ecsWorld.view<
                 ShaderHandle,

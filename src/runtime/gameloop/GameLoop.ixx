@@ -9,11 +9,12 @@ module;
 #include <vector>
 #include <span>
 
-export module helios.engine.runtime.gameloop:GameLoop;
+export module helios.engine.runtime.gameloop.GameLoop;
 
 import helios.engine.runtime.GameWorld;
 
 import helios.engine.runtime.gameloop.types;
+
 import helios.core.log.Logger;
 import helios.core.log.LogManager;
 
@@ -38,8 +39,9 @@ export namespace helios::engine::runtime::gameloop {
      */
     class GameLoop {
 
-        using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
-
+        using FrameTiming = types::FrameTiming;
+        using UpdateContext = types::UpdateContext;
+        using PhaseType = types::PhaseType;
 
         /**
          * @brief Flag indicating whether init() has been called.
@@ -125,12 +127,11 @@ export namespace helios::engine::runtime::gameloop {
         /**
          * @brief Executes one full frame update across all phases.
          *
-         * @param gameWorld Reference to the game world.
          * @param deltaTime Time elapsed since the last frame in seconds.
          * @param inputSnapshot Snapshot of the current input state.
          *
          */
-        void update(const float deltaTime, const helios::engine::input::InputSnapshot& inputSnapshot
+        void update(FrameTiming& frameTiming, const helios::engine::input::InputSnapshot& inputSnapshot
         ) noexcept {
 
             // clear the ContextProvider and previous ecsDataContainer
@@ -138,15 +139,14 @@ export namespace helios::engine::runtime::gameloop {
 
             assert(initialized_ && "GameLoop not initialized");
 
-            totalTime_ += deltaTime;
+            totalTime_ += frameTiming.totalFrameTime;
             frameCount_++;
 
             auto updateContext = UpdateContext(
-                  deltaTime,
+                  frameTiming.totalFrameTime,
                   totalTime_,
                   frameCount_,
-                  inputSnapshot,
-                  gameWorld_.ecsWorld()
+                  inputSnapshot
             );
 
             ecsDataContainer_.emplace<UpdateContext>(updateContext);

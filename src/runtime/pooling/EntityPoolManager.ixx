@@ -61,7 +61,7 @@ export namespace helios::engine::runtime::pooling {
          * @brief Processes all pending `PrefabComponentPoolCommand`s for `THandle`.
          */
         void processPrewarmEntityPoolCommands(
-            EntityManager<THandle>& entityManager,
+            entity::EntityManager<THandle>& entityManager,
             EntityPoolRegistry& entityPoolRegistry) noexcept {
 
             auto& commands = prewarmEntityPoolCommands_;
@@ -104,7 +104,7 @@ export namespace helios::engine::runtime::pooling {
             commands.clear();
         }
 
-        void processReleaseEntityCommands(EntityManager<THandle>& entityManager, EntityPoolRegistry& entityPoolRegistry) noexcept {
+        void processReleaseEntityCommands(entity::EntityManager<THandle>& entityManager, EntityPoolRegistry& entityPoolRegistry) noexcept {
 
             auto& commands = releaseEntityCommands_;
 
@@ -151,7 +151,7 @@ export namespace helios::engine::runtime::pooling {
          *
          * @param updateContext  Current frame update context (unused directly, passed for API symmetry).
          */
-        bool executeCommands(EntityManager<THandle>& entityManager, EntityPoolRegistry& entityPoolRegistry) noexcept {
+        bool executeCommands(entity::EntityManager<THandle>& entityManager, EntityPoolRegistry& entityPoolRegistry) noexcept {
 
             processPrewarmEntityPoolCommands(entityManager, entityPoolRegistry);
             processReleaseEntityCommands(entityManager, entityPoolRegistry);

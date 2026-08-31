@@ -8,17 +8,17 @@ module;
 #include <numeric>
 #include <cstddef>
 
-export module helios.engine.tooling.FpsMetrics;
+export module helios.engine.runtime.gameloop.FpsMetrics;
 
-import helios.engine.tooling.FrameStats;
+import helios.engine.runtime.gameloop.types;
 
-export namespace helios::engine::tooling {
+export namespace helios::engine::runtime::gameloop {
 
     /**
      * @class FpsMetrics
      * @brief Aggregates and analyzes frame timing data over a rolling window.
      *
-     * FpsMetrics collects FrameStats data from multiple frames and calculates
+     * FpsMetrics collects FrameTiming data from multiple frames and calculates
      * average FPS and frame times. It maintains a configurable history buffer
      * for smoothing out momentary fluctuations in frame rate.
      *
@@ -31,7 +31,7 @@ export namespace helios::engine::tooling {
      * metrics.setHistorySize(120);
      *
      * // In game loop:
-     * helios::engine::tooling::FrameStats stats = framePacer.sync();
+     * helios::engine::tooling::FrameTiming stats = framePacer.sync();
      * metrics.addFrame(stats);
      *
      * float fps          = metrics.getFps();
@@ -39,6 +39,8 @@ export namespace helios::engine::tooling {
      * ```
      */
     class FpsMetrics {
+
+        using FrameTiming = types::FrameTiming;
 
         /**
          * @brief Stores a rolling history of frame statistics.
@@ -50,7 +52,7 @@ export namespace helios::engine::tooling {
          * The use of a `std::deque` allows efficient addition and removal
          * of frame timing records while maintaining the order of events.
          */
-        std::deque<helios::engine::tooling::FrameStats> history_;
+        std::deque<FrameTiming> history_;
 
         /**
          * @brief Size of the history buffer for storing frame statistics.
@@ -89,7 +91,7 @@ export namespace helios::engine::tooling {
          * @brief Tracks the most recent frame's work time in milliseconds.
          *
          * Represents the duration of work performed during the last processed frame.
-         * This value is derived from the most recent `FrameStats` in the history and
+         * This value is derived from the most recent `FrameTiming` in the history and
          * expressed in milliseconds. It is updated when the metrics are recomputed
          * (lazy evaluation triggered by the getters).
          */
@@ -99,7 +101,7 @@ export namespace helios::engine::tooling {
          * @brief Tracks the idle time in milliseconds for the most recent frame.
          *
          * Represents the duration the system waited (idle time) during the last
-         * processed frame. This value is derived from the most recent `FrameStats`
+         * processed frame. This value is derived from the most recent `FrameTiming`
          * in the history and expressed in milliseconds. It is updated when the
          * metrics are recomputed (lazy evaluation triggered by the getters).
          */
@@ -162,7 +164,7 @@ export namespace helios::engine::tooling {
         /**
          * @brief Adds a frame's statistics to the metrics history.
          *
-         * Processes the provided FrameStats, updates the rolling history,
+         * Processes the provided FrameTiming, updates the rolling history,
          * and marks cached values as dirty so they will be recomputed on
          * the next query. Old frames are automatically removed when the
          * history buffer exceeds the configured size. Additionally, the
@@ -172,14 +174,14 @@ export namespace helios::engine::tooling {
          *
          * @note When used together with FramePacer, a typical usage pattern is:
          * @code
-         * helios::engine::tooling::FrameStats stats = framePacer.sync();
+         * helios::engine::tooling::FrameTiming stats = framePacer.sync();
          * metrics.addFrame(stats);
          * @endcode
          * This should usually be called once per frame at the end of the
          * frame loop, after timing information for the current frame has
          * been measured.
          */
-        void addFrame(const helios::engine::tooling::FrameStats& stats) {
+        void addFrame(const FrameTiming& stats) {
             needsUpdate_ = true;
 
             history_.push_back(stats);
@@ -324,7 +326,7 @@ export namespace helios::engine::tooling {
          * @note Useful for rendering frame time graphs or diagnostic views
          *       in debug overlays.
          */
-        [[nodiscard]] const std::deque<helios::engine::tooling::FrameStats>& getHistory() const noexcept {
+        [[nodiscard]] const std::deque<FrameTiming>& getHistory() const noexcept {
             return history_;
         }
 

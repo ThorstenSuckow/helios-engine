@@ -9,12 +9,12 @@ module;
 #include <chrono>
 #include <cassert>
 
-export module helios.engine.tooling.FramePacer;
+export module helios.engine.runtime.gameloop.FramePacer;
 
 import helios.core.time;
-import helios.engine.tooling.FrameStats;
+import helios.engine.runtime.gameloop.types;
 
-export namespace helios::engine::tooling {
+export namespace helios::engine::runtime::gameloop {
 
     /**
      * @class FramePacer
@@ -22,7 +22,7 @@ export namespace helios::engine::tooling {
      *
      * The FramePacer class utilizes a `Stopwatch` to measure frame execution time and
      * introduces necessary sleep delays to maintain a consistent target frame rate.
-     * It returns detailed timing statistics via the `FrameStats` structure upon synchronization.
+     * It returns detailed timing statistics via the `FrameTiming` structure upon synchronization.
      *
      * @details The pacing mechanism helps in achieving smoother frame delivery by minimizing
      * jitter, although strict adherence depends on the OS scheduler's precision.
@@ -39,11 +39,14 @@ export namespace helios::engine::tooling {
      * while (running) {
      * pacer.beginFrame();
      * // ... game logic and rendering ...
-     * FrameStats stats = pacer.sync();
+     * FrameTiming stats = pacer.sync();
      * }
      * ```
      */
     class FramePacer {
+
+        using FrameTiming = types::FrameTiming;
+
         /**
          * @brief The stopwatch used for high-resolution time measurement.
          */
@@ -99,7 +102,7 @@ export namespace helios::engine::tooling {
          * and the work time is less than the target frame duration, this method
          * sleeps the current thread to meet the target timing.
          *
-         * @return A `FrameStats` structure containing the total frame time (including wait),
+         * @return A `FrameTiming` structure containing the total frame time (including wait),
          * the actual work time (CPU processing), and the wait time (idle).
          *
          * @note If `targetFps` is 0.0f or the frame took longer than the target duration,
@@ -108,7 +111,7 @@ export namespace helios::engine::tooling {
          * @todo Implement hybrid spinning for the last millisecond of the wait time
          * to improve timing precision and mitigate OS scheduler wake-up latency.
          */
-        [[nodiscard]] FrameStats sync() {
+        [[nodiscard]] FrameTiming sync() {
             float workTime = stopwatch_.elapsedSeconds();
 
             float waitTime = 0.0f;
@@ -125,7 +128,7 @@ export namespace helios::engine::tooling {
                 }
             }
 
-            return FrameStats{ totalTime, workTime, waitTime };
+            return FrameTiming{ totalTime, workTime, waitTime };
         }
     };
 }

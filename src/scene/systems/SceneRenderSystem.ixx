@@ -110,7 +110,7 @@ export namespace helios::engine::scene::systems {
          * @param cmdBuffer Command buffer receiving render commands.
          */
         void dispatchNonInstancedRenderCommands(
-            EntityManager<TMemberHandle>& entityManager,
+            entity::EntityManager<TMemberHandle>& entityManager,
              std::span<const std::vector<SceneMemberVisibilityContext>> visibilityContexts,
              CommandBuffer& cmdBuffer) requires std::is_same_v<TSubmissionMode, NonInstanced>  {
 
@@ -154,7 +154,7 @@ export namespace helios::engine::scene::systems {
          * @param cmdBuffer Command buffer receiving render commands.
          */
         void dispatchInstancedRenderCommands (
-            EntityManager<TMemberHandle>& entityManager,
+            entity::EntityManager<TMemberHandle>& entityManager,
             std::span<const std::vector<SceneMemberVisibilityContext>> visibilityContexts,
             CommandBuffer& cmdBuffer) requires std::is_same_v<TSubmissionMode, Instanced> {
 
@@ -237,7 +237,7 @@ export namespace helios::engine::scene::systems {
          * @param cmdBuffer Command buffer receiving extracted render commands.
          */
         void update(
-            EntityManager<TMemberHandle>& entityManager,
+            entity::EntityManager<TMemberHandle>& entityManager,
             CommandBuffer& cmdBuffer,
             const SceneMemberVisibilityRegistry& visibilityRegistry) noexcept {
 

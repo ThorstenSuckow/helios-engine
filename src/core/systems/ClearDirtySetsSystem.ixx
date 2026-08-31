@@ -12,7 +12,7 @@ import helios.engine.runtime.gameloop.types;
 
 import helios.ecs.component;
 import helios.ecs.common.concepts;
-import helios.ecs.EcsWorld;
+import helios.ecs.entity.EntityWorld;
 
 using namespace helios::ecs::common::concepts::traits;
 using namespace helios::ecs::components;
@@ -35,7 +35,7 @@ export namespace helios::engine::core::systems {
         /**
          * @brief Executes one dirty-clear pass for all configured component specifications.access.
          */
-        void update(ecs::EcsWorld& ecsWorld) noexcept {
+        void update(ecs::entity::EntityWorld& ecsWorld) noexcept {
             ecsWorld.clearDirtySets<TMemberHandle, TComponents...>();
         }
     };

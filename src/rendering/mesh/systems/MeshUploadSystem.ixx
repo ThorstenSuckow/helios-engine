@@ -18,7 +18,7 @@ import helios.engine.runtime.gameloop.types;
 
 
 import helios.ecs.component;
-import helios.ecs.EcsWorld;
+import helios.ecs.entity.EntityWorld;
 
 using namespace helios::engine::rendering::mesh::commands;
 using namespace helios::engine::rendering::mesh::components;
@@ -34,7 +34,7 @@ export namespace helios::engine::rendering::mesh::systems {
     template<typename THandle>
     class MeshUploadSystem {
 
-        using EcsWorld = ecs::EcsWorld;
+        using EntityWorld = ecs::entity::EntityWorld;
 
         std::vector<THandle> meshHandles_;
 
@@ -48,7 +48,7 @@ export namespace helios::engine::rendering::mesh::systems {
             meshHandles_.reserve(capacity);
         }
 
-        void update(EcsWorld& ecsWorld, CommandBuffer& cmdBuffer) noexcept {
+        void update(EntityWorld& ecsWorld, CommandBuffer& cmdBuffer) noexcept {
 
             for (auto [entity, mdc, murc] : ecsWorld.view<
                 THandle,

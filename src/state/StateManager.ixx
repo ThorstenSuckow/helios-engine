@@ -31,7 +31,7 @@ import helios.ecs.command.types;
 import helios.engine.runtime.common;
 
 import helios.ecs.manager;
-import helios.ecs.EntityManager;
+import helios.ecs.entity.EntityManager;
 
 using helios::engine::state::types::StateTransitionIdType;
 using helios::engine::state::types::StateTransitionContext;

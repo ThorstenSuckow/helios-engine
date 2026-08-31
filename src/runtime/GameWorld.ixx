@@ -40,9 +40,11 @@ export namespace helios::engine::runtime {
     /**
      * @brief Engine-level representation of a runtime world.
      *
-     * Owns an EcsWorld and provides world-scoped resources and runtime state information.
+     * Owns an EntityWorld and provides world-scoped resources and runtime state information.
      */
     class GameWorld {
+
+        using EntityWorld = ecs::entity::EntityWorld;
 
         struct GameWorldResources{};
 
@@ -57,7 +59,7 @@ export namespace helios::engine::runtime {
 
 
 
-        EcsWorld ecsWorld_;
+        entity::EntityWorld ecsWorld_;
 
 
         helios::ecs::common::container::EcsDataContainer resourceRegistry_{};
@@ -74,11 +76,11 @@ export namespace helios::engine::runtime {
         /**
          * @brief Constructs `GameWorld` and creates internal session/environment entities.
          */
-        explicit GameWorld(EcsWorld&& ecsWorld, JobSystem& jobSystem)
+        explicit GameWorld(EntityWorld&& ecsWorld, JobSystem& jobSystem)
         : ecsWorld_(std::move(ecsWorld)),
           jobSystem_(jobSystem) {
 
-            resourceRegistry_.bind<EcsWorld>(ecsWorld_);
+            resourceRegistry_.bind<EntityWorld>(ecsWorld_);
             resourceRegistry_.emplace<ecs::manager::ManagerRegistry>();
             resourceRegistry_.emplace<ecs::command::CommandHandlerRegistry>();
             resourceRegistry_.emplace<runtime::pooling::EntityPoolRegistry>();
@@ -94,7 +96,7 @@ export namespace helios::engine::runtime {
         GameWorld(GameWorld&&) = delete;
         GameWorld& operator=(GameWorld&&) = delete;
 
-        [[nodiscard]] EcsWorld& ecsWorld() {
+        [[nodiscard]] EntityWorld& ecsWorld() {
             return ecsWorld_;
         }
 

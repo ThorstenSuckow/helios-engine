@@ -24,7 +24,7 @@ import helios.engine.rendering.shader.commands;
 import helios.ecs.common.concepts;
 
 import helios.ecs.component;
-import helios.ecs.EcsWorld;
+import helios.ecs.entity.EntityWorld;
 
 
 using namespace helios::engine::runtime;
@@ -45,7 +45,7 @@ export namespace helios::engine::rendering::shader::systems {
     template<typename THandle>
     class ShaderCompileSystem {
 
-        using EcsWorld = ecs::EcsWorld;
+        using EntityWorld = ecs::entity::EntityWorld;
 
         std::vector<THandle> shaderHandles_;
 
@@ -59,7 +59,7 @@ export namespace helios::engine::rendering::shader::systems {
             shaderHandles_.reserve(capacity);
         }
 
-        void update(EcsWorld& ecsWorld, CommandBuffer& cmdBuffer) noexcept {
+        void update(EntityWorld& ecsWorld, CommandBuffer& cmdBuffer) noexcept {
 
             for (auto [entity, scc] : ecsWorld.view<
                 THandle,

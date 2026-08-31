@@ -14,10 +14,11 @@ module;
 #include <exception>
 #include "helios-engine-config.h"
 
-export module helios.engine.runtime.gameloop:Pass;
+export module helios.engine.runtime.gameloop.GameLoop:Pass;
 
 import helios.engine.runtime.GameWorld;
 
+import helios.engine.runtime.gameloop.types;
 import helios.core.common.concepts;
 import helios.core.thread.JobSystem;
 
@@ -30,8 +31,6 @@ import helios.ecs.system;
 import helios.ecs.command;
 
 import helios.engine.runtime.Session;
-
-import helios.engine.runtime.gameloop.types;
 
 import helios.engine.runtime.enginestate.types;
 

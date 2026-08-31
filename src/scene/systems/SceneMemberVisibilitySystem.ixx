@@ -28,7 +28,7 @@ import helios.engine.rendering.common.components.RenderTargetBindingComponent;
 import helios.engine.spatial.components;
 
 import helios.engine.runtime.gameloop.types;
-import helios.ecs.EcsWorld;
+import helios.ecs.entity.EntityWorld;
 
 
 import helios.ecs;
@@ -81,7 +81,7 @@ export namespace helios::engine::scene::systems {
             (std::same_as<TSubmissionMode, Instanced> || std::same_as<TSubmissionMode, NonInstanced>)
     class SceneMemberVisibilitySystem {
 
-        using EcsWorld = ecs::EcsWorld;
+        using EntityWorld = ecs::entity::EntityWorld;
 
         using SceneMemberVisibilityRegistry = SceneMemberVisibilityRegistry<TMemberHandle, TSubmissionMode, TRenderHandles>;
         using SceneMemberVisibilityContext = SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode, TRenderHandles>;
@@ -90,7 +90,7 @@ export namespace helios::engine::scene::systems {
         using CameraHandle = typename TRenderHandles::CameraHandle;
         using ViewportHandle = typename TRenderHandles::ViewportHandle;
         using RenderTargetHandle = typename TRenderHandles::RenderTargetHandle;
-        using ViewportEntity = ecs::Entity<EntityManager<ViewportHandle>>;
+        using ViewportEntity = ecs::entity::Entity<entity::EntityManager<ViewportHandle>>;
 
         /**
          * @brief Culling strategy used to decide member visibility per viewport.
@@ -112,7 +112,7 @@ export namespace helios::engine::scene::systems {
          * @param viewportEntity Viewport entity being processed.
          */
         void processMembers(
-            EcsWorld& ecsWorld,
+            EntityWorld& ecsWorld,
             CullingContext<TMemberHandle>& cullingContext,
             const SceneHandle sceneHandle,
             const RenderTargetBindingComponent<ViewportHandle, TRenderHandles>& renderTargetBindingComponent,
@@ -178,7 +178,7 @@ export namespace helios::engine::scene::systems {
          *
          * @param ecsWorld ECS world.
          */
-        SceneMemberVisibilityRegistry update(EcsWorld& ecsWorld) noexcept {
+        SceneMemberVisibilityRegistry update(EntityWorld& ecsWorld) noexcept {
 
             auto visibilityRegistry = SceneMemberVisibilityRegistry{};
 

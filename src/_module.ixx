@@ -21,6 +21,5 @@ export import helios.engine.state;
 export import helios.engine.spatial;
 export import helios.engine.runtime;
 export import helios.engine.platform;
-export import helios.engine.tooling;
 
 

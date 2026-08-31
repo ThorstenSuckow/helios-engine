@@ -5,3 +5,5 @@
 export module helios.engine.runtime.gameloop.types;
 
 export import :UpdateContext;
+export import :FrameTiming;
+export import :PhaseType;

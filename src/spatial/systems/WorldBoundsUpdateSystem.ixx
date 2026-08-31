@@ -10,7 +10,7 @@ export module helios.engine.spatial.systems.WorldBoundsUpdateSystem;
 
 
 import helios.engine.runtime.gameloop.types;
-import helios.ecs.EcsWorld;
+import helios.ecs.entity.EntityWorld;
 
 import helios.ecs.component;
 import helios.engine.spatial.components;
@@ -34,7 +34,7 @@ export namespace helios::engine::scene::systems {
     template<typename TMemberHandle>
     class WorldBoundsUpdateSystem {
 
-        using EcsWorld = ecs::EcsWorld;
+        using EntityWorld = ecs::entity::EntityWorld;
 
     public:
 
@@ -50,7 +50,7 @@ export namespace helios::engine::scene::systems {
          *
          * @param ecsWorld Frame-local ECS world.
          */
-        void update(EcsWorld& ecsWorld) noexcept {
+        void update(EntityWorld& ecsWorld) noexcept {
 
             for (auto [entity, boundsLocal, boundsWorld, worldTransform] : ecsWorld.view<
                 TMemberHandle,

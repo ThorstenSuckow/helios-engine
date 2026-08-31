@@ -8,7 +8,7 @@ module;
 export module helios.engine.rendering.shader.NullUniformCacheStrategy;
 
 import helios.engine.runtime.gameloop.types;
-import helios.ecs.EcsWorld;
+import helios.ecs.entity.EntityWorld;
 
 
 export namespace helios::opengl {
@@ -39,7 +39,7 @@ export namespace helios::opengl {
         template<typename TUniformScope>
         [[nodiscard]] bool cacheUniforms(
             TMemberHandle memberHandle,
-            ecs::EcsWorld& ecsWorld,
+            ecs::entity::EntityWorld& ecsWorld,
             UpdateContext& updateContext
         ) {
             return true;

@@ -49,9 +49,11 @@ export namespace helios::engine::input {
          *
          * @details Stored as a const member to enforce immutability of the snapshot.
          */
-        const helios::engine::input::gamepad::GamepadState gamepadState_;
+        const helios::engine::input::gamepad::GamepadState gamepadState_{};
 
     public:
+
+        InputSnapshot() = default;
 
         /**
          * @brief Constructs an InputSnapshot capturing the current gamepad state.

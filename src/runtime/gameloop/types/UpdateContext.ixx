@@ -15,29 +15,11 @@ import helios.engine.input.InputSnapshot;
 import helios.ecs.common.types;
 
 
-import helios.ecs.EcsWorld;
-import helios.ecs.View;
-
-
 export namespace helios::engine::runtime::gameloop::types {
 
 
     /**
      * @brief Per-frame context passed to systems during game loop updates.
-     *
-     * @details UpdateContext bundles frame-scoped data and services used by
-     * system updates: timing values, immutable input/viewport snapshots,
-     * session/runtime environment access, typed entity access via `EcsWorld`,
-     * event-bus read/write channels, and typed ECS access.
-     *
-     * Command submission is handled by systems through injected command buffers
-     * (`CommandBufferType`) using `cmdBuffer.template add<TCommand>(...)`.
-     *
-     * @see GameLoop
-     * @see Session
-     * @see RuntimeEnvironment
-     * @see EcsWorld
-     * @see ResourceRegistry
      */
     class UpdateContext {
 
@@ -62,10 +44,6 @@ export namespace helios::engine::runtime::gameloop::types {
          */
         const helios::engine::input::InputSnapshot& inputSnapshot_;
 
-        /**
-         * @brief Aggregate typed world used for domain-routed ECS operations.
-         */
-        helios::ecs::EcsWorld& ecsWorld_;
     public:
 
 
@@ -76,20 +54,17 @@ export namespace helios::engine::runtime::gameloop::types {
          * @param totalTime Accumulated time in seconds.
          * @param frameCount Accumulated frames.
          * @param inputSnapshot Immutable frame input snapshot.
-         * @param ecsWorld Aggregate typed world for entity operations.
          */
         UpdateContext(
             const float deltaTime,
             const float totalTime,
             const std::size_t frameCount,
-            const helios::engine::input::InputSnapshot& inputSnapshot,
-            helios::ecs::EcsWorld& ecsWorld
+            const helios::engine::input::InputSnapshot& inputSnapshot
         ) :
         deltaTime_(deltaTime),
         totalTime_(totalTime),
         frameCount_(frameCount),
-        inputSnapshot_(inputSnapshot),
-        ecsWorld_(ecsWorld)
+        inputSnapshot_(inputSnapshot)
         {
 
         }

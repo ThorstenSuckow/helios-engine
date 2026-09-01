@@ -23,6 +23,8 @@ export namespace helios::engine::rendering::texture::components {
          */
         std::string texturePath;
 
+        using HandleType = THandle;
+
     };
 
 }

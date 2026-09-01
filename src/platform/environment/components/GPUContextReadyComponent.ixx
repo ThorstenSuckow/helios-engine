@@ -17,6 +17,9 @@ export namespace helios::engine::platform::environment::components {
      * @tparam THandle Runtime platform handle type.
      */
     template<typename THandle>
-    struct GPUContextReadyComponent {};
+    struct GPUContextReadyComponent {
+        using HandleType = THandle;
+
+    };
 
 } // namespace helios::engine::platform::environment::components

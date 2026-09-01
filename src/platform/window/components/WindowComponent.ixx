@@ -17,6 +17,7 @@ export namespace helios::engine::platform::window::components {
      */
     template<typename THandle>
     struct WindowComponent {
+        using HandleType = THandle;
 
         /** @brief Runtime title used by the window backend. */
         std::string title;

@@ -31,7 +31,7 @@ export namespace helios::engine::core::components {
     public:
 
         using Value_type = helios::math::vec4<TNumericType>;;
-        using Handle_type = THandle;
+        using HandleType = THandle;
 
         Vec4Component() = default;
 

@@ -39,6 +39,9 @@ export namespace helios::engine::rendering::shader::components {
         std::array<std::string, UniformSemanticsCount> mappings{};
 
     public:
+
+        using HandleType = TOwnerHandle;
+
         /**
          * @brief Constructs mappings from one or more semantic/name entries.
          * @tparam TMappings Mapping entry types compatible with `UniformMapping`.

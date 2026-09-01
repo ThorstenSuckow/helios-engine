@@ -33,6 +33,7 @@ export namespace helios::engine::scene::components {
 
     public:
 
+        using HandleType = THandle;
         /**
          * @brief Constructs the component from viewport, scene, and camera handles.
          *

@@ -14,9 +14,10 @@ export namespace helios::engine::rendering::mesh::components {
     /**
      * @brief Component that links an entity to a mesh-data entry.
      */
-    template<typename TWOwnerHandle>
+    template<typename TOwnerHandle>
     struct MeshDataIndexComponent {
 
+        using HandleType = TOwnerHandle;
         /**
          * @brief Index into mesh data storage used by rendering systems.
          */

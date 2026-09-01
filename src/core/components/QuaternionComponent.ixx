@@ -30,7 +30,7 @@ export namespace helios::engine::core::components {
     public:
 
         using Value_type = helios::math::quat<TNumericType>;
-        using Handle_type = THandle;
+        using HandleType = THandle;
 
         /**
          * @brief Returns the current quaternion value.

@@ -22,6 +22,8 @@ export namespace helios::engine::rendering::mesh::components {
 
         MeshData meshData;
 
+        using HandleType = TOwnerHandle;
+
         template<typename ... TArgs>
         requires std::constructible_from<MeshData, TArgs...>
         explicit MeshDataComponent(TArgs&& ... args)

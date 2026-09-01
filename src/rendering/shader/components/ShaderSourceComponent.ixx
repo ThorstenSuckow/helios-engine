@@ -18,6 +18,7 @@ export namespace helios::engine::rendering::shader::components {
     template<typename THandle>
     struct ShaderSourceComponent {
 
+        using HandleType = THandle;
         /**
          * @brief Path to the vertex shader source.
          */

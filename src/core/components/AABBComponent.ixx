@@ -26,7 +26,7 @@ export namespace helios::engine::core::components {
     public:
 
         using Value_type = helios::math::aabb<TNumericType>;
-        using Handle_type = THandle;
+        using HandleType = THandle;
 
         AABBComponent() = default;
 

@@ -44,6 +44,7 @@ export namespace helios::engine::runtime::timing::components {
 
     public:
 
+        using HandleType = THandle;
 
         TimerBindingComponent() = default;
 

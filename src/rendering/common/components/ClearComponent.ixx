@@ -19,6 +19,7 @@ export namespace helios::engine::rendering::common::components {
     template<typename TOwnerHandle>
     struct ClearComponent {
 
+        using HandleType = TOwnerHandle;
         /** @brief Active clear flags for the owning entity. */
         ClearFlags flags = ClearFlags::None;
 

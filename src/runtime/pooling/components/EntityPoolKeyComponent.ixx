@@ -22,6 +22,7 @@ export namespace helios::engine::runtime::pooling::components {
          */
         types::EntityPoolKey entityPoolKey;
 
+        using HandleType = TOwnerHandle;
     };
 
 

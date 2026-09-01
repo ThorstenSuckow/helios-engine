@@ -21,7 +21,7 @@ export namespace helios::engine::runtime::pooling::commands {
     template<typename TOwnerHandle>
     struct ReleaseEntityCommand {
 
-        using Handle_type = TOwnerHandle;
+        using HandleType = TOwnerHandle;
 
         /**
          * @brief The key of the pool that should be used for releasing the entity.

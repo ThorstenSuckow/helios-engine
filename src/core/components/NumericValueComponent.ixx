@@ -33,7 +33,7 @@ export namespace helios::engine::core::components {
 
         using Value_type = TNumericType;
 
-        using Handle_type = THandle;
+        using HandleType = THandle;
 
         NumericValueComponent() = default;
 

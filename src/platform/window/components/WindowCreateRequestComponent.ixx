@@ -19,6 +19,8 @@ export namespace helios::engine::platform::window::components {
     template<typename  THandle>
     struct WindowCreateRequestComponent {
 
+        using HandleType = THandle;
+
         /** @brief Window configuration used for the creation command. */
         WindowConfig windowConfig;
 

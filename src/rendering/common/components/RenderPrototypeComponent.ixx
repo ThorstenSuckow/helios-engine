@@ -34,7 +34,7 @@ export namespace helios::engine::rendering::common::components {
         using TextureEntity = ecs::entity::Entity<ecs::entity::EntityManager<TextureHandle>>;
 
     public:
-
+        using HandleType = TOwnerHandle;
         /**
          * @brief Constructs the component from explicit resource handles.
          *

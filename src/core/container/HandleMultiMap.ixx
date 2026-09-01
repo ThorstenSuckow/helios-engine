@@ -147,7 +147,7 @@ export namespace helios::engine::core::container {
          * @return `true` if the binding was inserted, otherwise `false`.
          */
         template<typename TOneEntity, typename TManyEntity>
-        requires std::same_as<TOneHandle, typename TOneEntity::Handle_type> && std::same_as<TManyHandle, typename TManyEntity::Handle_type>
+        requires std::same_as<TOneHandle, typename TOneEntity::HandleType> && std::same_as<TManyHandle, typename TManyEntity::HandleType>
         bool bind(TOneEntity oneEntity, TManyEntity manyEntity) {
             return bind(oneEntity.handle(), manyEntity.handle());
         }

@@ -28,7 +28,7 @@ export namespace helios::engine::core::components {
     public:
 
         using Value_type = helios::math::vec2<TNumericType>;
-        using Handle_type = THandle;
+        using HandleType = THandle;
 
         Vec2Component() = default;
 

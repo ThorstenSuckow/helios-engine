@@ -17,7 +17,7 @@ export namespace helios::engine::runtime::pooling::commands {
     template<typename TOwnerHandle>
     struct PrewarmEntityPoolCommand {
 
-        using Handle_type = TOwnerHandle;
+        using HandleType = TOwnerHandle;
 
         /**
          * @brief The key of the pool that should be used for prefabrication.

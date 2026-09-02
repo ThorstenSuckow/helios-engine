@@ -246,20 +246,6 @@ export namespace helios::engine::runtime {
         }
 
 
-
-        /**
-         * @brief Builds a typed ECS view for a handle domain and component set.
-         *
-         * @tparam THandle Handle domain type.
-         * @tparam Components Component types to include.
-         *
-         * @return Domain-specific view.
-         */
-        template <typename THandle, typename... Components>
-        [[nodiscard]] auto view() {
-            return ecsWorld_.view<THandle, Components...>();
-        }
-
         /**
          * @brief Finds an entity facade by handle.
          *

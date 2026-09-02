@@ -16,6 +16,9 @@ import helios.ecs.component;
 import helios.engine.scene.components;
 import helios.engine.spatial.components;
 
+import helios.ecs.entity.EntityAccessSet;
+import helios.ecs.entity.Query;
+
 import helios.math;
 import helios.engine.core.types;
 
@@ -43,23 +46,42 @@ export namespace helios::engine::scene::systems {
 
         using EntityWorld = ecs::entity::EntityWorld;
 
+        template<typename TRead, typename TWrite>
+        using Query = ecs::entity::Query<TMemberHandle, TRead, TWrite>;
+
+        template<typename ... TReads>
+        using Read = ecs::entity::ReadSet<TReads...>;
+
+        template<typename ... TWrites>
+        using Write = ecs::entity::WriteSet<TWrites...>;
+
         public:
 
-        using Handle_type = TMemberHandle;
+        using HandleType = TMemberHandle;
 
 
         /**
          * @brief Executes the camera update pass for all active camera entities.
          *
-         * @param ecsWorld Frame-local ECS world.
+         * @param worldTransformQuery Query for world transform -> view matrix updates.
+         * @param perspectiveQuery Query for perspective settings -> projection matrix updates.
          */
-        void update(EntityWorld& ecsWorld) noexcept {
+        void update(
+            Query<
+                Read<TransformComponent<TMemberHandle, World>,
+                    ViewMatrixComponent<TMemberHandle>
+                >,
+                Write<ViewMatrixComponent<TMemberHandle>>
+            > worldTransformQuery,
+            Query<
+                Read<PerspectiveCameraComponent<TMemberHandle>,
+                    ProjectionMatrixComponent<TMemberHandle>
+                >,
+                Write<ProjectionMatrixComponent<TMemberHandle>>
+            > perspectiveQuery
+        ) noexcept {
 
-            for (auto [entity, tcw, vmc] : ecsWorld.view<
-                TMemberHandle,
-                TransformComponent<TMemberHandle, World>,
-                ViewMatrixComponent<TMemberHandle>
-            >().withActive()
+            for (auto [entity, tcw, vmc] : worldTransformQuery.withActive()
 
                .template whereAnyDirty<
                     TransformComponent<TMemberHandle, World>,
@@ -75,11 +97,7 @@ export namespace helios::engine::scene::systems {
                 entity.setTrackedValue(vmc, helios::math::lookAt(eye, center, up));
             }
 
-            for (auto [entity, pcc, pmc] : ecsWorld.view<
-                TMemberHandle,
-                PerspectiveCameraComponent<TMemberHandle>,
-                ProjectionMatrixComponent<TMemberHandle>
-            >().withActive()
+            for (auto [entity, pcc, pmc] : perspectiveQuery.withActive()
                .template whereAnyDirty<
                     PerspectiveCameraComponent<TMemberHandle>,
                     Active<TMemberHandle>

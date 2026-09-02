@@ -20,6 +20,8 @@ import helios.engine.runtime.gameloop.types;
 
 import helios.ecs;
 import helios.ecs.entity.EntityWorld;
+import helios.ecs.entity.EntityAccessSet;
+import helios.ecs.entity.Query;
 
 using namespace helios::ecs;
 
@@ -33,6 +35,15 @@ export namespace helios::engine::rendering::texture::systems {
     class TextureUploadSystem {
 
         using EntityWorld = ecs::entity::EntityWorld;
+
+        template<typename TRead, typename TWrite>
+        using Query = ecs::entity::Query<THandle, TRead, TWrite>;
+
+        template<typename ... TReads>
+        using Read = ecs::entity::ReadSet<TReads...>;
+
+        template<typename ... TWrites>
+        using Write = ecs::entity::WriteSet<TWrites...>;
 
         std::vector<THandle> textureHandles_;
 
@@ -50,15 +61,17 @@ export namespace helios::engine::rendering::texture::systems {
         /**
          * @brief Collects texture handles and queues one batch upload command.
          *
-         * @param ecsWorld Frame ECS world.
-         * @return true if the update was successful.
+         * @param query Frame-local query over texture sources.
          */
-        void update(EntityWorld& ecsWorld, CommandBuffer& cmdBuffer) noexcept {
+        void update(
+            Query<
+                Read<texture::components::TextureSourceComponent<THandle>>,
+                Write<>
+            > query,
+            CommandBuffer& cmdBuffer
+        ) noexcept {
 
-            for (auto [entity, textureSource] : ecsWorld.view<
-                THandle,
-                texture::components::TextureSourceComponent<THandle>
-            >().withActive()) {
+            for (auto [entity, textureSource] : query.withActive()) {
                 textureHandles_.push_back(entity.handle());
             }
 

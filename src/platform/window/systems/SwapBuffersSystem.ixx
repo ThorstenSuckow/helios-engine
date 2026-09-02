@@ -13,6 +13,8 @@ export module helios.engine.platform.window.systems.SwapBuffersSystem;
 
 import helios.engine.runtime.gameloop.types;
 import helios.ecs.entity.EntityWorld;
+import helios.ecs.entity.EntityAccessSet;
+import helios.ecs.entity.Query;
 
 import helios.ecs.command.types;
 
@@ -41,6 +43,15 @@ export namespace helios::engine::platform::window::systems {
 
         using EntityWorld = ecs::entity::EntityWorld;
 
+        template<typename TRead, typename TWrite>
+        using Query = ecs::entity::Query<THandle, TRead, TWrite>;
+
+        template<typename ... TReads>
+        using Read = ecs::entity::ReadSet<TReads...>;
+
+        template<typename ... TWrites>
+        using Write = ecs::entity::WriteSet<TWrites...>;
+
     public:
 
 
@@ -49,15 +60,19 @@ export namespace helios::engine::platform::window::systems {
         /**
          * @brief Enqueues swap-buffer commands for the current frame.
          *
-         * @param ecsWorld Frame-local ECS world.
+         * @param query Frame-local query over shown windows.
          */
-        void update(EntityWorld& ecsWorld, CommandBuffer& cmdBuffer) noexcept {
+        void update(
+            Query<
+                Read<WindowComponent<THandle>,
+                    WindowShownComponent<THandle>
+                >,
+                Write<>
+            > query,
+            CommandBuffer& cmdBuffer
+        ) noexcept {
 
-            for (auto [entity, wc, wsc]: ecsWorld.view<
-                THandle,
-                WindowComponent<THandle>,
-                WindowShownComponent<THandle>
-                >().withActive()) {
+            for (auto [entity, wc, wsc] : query.withActive()) {
 
                 cmdBuffer.template add<SwapBuffersCommand<THandle>>(entity.handle());
             }

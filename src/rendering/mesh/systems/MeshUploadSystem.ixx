@@ -19,6 +19,8 @@ import helios.engine.runtime.gameloop.types;
 
 import helios.ecs.component;
 import helios.ecs.entity.EntityWorld;
+import helios.ecs.entity.EntityAccessSet;
+import helios.ecs.entity.Query;
 
 using namespace helios::engine::rendering::mesh::commands;
 using namespace helios::engine::rendering::mesh::components;
@@ -36,6 +38,15 @@ export namespace helios::engine::rendering::mesh::systems {
 
         using EntityWorld = ecs::entity::EntityWorld;
 
+        template<typename TRead, typename TWrite>
+        using Query = ecs::entity::Query<THandle, TRead, TWrite>;
+
+        template<typename ... TReads>
+        using Read = ecs::entity::ReadSet<TReads...>;
+
+        template<typename ... TWrites>
+        using Write = ecs::entity::WriteSet<TWrites...>;
+
         std::vector<THandle> meshHandles_;
 
         size_t capacity_;
@@ -48,13 +59,17 @@ export namespace helios::engine::rendering::mesh::systems {
             meshHandles_.reserve(capacity);
         }
 
-        void update(EntityWorld& ecsWorld, CommandBuffer& cmdBuffer) noexcept {
+        void update(
+            Query<
+                Read<MeshDataComponent<THandle>,
+                    MeshUploadRequestComponent<THandle>
+                >,
+                Write<>
+            > query,
+            CommandBuffer& cmdBuffer
+        ) noexcept {
 
-            for (auto [entity, mdc, murc] : ecsWorld.view<
-                THandle,
-                MeshDataComponent<THandle>,
-                MeshUploadRequestComponent<THandle>
-            >().withActive()) {
+            for (auto [entity, mdc, murc] : query.withActive()) {
                 meshHandles_.push_back(entity.handle());
             }
 

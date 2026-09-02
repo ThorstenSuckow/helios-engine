@@ -16,6 +16,9 @@ import helios.ecs.component;
 import helios.engine.spatial.components;
 
 
+import helios.ecs.entity.EntityAccessSet;
+import helios.ecs.entity.Query;
+
 import helios.math;
 import helios.engine.core.types;
 
@@ -36,9 +39,18 @@ export namespace helios::engine::scene::systems {
 
         using EntityWorld = ecs::entity::EntityWorld;
 
+        template<typename TRead, typename TWrite>
+        using Query = ecs::entity::Query<TMemberHandle, TRead, TWrite>;
+
+        template<typename ... TReads>
+        using Read = ecs::entity::ReadSet<TReads...>;
+
+        template<typename ... TWrites>
+        using Write = ecs::entity::WriteSet<TWrites...>;
+
     public:
 
-        using Handle_type = TMemberHandle;
+        using HandleType = TMemberHandle;
 
 
 
@@ -50,23 +62,28 @@ export namespace helios::engine::scene::systems {
          *
          * @param ecsWorld Frame-local ECS world.
          */
-        void update(EntityWorld& ecsWorld) noexcept {
+        void update(Query<
+                Read<BoundsComponent<TMemberHandle, Local>,
+                    BoundsComponent<TMemberHandle, World>,
+                    TransformComponent<TMemberHandle, World>
+                >, Write<
+                    BoundsComponent<TMemberHandle, World>
+                >> query) noexcept {
 
-            for (auto [entity, boundsLocal, boundsWorld, worldTransform] : ecsWorld.view<
-                TMemberHandle,
-                BoundsComponent<TMemberHandle, Local>,
-                BoundsComponent<TMemberHandle, World>,
-                TransformComponent<TMemberHandle, World>
-            >().withActive()
-               .template whereAnyDirty<
-                    BoundsComponent<TMemberHandle, Local>,
-                    TransformComponent<TMemberHandle, World>,
-                    Active<TMemberHandle>
-                >()
+            for (auto [
+                    entity,
+                    boundsLocal,
+                    boundsWorld,
+                    worldTransform
+                ] : query
+                    .withActive()
+                    .template whereAnyDirty<
+                        BoundsComponent<TMemberHandle, Local>,
+                        TransformComponent<TMemberHandle, World>,
+                        Active<TMemberHandle>
+                    >()
                ) {
-
                 entity.setTrackedValue(boundsWorld, boundsLocal->value().applyTransform(worldTransform->value()));
-
             }
         }
 

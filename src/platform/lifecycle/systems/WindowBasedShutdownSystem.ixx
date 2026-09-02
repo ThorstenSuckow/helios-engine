@@ -10,6 +10,8 @@ export module helios.engine.platform.lifecycle.systems.WindowBasedShutdownSystem
 
 import helios.engine.runtime.gameloop.types;
 import helios.ecs.entity.EntityWorld;
+import helios.ecs.entity.EntityAccessSet;
+import helios.ecs.entity.Query;
 
 
 import helios.ecs.command.types;
@@ -42,6 +44,15 @@ export namespace helios::engine::platform::lifecycle::systems {
 
         using EntityWorld = ecs::entity::EntityWorld;
 
+        template<typename TRead, typename TWrite>
+        using Query = ecs::entity::Query<THandle, TRead, TWrite>;
+
+        template<typename ... TReads>
+        using Read = ecs::entity::ReadSet<TReads...>;
+
+        template<typename ... TWrites>
+        using Write = ecs::entity::WriteSet<TWrites...>;
+
     public:
 
 
@@ -50,12 +61,18 @@ export namespace helios::engine::platform::lifecycle::systems {
         /**
          * @brief Checks window activity and queues shutdown when the set is empty.
          *
-         * @param ecsWorld Frame-local ECS world.
+         * @param query Frame-local query over window entities.
          * @param cmdBuffer Command buffer for submitting shutdown commands.
          */
-        void update(EntityWorld& ecsWorld, CommandBuffer& cmdBuffer) noexcept {
+        void update(
+            Query<
+                Read<WindowComponent<THandle>>,
+                Write<>
+            > query,
+            CommandBuffer& cmdBuffer
+        ) noexcept {
 
-            if (ecsWorld.view<THandle, WindowComponent<THandle>>().withActive().empty()) {
+            if (query.withActive().empty()) {
                cmdBuffer.template add<ShutdownCommand>();
             }
 

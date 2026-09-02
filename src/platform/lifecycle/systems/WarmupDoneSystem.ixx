@@ -11,6 +11,8 @@ export module helios.engine.platform.lifecycle.systems.WarmupDoneSystem;
 
 import helios.ecs;
 import helios.ecs.entity.EntityWorld;
+import helios.ecs.entity.EntityAccessSet;
+import helios.ecs.entity.Query;
 
 import helios.ecs.command.types;
 
@@ -45,6 +47,27 @@ export namespace helios::engine::platform::lifecycle::systems {
         using TextureHandle = typename TRenderHandles::TextureHandle;
         using EntityWorld = ecs::entity::EntityWorld;
 
+        template<typename THandle, typename TRead, typename TWrite>
+        using Query = ecs::entity::Query<THandle, TRead, TWrite>;
+
+        template<typename ... TReads>
+        using Read = ecs::entity::ReadSet<TReads...>;
+
+        template<typename ... TWrites>
+        using Write = ecs::entity::WriteSet<TWrites...>;
+
+        using ShaderWarmupQuery = Query<
+            ShaderHandle,
+            Read<ShaderSourceComponent<ShaderHandle>>,
+            Write<>
+        >;
+
+        using TextureWarmupQuery = Query<
+            TextureHandle,
+            Read<rendering::texture::components::TextureSourceComponent<TextureHandle>>,
+            Write<>
+        >;
+
     public:
 
 
@@ -53,19 +76,17 @@ export namespace helios::engine::platform::lifecycle::systems {
         /**
          * @brief Queues `StateCommand<EngineState>` with `WarmupDoneSignal` when warmup resources are consumed.
          *
-         * @param ecsWorld Frame-local ECS world.
+         * @param shaderWarmupQuery Query over active shader warmup sources.
+         * @param textureWarmupQuery Query over active texture warmup sources.
          */
-        void update(EntityWorld& ecsWorld, runtime::Session& session, CommandBuffer& cmdBuffer) noexcept {
+        void update(
+            ShaderWarmupQuery shaderWarmupQuery,
+            TextureWarmupQuery textureWarmupQuery,
+            runtime::Session& session,
+            CommandBuffer& cmdBuffer
+        ) noexcept {
 
-            if (ecsWorld.view<
-                ShaderHandle,
-                ShaderSourceComponent<ShaderHandle>
-                >().withActive().empty() &&
-                ecsWorld.view<
-                TextureHandle,
-                rendering::texture::components::TextureSourceComponent<TextureHandle>
-                >().withActive().empty()
-                ) {
+            if (shaderWarmupQuery.withActive().empty() && textureWarmupQuery.withActive().empty()) {
 
                 cmdBuffer.template add<StateCommand<EngineState>>(
                     StateTransitionRequest<EngineState>(

@@ -25,6 +25,8 @@ import helios.ecs.common.concepts;
 
 import helios.ecs.component;
 import helios.ecs.entity.EntityWorld;
+import helios.ecs.entity.EntityAccessSet;
+import helios.ecs.entity.Query;
 
 
 using namespace helios::engine::runtime;
@@ -47,6 +49,15 @@ export namespace helios::engine::rendering::shader::systems {
 
         using EntityWorld = ecs::entity::EntityWorld;
 
+        template<typename TRead, typename TWrite>
+        using Query = ecs::entity::Query<THandle, TRead, TWrite>;
+
+        template<typename ... TReads>
+        using Read = ecs::entity::ReadSet<TReads...>;
+
+        template<typename ... TWrites>
+        using Write = ecs::entity::WriteSet<TWrites...>;
+
         std::vector<THandle> shaderHandles_;
 
         size_t capacity_;
@@ -59,12 +70,15 @@ export namespace helios::engine::rendering::shader::systems {
             shaderHandles_.reserve(capacity);
         }
 
-        void update(EntityWorld& ecsWorld, CommandBuffer& cmdBuffer) noexcept {
+        void update(
+            Query<
+                Read<ShaderSourceComponent<THandle>>,
+                Write<>
+            > query,
+            CommandBuffer& cmdBuffer
+        ) noexcept {
 
-            for (auto [entity, scc] : ecsWorld.view<
-                THandle,
-                ShaderSourceComponent<THandle>
-            >().withActive()) {
+            for (auto [entity, scc] : query.withActive()) {
                 shaderHandles_.push_back(entity.handle());
             }
 

@@ -18,6 +18,9 @@ import helios.ecs.entity.EntityWorld;
 import helios.ecs.component;
 import helios.engine.spatial.components;
 
+import helios.ecs.entity.EntityAccessSet;
+import helios.ecs.entity.Query;
+
 
 import helios.math;
 import helios.engine.core.types;
@@ -39,6 +42,15 @@ export namespace helios::engine::scene::systems {
 
         using EntityWorld = ecs::entity::EntityWorld;
 
+        template<typename TRead, typename TWrite>
+        using Query = ecs::entity::Query<TMemberHandle, TRead, TWrite>;
+
+        template<typename ... TReads>
+        using Read = ecs::entity::ReadSet<TReads...>;
+
+        template<typename ... TWrites>
+        using Write = ecs::entity::WriteSet<TWrites...>;
+
         /**
          * @brief Wraps an angle to the interval `[-pi, +pi]`.
          *
@@ -53,7 +65,7 @@ export namespace helios::engine::scene::systems {
 
     public:
 
-        using Handle_type = TMemberHandle;
+        using HandleType = TMemberHandle;
 
 
         /**
@@ -62,16 +74,17 @@ export namespace helios::engine::scene::systems {
          * @details Reads yaw/pitch/roll angles, wraps them to `[-pi, +pi]`,
          * builds axis-angle quaternions and writes the composed local rotation.
          *
-         * @param ecsWorld Frame-local ECS world.
-         * @return true if the update was successful, false otherwise.
+         * @param query Frame-local query over yaw/pitch/roll and local rotation.
          */
-        void update(EntityWorld& ecsWorld) noexcept {
+        void update(Query<
+                Read<YawPitchRollComponent<TMemberHandle>,
+                    Rotation3DComponent<TMemberHandle, Local>
+                >, Write<
+                    Rotation3DComponent<TMemberHandle, Local>
+                >> query) noexcept {
 
-            for (auto [entity, yawPitchRoll, localRotation] : ecsWorld.view<
-                TMemberHandle,
-                YawPitchRollComponent<TMemberHandle>,
-                Rotation3DComponent<TMemberHandle, Local>
-            >().withActive()
+            for (auto [entity, yawPitchRoll, localRotation] : query
+               .withActive()
                .template whereAnyDirty<
                YawPitchRollComponent<TMemberHandle>,
                Active<TMemberHandle>

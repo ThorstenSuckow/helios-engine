@@ -14,6 +14,9 @@ import helios.ecs.entity.EntityWorld;
 import helios.ecs.component;
 import helios.engine.spatial.components;
 
+import helios.ecs.entity.EntityAccessSet;
+import helios.ecs.entity.Query;
+
 
 import helios.math;
 import helios.engine.core.types;
@@ -35,9 +38,18 @@ export namespace helios::engine::scene::systems {
 
         using EntityWorld = ecs::entity::EntityWorld;
 
+        template<typename TRead, typename TWrite>
+        using Query = ecs::entity::Query<TMemberHandle, TRead, TWrite>;
+
+        template<typename ... TReads>
+        using Read = ecs::entity::ReadSet<TReads...>;
+
+        template<typename ... TWrites>
+        using Write = ecs::entity::WriteSet<TWrites...>;
+
     public:
 
-        using Handle_type = TMemberHandle;
+        using HandleType = TMemberHandle;
 
 
         /**
@@ -46,27 +58,28 @@ export namespace helios::engine::scene::systems {
          * @details For each active entity, the world transform translation is updated
          * only when the local position component is marked dirty.
          *
-         * @param ecsWorld Frame-local ECS world.
+         * @param query Frame-local query over required transform components.
          */
-        void update(EntityWorld& ecsWorld) noexcept {
+        void update(Query<
+                Read<Position3DComponent<TMemberHandle, Local>,
+                    Rotation3DComponent<TMemberHandle, Local>,
+                    TransformComponent<TMemberHandle, World>
+                >, Write<
+                    TransformComponent<TMemberHandle, World>
+                >> query) noexcept {
 
             for (auto [
                 entity,
                 localPosition,
                 localRotation,
                 worldTransform
-                ] : ecsWorld.view<
-                TMemberHandle,
-                Position3DComponent<TMemberHandle, Local>,
-                Rotation3DComponent<TMemberHandle, Local>,
-                TransformComponent<TMemberHandle, World>
-            >().withActive()
-                .template whereAnyDirty<
-                Active<TMemberHandle>,
-                Position3DComponent<TMemberHandle, Local>,
-                Rotation3DComponent<TMemberHandle, Local>
-            >()) {
-
+                ] : query
+                    .withActive()
+                    .template whereAnyDirty<
+                        Active<TMemberHandle>,
+                        Position3DComponent<TMemberHandle, Local>,
+                        Rotation3DComponent<TMemberHandle, Local>
+                    >()) {
                 entity.setTrackedValue(
                     worldTransform,
                     localRotation->value().rotationMatrix().withTranslation(localPosition->value())

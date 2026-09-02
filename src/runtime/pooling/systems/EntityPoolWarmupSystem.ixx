@@ -11,6 +11,8 @@ export module helios.engine.runtime.pooling.systems:EntityPoolWarmupSystem;
 import helios.ecs.common;
 import helios.ecs.command;
 import helios.ecs.entity.EntityWorld;
+import helios.ecs.entity.EntityAccessSet;
+import helios.ecs.entity.Query;
 
 import helios.engine.runtime.pooling.commands;
 import helios.engine.runtime.pooling.types;
@@ -26,6 +28,14 @@ export namespace helios::engine::runtime::pooling::systems {
     template<typename TMemberHandle>
     class EntityPoolWarmupSystem {
 
+        template<typename TRead, typename TWrite>
+        using Query = ecs::entity::Query<TMemberHandle, TRead, TWrite>;
+
+        template<typename ... TReads>
+        using Read = ecs::entity::ReadSet<TReads...>;
+
+        template<typename ... TWrites>
+        using Write = ecs::entity::WriteSet<TWrites...>;
 
     public:
 
@@ -38,16 +48,20 @@ export namespace helios::engine::runtime::pooling::systems {
          * @details Subsequent managers are responsible for removing the entity to
          * prevent multiple warmup attempts.
          *
-         * @param ecsWorld The ECS world providing entity views.
+         * @param query Query over pool warmup request/key components.
          * @param cmdBuffer The command buffer receiving the emitted pool commands.
          */
-        void update(ecs::entity::EntityWorld& ecsWorld, CommandBuffer& cmdBuffer) noexcept {
+        void update(
+            Query<
+                Read<components::PrefabEntityPoolRequestComponent<TMemberHandle>,
+                    components::EntityPoolKeyComponent<TMemberHandle>
+                >,
+                Write<>
+            > query,
+            CommandBuffer& cmdBuffer
+        ) noexcept {
 
-            for (auto [entity, requestComponent, keyComponent] : ecsWorld.view<
-                TMemberHandle,
-                components::PrefabEntityPoolRequestComponent<TMemberHandle>,
-                components::EntityPoolKeyComponent<TMemberHandle>
-            >()) {
+            for (auto [entity, requestComponent, keyComponent] : query) {
                 cmdBuffer.template add<commands::PrewarmEntityPoolCommand<TMemberHandle>>(
                     keyComponent->entityPoolKey,
                     entity.handle(),

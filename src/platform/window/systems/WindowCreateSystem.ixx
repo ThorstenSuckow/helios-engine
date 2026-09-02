@@ -12,6 +12,8 @@ import helios.engine.runtime.gameloop.types;
 import helios.ecs.command;
 
 import helios.ecs.entity.EntityWorld;
+import helios.ecs.entity.EntityAccessSet;
+import helios.ecs.entity.Query;
 
 import helios.engine.platform.window.components.WindowCreateRequestComponent;
 import helios.engine.platform.window.commands.WindowCreateCommand;
@@ -37,17 +39,29 @@ export namespace helios::engine::platform::window::systems {
 
         using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
 
+        template<typename TRead, typename TWrite>
+        using Query = ecs::entity::Query<THandle, TRead, TWrite>;
+
+        template<typename ... TReads>
+        using Read = ecs::entity::ReadSet<TReads...>;
+
+        template<typename ... TWrites>
+        using Write = ecs::entity::WriteSet<TWrites...>;
+
         public:
 
 
         using CommandBuffer = ecs::command::TypedCommandBuffer<WindowCreateCommand<THandle>>;
 
-        void update(entity::EntityWorld& ecsWorld, CommandBuffer& cmdBuffer) noexcept {
+        void update(
+            Query<
+                Read<WindowCreateRequestComponent<THandle>>,
+                Write<>
+            > query,
+            CommandBuffer& cmdBuffer
+        ) noexcept {
 
-            for (auto [entity, win]: ecsWorld.view<
-                THandle,
-                WindowCreateRequestComponent<THandle>
-                >().withActive()) {
+            for (auto [entity, win] : query.withActive()) {
 
                 cmdBuffer.template add<WindowCreateCommand<THandle>>(
                     entity.handle(),

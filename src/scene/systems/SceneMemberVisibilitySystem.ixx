@@ -29,6 +29,9 @@ import helios.engine.spatial.components;
 
 import helios.engine.runtime.gameloop.types;
 import helios.ecs.entity.EntityWorld;
+import helios.ecs.entity.EntityAccessSet;
+import helios.ecs.entity.Query;
+import helios.ecs.entity.EntityManager;
 
 
 import helios.ecs;
@@ -83,6 +86,15 @@ export namespace helios::engine::scene::systems {
 
         using EntityWorld = ecs::entity::EntityWorld;
 
+        template<typename THandle, typename TRead, typename TWrite>
+        using Query = ecs::entity::Query<THandle, TRead, TWrite>;
+
+        template<typename ... TReads>
+        using Read = ecs::entity::ReadSet<TReads...>;
+
+        template<typename ... TWrites>
+        using Write = ecs::entity::WriteSet<TWrites...>;
+
         using SceneMemberVisibilityRegistry = SceneMemberVisibilityRegistry<TMemberHandle, TSubmissionMode, TRenderHandles>;
         using SceneMemberVisibilityContext = SceneMemberVisibilityContext<TMemberHandle, TSubmissionMode, TRenderHandles>;
 
@@ -91,6 +103,25 @@ export namespace helios::engine::scene::systems {
         using ViewportHandle = typename TRenderHandles::ViewportHandle;
         using RenderTargetHandle = typename TRenderHandles::RenderTargetHandle;
         using ViewportEntity = ecs::entity::Entity<entity::EntityManager<ViewportHandle>>;
+
+        using ViewportQuery = Query<
+            ViewportHandle,
+            Read<RenderTargetBindingComponent<ViewportHandle, TRenderHandles>,
+                SceneBindingComponent<ViewportHandle, TRenderHandles>,
+                CameraBindingComponent<ViewportHandle, TRenderHandles>
+            >,
+            Write<>
+        >;
+
+        using MemberQuery = Query<
+            TMemberHandle,
+            Read<SceneMemberComponent<TMemberHandle, TRenderHandles>,
+                RenderPrototypeComponent<TMemberHandle, TSubmissionMode, TRenderHandles>,
+                TransformComponent<TMemberHandle, World>,
+                BoundsComponent<TMemberHandle, World>
+            >,
+            Write<>
+        >;
 
         /**
          * @brief Culling strategy used to decide member visibility per viewport.
@@ -111,12 +142,12 @@ export namespace helios::engine::scene::systems {
          * @param renderTargetBindingComponent Render target bound to the viewport.
          * @param viewportEntity Viewport entity being processed.
          */
-        void processMembers(
-            EntityWorld& ecsWorld,
+          void processMembers(
+            MemberQuery& memberQuery,
             CullingContext<TMemberHandle>& cullingContext,
             const SceneHandle sceneHandle,
             const RenderTargetBindingComponent<ViewportHandle, TRenderHandles>& renderTargetBindingComponent,
-            const ViewportEntity &viewportEntity,
+            const ViewportHandle viewportHandle,
             SceneMemberVisibilityRegistry& visibilityRegistry
         ) {
 
@@ -126,13 +157,7 @@ export namespace helios::engine::scene::systems {
                 rpc,
                 transformWorld,
                 boundsWorld
-                ] : ecsWorld.view<
-                TMemberHandle,
-                SceneMemberComponent<TMemberHandle, TRenderHandles>,
-                RenderPrototypeComponent<TMemberHandle, TSubmissionMode, TRenderHandles>,
-                TransformComponent<TMemberHandle, World>,
-                BoundsComponent<TMemberHandle, World>
-            >().withActive()) {
+                ] : memberQuery.withActive()) {
 
                 cullingContext.bounds = boundsWorld->value();
                 cullingContext.handle = memberEntity.handle();
@@ -140,15 +165,15 @@ export namespace helios::engine::scene::systems {
                 auto memberContext = SceneMemberVisibilityContext{
                     memberEntity.handle(),
                     renderTargetBindingComponent.targetHandle(),
-                    viewportEntity.handle(),
+                    viewportHandle,
                     sceneHandle,
                     transformWorld->value()
                 };
 
                 if (smc->targetHandle() == sceneHandle && cullingStrategy_.shouldRender(cullingContext)) {
-                    visibilityRegistry.addVisibleMember(viewportEntity.handle(), std::move(memberContext));
+                    visibilityRegistry.addVisibleMember(viewportHandle, std::move(memberContext));
                 } else {
-                    visibilityRegistry.addCulledMember(viewportEntity.handle(), std::move(memberContext));
+                    visibilityRegistry.addCulledMember(viewportHandle, std::move(memberContext));
                 }
             }
         }
@@ -177,22 +202,23 @@ export namespace helios::engine::scene::systems {
          * visible/culled buckets per submission mode.
          *
          * @param ecsWorld ECS world.
+         * @param viewportQuery Query over active viewport bindings.
+         * @param memberQuery Query over active scene members for the current submission mode.
          */
-        SceneMemberVisibilityRegistry update(EntityWorld& ecsWorld) noexcept {
+        SceneMemberVisibilityRegistry update(
+            ecs::entity::EntityManager<CameraHandle>& cameraEntityManager,
+            ViewportQuery viewportQuery,
+            MemberQuery memberQuery
+        ) noexcept {
 
             auto visibilityRegistry = SceneMemberVisibilityRegistry{};
 
-            for (auto [viewportEntity, renderTargetBindingComponent, sbc, cbc] : ecsWorld.view<
-                ViewportHandle,
-                RenderTargetBindingComponent<ViewportHandle, TRenderHandles>,
-                SceneBindingComponent<ViewportHandle, TRenderHandles>,
-                CameraBindingComponent<ViewportHandle, TRenderHandles>
-            >().withActive()) {
+            for (auto [viewportEntity, renderTargetBindingComponent, sbc, cbc] : viewportQuery.withActive()) {
 
                 const auto sceneHandle  = sbc->targetHandle();
                 const auto cameraHandle = cbc->targetHandle();
 
-                const auto camera = ecsWorld.find(cameraHandle);
+                const auto camera = cameraEntityManager.entity(cameraHandle);
                 if (!camera) {
                     assert(false && "Camera not found");
                     logger_.error("Camera not found");
@@ -232,7 +258,7 @@ export namespace helios::engine::scene::systems {
                 });
 
                 processMembers(
-                    ecsWorld, cullingContext, sceneHandle, *renderTargetBindingComponent, viewportEntity, visibilityRegistry);
+                    memberQuery, cullingContext, sceneHandle, *renderTargetBindingComponent, viewportEntity.handle(), visibilityRegistry);
             }
 
             return visibilityRegistry;

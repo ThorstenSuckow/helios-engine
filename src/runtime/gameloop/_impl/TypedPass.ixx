@@ -80,12 +80,8 @@ export namespace helios::engine::runtime::gameloop {
                         // consume frame results
                         system->update(ecsDataContainer);
 
-                        // produce frame results
+                        // produce frame results, flush any underlying flushable objects
                         system->flush(ecsDataContainer);
-
-                        if (auto* commandBuffer = system->commandBuffer()) {
-                            commandBuffer->flush(ecsDataContainer);
-                        }
                     }
                     continue;
                 }
@@ -106,10 +102,6 @@ export namespace helios::engine::runtime::gameloop {
                     for (const auto& serialSystem : parallelSystem) {
                         auto* system = systemRegistry_.item(serialSystem);
                         system->flush(ecsDataContainer);
-
-                        if (auto* commandBuffer = system->commandBuffer()) {
-                            commandBuffer->flush(ecsDataContainer);
-                        }
                     }
                 }
 
@@ -131,10 +123,7 @@ export namespace helios::engine::runtime::gameloop {
                 #endif
 
                 manager->executeCommands(ecsDataContainer);
-
-                if (auto* commandBuffer = manager->commandBuffer()) {
-                    commandBuffer->flush(ecsDataContainer);
-                }
+                manager->flush(ecsDataContainer);
             }
         }
 

@@ -179,7 +179,9 @@ export namespace helios::engine::runtime {
         template<typename TConcreteManager, typename... Args>
         requires helios::ecs::manager::concepts::IsManagerLike<TConcreteManager>
         TConcreteManager& registerManager(Args&&... args) {
-            return managerRegistry().add<TConcreteManager>(std::forward<Args>(args)...);
+            auto& mgr = managerRegistry().add<TConcreteManager>(std::forward<Args>(args)...);
+            resourceRegistry_.bind<TConcreteManager>(mgr);
+            return mgr;
         }
 
 

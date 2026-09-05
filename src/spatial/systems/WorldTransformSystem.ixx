@@ -83,8 +83,9 @@ export namespace helios::engine::scene::systems {
                 localRotation,
                 worldTransform
                 ] : query) {
-                entity.setTrackedValue(
-                    worldTransform,
+
+                entity.template track<TransformComponent<TMemberHandle, World>>()
+                    ->setValue(
                     localRotation->value().rotationMatrix().withTranslation(localPosition->value())
                 );
 

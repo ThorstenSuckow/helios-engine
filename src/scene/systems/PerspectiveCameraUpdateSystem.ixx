@@ -103,12 +103,14 @@ export namespace helios::engine::scene::systems {
                 const auto center = eye + mat.column(2).toVec3().normalize();
                 const auto up =  mat.column(1).toVec3().normalize();
 
-                entity.setTrackedValue(vmc, helios::math::lookAt(eye, center, up));
+                entity.template track<ViewMatrixComponent<TMemberHandle>>()
+                    ->setValue(helios::math::lookAt(eye, center, up));
             }
 
             for (auto [entity, pcc, pmc] : perspectiveQuery) {
 
-                entity.setTrackedValue(pmc, helios::math::perspective(
+                entity.template track<ProjectionMatrixComponent<TMemberHandle>>()
+                    ->setValue(helios::math::perspective(
                     pcc->fovY(),
                     pcc->aspectRatio(),
                     pcc->zNear(),

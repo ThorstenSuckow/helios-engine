@@ -78,8 +78,7 @@ export namespace helios::engine::runtime::gameloop {
                         auto* system = systemRegistry_.item(serialSystem);
                         // update, then immediately flush the buffer contents
                         // consume frame results
-                        system->update(ecsDataContainer);
-
+                        system->execute(ecsDataContainer);
                         // produce frame results, flush any underlying flushable objects
                         system->flush(ecsDataContainer);
                     }
@@ -93,7 +92,7 @@ export namespace helios::engine::runtime::gameloop {
                         // a parallel system owns more ore more serial systems
                         for (const auto& serialSystem : parallelSystems[i]) {
                             auto* system = systemRegistry_.item(serialSystem);
-                            system->update(ecsDataContainer);
+                            system->execute(ecsDataContainer);
                         }
                 });
 
@@ -122,7 +121,7 @@ export namespace helios::engine::runtime::gameloop {
                 }
                 #endif
 
-                manager->executeCommands(ecsDataContainer);
+                manager->execute(ecsDataContainer);
                 manager->flush(ecsDataContainer);
             }
         }

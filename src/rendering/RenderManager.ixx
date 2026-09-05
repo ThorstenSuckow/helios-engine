@@ -309,7 +309,7 @@ export namespace helios::engine::rendering {
         /**
          * @brief Flushes all active render-target batches to the backend.
          */
-        bool executeCommands(ecs::common::container::EcsDataContainer& ecsDataContainer,
+        bool commit(ecs::common::container::EcsDataContainer& ecsDataContainer,
             RenderDataResolver& renderDataResolver, RenderBackend& renderBackend) noexcept {
 
 

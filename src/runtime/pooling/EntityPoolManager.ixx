@@ -151,7 +151,7 @@ export namespace helios::engine::runtime::pooling {
          *
          * @param updateContext  Current frame update context (unused directly, passed for API symmetry).
          */
-        bool executeCommands(entity::EntityManager<THandle>& entityManager, EntityPoolRegistry& entityPoolRegistry) noexcept {
+        bool commit(entity::EntityManager<THandle>& entityManager, EntityPoolRegistry& entityPoolRegistry) noexcept {
 
             processPrewarmEntityPoolCommands(entityManager, entityPoolRegistry);
             processReleaseEntityCommands(entityManager, entityPoolRegistry);

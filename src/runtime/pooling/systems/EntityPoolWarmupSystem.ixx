@@ -12,7 +12,7 @@ import helios.ecs.common;
 import helios.ecs.command;
 import helios.ecs.entity.EntityWorld;
 import helios.ecs.entity.EntityAccessSet;
-import helios.ecs.entity.Query;
+import helios.ecs.entity.query.Query;
 
 import helios.engine.runtime.pooling.commands;
 import helios.engine.runtime.pooling.types;
@@ -28,8 +28,8 @@ export namespace helios::engine::runtime::pooling::systems {
     template<typename TMemberHandle>
     class EntityPoolWarmupSystem {
 
-        template<typename TRead, typename TWrite, typename TFilter = ecs::entity::Filter<ecs::entity::AnyDirty<>>>
-        using Query = ecs::entity::Query<TRead, TWrite, TFilter>;
+        template<typename TRead, typename TWrite, typename TFilter = ecs::entity::query::Filter<ecs::entity::query::AnyDirty<>>>
+        using Query = ecs::entity::query::Query<TRead, TWrite, TFilter>;
 
         template<typename ... TReads>
         using Read = ecs::entity::ReadSet<TReads...>;
@@ -57,7 +57,7 @@ export namespace helios::engine::runtime::pooling::systems {
                     components::EntityPoolKeyComponent<TMemberHandle>
                 >,
                 Write<>,
-                ecs::entity::Filter<ecs::entity::IsActive>
+                ecs::entity::query::Filter<ecs::entity::query::IsActive>
             > query,
             CommandBuffer& cmdBuffer
         ) noexcept {

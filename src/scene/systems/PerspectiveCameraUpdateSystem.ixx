@@ -17,7 +17,7 @@ import helios.engine.scene.components;
 import helios.engine.spatial.components;
 
 import helios.ecs.entity.EntityAccessSet;
-import helios.ecs.entity.Query;
+import helios.ecs.entity.query.Query;
 
 import helios.math;
 import helios.engine.core.types;
@@ -46,8 +46,8 @@ export namespace helios::engine::scene::systems {
 
         using EntityWorld = ecs::entity::EntityWorld;
 
-        template<typename TRead, typename TWrite, typename TFilter = ecs::entity::Filter<ecs::entity::AnyDirty<>>>
-        using Query = ecs::entity::Query<TRead, TWrite, TFilter>;
+        template<typename TRead, typename TWrite, typename TFilter = ecs::entity::query::Filter<ecs::entity::query::AnyDirty<>>>
+        using Query = ecs::entity::query::Query<TRead, TWrite, TFilter>;
 
         template<typename ... TReads>
         using Read = ecs::entity::ReadSet<TReads...>;
@@ -72,9 +72,9 @@ export namespace helios::engine::scene::systems {
                     ViewMatrixComponent<TMemberHandle>
                 >,
                 Write<ViewMatrixComponent<TMemberHandle>>,
-                ecs::entity::Filter<
-                    ecs::entity::IsActive,
-                    ecs::entity::AnyDirty<
+                ecs::entity::query::Filter<
+                    ecs::entity::query::IsActive,
+                    ecs::entity::query::AnyDirty<
                         TransformComponent<TMemberHandle, World>,
                         Active<TMemberHandle>
                     >
@@ -85,9 +85,9 @@ export namespace helios::engine::scene::systems {
                     ProjectionMatrixComponent<TMemberHandle>
                 >,
                 Write<ProjectionMatrixComponent<TMemberHandle>>,
-                ecs::entity::Filter<
-                    ecs::entity::IsActive,
-                    ecs::entity::AnyDirty<
+                ecs::entity::query::Filter<
+                    ecs::entity::query::IsActive,
+                    ecs::entity::query::AnyDirty<
                         PerspectiveCameraComponent<TMemberHandle>,
                         Active<TMemberHandle>
                     >

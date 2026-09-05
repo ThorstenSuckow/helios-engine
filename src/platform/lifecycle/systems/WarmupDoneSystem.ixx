@@ -12,7 +12,7 @@ export module helios.engine.platform.lifecycle.systems.WarmupDoneSystem;
 import helios.ecs;
 import helios.ecs.entity.EntityWorld;
 import helios.ecs.entity.EntityAccessSet;
-import helios.ecs.entity.Query;
+import helios.ecs.entity.query.Query;
 
 import helios.ecs.command.types;
 
@@ -47,8 +47,8 @@ export namespace helios::engine::platform::lifecycle::systems {
         using TextureHandle = typename TRenderHandles::TextureHandle;
         using EntityWorld = ecs::entity::EntityWorld;
 
-        template<typename TRead, typename TWrite, typename TFilter = ecs::entity::Filter<ecs::entity::AnyDirty<>>>
-        using Query = ecs::entity::Query<TRead, TWrite, TFilter>;
+        template<typename TRead, typename TWrite, typename TFilter = ecs::entity::query::Filter<ecs::entity::query::AnyDirty<>>>
+        using Query = ecs::entity::query::Query<TRead, TWrite, TFilter>;
 
         template<typename ... TReads>
         using Read = ecs::entity::ReadSet<TReads...>;
@@ -59,13 +59,13 @@ export namespace helios::engine::platform::lifecycle::systems {
         using ShaderWarmupQuery = Query<
             Read<ShaderSourceComponent<ShaderHandle>>,
             Write<>,
-            ecs::entity::Filter<ecs::entity::IsActive>
+            ecs::entity::query::Filter<ecs::entity::query::IsActive>
         >;
 
         using TextureWarmupQuery = Query<
             Read<rendering::texture::components::TextureSourceComponent<TextureHandle>>,
             Write<>,
-            ecs::entity::Filter<ecs::entity::IsActive>
+            ecs::entity::query::Filter<ecs::entity::query::IsActive>
         >;
 
     public:

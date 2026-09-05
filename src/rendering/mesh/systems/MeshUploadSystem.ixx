@@ -38,8 +38,8 @@ export namespace helios::engine::rendering::mesh::systems {
 
         using EntityWorld = ecs::entity::EntityWorld;
 
-        template<typename TRead, typename TWrite>
-        using Query = ecs::entity::Query<THandle, TRead, TWrite>;
+        template<typename TRead, typename TWrite, typename TFilter = ecs::entity::Filter<ecs::entity::AnyDirty<>>>
+        using Query = ecs::entity::Query<TRead, TWrite, TFilter>;
 
         template<typename ... TReads>
         using Read = ecs::entity::ReadSet<TReads...>;
@@ -64,12 +64,13 @@ export namespace helios::engine::rendering::mesh::systems {
                 Read<MeshDataComponent<THandle>,
                     MeshUploadRequestComponent<THandle>
                 >,
-                Write<>
+                Write<>,
+                ecs::entity::Filter<ecs::entity::IsActive>
             > query,
             CommandBuffer& cmdBuffer
         ) noexcept {
 
-            for (auto [entity, mdc, murc] : query.withActive()) {
+            for (auto [entity, mdc, murc] : query) {
                 meshHandles_.push_back(entity.handle());
             }
 

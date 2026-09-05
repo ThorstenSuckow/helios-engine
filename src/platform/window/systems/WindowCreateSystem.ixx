@@ -39,8 +39,8 @@ export namespace helios::engine::platform::window::systems {
 
         using UpdateContext = engine::runtime::gameloop::types::UpdateContext;
 
-        template<typename TRead, typename TWrite>
-        using Query = ecs::entity::Query<THandle, TRead, TWrite>;
+        template<typename TRead, typename TWrite, typename TFilter = ecs::entity::Filter<ecs::entity::AnyDirty<>>>
+        using Query = ecs::entity::Query<TRead, TWrite, TFilter>;
 
         template<typename ... TReads>
         using Read = ecs::entity::ReadSet<TReads...>;
@@ -56,12 +56,13 @@ export namespace helios::engine::platform::window::systems {
         void update(
             Query<
                 Read<WindowCreateRequestComponent<THandle>>,
-                Write<>
+                Write<>,
+                ecs::entity::Filter<ecs::entity::IsActive>
             > query,
             CommandBuffer& cmdBuffer
         ) noexcept {
 
-            for (auto [entity, win] : query.withActive()) {
+            for (auto [entity, win] : query) {
 
                 cmdBuffer.template add<WindowCreateCommand<THandle>>(
                     entity.handle(),

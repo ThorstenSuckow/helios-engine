@@ -39,8 +39,8 @@ export namespace helios::engine::scene::systems {
 
         using EntityWorld = ecs::entity::EntityWorld;
 
-        template<typename TRead, typename TWrite>
-        using Query = ecs::entity::Query<TMemberHandle, TRead, TWrite>;
+        template<typename TRead, typename TWrite, typename TFilter = ecs::entity::Filter<ecs::entity::AnyDirty<>>>
+        using Query = ecs::entity::Query<TRead, TWrite, TFilter>;
 
         template<typename ... TReads>
         using Read = ecs::entity::ReadSet<TReads...>;
@@ -68,21 +68,23 @@ export namespace helios::engine::scene::systems {
                     TransformComponent<TMemberHandle, World>
                 >, Write<
                     BoundsComponent<TMemberHandle, World>
-                >> query) noexcept {
+                >,
+                ecs::entity::Filter<
+                    ecs::entity::IsActive,
+                    ecs::entity::AnyDirty<
+                        BoundsComponent<TMemberHandle, Local>,
+                        TransformComponent<TMemberHandle, World>,
+                        Active<TMemberHandle>
+                    >
+                >
+            > query) noexcept {
 
             for (auto [
                     entity,
                     boundsLocal,
                     boundsWorld,
                     worldTransform
-                ] : query
-                    .withActive()
-                    .template whereAnyDirty<
-                        BoundsComponent<TMemberHandle, Local>,
-                        TransformComponent<TMemberHandle, World>,
-                        Active<TMemberHandle>
-                    >()
-               ) {
+                ] : query) {
                 entity.setTrackedValue(boundsWorld, boundsLocal->value().applyTransform(worldTransform->value()));
             }
         }

@@ -38,8 +38,8 @@ export namespace helios::engine::scene::systems {
 
         using EntityWorld = ecs::entity::EntityWorld;
 
-        template<typename TRead, typename TWrite>
-        using Query = ecs::entity::Query<TMemberHandle, TRead, TWrite>;
+        template<typename TRead, typename TWrite, typename TFilter = ecs::entity::Filter<ecs::entity::AnyDirty<>>>
+        using Query = ecs::entity::Query<TRead, TWrite, TFilter>;
 
         template<typename ... TReads>
         using Read = ecs::entity::ReadSet<TReads...>;
@@ -66,20 +66,23 @@ export namespace helios::engine::scene::systems {
                     TransformComponent<TMemberHandle, World>
                 >, Write<
                     TransformComponent<TMemberHandle, World>
-                >> query) noexcept {
+                >,
+                ecs::entity::Filter<
+                    ecs::entity::IsActive,
+                    ecs::entity::AnyDirty<
+                        Active<TMemberHandle>,
+                        Position3DComponent<TMemberHandle, Local>,
+                        Rotation3DComponent<TMemberHandle, Local>
+                    >
+                >
+            > query) noexcept {
 
             for (auto [
                 entity,
                 localPosition,
                 localRotation,
                 worldTransform
-                ] : query
-                    .withActive()
-                    .template whereAnyDirty<
-                        Active<TMemberHandle>,
-                        Position3DComponent<TMemberHandle, Local>,
-                        Rotation3DComponent<TMemberHandle, Local>
-                    >()) {
+                ] : query) {
                 entity.setTrackedValue(
                     worldTransform,
                     localRotation->value().rotationMatrix().withTranslation(localPosition->value())

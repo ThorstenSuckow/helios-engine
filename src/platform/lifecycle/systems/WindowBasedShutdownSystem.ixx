@@ -44,8 +44,8 @@ export namespace helios::engine::platform::lifecycle::systems {
 
         using EntityWorld = ecs::entity::EntityWorld;
 
-        template<typename TRead, typename TWrite>
-        using Query = ecs::entity::Query<THandle, TRead, TWrite>;
+        template<typename TRead, typename TWrite, typename TFilter = ecs::entity::Filter<ecs::entity::AnyDirty<>>>
+        using Query = ecs::entity::Query<TRead, TWrite, TFilter>;
 
         template<typename ... TReads>
         using Read = ecs::entity::ReadSet<TReads...>;
@@ -67,12 +67,13 @@ export namespace helios::engine::platform::lifecycle::systems {
         void update(
             Query<
                 Read<WindowComponent<THandle>>,
-                Write<>
+                Write<>,
+                ecs::entity::Filter<ecs::entity::IsActive>
             > query,
             CommandBuffer& cmdBuffer
         ) noexcept {
 
-            if (query.withActive().empty()) {
+            if (query.empty()) {
                cmdBuffer.template add<ShutdownCommand>();
             }
 

@@ -5,7 +5,9 @@
 module;
 
 #include <cmath>
+#include <iostream>
 #include <numbers>
+#include <ostream>
 
 export module helios.engine.spatial.systems.YawPitchRollUpdateSystem;
 
@@ -42,8 +44,8 @@ export namespace helios::engine::scene::systems {
 
         using EntityWorld = ecs::entity::EntityWorld;
 
-        template<typename TRead, typename TWrite>
-        using Query = ecs::entity::Query<TMemberHandle, TRead, TWrite>;
+        template<typename TRead, typename TWrite, typename TFilter = ecs::entity::Filter<ecs::entity::AnyDirty<>>>
+        using Query = ecs::entity::Query<TRead, TWrite, TFilter>;
 
         template<typename ... TReads>
         using Read = ecs::entity::ReadSet<TReads...>;
@@ -81,14 +83,18 @@ export namespace helios::engine::scene::systems {
                     Rotation3DComponent<TMemberHandle, Local>
                 >, Write<
                     Rotation3DComponent<TMemberHandle, Local>
-                >> query) noexcept {
+                >,
+                ecs::entity::Filter<
+                    ecs::entity::IsActive,
+                    ecs::entity::AnyDirty<
+                        YawPitchRollComponent<TMemberHandle>,
+                        Active<TMemberHandle>
+                    >
+                >
+            > query) noexcept {
 
-            for (auto [entity, yawPitchRoll, localRotation] : query
-               .withActive()
-               .template whereAnyDirty<
-               YawPitchRollComponent<TMemberHandle>,
-               Active<TMemberHandle>
-            >()) {
+
+            for (auto [entity, yawPitchRoll, localRotation] : query) {
                 constexpr auto x = helios::math::X_AXISf;
                 constexpr auto y = helios::math::Y_AXISf;
                 constexpr auto z = helios::math::Z_AXISf;

@@ -86,8 +86,8 @@ export namespace helios::engine::scene::systems {
 
         using EntityWorld = ecs::entity::EntityWorld;
 
-        template<typename THandle, typename TRead, typename TWrite>
-        using Query = ecs::entity::Query<THandle, TRead, TWrite>;
+        template<typename TRead, typename TWrite, typename TFilter = ecs::entity::Filter<ecs::entity::AnyDirty<>>>
+        using Query = ecs::entity::Query<TRead, TWrite, TFilter>;
 
         template<typename ... TReads>
         using Read = ecs::entity::ReadSet<TReads...>;
@@ -105,22 +105,22 @@ export namespace helios::engine::scene::systems {
         using ViewportEntity = ecs::entity::Entity<entity::EntityManager<ViewportHandle>>;
 
         using ViewportQuery = Query<
-            ViewportHandle,
             Read<RenderTargetBindingComponent<ViewportHandle, TRenderHandles>,
                 SceneBindingComponent<ViewportHandle, TRenderHandles>,
                 CameraBindingComponent<ViewportHandle, TRenderHandles>
             >,
-            Write<>
+            Write<>,
+            ecs::entity::Filter<ecs::entity::IsActive>
         >;
 
         using MemberQuery = Query<
-            TMemberHandle,
             Read<SceneMemberComponent<TMemberHandle, TRenderHandles>,
                 RenderPrototypeComponent<TMemberHandle, TSubmissionMode, TRenderHandles>,
                 TransformComponent<TMemberHandle, World>,
                 BoundsComponent<TMemberHandle, World>
             >,
-            Write<>
+            Write<>,
+            ecs::entity::Filter<ecs::entity::IsActive>
         >;
 
         /**
@@ -157,7 +157,7 @@ export namespace helios::engine::scene::systems {
                 rpc,
                 transformWorld,
                 boundsWorld
-                ] : memberQuery.withActive()) {
+                ] : memberQuery) {
 
                 cullingContext.bounds = boundsWorld->value();
                 cullingContext.handle = memberEntity.handle();
@@ -213,7 +213,7 @@ export namespace helios::engine::scene::systems {
 
             auto visibilityRegistry = SceneMemberVisibilityRegistry{};
 
-            for (auto [viewportEntity, renderTargetBindingComponent, sbc, cbc] : viewportQuery.withActive()) {
+            for (auto [viewportEntity, renderTargetBindingComponent, sbc, cbc] : viewportQuery) {
 
                 const auto sceneHandle  = sbc->targetHandle();
                 const auto cameraHandle = cbc->targetHandle();

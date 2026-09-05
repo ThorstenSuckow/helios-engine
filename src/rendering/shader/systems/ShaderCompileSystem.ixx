@@ -49,8 +49,8 @@ export namespace helios::engine::rendering::shader::systems {
 
         using EntityWorld = ecs::entity::EntityWorld;
 
-        template<typename TRead, typename TWrite>
-        using Query = ecs::entity::Query<THandle, TRead, TWrite>;
+        template<typename TRead, typename TWrite, typename TFilter = ecs::entity::Filter<ecs::entity::AnyDirty<>>>
+        using Query = ecs::entity::Query<TRead, TWrite, TFilter>;
 
         template<typename ... TReads>
         using Read = ecs::entity::ReadSet<TReads...>;
@@ -73,12 +73,13 @@ export namespace helios::engine::rendering::shader::systems {
         void update(
             Query<
                 Read<ShaderSourceComponent<THandle>>,
-                Write<>
+                Write<>,
+                ecs::entity::Filter<ecs::entity::IsActive>
             > query,
             CommandBuffer& cmdBuffer
         ) noexcept {
 
-            for (auto [entity, scc] : query.withActive()) {
+            for (auto [entity, scc] : query) {
                 shaderHandles_.push_back(entity.handle());
             }
 

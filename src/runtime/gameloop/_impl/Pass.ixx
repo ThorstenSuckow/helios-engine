@@ -370,7 +370,7 @@ export namespace helios::engine::runtime::gameloop {
          */
         template<typename... T>
         requires (ecs::manager::concepts::IsManagerLike<T> && ...)
-        Pass& executeCommands() {
+        Pass& commit() {
 
             (registerManagerExecuteCommands<T>(), ...);
 

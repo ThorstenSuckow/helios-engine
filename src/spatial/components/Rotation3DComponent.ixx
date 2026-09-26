@@ -19,14 +19,12 @@ export namespace helios::engine::spatial::components {
     /**
      * @brief Stores 3D local/world rotation state as `quat<float>`.
      *
-     * @tparam THandle Owning entity handle type.
      * @tparam Args Additional type tags (e.g. `Local`, `World`).
      */
-    template<typename THandle, typename ...Args>
+    template<typename ...Args>
     using Rotation3DComponent = helios::engine::core::components::QuaternionComponent<
             Rotation3DComponentDomain,
             float,
-            THandle,
             Args...
         >;
 }

@@ -88,7 +88,7 @@ export namespace helios::engine::scene::systems {
         using RenderInstanceBatchCommand = RenderInstanceBatchCommand<TMemberHandle, TRenderHandles>;
         using RenderInstanceBatchContext = InstanceRenderBatchContext<TMemberHandle, TRenderHandles>;
         using RenderSceneCommand = RenderSceneCommand<TMemberHandle, TRenderHandles>;
-        using RenderPrototypeComponent = RenderPrototypeComponent<TMemberHandle, TSubmissionMode, TRenderHandles>;
+        using RenderPrototypeComponent = RenderPrototypeComponent<TSubmissionMode, TRenderHandles>;
 
         using CommandBuffer = ecs::command::TypedCommandBuffer<
             RenderSceneCommand,

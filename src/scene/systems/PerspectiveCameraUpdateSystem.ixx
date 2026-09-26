@@ -47,7 +47,7 @@ export namespace helios::engine::scene::systems {
         using EntityWorld = ecs::entity::EntityWorld;
 
         template<typename TRead, typename TWrite, typename TFilter = ecs::entity::query::Filter<ecs::entity::query::AnyDirty<>>>
-        using Query = ecs::entity::query::Query<TRead, TWrite, TFilter>;
+        using Query = ecs::entity::query::Query<TMemberHandle, TRead, TWrite, TFilter>;
 
         template<typename ... TReads>
         using Read = ecs::entity::ReadSet<TReads...>;
@@ -68,28 +68,28 @@ export namespace helios::engine::scene::systems {
          */
         void update(
             Query<
-                Read<TransformComponent<TMemberHandle, World>,
-                    ViewMatrixComponent<TMemberHandle>
+                Read<TransformComponent<World>,
+                    ViewMatrixComponent
                 >,
-                Write<ViewMatrixComponent<TMemberHandle>>,
+                Write<ViewMatrixComponent>,
                 ecs::entity::query::Filter<
                     ecs::entity::query::IsActive,
                     ecs::entity::query::AnyDirty<
-                        TransformComponent<TMemberHandle, World>,
-                        Active<TMemberHandle>
+                        TransformComponent<World>,
+                        Active
                     >
                 >
             > worldTransformQuery,
             Query<
-                Read<PerspectiveCameraComponent<TMemberHandle>,
-                    ProjectionMatrixComponent<TMemberHandle>
+                Read<PerspectiveCameraComponent,
+                    ProjectionMatrixComponent
                 >,
-                Write<ProjectionMatrixComponent<TMemberHandle>>,
+                Write<ProjectionMatrixComponent>,
                 ecs::entity::query::Filter<
                     ecs::entity::query::IsActive,
                     ecs::entity::query::AnyDirty<
-                        PerspectiveCameraComponent<TMemberHandle>,
-                        Active<TMemberHandle>
+                        PerspectiveCameraComponent,
+                        Active
                     >
                 >
             > perspectiveQuery
@@ -103,13 +103,13 @@ export namespace helios::engine::scene::systems {
                 const auto center = eye + mat.column(2).toVec3().normalize();
                 const auto up =  mat.column(1).toVec3().normalize();
 
-                entity.template track<ViewMatrixComponent<TMemberHandle>>()
+                entity.template track<ViewMatrixComponent>()
                     ->setValue(helios::math::lookAt(eye, center, up));
             }
 
             for (auto [entity, pcc, pmc] : perspectiveQuery) {
 
-                entity.template track<ProjectionMatrixComponent<TMemberHandle>>()
+                entity.template track<ProjectionMatrixComponent>()
                     ->setValue(helios::math::perspective(
                     pcc->fovY(),
                     pcc->aspectRatio(),

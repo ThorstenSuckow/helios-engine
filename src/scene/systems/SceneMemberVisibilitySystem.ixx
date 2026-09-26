@@ -86,8 +86,8 @@ export namespace helios::engine::scene::systems {
 
         using EntityWorld = ecs::entity::EntityWorld;
 
-        template<typename TRead, typename TWrite, typename TFilter = ecs::entity::query::Filter<ecs::entity::query::AnyDirty<>>>
-        using Query = ecs::entity::query::Query<TRead, TWrite, TFilter>;
+        template<typename THandle, typename TRead, typename TWrite, typename TFilter = ecs::entity::query::Filter<ecs::entity::query::AnyDirty<>>>
+        using Query = ecs::entity::query::Query<THandle, TRead, TWrite, TFilter>;
 
         template<typename ... TReads>
         using Read = ecs::entity::ReadSet<TReads...>;
@@ -105,19 +105,21 @@ export namespace helios::engine::scene::systems {
         using ViewportEntity = ecs::entity::Entity<entity::EntityManager<ViewportHandle>>;
 
         using ViewportQuery = Query<
-            Read<RenderTargetBindingComponent<ViewportHandle, TRenderHandles>,
-                SceneBindingComponent<ViewportHandle, TRenderHandles>,
-                CameraBindingComponent<ViewportHandle, TRenderHandles>
+            ViewportHandle,
+            Read<RenderTargetBindingComponent<TRenderHandles>,
+                SceneBindingComponent<TRenderHandles>,
+                CameraBindingComponent<TRenderHandles>
             >,
             Write<>,
             ecs::entity::query::Filter<ecs::entity::query::IsActive>
         >;
 
         using MemberQuery = Query<
-            Read<SceneMemberComponent<TMemberHandle, TRenderHandles>,
-                RenderPrototypeComponent<TMemberHandle, TSubmissionMode, TRenderHandles>,
-                TransformComponent<TMemberHandle, World>,
-                BoundsComponent<TMemberHandle, World>
+            TMemberHandle,
+            Read<SceneMemberComponent<TRenderHandles>,
+                RenderPrototypeComponent<TSubmissionMode, TRenderHandles>,
+                TransformComponent<World>,
+                BoundsComponent<World>
             >,
             Write<>,
             ecs::entity::query::Filter<ecs::entity::query::IsActive>
@@ -146,7 +148,7 @@ export namespace helios::engine::scene::systems {
             MemberQuery& memberQuery,
             CullingContext<TMemberHandle>& cullingContext,
             const SceneHandle sceneHandle,
-            const RenderTargetBindingComponent<ViewportHandle, TRenderHandles>& renderTargetBindingComponent,
+            const RenderTargetBindingComponent<TRenderHandles>& renderTargetBindingComponent,
             const ViewportHandle viewportHandle,
             SceneMemberVisibilityRegistry& visibilityRegistry
         ) {

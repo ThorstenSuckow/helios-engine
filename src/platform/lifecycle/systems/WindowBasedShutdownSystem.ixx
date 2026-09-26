@@ -45,7 +45,7 @@ export namespace helios::engine::platform::lifecycle::systems {
         using EntityWorld = ecs::entity::EntityWorld;
 
         template<typename TRead, typename TWrite, typename TFilter = ecs::entity::query::Filter<ecs::entity::query::AnyDirty<>>>
-        using Query = ecs::entity::query::Query<TRead, TWrite, TFilter>;
+        using Query = ecs::entity::query::Query<THandle, TRead, TWrite, TFilter>;
 
         template<typename ... TReads>
         using Read = ecs::entity::ReadSet<TReads...>;
@@ -66,7 +66,7 @@ export namespace helios::engine::platform::lifecycle::systems {
          */
         void update(
             Query<
-                Read<WindowComponent<THandle>>,
+                Read<WindowComponent>,
                 Write<>,
                 ecs::entity::query::Filter<ecs::entity::query::IsActive>
             > query,

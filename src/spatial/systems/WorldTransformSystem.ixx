@@ -39,7 +39,7 @@ export namespace helios::engine::scene::systems {
         using EntityWorld = ecs::entity::EntityWorld;
 
         template<typename TRead, typename TWrite, typename TFilter = ecs::entity::query::Filter<ecs::entity::query::AnyDirty<>>>
-        using Query = ecs::entity::query::Query<TRead, TWrite, TFilter>;
+        using Query = ecs::entity::query::Query<TMemberHandle, TRead, TWrite, TFilter>;
 
         template<typename ... TReads>
         using Read = ecs::entity::ReadSet<TReads...>;
@@ -61,18 +61,18 @@ export namespace helios::engine::scene::systems {
          * @param query Frame-local query over required transform components.
          */
         void update(Query<
-                Read<Position3DComponent<TMemberHandle, Local>,
-                    Rotation3DComponent<TMemberHandle, Local>,
-                    TransformComponent<TMemberHandle, World>
+                Read<Position3DComponent<Local>,
+                    Rotation3DComponent<Local>,
+                    TransformComponent<World>
                 >, Write<
-                    TransformComponent<TMemberHandle, World>
+                    TransformComponent<World>
                 >,
                 ecs::entity::query::Filter<
                     ecs::entity::query::IsActive,
                     ecs::entity::query::AnyDirty<
-                        Active<TMemberHandle>,
-                        Position3DComponent<TMemberHandle, Local>,
-                        Rotation3DComponent<TMemberHandle, Local>
+                        Active,
+                        Position3DComponent<Local>,
+                        Rotation3DComponent<Local>
                     >
                 >
             > query) noexcept {
@@ -84,7 +84,7 @@ export namespace helios::engine::scene::systems {
                 worldTransform
                 ] : query) {
 
-                entity.template track<TransformComponent<TMemberHandle, World>>()
+                entity.template track<TransformComponent<World>>()
                     ->setValue(
                     localRotation->value().rotationMatrix().withTranslation(localPosition->value())
                 );

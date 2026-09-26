@@ -35,7 +35,7 @@ using namespace helios::engine::spatial::components;
 export namespace helios::engine::scene::systems {
 
     /**
-     * @brief Updates `Rotation3DComponent<..., Local>` from `YawPitchRollComponent`.
+     * @brief Updates `Rotation3DComponent<Local>` from `YawPitchRollComponent`.
      *
      * @tparam TMemberHandle ECS member handle type used by queried components.
      */
@@ -45,7 +45,7 @@ export namespace helios::engine::scene::systems {
         using EntityWorld = ecs::entity::EntityWorld;
 
         template<typename TRead, typename TWrite, typename TFilter = ecs::entity::query::Filter<ecs::entity::query::AnyDirty<>>>
-        using Query = ecs::entity::query::Query<TRead, TWrite, TFilter>;
+        using Query = ecs::entity::query::Query<TMemberHandle, TRead, TWrite, TFilter>;
 
         template<typename ... TReads>
         using Read = ecs::entity::ReadSet<TReads...>;
@@ -79,16 +79,16 @@ export namespace helios::engine::scene::systems {
          * @param query Frame-local query over yaw/pitch/roll and local rotation.
          */
         void update(Query<
-                Read<YawPitchRollComponent<TMemberHandle>,
-                    Rotation3DComponent<TMemberHandle, Local>
+                Read<YawPitchRollComponent,
+                    Rotation3DComponent<Local>
                 >, Write<
-                    Rotation3DComponent<TMemberHandle, Local>
+                    Rotation3DComponent<Local>
                 >,
                 ecs::entity::query::Filter<
                     ecs::entity::query::IsActive,
                     ecs::entity::query::AnyDirty<
-                        YawPitchRollComponent<TMemberHandle>,
-                        Active<TMemberHandle>
+                        YawPitchRollComponent,
+                        Active
                     >
                 >
             > query) noexcept {
@@ -107,7 +107,7 @@ export namespace helios::engine::scene::systems {
                 const auto qPitch = helios::math::quatf::fromAxisAngle(x, pitch);
                 const auto qRoll = helios::math::quatf::fromAxisAngle(z, roll);
 
-                entity.template track<Rotation3DComponent<TMemberHandle, Local>>()
+                entity.template track<Rotation3DComponent<Local>>()
                     ->setValue(qYaw * qPitch * qRoll);
             }
 

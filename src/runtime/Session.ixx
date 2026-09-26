@@ -34,23 +34,23 @@ export namespace helios::engine::runtime {
     public:
 
         Session() : sessionHandle_(entityManager_.create()) {
-            sessionObject().add<ecs::components::Uninitialized<SessionHandle>>();
+            sessionObject().add<ecs::components::Uninitialized>();
         }
 
         [[nodiscard]] bool isInitialized() const noexcept {
-            return !sessionObject().has<ecs::components::Uninitialized<SessionHandle>>();
+            return !sessionObject().has<ecs::components::Uninitialized>();
         }
 
         [[nodiscard]] bool initialize() noexcept {
-            return sessionObject().remove<ecs::components::Uninitialized<SessionHandle>>();
+            return sessionObject().remove<ecs::components::Uninitialized>();
         }
 
         [[nodiscard]] bool isDestroyed() noexcept {
-            return sessionObject().has<ecs::components::Destroyed<SessionHandle>>();
+            return sessionObject().has<ecs::components::Destroyed>();
         }
 
         void destroy() noexcept {
-            sessionObject().add<ecs::components::Destroyed<SessionHandle>>();
+            sessionObject().add<ecs::components::Destroyed>();
         }
 
         /**

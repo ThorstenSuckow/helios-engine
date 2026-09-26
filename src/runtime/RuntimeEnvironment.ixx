@@ -60,7 +60,7 @@ export namespace helios::engine::runtime {
          * @return `true` if GPU context is ready, otherwise `false`.
          */
         [[nodiscard]] bool isGPUReady() const noexcept {
-            return runtimeObject().has<GPUContextReadyComponent<RuntimeHandle>>();
+            return runtimeObject().has<GPUContextReadyComponent>();
         }
 
         /**
@@ -73,7 +73,7 @@ export namespace helios::engine::runtime {
                 assert(false && "RuntimeEnvironment already initialized");
                 return false;
             }
-            runtimeObject().add<PlatformInitializedComponent<RuntimeHandle>>();
+            runtimeObject().add<PlatformInitializedComponent>();
             return true;
         }
 
@@ -83,7 +83,7 @@ export namespace helios::engine::runtime {
          * @return `true` if initialized, otherwise `false`.
          */
         [[nodiscard]] bool isInitialized() const noexcept {
-            return runtimeObject().has<PlatformInitializedComponent<RuntimeHandle>>();
+            return runtimeObject().has<PlatformInitializedComponent>();
         }
 
         /**
@@ -100,7 +100,7 @@ export namespace helios::engine::runtime {
          */
         void setGPUReady() noexcept {
             assert(!isGPUReady() && "GPUContextReadyComponent already set");
-            runtimeObject().add<GPUContextReadyComponent<RuntimeHandle>>();
+            runtimeObject().add<GPUContextReadyComponent>();
         }
 
         /**

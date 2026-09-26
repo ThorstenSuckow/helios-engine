@@ -37,7 +37,7 @@ export namespace helios::engine::rendering::texture::systems {
         using EntityWorld = ecs::entity::EntityWorld;
 
         template<typename TRead, typename TWrite, typename TFilter = ecs::entity::query::Filter<ecs::entity::query::AnyDirty<>>>
-        using Query = ecs::entity::query::Query<TRead, TWrite, TFilter>;
+        using Query = ecs::entity::query::Query<THandle, TRead, TWrite, TFilter>;
 
         template<typename ... TReads>
         using Read = ecs::entity::ReadSet<TReads...>;
@@ -65,7 +65,7 @@ export namespace helios::engine::rendering::texture::systems {
          */
         void update(
             Query<
-                Read<texture::components::TextureSourceComponent<THandle>>,
+                Read<texture::components::TextureSourceComponent>,
                 Write<>,
                 ecs::entity::query::Filter<ecs::entity::query::IsActive>
             > query,

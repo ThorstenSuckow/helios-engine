@@ -40,7 +40,7 @@ export namespace helios::engine::scene::systems {
         using EntityWorld = ecs::entity::EntityWorld;
 
         template<typename TRead, typename TWrite, typename TFilter = ecs::entity::query::Filter<ecs::entity::query::AnyDirty<>>>
-        using Query = ecs::entity::query::Query<TRead, TWrite, TFilter>;
+        using Query = ecs::entity::query::Query<TMemberHandle, TRead, TWrite, TFilter>;
 
         template<typename ... TReads>
         using Read = ecs::entity::ReadSet<TReads...>;
@@ -63,18 +63,18 @@ export namespace helios::engine::scene::systems {
          * @param ecsWorld Frame-local ECS world.
          */
         void update(Query<
-                Read<BoundsComponent<TMemberHandle, Local>,
-                    BoundsComponent<TMemberHandle, World>,
-                    TransformComponent<TMemberHandle, World>
+                Read<BoundsComponent<Local>,
+                    BoundsComponent<World>,
+                    TransformComponent<World>
                 >, Write<
-                    BoundsComponent<TMemberHandle, World>
+                    BoundsComponent<World>
                 >,
                 ecs::entity::query::Filter<
                     ecs::entity::query::IsActive,
                     ecs::entity::query::AnyDirty<
-                        BoundsComponent<TMemberHandle, Local>,
-                        TransformComponent<TMemberHandle, World>,
-                        Active<TMemberHandle>
+                        BoundsComponent<Local>,
+                        TransformComponent<World>,
+                        Active
                     >
                 >
             > query) noexcept {
@@ -86,7 +86,7 @@ export namespace helios::engine::scene::systems {
                     worldTransform
                 ] : query) {
 
-                entity.template track<BoundsComponent<TMemberHandle, World>>()
+                entity.template track<BoundsComponent<World>>()
                     ->setValue(boundsLocal->value().applyTransform(worldTransform->value()));
 
                // entity.setTrackedValue(boundsWorld, boundsLocal->value().applyTransform(worldTransform->value()));

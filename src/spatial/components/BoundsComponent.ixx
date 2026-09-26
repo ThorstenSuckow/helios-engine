@@ -18,9 +18,9 @@ export namespace helios::engine::spatial::components {
 
     /**
      * @brief AABB component describing an entity's bounds in  space.
-     * @tparam TOwnerHandler Owner/entity handle type.
+     * @tparam Args Additional type tags (e.g. `Local`, `World`).
      */
-    template<typename THandle, typename ... Args>
-    using BoundsComponent = AABBComponent<BoundsDomain, float, THandle, Args...>;
+    template<typename ... Args>
+    using BoundsComponent = AABBComponent<BoundsDomain, float, Args...>;
 
 }

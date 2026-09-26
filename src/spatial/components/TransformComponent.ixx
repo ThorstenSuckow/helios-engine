@@ -18,9 +18,9 @@ export namespace helios::engine::spatial::components {
 
     /**
      * @brief 4x4 matrix component representing an entity transform in world space.
-     * @tparam TOwnerHandler Owner/entity handle type.
+     * @tparam Args Additional type tags (e.g. `Local`, `World`).
      */
-    template<typename THandle, typename ... Args>
-    using TransformComponent = Mat4Component<WorldMatrixDomain, float, THandle, Args...>;
+    template<typename ... Args>
+    using TransformComponent = Mat4Component<WorldMatrixDomain, float, Args...>;
 
 }

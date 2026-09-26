@@ -14,10 +14,9 @@ export namespace helios::engine::core::components {
      * @brief Generic AABB value component with dirty-state tracking.
      *
      * @tparam TDomainTag Semantic domain tag.
-     * @tparam THandle Owning entity handle type.
      * @tparam TNumericType Scalar type for AABB values.
      */
-    template<typename TDomainTag, typename TNumericType, typename THandle, typename ... Args>
+    template<typename TDomainTag, typename TNumericType, typename ... Args>
     requires IsNumeric<TNumericType>
     class AABBComponent  {
 
@@ -26,7 +25,6 @@ export namespace helios::engine::core::components {
     public:
 
         using Value_type = helios::math::aabb<TNumericType>;
-        using HandleType = THandle;
 
         AABBComponent() = default;
 

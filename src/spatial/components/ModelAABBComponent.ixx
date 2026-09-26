@@ -14,8 +14,8 @@ export namespace helios::engine::spatial::components {
 
     struct ModelAABBComponent {};
 
-    template<typename THandle, typename ... T>
+    template<typename ... T>
     using ModelAabbComponent = helios::engine::core::components::AABBComponent<
-        ModelAABBComponent, float, THandle, T...>;
+        ModelAABBComponent, float, T...>;
 
 }

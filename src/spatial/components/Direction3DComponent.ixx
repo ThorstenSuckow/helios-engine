@@ -16,9 +16,6 @@ export namespace helios::engine::spatial::components {
 
     /**
      * @brief Stores 3d direction data in a `vec3<float>` component.
-     *
-     * @tparam THandle Owning entity handle type.
      */
-    template<typename THandle>
-    using Direction3DComponent = helios::engine::core::components::Vec3Component<Direction3DComponentDomain, float, THandle>;
+    using Direction3DComponent = helios::engine::core::components::Vec3Component<Direction3DComponentDomain, float>;
 }

@@ -19,12 +19,10 @@ export namespace helios::engine::spatial::components {
      *
      * @tparam THandle Owning entity handle type.
      */
-    template<typename THandle>
     struct YawPitchRollComponent {
 
         using Value_type = helios::math::vec3f;
 
-        using HandleType = THandle;
 
         /** @brief Rotation around up axis in radians. */
         float yaw = 0;

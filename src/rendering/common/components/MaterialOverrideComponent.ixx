@@ -11,7 +11,7 @@ import helios.ecs.component.components;
 export namespace helios::engine::rendering::common::components {
 
     struct MaterialOverrideComponentDomainTag;
-    template<typename TOwnerHandle, typename TMaterialHandle>
-    using MaterialOverrideComponent = ecs::components::BindingComponent<TOwnerHandle, TMaterialHandle,MaterialOverrideComponentDomainTag>;
+    template<typename TMaterialHandle>
+    using MaterialOverrideComponent = ecs::components::BindingComponent<TMaterialHandle, MaterialOverrideComponentDomainTag>;
 
 };

@@ -24,8 +24,7 @@ export namespace helios::engine::runtime::pooling::components {
      * @details Owning entity should provide an EntityPoolKeyComponent to make sure pool is properly identified
      * for prefab.
      */
-    template<typename TOwnerHandle>
-    using PrefabEntityPoolRequestComponent = core::components::NumericValueComponent<PrefabRequestDomain, std::size_t, TOwnerHandle>;
+    using PrefabEntityPoolRequestComponent = core::components::NumericValueComponent<PrefabRequestDomain, std::size_t>;
 
 };
 

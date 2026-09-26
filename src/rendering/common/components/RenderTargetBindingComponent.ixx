@@ -13,10 +13,7 @@ using namespace helios::ecs::components;
 export namespace helios::engine::rendering::common::components {
 
     struct RenderTargetBindingComponentTag;
-    template<
-        typename TOwnerHandle,
-        typename TRenderHandles
-    >
-    using RenderTargetBindingComponent = BindingComponent<TOwnerHandle, typename TRenderHandles::RenderTargetHandle, RenderTargetBindingComponentTag>;
+    template<typename TRenderHandles>
+    using RenderTargetBindingComponent = BindingComponent<typename TRenderHandles::RenderTargetHandle, RenderTargetBindingComponentTag>;
 
 }

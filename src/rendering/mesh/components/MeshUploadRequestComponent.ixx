@@ -10,12 +10,9 @@ export namespace helios::engine::rendering::mesh::components {
 
     /**
      * @brief Tag component used to request mesh upload for an entity.
-     * @tparam TWOwnerHandle Owner handle type used by ECS composition.
      */
-    template<typename TOwnerHandle>
     struct MeshUploadRequestComponent {
 
-        using HandleType = TOwnerHandle;
     };
 
 

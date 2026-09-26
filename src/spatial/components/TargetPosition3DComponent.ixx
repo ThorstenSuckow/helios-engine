@@ -16,9 +16,7 @@ export namespace helios::engine::spatial::components {
 
     /**
      * @brief Stores 3d TargetPosition data in a `vec3<float>` component.
-     *
-     * @tparam THandle Owning entity handle type.
      */
-    template<typename THandle, typename ... Args>
-    using TargetPosition3DComponent = helios::engine::core::components::Vec3Component<TargetPosition3DComponentDomain, float, THandle, Args...>;
+    template<typename ... Args>
+    using TargetPosition3DComponent = helios::engine::core::components::Vec3Component<TargetPosition3DComponentDomain, float, Args...>;
 }

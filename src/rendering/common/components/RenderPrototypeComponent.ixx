@@ -15,7 +15,7 @@ export namespace helios::engine::rendering::common::components {
      *
      * @tparam TOwnerHandle Owning entity handle type.
      */
-    template<typename TOwnerHandle, typename TSubmissionMode, typename TRenderHandles>
+    template<typename TSubmissionMode, typename TRenderHandles>
     class RenderPrototypeComponent {
 
         using ShaderHandle = typename TRenderHandles::ShaderHandle;
@@ -34,7 +34,6 @@ export namespace helios::engine::rendering::common::components {
         using TextureEntity = ecs::entity::Entity<ecs::entity::EntityManager<TextureHandle>>;
 
     public:
-        using HandleType = TOwnerHandle;
         /**
          * @brief Constructs the component from explicit resource handles.
          *

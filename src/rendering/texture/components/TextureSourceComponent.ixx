@@ -15,7 +15,6 @@ export namespace helios::engine::rendering::texture::components {
      *
      * @tparam THandle Texture handle type.
      */
-    template<typename THandle>
     struct TextureSourceComponent {
 
         /**
@@ -23,7 +22,6 @@ export namespace helios::engine::rendering::texture::components {
          */
         std::string texturePath;
 
-        using HandleType = THandle;
 
     };
 

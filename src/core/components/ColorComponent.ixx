@@ -16,12 +16,9 @@ export namespace helios::engine::core::components {
     /**
      * @brief Convenience alias for 4-channel floating-point color values.
      *
-     * @tparam THandle Owning entity handle type.
-     *
      * This alias maps color storage to `Vec4Component` with `float` channels,
      * typically interpreted as RGBA.
      */
-    template<typename THandle>
-    using ColorComponent = helios::engine::core::components::Vec4Component<ColorDomainTag, float, THandle>;
+    using ColorComponent = helios::engine::core::components::Vec4Component<ColorDomainTag, float>;
 
 }

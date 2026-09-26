@@ -17,12 +17,10 @@ export namespace helios::engine::rendering::mesh::components {
     /**
      * @brief Component that provides raw MeshData.
      */
-    template<typename TOwnerHandle>
     struct MeshDataComponent {
 
         MeshData meshData;
 
-        using HandleType = TOwnerHandle;
 
         template<typename ... TArgs>
         requires std::constructible_from<MeshData, TArgs...>

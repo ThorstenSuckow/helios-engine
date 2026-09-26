@@ -21,9 +21,8 @@ export namespace helios::engine::core::components {
      *
      * @tparam TDomainTag Semantic domain tag.
      * @tparam TNumericType Scalar type for stored numeric values.
-     * @tparam THandle Owning entity handle type.
      */
-    template<typename TDomainTag, typename TNumericType, typename THandle, typename ... Args>
+    template<typename TDomainTag, typename TNumericType, typename ... Args>
     requires IsNumeric<TNumericType>
     class NumericValueComponent  {
 
@@ -33,7 +32,6 @@ export namespace helios::engine::core::components {
 
         using Value_type = TNumericType;
 
-        using HandleType = THandle;
 
         NumericValueComponent() = default;
 

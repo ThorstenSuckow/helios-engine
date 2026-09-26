@@ -16,10 +16,9 @@ export namespace helios::engine::core::components {
      * @brief Generic 3D value component with dirty-state tracking.
      *
      * @tparam TDomainTag Semantic domain tag.
-     * @tparam THandle Owning entity handle type.
      * @tparam TNumericType Scalar type for vector values.
      */
-    template<typename TDomainTag, typename TNumericType, typename THandle,  typename ... Args>
+    template<typename TDomainTag, typename TNumericType, typename ... Args>
     requires IsNumeric<TNumericType>
     class Vec3Component  {
 
@@ -28,7 +27,6 @@ export namespace helios::engine::core::components {
     public:
 
 
-        using HandleType = THandle;
         using Value_type = helios::math::vec3<TNumericType>;
 
         Vec3Component() = default;

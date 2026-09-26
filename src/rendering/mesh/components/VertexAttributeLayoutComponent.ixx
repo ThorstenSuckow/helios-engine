@@ -28,7 +28,7 @@ export namespace helios::engine::rendering::mesh::components {
      * @tparam TOwnerHandle Owning entity handle type.
      * @tparam TVertexInput Marker type describing the input stepping domain.
      */
-    template<typename TOwnerHandle, typename TVertexInput>
+    template<typename TVertexInput>
     class VertexAttributeLayoutComponent {
 
         /**
@@ -67,7 +67,6 @@ export namespace helios::engine::rendering::mesh::components {
 
     public:
 
-        using HandleType = TOwnerHandle;
 
         /**
          * @brief Constructs the component from one or more layout descriptors.

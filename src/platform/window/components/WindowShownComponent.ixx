@@ -13,9 +13,7 @@ export namespace helios::engine::platform::window::components {
      *
      * @tparam THandle Window handle type.
      */
-    template<typename THandle>
     struct WindowShownComponent {
-        using HandleType = THandle;
 
     };
 

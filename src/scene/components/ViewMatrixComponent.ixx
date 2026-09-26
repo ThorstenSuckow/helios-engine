@@ -16,11 +16,8 @@ export namespace helios::engine::scene::components {
 
     /**
      * @brief Stores a computed view matrix for a scene-related entity.
-     *
-     * @tparam TOwnerHandle Owning entity handle type.
      */
-    template<typename TOwnerHandle>
-    using ViewMatrixComponent = Mat4Component<ViewMatrixTag, float, TOwnerHandle>;
+    using ViewMatrixComponent = Mat4Component<ViewMatrixTag, float>;
 
 
 }

@@ -20,10 +20,9 @@ export namespace helios::engine::core::components {
      * @brief Generic 4D value component.
      *
      * @tparam TDomainTag Semantic domain tag.
-     * @tparam THandle Owning entity handle type.
      * @tparam TNumericType Scalar type for vector values.
      */
-    template<typename TDomainTag, typename TNumericType, typename THandle, typename ... Args>
+    template<typename TDomainTag, typename TNumericType, typename ... Args>
     requires IsNumeric<TNumericType>
     class Vec4Component  {
 
@@ -31,7 +30,6 @@ export namespace helios::engine::core::components {
     public:
 
         using Value_type = helios::math::vec4<TNumericType>;;
-        using HandleType = THandle;
 
         Vec4Component() = default;
 

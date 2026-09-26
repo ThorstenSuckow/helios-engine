@@ -19,7 +19,6 @@ export namespace helios::engine::scene::components {
      *
      * @tparam THandle Owning entity handle type.
      */
-    template<typename THandle>
     class PerspectiveCameraComponent {
 
         /**
@@ -54,7 +53,6 @@ export namespace helios::engine::scene::components {
 
         using Value_type = helios::math::vec4f;
 
-        using HandleType = THandle;
 
         explicit PerspectiveCameraComponent(const float fovY, const float aspectRatio, const float zNear = 0.1f, const float zFar = 1000.0f) {
             setPerspective(fovY, aspectRatio, zNear, zFar);

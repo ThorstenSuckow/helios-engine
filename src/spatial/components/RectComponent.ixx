@@ -17,8 +17,8 @@ export namespace helios::engine::spatial::components {
     /**
      * @brief Stores 2D rect data (x1, y1, x2, y2) in a `vec4<float>` component.
      *
-     * @tparam THandle Owning entity handle type.
+     * @tparam Args Additional type tags (e.g. `Local`, `World`).
      */
-    template<typename THandle, typename ... Args>
-    using RectComponent = helios::engine::core::components::Vec4Component<RectComponentDomain, float, THandle, Args...>;
+    template<typename ... Args>
+    using RectComponent = helios::engine::core::components::Vec4Component<RectComponentDomain, float, Args...>;
 }

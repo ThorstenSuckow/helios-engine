@@ -21,9 +21,8 @@ export namespace helios::engine::rendering::shader::components {
 
     /**
      * @brief Stores uniform names indexed by `UniformSemantics`.
-     * @tparam TOwnerHandle Owner handle type used by ECS composition.
      */
-    template<typename TOwnerHandle, typename TUniformScope>
+    template<typename TUniformScope>
     struct UniformMappingsComponent {
 
         /**
@@ -40,7 +39,6 @@ export namespace helios::engine::rendering::shader::components {
 
     public:
 
-        using HandleType = TOwnerHandle;
 
         /**
          * @brief Constructs mappings from one or more semantic/name entries.

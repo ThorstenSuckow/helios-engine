@@ -19,9 +19,9 @@ export namespace helios::engine::core::components {
      *
      * @tparam TDomainTag Domain tag type used for semantic component grouping.
      * @tparam TNumericType Floating-point scalar type used by `helios::math::quat`.
-     * @tparam Args Additional template arguments (e.g. owner handle, tags).
+     * @tparam Args Additional template arguments (e.g. tags).
      */
-    template<typename TDomainTag, typename TNumericType, typename THandle, typename ... Args>
+    template<typename TDomainTag, typename TNumericType, typename ... Args>
     requires std::floating_point<TNumericType>
     class QuaternionComponent {
 
@@ -30,7 +30,6 @@ export namespace helios::engine::core::components {
     public:
 
         using Value_type = helios::math::quat<TNumericType>;
-        using HandleType = THandle;
 
         /**
          * @brief Returns the current quaternion value.

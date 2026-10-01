@@ -159,6 +159,19 @@ export namespace helios::engine::runtime {
             return *this;
         }
 
+        template<typename TStateType>
+        static auto sessionState(const TStateType mask) {
+            return [mask](runtime::Session& session)-> bool {
+                auto state = session.state<TStateType>();
+                using U = std::underlying_type_t<TStateType>;
+                bool hasFlag = (static_cast<U>(mask) & static_cast<U>(state)) != 0;
+
+                if (!hasFlag) {
+                    return false;
+                }
+                return true;
+            };
+        };
 
         /**
          * @brief Checks whether a Manager of type T is registered.

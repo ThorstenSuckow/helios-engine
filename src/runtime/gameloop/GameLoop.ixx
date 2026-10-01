@@ -8,12 +8,14 @@ module;
 #include <memory>
 #include <vector>
 #include <span>
+#include <functional>
 
 export module helios.engine.runtime.gameloop.GameLoop;
 
 import helios.engine.runtime.GameWorld;
 
 import helios.engine.runtime.gameloop.types;
+import helios.engine.runtime.Session;
 
 import helios.core.log.Logger;
 import helios.core.log.LogManager;
@@ -21,9 +23,6 @@ import helios.core.log.LogManager;
 import helios.ecs;
 
 import helios.engine.runtime.enginestate.types;
-
-import :Pass;
-import :Phase;
 
 import helios.engine.input.InputSnapshot;
 
@@ -41,7 +40,7 @@ export namespace helios::engine::runtime::gameloop {
 
         using FrameTiming = types::FrameTiming;
         using UpdateContext = types::UpdateContext;
-        using PhaseType = types::PhaseType;
+        using Scheduler = helios::ecs::scheduling::Scheduler;
 
         /**
          * @brief Flag indicating whether init() has been called.
@@ -55,13 +54,9 @@ export namespace helios::engine::runtime::gameloop {
 
         GameWorld& gameWorld_;
 
-
-
         ecs::common::container::EcsDataContainer ecsDataContainer_{true};
 
-        Phase prePhase_;
-        Phase mainPhase_;
-        Phase postPhase_;
+        Scheduler scheduler_;
 
         float totalTime_ = 0.0f;
 
@@ -77,10 +72,10 @@ export namespace helios::engine::runtime::gameloop {
          *
          */
         GameLoop(GameWorld& gameWorld) :
-            gameWorld_(gameWorld),
-            prePhase_(gameWorld_),
-            mainPhase_(gameWorld_),
-            postPhase_(gameWorld_) {};
+            gameWorld_(gameWorld) {
+            ecsDataContainer_.borrow(gameWorld_.resourceRegistry());
+            scheduler_.init(ecsDataContainer_);
+        };
 
 
         /**
@@ -90,21 +85,8 @@ export namespace helios::engine::runtime::gameloop {
          *
          * @return Reference to the requested Phase.
          */
-        [[nodiscard]] Phase& phase(const PhaseType phaseType) noexcept {
-
-            switch (phaseType) {
-                case PhaseType::Pre:
-                    return prePhase_;
-                    break;
-                case PhaseType::Main:
-                    return mainPhase_;
-                    break;
-                case PhaseType::Post:
-                    return postPhase_;
-                    break;
-            }
-
-            std::unreachable();
+        [[nodiscard]] Scheduler& scheduler() noexcept {
+            return scheduler_;
         }
 
 
@@ -115,14 +97,13 @@ export namespace helios::engine::runtime::gameloop {
 
             assert(!initialized_ && "init() already called");
 
-            ecsDataContainer_.borrow(gameWorld_.resourceRegistry());
-
             initialized_ = true;
         }
 
         GameWorld& gameWorld() noexcept {
             return gameWorld_;
         }
+
 
         /**
          * @brief Executes one full frame update across all phases.
@@ -151,12 +132,8 @@ export namespace helios::engine::runtime::gameloop {
 
             ecsDataContainer_.emplace<UpdateContext>(updateContext);
 
-            auto& session = gameWorld_.session();
-
             // gameloop phases
-            prePhase_.update(ecsDataContainer_, session, gameWorld_.jobSystem());
-            mainPhase_.update(ecsDataContainer_, session, gameWorld_.jobSystem());
-            postPhase_.update(ecsDataContainer_, session, gameWorld_.jobSystem());
+            scheduler_.update(ecsDataContainer_, gameWorld_.jobSystem());
         }
 
         [[nodiscard]] bool isRunning() const noexcept {

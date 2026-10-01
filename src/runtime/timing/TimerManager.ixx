@@ -140,7 +140,7 @@ export namespace helios::engine::runtime::timing {
          *
          * @param executionContext Reference to the current execution context.
          */
-        bool commit() noexcept {
+        bool execute() noexcept {
 
             for (const auto& controlContext : pendingControlContexts_) {
                 auto* timer = getTimer(controlContext.timerId);

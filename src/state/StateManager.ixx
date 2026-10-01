@@ -152,7 +152,7 @@ export namespace helios::engine::state {
          *
          * @param updateContext The current frame's update context.
          */
-        bool commit(
+        bool execute(
             UpdateContext& updateContext,
             StateTransitionRules<StateType>& rules,
             RuntimeEnvironment& runtimeEnvironment, Session& session) noexcept {

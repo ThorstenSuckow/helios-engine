@@ -16,7 +16,7 @@ import helios.ecs.component;
 import helios.engine.scene.components;
 import helios.engine.spatial.components;
 
-import helios.ecs.entity.EntityAccessSet;
+import helios.ecs.entity.QueryAccessSet;
 import helios.ecs.entity.query.Query;
 
 import helios.math;

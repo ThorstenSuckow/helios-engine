@@ -11,7 +11,7 @@ export module helios.engine.runtime.pooling.systems:EntityPoolWarmupSystem;
 import helios.ecs.common;
 import helios.ecs.command;
 import helios.ecs.entity.EntityWorld;
-import helios.ecs.entity.EntityAccessSet;
+import helios.ecs.entity.QueryAccessSet;
 import helios.ecs.entity.query.Query;
 
 import helios.engine.runtime.pooling.commands;

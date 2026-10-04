@@ -12,7 +12,7 @@ import helios.engine.runtime.gameloop.types;
 import helios.ecs.command;
 
 import helios.ecs.entity.EntityWorld;
-import helios.ecs.entity.EntityAccessSet;
+import helios.ecs.entity.QueryAccessSet;
 import helios.ecs.entity.query.Query;
 
 import helios.engine.platform.window.components.WindowCreateRequestComponent;

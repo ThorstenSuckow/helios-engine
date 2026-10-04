@@ -25,7 +25,7 @@ import helios.ecs.common.concepts;
 
 import helios.ecs.component;
 import helios.ecs.entity.EntityWorld;
-import helios.ecs.entity.EntityAccessSet;
+import helios.ecs.entity.QueryAccessSet;
 import helios.ecs.entity.query.Query;
 
 

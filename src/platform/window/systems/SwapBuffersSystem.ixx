@@ -13,7 +13,7 @@ export module helios.engine.platform.window.systems.SwapBuffersSystem;
 
 import helios.engine.runtime.gameloop.types;
 import helios.ecs.entity.EntityWorld;
-import helios.ecs.entity.EntityAccessSet;
+import helios.ecs.entity.QueryAccessSet;
 import helios.ecs.entity.query.Query;
 
 import helios.ecs.command.types;

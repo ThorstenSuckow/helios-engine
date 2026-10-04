@@ -11,7 +11,7 @@ export module helios.engine.platform.lifecycle.systems.WarmupDoneSystem;
 
 import helios.ecs;
 import helios.ecs.entity.EntityWorld;
-import helios.ecs.entity.EntityAccessSet;
+import helios.ecs.entity.QueryAccessSet;
 import helios.ecs.entity.query.Query;
 
 import helios.ecs.command.types;

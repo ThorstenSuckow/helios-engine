@@ -17,7 +17,7 @@ import helios.engine.runtime.RuntimeEnvironment;
 
 import helios.engine.runtime.enginestate;
 
-import helios.core.thread.JobSystem;
+
 import helios.core.common.container;
 
 import helios.ecs;
@@ -29,9 +29,6 @@ import helios.engine.runtime.gameloop.types;
 import helios.core.log.Logger;
 import helios.core.log.LogManager;
 
-
-
-using namespace helios::core::thread;
 using namespace helios::ecs::common::concepts;
 using namespace helios::ecs;
 #define HELIOS_LOG_SCOPE "GameWorld"
@@ -65,20 +62,14 @@ export namespace helios::engine::runtime {
         helios::ecs::common::container::EcsDataContainer resourceRegistry_{};
 
 
-        /**
-         * @brief Reference to the job system used for parallel task execution.
-         */
-        JobSystem& jobSystem_;
-
 
     public:
 
         /**
          * @brief Constructs `GameWorld` and creates internal session/environment entities.
          */
-        explicit GameWorld(EntityWorld&& ecsWorld, JobSystem& jobSystem)
-        : ecsWorld_(std::move(ecsWorld)),
-          jobSystem_(jobSystem) {
+        explicit GameWorld(EntityWorld&& ecsWorld)
+        : ecsWorld_(std::move(ecsWorld)) {
 
             resourceRegistry_.bind<EntityWorld>(ecsWorld_);
             resourceRegistry_.emplace<ecs::manager::ManagerRegistry>();
@@ -109,14 +100,6 @@ export namespace helios::engine::runtime {
             return resourceRegistry_.get<Session>();
         }
 
-        /**
-         * @brief Returns a reference to the job system used for parallel task execution.
-         *
-         * @return Reference to the JobSystem.
-         */
-        [[nodiscard]] JobSystem& jobSystem() {
-            return jobSystem_;
-        }
 
         /**
          * @brief Returns a reference to the current runtime platform.

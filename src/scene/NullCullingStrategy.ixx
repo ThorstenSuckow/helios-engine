@@ -1,10 +1,10 @@
 /**
- * @file NoCullingStrategy.ixx
+ * @file NullCullingStrategy.ixx
  * @brief Culling strategy that intentionally keeps all scene members visible.
  */
 module;
 
-export module helios.engine.scene.NoCullingStrategy;
+export module helios.engine.scene.NullCullingStrategy;
 
 
 
@@ -24,7 +24,7 @@ export namespace helios::engine::scene {
      * @tparam TStrongId Strong-id type used by entity handles.
      */
     template<typename TMemberHandle>
-    class NoCullingStrategy  {
+    class NullCullingStrategy  {
 
 
 

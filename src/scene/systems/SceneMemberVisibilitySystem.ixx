@@ -15,6 +15,7 @@ module;
 export module helios.engine.scene.systems.SceneMemberVisibilitySystem;
 
 import helios.engine.scene.SceneMemberVisibilityRegistry;
+import helios.engine.scene.NullCullingStrategy;
 import helios.engine.scene.types;
 import helios.engine.scene.components;
 import helios.engine.scene.concepts.IsFrustumCullerLike;
@@ -172,10 +173,19 @@ export namespace helios::engine::scene::systems {
                     transformWorld->value()
                 };
 
-                if (smc->targetHandle() == sceneHandle && cullingStrategy_.shouldRender(cullingContext)) {
-                    visibilityRegistry.addVisibleMember(viewportHandle, std::move(memberContext));
+
+                if constexpr (std::same_as<TCullingStrategy, NullCullingStrategy<TMemberHandle>>) {
+                    if (smc->targetHandle() == sceneHandle) {
+                        visibilityRegistry.addVisibleMember(viewportHandle, std::move(memberContext));
+                    } else {
+                        visibilityRegistry.addCulledMember(viewportHandle, std::move(memberContext));
+                    }
                 } else {
-                    visibilityRegistry.addCulledMember(viewportHandle, std::move(memberContext));
+                    if (smc->targetHandle() == sceneHandle && cullingStrategy_.shouldRender(cullingContext)) {
+                        visibilityRegistry.addVisibleMember(viewportHandle, std::move(memberContext));
+                    } else {
+                        visibilityRegistry.addCulledMember(viewportHandle, std::move(memberContext));
+                    }
                 }
             }
         }

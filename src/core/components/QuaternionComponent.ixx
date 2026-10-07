@@ -31,6 +31,9 @@ export namespace helios::engine::core::components {
 
         using Value_type = helios::math::quat<TNumericType>;
 
+        explicit QuaternionComponent(const Value_type& value = Value_type::identity()) noexcept
+            : quat(value) {}
+
         /**
          * @brief Returns the current quaternion value.
          *

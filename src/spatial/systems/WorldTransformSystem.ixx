@@ -38,8 +38,13 @@ export namespace helios::engine::scene::systems {
 
         using EntityWorld = ecs::entity::EntityWorld;
 
-        template<typename TRead, typename TWrite, typename TFilter = ecs::entity::query::Filter<ecs::entity::query::AnyDirty<>>>
-        using Query = ecs::entity::query::Query<TMemberHandle, TRead, TWrite, TFilter>;
+        template<
+            typename TRead,
+            typename TWrite,
+            typename TFilter = ecs::entity::query::Filter<ecs::entity::query::AnyDirty<>>,
+            typename TOptional = ecs::entity::query::Optional<>
+        >
+        using Query = ecs::entity::query::Query<TMemberHandle, TRead, TWrite, TFilter, TOptional>;
 
         template<typename ... TReads>
         using Read = ecs::entity::ReadSet<TReads...>;
@@ -63,6 +68,7 @@ export namespace helios::engine::scene::systems {
         void update(Query<
                 Read<Position3DComponent<Local>,
                     Rotation3DComponent<Local>,
+                    Scale3DComponent<Local>,
                     TransformComponent<World>
                 >, Write<
                     TransformComponent<World>
@@ -74,20 +80,29 @@ export namespace helios::engine::scene::systems {
                         Position3DComponent<Local>,
                         Rotation3DComponent<Local>
                     >
-                >
+                >,
+                ecs::entity::query::Optional<Scale3DComponent<Local>>
             > query) noexcept {
 
+            helios::math::mat4f tr;
             for (auto [
                 entity,
                 localPosition,
                 localRotation,
+                scaleComponent,
                 worldTransform
                 ] : query) {
 
-                entity.template track<TransformComponent<World>>()
-                    ->setValue(
-                    localRotation->value().rotationMatrix().withTranslation(localPosition->value())
-                );
+                if (scaleComponent) {
+                    entity.template track<TransformComponent<World>>()
+                    ->setValue(localRotation->value()
+                        .rotationMatrix()
+                        .withScaling(scaleComponent->value())
+                        .withTranslation(localPosition->value()));
+                } else {
+                    entity.template track<TransformComponent<World>>()
+                    ->setValue(localRotation->value().rotationMatrix().withTranslation(localPosition->value()));
+                }
 
             }
         }

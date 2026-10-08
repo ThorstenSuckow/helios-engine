@@ -115,6 +115,17 @@ export namespace helios::engine::scene::systems {
             ecs::entity::query::Filter<ecs::entity::query::IsActive>
         >;
 
+        using CameraQuery = Query<
+            CameraHandle,
+            Read<
+                ProjectionMatrixComponent,
+                ViewMatrixComponent,
+                PerspectiveCameraComponent
+            >,
+            Write<>,
+            ecs::entity::query::Filter<ecs::entity::query::IsActive>
+        >;
+
         using MemberQuery = Query<
             TMemberHandle,
             Read<SceneMemberComponent<TRenderHandles>,
@@ -218,7 +229,7 @@ export namespace helios::engine::scene::systems {
          * @param memberQuery Query over active scene members for the current submission mode.
          */
         SceneMemberVisibilityRegistry update(
-            ecs::entity::EntityManager<CameraHandle>& cameraEntityManager,
+            CameraQuery cameraQuery,
             ViewportQuery viewportQuery,
             MemberQuery memberQuery
         ) noexcept {
@@ -230,26 +241,16 @@ export namespace helios::engine::scene::systems {
                 const auto sceneHandle  = sbc->targetHandle();
                 const auto cameraHandle = cbc->targetHandle();
 
-                const auto camera = cameraEntityManager.entity(cameraHandle);
-                if (!camera) {
+                const auto cameraResult = cameraQuery.get(cameraHandle);
+
+                if (!cameraResult) {
                     assert(false && "Camera not found");
                     logger_.error("Camera not found");
                     continue;
                 }
-                auto* pmc = camera->template get<ProjectionMatrixComponent>();
-                if (!pmc) {
-                    assert(pmc && "Camera had no ProjectionMatrixComponent");
-                    logger_.error("Camera had no ProjectionMatrixComponent");
-                    continue;
-                }
-                auto* lac = camera->template get<ViewMatrixComponent>();
-                if (!lac) {
-                    assert(lac && "Camera had no ViewMatrixComponent");
-                    logger_.error("Camera had no ViewMatrixComponent");
-                    continue;
-                }
 
-                auto* pcc = camera->template get<PerspectiveCameraComponent>();
+                auto [cameraEntity, pmc, lac, pcc] = *cameraResult;
+
                 auto frustumPlanes = helios::math::frustumPlanes(
                     pcc->fovY(), pcc->aspectRatio(), pcc->zNear(), pcc->zFar(), lac->value()
                 );

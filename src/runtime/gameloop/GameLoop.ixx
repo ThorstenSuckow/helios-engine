@@ -133,7 +133,7 @@ export namespace helios::engine::runtime::gameloop {
             ecsDataContainer_.emplace<UpdateContext>(updateContext);
 
             // gameloop phases
-            scheduler_.update(ecsDataContainer_);
+            scheduler_.update();
         }
 
         [[nodiscard]] bool isRunning() const noexcept {

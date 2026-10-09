@@ -73,6 +73,7 @@ export namespace helios::engine::runtime {
 
             resourceRegistry_.bind<EntityWorld>(ecsWorld_);
             resourceRegistry_.emplace<ecs::manager::ManagerRegistry>();
+            resourceRegistry_.emplace<ecs::common::RuntimeResultRegistry>();
             resourceRegistry_.emplace<ecs::command::CommandHandlerRegistry>();
             resourceRegistry_.emplace<runtime::pooling::EntityPoolRegistry>();
             resourceRegistry_.emplace<helios::engine::runtime::Session>();

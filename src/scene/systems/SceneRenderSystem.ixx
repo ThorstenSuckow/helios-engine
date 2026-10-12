@@ -96,6 +96,13 @@ export namespace helios::engine::scene::systems {
             RenderInstanceBatchCommand
         >;
 
+        using Query = ecs::entity::query::Query<
+            TMemberHandle,
+            ecs::entity::ReadSet<RenderPrototypeComponent>,
+            ecs::entity::WriteSet<>,
+            ecs::entity::query::Filter<ecs::entity::query::IsActive>
+        >;
+
         static inline auto& logger_ = helios::core::log::LogManager::loggerForScope(HELIOS_LOG_SCOPE);
 
 
@@ -110,9 +117,9 @@ export namespace helios::engine::scene::systems {
          * @param cmdBuffer Command buffer receiving render commands.
          */
         void dispatchNonInstancedRenderCommands(
-            entity::EntityManager<TMemberHandle>& entityManager,
-             std::span<const std::vector<SceneMemberVisibilityContext>> visibilityContexts,
-             CommandBuffer& cmdBuffer) requires std::is_same_v<TSubmissionMode, NonInstanced>  {
+            Query& query,
+            std::span<const std::vector<SceneMemberVisibilityContext>> visibilityContexts,
+            CommandBuffer& cmdBuffer) requires std::is_same_v<TSubmissionMode, NonInstanced>  {
 
 
             for (const auto& viewportContexts : visibilityContexts) {
@@ -122,11 +129,10 @@ export namespace helios::engine::scene::systems {
                     const auto renderTargetHandle = memberContext.renderTargetHandle;
                     const auto viewportHandle = memberContext.viewportHandle;
 
-                    const auto entity = entityManager.template entity<TMemberHandle>(memberContext.memberHandle);
-                    assert(entity && "Unexpected missing entity");
+                    auto queryResult = query.get(memberContext.memberHandle);
+                    assert(queryResult && "Unexpected missing entity");
 
-                    const auto* renderPrototype = entity->template get<RenderPrototypeComponent>();
-                    assert(renderPrototype && "Unexpected missing RenderPrototypeComponent");
+                    auto [_, renderPrototype] = *queryResult;
 
                     cmdBuffer.template add<RenderSceneMemberCommand>(SceneMemberRenderContext{
                         memberContext.memberHandle,
@@ -154,7 +160,7 @@ export namespace helios::engine::scene::systems {
          * @param cmdBuffer Command buffer receiving render commands.
          */
         void dispatchInstancedRenderCommands (
-            entity::EntityManager<TMemberHandle>& entityManager,
+            Query& query,
             std::span<const std::vector<SceneMemberVisibilityContext>> visibilityContexts,
             CommandBuffer& cmdBuffer) requires std::is_same_v<TSubmissionMode, Instanced> {
 
@@ -180,10 +186,12 @@ export namespace helios::engine::scene::systems {
                     const auto renderTargetHandle = memberContext.renderTargetHandle;
                     const auto viewportHandle = memberContext.viewportHandle;
 
-                    const auto entity = entityManager.entity(memberContext.memberHandle);
-                    assert(entity && "Unexpected missing entity");
+                    auto queryResult = query.get(memberContext.memberHandle);
 
-                    const auto* renderPrototype = entity->template get<RenderPrototypeComponent>();
+                    assert(queryResult && "Unexpected missing entity");
+
+                    auto [_, renderPrototype] = *queryResult;
+
                     assert(renderPrototype && "Unexpected missing RenderPrototypeComponent");
 
                     if (!renderBatchContext ||
@@ -237,7 +245,7 @@ export namespace helios::engine::scene::systems {
          * @param cmdBuffer Command buffer receiving extracted render commands.
          */
         void update(
-            entity::EntityManager<TMemberHandle>& entityManager,
+            Query query,
             CommandBuffer& cmdBuffer,
             const SceneMemberVisibilityRegistry& visibilityRegistry) noexcept {
 
@@ -251,9 +259,9 @@ export namespace helios::engine::scene::systems {
             const auto members = visibilityRegistry.visibleMembers();
 
             if constexpr (std::is_same_v<TSubmissionMode, Instanced>) {
-                dispatchInstancedRenderCommands(entityManager, members, cmdBuffer);
+                dispatchInstancedRenderCommands(query, members, cmdBuffer);
             } else if constexpr (std::is_same_v<TSubmissionMode, NonInstanced>) {
-                dispatchNonInstancedRenderCommands(entityManager, members, cmdBuffer);
+                dispatchNonInstancedRenderCommands(query, members, cmdBuffer);
             } else {
                 static_assert(false, "Unsupported submission mode");
             }

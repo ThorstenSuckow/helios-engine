@@ -57,7 +57,13 @@ export namespace helios::engine::runtime::gameloop {
          */
         float targetFps_ = 0.0f;
 
+        float fixedDeltaTime_ = 0.0f;
+
     public:
+
+        void setFixedDeltaTime(const float deltaTime) {
+            fixedDeltaTime_ = deltaTime;
+        }
 
         /**
          * @brief Sets the desired target frame rate.
@@ -128,7 +134,9 @@ export namespace helios::engine::runtime::gameloop {
                 }
             }
 
-            return FrameTiming{ totalTime, workTime, waitTime };
+            const float deltaTime = fixedDeltaTime_ > 0.0F ? fixedDeltaTime_ : totalTime;
+
+            return FrameTiming{ totalTime, deltaTime, workTime, waitTime };
         }
     };
 }

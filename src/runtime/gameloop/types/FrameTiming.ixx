@@ -24,7 +24,15 @@ export namespace helios::engine::runtime::gameloop::types {
          * of the frame from start to synchronization. This value corresponds
          * to the `deltaTime` used for game logic.
          */
-        float totalFrameTime = 0.0f; /**< Total frame time in seconds. */
+        float totalFrameTime = 0.0f;
+
+        /**
+         * @brief The since the last computation of a frame.
+         *
+         * This value can be overwritten to enforce fixed time steps.
+         * Otherwise, it is assumed to equal worlTime.
+         */
+        float deltaTime = 0.0f;
 
         /**
          * @brief CPU processing time in seconds.
@@ -32,7 +40,7 @@ export namespace helios::engine::runtime::gameloop::types {
          * The actual time spent executing frame logic, rendering,
          * and other computational tasks before synchronization.
          */
-        float workTime = 0.0f; /**< CPU processing time in seconds. */
+        float workTime = 0.0f;
 
         /**
          * @brief Idle time in seconds.
@@ -41,7 +49,7 @@ export namespace helios::engine::runtime::gameloop::types {
          * the target frame rate. This is 0.0f if no frame pacing is active
          * or if the frame took longer than the target time.
          */
-        float waitTime = 0.0f; /**< Idle time in seconds. */
+        float waitTime = 0.0f; 
 
     };
 }

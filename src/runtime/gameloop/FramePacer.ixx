@@ -136,7 +136,12 @@ export namespace helios::engine::runtime::gameloop {
 
             const float deltaTime = fixedDeltaTime_ > 0.0F ? fixedDeltaTime_ : totalTime;
 
-            return FrameTiming{ totalTime, deltaTime, workTime, waitTime };
+            return FrameTiming{
+                .totalFrameTime = totalTime,
+                .deltaTime = deltaTime,
+                .workTime = workTime,
+                .waitTime = waitTime
+            };
         }
     };
 }

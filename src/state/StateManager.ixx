@@ -87,10 +87,10 @@ export namespace helios::engine::state {
          * @param updateContext The current frame's update context.
          */
         void signalExit(
-            const StateType from,
-            const StateType to,
-            const StateTransitionIdType<StateType> transitionId,
-            UpdateContext& updateContext)  {
+            const StateType,
+            const StateType,
+            const StateTransitionIdType<StateType>,
+            UpdateContext&)  {
 
             /*for (auto& listener : listeners_) {
                 listener->onStateExit(updateContext, from);
@@ -106,10 +106,10 @@ export namespace helios::engine::state {
          * @param updateContext The current frame's update context.
          */
         void signalTransition(
-           const StateType from,
-           const StateType to,
-           const StateTransitionIdType<StateType> transitionId,
-           UpdateContext& updateContext)  {
+           const StateType,
+           const StateType,
+           const StateTransitionIdType<StateType>,
+           UpdateContext&)  {
 
             /*for (auto& listener : listeners_) {
                 listener->onStateTransition(
@@ -129,10 +129,10 @@ export namespace helios::engine::state {
          * @param updateContext The current frame's update context.
          */
         void signalEnter(
-           const StateType from,
-           const StateType to,
-           const StateTransitionIdType<StateType> transitionId,
-           UpdateContext& updateContext)  {
+           const StateType,
+           const StateType,
+           const StateTransitionIdType<StateType>,
+           UpdateContext&)  {
 
             /*for (auto& listener : listeners_) {
                 listener->onStateEnter(updateContext, to);

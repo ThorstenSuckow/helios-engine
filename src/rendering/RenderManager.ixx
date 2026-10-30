@@ -157,8 +157,8 @@ export namespace helios::engine::rendering {
             std::vector<MeshBatch> batches;
             std::vector<std::size_t> activeBatchIndices;
             MaterialBatch(){batches.reserve(MESH_INITIAL_STORAGE_CAPACITY);}
-            [[nodiscard]] MeshBatch& getOrAdd(MeshHandle handle) {
-                return addToBatch(handle, batches, activeBatchIndices);
+            [[nodiscard]] MeshBatch& getOrAdd(MeshHandle hnd) {
+                return addToBatch(hnd, batches, activeBatchIndices);
             }
             void clear() {
                 clearActive(this, activeBatchIndices, batches);
@@ -174,8 +174,8 @@ export namespace helios::engine::rendering {
             std::vector<MaterialBatch> batches;
             std::vector<std::size_t> activeBatchIndices;
             TextureBatch(){batches.reserve(MATERIAL_INITIAL_STORAGE_CAPACITY);}
-            [[nodiscard]] MaterialBatch& getOrAdd(MaterialHandle handle) {
-                return addToBatch(handle, batches, activeBatchIndices);
+            [[nodiscard]] MaterialBatch& getOrAdd(MaterialHandle hnd) {
+                return addToBatch(hnd, batches, activeBatchIndices);
             }
             void clear() {
                 clearActive(this, activeBatchIndices, batches);
@@ -191,8 +191,8 @@ export namespace helios::engine::rendering {
             std::vector<TextureBatch> batches;
             std::vector<std::size_t> activeBatchIndices;
             ShaderBatch(){batches.reserve(TEXTURE_INITIAL_STORAGE_CAPACITY);}
-            [[nodiscard]] TextureBatch& getOrAdd(TextureHandle handle) {
-                return addToBatch(handle, batches, activeBatchIndices);
+            [[nodiscard]] TextureBatch& getOrAdd(TextureHandle hnd) {
+                return addToBatch(hnd, batches, activeBatchIndices);
             }
             void clear() {
                 clearActive(this, activeBatchIndices, batches);
@@ -207,8 +207,8 @@ export namespace helios::engine::rendering {
             ViewportHandle handle;
             std::vector<ShaderBatch> batches;
             std::vector<std::size_t> activeBatchIndices;
-            [[nodiscard]] ShaderBatch& getOrAdd(ShaderHandle handle) {
-                return addToBatch(handle, batches, activeBatchIndices);
+            [[nodiscard]] ShaderBatch& getOrAdd(ShaderHandle hnd) {
+                return addToBatch(hnd, batches, activeBatchIndices);
             }
             ViewportBatch(){batches.reserve(SHADER_INITIAL_STORAGE_CAPACITY);}
             void clear() {
@@ -224,8 +224,8 @@ export namespace helios::engine::rendering {
             RenderTargetHandle handle;
             std::vector<ViewportBatch> batches;
             std::vector<std::size_t> activeBatchIndices;
-            [[nodiscard]] ViewportBatch& getOrAdd(ViewportHandle handle) {
-                return addToBatch(handle, batches, activeBatchIndices);
+            [[nodiscard]] ViewportBatch& getOrAdd(ViewportHandle hnd) {
+                return addToBatch(hnd, batches, activeBatchIndices);
             }
             RenderTargetBatch(){batches.reserve(VIEWPORT_INITIAL_STORAGE_CAPACITY);}
             void clear() {

@@ -22,7 +22,7 @@ export namespace helios::engine::core::components {
      * @tparam TDomainTag Semantic domain tag.
      * @tparam TNumericType Scalar type for vector values.
      */
-    template<typename TDomainTag, typename TNumericType, typename ... Args>
+    template<typename TDomainTag, typename TNumericType>
     requires IsNumeric<TNumericType>
     class Vec4Component  {
 

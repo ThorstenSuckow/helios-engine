@@ -18,7 +18,7 @@ export namespace helios::engine::core::components {
      * @tparam TDomainTag
      * @tparam THandle
      */
-    template<typename TDomainTag, typename THandle>
+    template<typename TDomainTag>
     struct StringComponent  {
 
         std::string value{};

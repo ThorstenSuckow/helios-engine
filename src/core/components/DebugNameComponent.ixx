@@ -16,7 +16,6 @@ export namespace helios::engine::core::components {
      *
      * @tparam THandle
      */
-    template<typename THandle>
-    using DebugNameComponent = StringComponent<DebugNameComponentDomain, THandle>;
+    using DebugNameComponent = StringComponent<DebugNameComponentDomain>;
 
 }

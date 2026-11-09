@@ -19,6 +19,5 @@ export namespace helios::engine::spatial::components {
      *
      * @tparam Args Additional type tags (e.g. `Local`, `World`).
      */
-    template<typename ... Args>
-    using RectComponent = helios::engine::core::components::Vec4Component<RectComponentDomain, float, Args...>;
+    using RectComponent = helios::engine::core::components::Vec4Component<RectComponentDomain, float>;
 }

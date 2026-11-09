@@ -13,7 +13,6 @@ export namespace helios::engine::core::components {
      *
      * @tparam THandle
      */
-    template<typename THandle>
-    using NameComponent = StringComponent<NameComponentDomain, THandle>;
+    using NameComponent = StringComponent<NameComponentDomain>;
 
 }

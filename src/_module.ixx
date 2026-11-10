@@ -16,6 +16,7 @@ export module helios.engine;
 export import helios.engine.core;
 export import helios.engine.rendering;
 export import helios.engine.scene;
+export import helios.engine.factory;
 export import helios.engine.input;
 export import helios.engine.state;
 export import helios.engine.spatial;

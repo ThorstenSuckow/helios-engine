@@ -88,8 +88,6 @@ export namespace helios::engine::scene::systems {
 
                 entity.template track<BoundsComponent<World>>()
                     ->setValue(boundsLocal->value().applyTransform(worldTransform->value()));
-
-               // entity.setTrackedValue(boundsWorld, boundsLocal->value().applyTransform(worldTransform->value()));
             }
         }
 

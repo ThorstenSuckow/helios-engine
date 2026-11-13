@@ -88,9 +88,8 @@ export namespace helios::engine::rendering::common::systems {
                 auto meshHandle = renderPrototype->meshHandle();
                 auto shaderHandle = renderPrototype->shaderHandle();
 
-                auto pair = MeshShaderPair{meshHandle, shaderHandle};
-
-                if (!meshShaderPairs_.insert(pair).second) {
+                if (auto pair = MeshShaderPair{meshHandle, shaderHandle};
+                    !meshShaderPairs_.insert(pair).second) {
                     continue;
                 }
 

@@ -9,3 +9,4 @@ export import helios.engine.rendering.shader.types.uniforms;
 export import helios.engine.rendering.shader.types.UniformMapping;
 export import helios.engine.rendering.shader.types.UniformSemantics;
 export import helios.engine.rendering.shader.types.UniformScope;
+export import helios.engine.rendering.shader.types.VertexAttributeMappings;

@@ -1,9 +1,10 @@
 /**
- * @file VertexAttributeLayoutComponent.ixx
- * @brief Component that stores active vertex attribute layouts by semantic.
+ * @file VertexAttributeLayout.ixx
+ * @brief Declares GPU input layout information for one vertex attribute.
  */
 module;
 
+#include <cstdint>
 #include <string>
 #include <array>
 #include <bitset>
@@ -12,24 +13,46 @@ module;
 #include <cassert>
 #include "helios-engine-config.h"
 
-export module helios.engine.rendering.mesh.components.VertexAttributeLayoutComponent;
+export module helios.engine.rendering.mesh.types.VertexAttributeLayouts;
 
-import helios.engine.rendering.mesh.types.VertexAttributeSemantics;
-import helios.engine.rendering.mesh.types.VertexAttributeLayout;
 import helios.engine.rendering.mesh.types.VertexAttribute;
+import helios.engine.rendering.mesh.types.VertexAttributeSemantics;
+import helios.engine.rendering.mesh.types.VertexAttribute;
+import helios.engine.rendering.mesh.types.VertexInputRate;
 
 using namespace helios::engine::rendering::mesh::types;
-export namespace helios::engine::rendering::mesh::components {
-
+export namespace helios::engine::rendering::mesh::types {
 
     /**
-     * @brief Stores a semantic-indexed set of vertex attribute layouts.
-     *
-     * @tparam TOwnerHandle Owning entity handle type.
-     * @tparam TVertexInput Marker type describing the input stepping domain.
+     * @brief Full binding description for one attribute in a vertex layout.
      */
-    template<typename TVertexInput>
-    class VertexAttributeLayoutComponent {
+    struct VertexAttributeLayout {
+
+        /**
+         * @brief Logical attribute description.
+         */
+        VertexAttribute attribute;
+
+        VertexInputRate inputRate;
+
+        /**
+         * @brief Byte stride between consecutive elements.
+         */
+        std::uint32_t stride;
+
+        /**
+         * @brief Byte offset to this attribute within one element.
+         */
+        std::uint32_t offset;
+
+        /**
+         * @brief Instance divisor (`0` per-vertex, `>0` instanced step rate).
+         */
+        std::uint32_t divisor = 0;
+    };
+
+    class VertexAttributeLayouts {
+
 
         /**
          * @brief Number of semantic slots available in the layout table.
@@ -56,7 +79,7 @@ export namespace helios::engine::rendering::mesh::components {
         void set(VertexAttributeLayout layout) {
 #if HELIOS_DEBUG
             assert(std::to_underlying(layout.attribute.semantics) < VertexAttributeSemanticsCount
-                && "VertexAttributeSemantics value out of range in VertexAttributeLayoutComponent constructor");
+                && "VertexAttributeSemantics value out of range in VertexAttributeLayouts constructor");
 #endif
 
             const auto idx = static_cast<std::size_t>(std::to_underlying(layout.attribute.semantics));
@@ -76,7 +99,7 @@ export namespace helios::engine::rendering::mesh::components {
          */
         template<typename ...TAttributes>
         requires (std::same_as<std::remove_cvref_t<TAttributes>, VertexAttributeLayout> && ...)
-        explicit VertexAttributeLayoutComponent(TAttributes&& ... layout)
+        explicit VertexAttributeLayouts(TAttributes&& ... layout)
         {
             (set(std::forward<TAttributes>(layout)), ...);
         }
@@ -103,7 +126,7 @@ export namespace helios::engine::rendering::mesh::components {
          *
          * @return Read-only reference to all layout slots.
          */
-        [[nodiscard]] const auto& layouts() const noexcept {
+        [[nodiscard]] const auto& items() const noexcept {
             return layouts_;
         }
 
@@ -115,6 +138,7 @@ export namespace helios::engine::rendering::mesh::components {
         [[nodiscard]] const auto& active() const noexcept {
             return active_;
         }
+
 
     };
 

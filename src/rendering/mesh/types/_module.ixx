@@ -10,6 +10,6 @@ export import helios.engine.rendering.mesh.types.MeshData;
 export import helios.engine.rendering.mesh.types.MeshDataIndex;
 export import helios.engine.rendering.mesh.types.VertexAttribute;
 export import helios.engine.rendering.mesh.types.VertexAttributeType;
-export import helios.engine.rendering.mesh.types.VertexAttributeLayout;
+export import helios.engine.rendering.mesh.types.VertexAttributeLayouts;
 export import helios.engine.rendering.mesh.types.VertexAttributeSemantics;
-export import helios.engine.rendering.mesh.types.vertexInputRates;
+export import helios.engine.rendering.mesh.types.VertexInputRate;

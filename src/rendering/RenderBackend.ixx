@@ -14,17 +14,22 @@ import helios.ecs;
 import helios.core.common.traits;
 
 import helios.engine.rendering.common.types;
+import helios.engine.rendering.mesh.types;
+import helios.engine.rendering.shader.types;
+
 
 export namespace helios::engine::rendering {
 
     class RenderBackend {
+
+        using VertexAttributeMappings = helios::engine::rendering::shader::types::VertexAttributeMappings;
+        using VertexAttributeLayouts = helios::engine::rendering::mesh::types::VertexAttributeLayouts;
 
         using EntityHandleValue = helios::ecs::common::types::EntityHandleValue;
         using EcsDataContainer = helios::ecs::common::container::EcsDataContainer;
         using DrawData = helios::engine::rendering::common::types::DrawData;
         using InstanceData = helios::engine::rendering::common::types::InstanceData;
         using RenderData = helios::engine::rendering::common::types::RenderData;
-
 
         class Concept {
 
@@ -52,6 +57,12 @@ export namespace helios::engine::rendering {
             virtual void renderBatch(std::span<const DrawData> drawData) noexcept = 0;
 
             virtual void renderBatch(std::span<const InstanceData> instanceData) noexcept = 0;
+
+            virtual void configureVertexAttributes(
+                const RenderData& meshData,
+                const VertexAttributeMappings& vertexAttributeMappings,
+                const VertexAttributeLayouts& vertexAttributeLayouts
+            ) noexcept = 0;;
 
             virtual void configureWindowCreationHints() noexcept = 0;
 
@@ -134,6 +145,18 @@ export namespace helios::engine::rendering {
                 concreteBackend_.renderBatch(instanceData);
             }
 
+            void configureVertexAttributes(
+                const RenderData& meshData,
+                const VertexAttributeMappings& vertexAttributeMappings,
+                const VertexAttributeLayouts& vertexAttributeLayouts) noexcept override {
+                using traits = helios::core::common::traits::FunctionSignatureTraits<decltype(&TConcreteBackend::configureVertexAttributes)>;
+                using MeshType = typename traits::template UnqualifiedArgumentType<0>;
+                concreteBackend_.configureVertexAttributes(
+                    meshData.get<MeshType>(),
+                    vertexAttributeMappings, vertexAttributeLayouts
+                );
+            }
+
             void configureWindowCreationHints() noexcept override {
                 concreteBackend_.configureWindowCreationHints();
             }
@@ -198,6 +221,14 @@ export namespace helios::engine::rendering {
         }
         void endMeshBatch() noexcept {
             model_->endMeshBatch();
+        }
+
+        void configureVertexAttributes(
+            const RenderData& meshData,
+            const VertexAttributeMappings& vertexAttributeMappings,
+            const VertexAttributeLayouts& vertexAttributeLayouts
+        ) noexcept {
+            model_->configureVertexAttributes(meshData, vertexAttributeMappings, vertexAttributeLayouts);
         }
 
         void renderBatch(std::span<const DrawData> drawData) {

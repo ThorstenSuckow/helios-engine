@@ -12,14 +12,11 @@ module;
 #include <cassert>
 #include "helios-engine-config.h"
 
-export module helios.engine.rendering.mesh.components.VertexAttributeLayoutsComponent;
+export module helios.engine.rendering.vertexInput.components:VertexBufferLayoutComponent;
 
-import helios.engine.rendering.mesh.types.VertexAttributeSemantics;
-import helios.engine.rendering.mesh.types.VertexAttributeLayouts;
-import helios.engine.rendering.mesh.types.VertexAttribute;
+import helios.engine.rendering.vertexInput.types;
 
-using namespace helios::engine::rendering::mesh::types;
-export namespace helios::engine::rendering::mesh::components {
+export namespace helios::engine::rendering::vertexInput::components {
 
 
     /**
@@ -28,10 +25,11 @@ export namespace helios::engine::rendering::mesh::components {
      * @tparam TOwnerHandle Owning entity handle type.
      * @tparam TVertexInput Marker type describing the input stepping domain.
      */
-    struct VertexAttributeLayoutsComponent {
+    struct VertexBufferLayoutComponent {
 
-        VertexAttributeLayouts layouts;
+        types::VertexBufferLayout vertexBufferLayout;
 
     };
 
+    using InstanceDataLayoutComponent = VertexBufferLayoutComponent;
 }

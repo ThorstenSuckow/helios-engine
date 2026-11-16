@@ -13,45 +13,22 @@ module;
 #include <cassert>
 #include "helios-engine-config.h"
 
-export module helios.engine.rendering.mesh.types.VertexAttributeLayouts;
+export module helios.engine.rendering.vertexInput.types:VertexBufferLayout;
 
-import helios.engine.rendering.mesh.types.VertexAttribute;
-import helios.engine.rendering.mesh.types.VertexAttributeSemantics;
-import helios.engine.rendering.mesh.types.VertexAttribute;
-import helios.engine.rendering.mesh.types.VertexInputRate;
+import helios.engine.rendering.common.types;
 
-using namespace helios::engine::rendering::mesh::types;
-export namespace helios::engine::rendering::mesh::types {
+import :VertexAttributeSemantics;
+import :VertexAttribute;
+import :VertexInputRate;
+import :VertexAttributeLayout;
 
-    /**
-     * @brief Full binding description for one attribute in a vertex layout.
-     */
-    struct VertexAttributeLayout {
 
-        /**
-         * @brief Logical attribute description.
-         */
-        VertexAttribute attribute;
+export namespace helios::engine::rendering::vertexInput::types {
 
-        VertexInputRate inputRate;
 
-        /**
-         * @brief Byte stride between consecutive elements.
-         */
-        std::uint32_t stride;
+    class VertexBufferLayout {
 
-        /**
-         * @brief Byte offset to this attribute within one element.
-         */
-        std::uint32_t offset;
-
-        /**
-         * @brief Instance divisor (`0` per-vertex, `>0` instanced step rate).
-         */
-        std::uint32_t divisor = 0;
-    };
-
-    class VertexAttributeLayouts {
+        using Vertex = helios::engine::rendering::common::types::Vertex;
 
 
         /**
@@ -88,18 +65,64 @@ export namespace helios::engine::rendering::mesh::types {
             active_.set(idx);
         }
 
+        /**
+         * @brief Byte stride between consecutive elements in the vertex buffer, expressed as VertexInputRate.
+         */
+        VertexInputRate inputRate_;
+
+        /**
+         * @brief Byte stride between consecutive elements.
+         */
+        std::uint32_t stride_;
+
     public:
 
+        template<typename TVertex>
+        static VertexBufferLayout from() {
+            if constexpr (std::same_as<TVertex, Vertex>) {
+                return VertexBufferLayout(
+                    VertexInputRate::PerVertex,
+                    sizeof(Vertex),
+                    VertexAttributeLayout{VertexAttributeSemantics::Position, VertexAttributeType::Vec3f},
+                    VertexAttributeLayout{VertexAttributeSemantics::Normal, VertexAttributeType::Vec3f},
+                    VertexAttributeLayout{VertexAttributeSemantics::TextureCoordinates, VertexAttributeType::Vec2f}
+                );
+            } else if constexpr (std::same_as<TVertex, common::types::InstanceData>) {
+                return VertexBufferLayout(
+                    VertexInputRate::PerInstance,
+                    sizeof(common::types::InstanceData),
+                    VertexAttributeLayout{VertexAttributeSemantics::InstancedModelMatrix, VertexAttributeType::Mat4f},
+                    VertexAttributeLayout{VertexAttributeSemantics::InstancedNormalizedAge, VertexAttributeType::Float}
+                );
+            } else {
+                static_assert(false, "Unsupported Vertex type");
+            }
+
+
+        }
+
+        [[nodiscard]] VertexInputRate inputRate() const noexcept {
+            return inputRate_;
+        }
+
+        [[nodiscard]] std::uint32_t stride() const noexcept {
+            return stride_;
+        }
+
+        VertexBufferLayout() noexcept = default;
 
         /**
          * @brief Constructs the component from one or more layout descriptors.
          *
          * @tparam TAttributes Parameter pack of `VertexAttributeLayout` values.
+         * @param inputRate Byte stride between consecutive elements in the vertex buffer, expressed as VertexInputRate.
+         * @param stride Byte stride between consecutive elements.
          * @param layout Layout descriptors to register as active.
          */
         template<typename ...TAttributes>
         requires (std::same_as<std::remove_cvref_t<TAttributes>, VertexAttributeLayout> && ...)
-        explicit VertexAttributeLayouts(TAttributes&& ... layout)
+        explicit VertexBufferLayout(const VertexInputRate inputRate, const std::uint32_t stride, TAttributes&& ... layout)
+            : inputRate_(inputRate), stride_(stride)
         {
             (set(std::forward<TAttributes>(layout)), ...);
         }
@@ -141,5 +164,7 @@ export namespace helios::engine::rendering::mesh::types {
 
 
     };
+
+    using InstanceDataLayout = VertexBufferLayout;
 
 }

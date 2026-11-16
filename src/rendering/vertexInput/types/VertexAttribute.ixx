@@ -4,15 +4,14 @@
  */
 module;
 
-#include <cstdint>
 
-export module helios.engine.rendering.mesh.types.VertexAttribute;
+export module helios.engine.rendering.vertexInput.types:VertexAttribute;
 
-import helios.engine.rendering.mesh.types.VertexAttributeSemantics;
-import helios.engine.rendering.mesh.types.VertexAttributeType;
+import :VertexAttributeSemantics;
+import :VertexAttributeType;
 
 
-export namespace helios::engine::rendering::mesh::types {
+export namespace helios::engine::rendering::vertexInput::types {
 
 
     /**

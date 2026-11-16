@@ -17,7 +17,8 @@ export namespace helios::engine::rendering {
         typename TShaderHandle,
         typename TMaterialHandle,
         typename TTextureHandle,
-        typename TMeshHandle
+        typename TMeshHandle,
+        typename TVertexInputHandle
     >
     struct RenderHandles {
         using RenderTargetHandle = TRenderTargetHandle;
@@ -28,6 +29,7 @@ export namespace helios::engine::rendering {
         using MeshHandle = TMeshHandle;
         using SceneHandle = TSceneHandle;
         using CameraHandle = TCameraHandle;
+        using VertexInputHandle = TVertexInputHandle;
 
     };
 

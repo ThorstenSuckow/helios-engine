@@ -4,10 +4,10 @@
  */
 module;
 
-export module helios.engine.rendering.mesh.types.VertexAttributeType;
+export module helios.engine.rendering.vertexInput.types:VertexAttributeType;
 
 
-export namespace helios::engine::rendering::mesh::types {
+export namespace helios::engine::rendering::vertexInput::types {
 
     /**
      * @brief Supported scalar component types in vertex attributes.

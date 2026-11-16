@@ -5,9 +5,9 @@
 module;
 
 
-export module helios.engine.rendering.mesh.types.VertexInputRate;
+export module helios.engine.rendering.vertexInput.types:VertexInputRate;
 
-export namespace helios::engine::rendering::mesh::types {
+export namespace helios::engine::rendering::vertexInput::types {
 
     enum class VertexInputRate{
         PerVertex,

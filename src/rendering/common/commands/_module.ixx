@@ -4,7 +4,6 @@
  */
 export module helios.engine.rendering.common.commands;
 
-export import :VertexAttributeConfigurationCommand;
 export import helios.engine.rendering.common.commands.RenderSceneMemberCommand;
 export import helios.engine.rendering.common.commands.RenderSceneCommand;
 export import helios.engine.rendering.common.commands.RenderInstanceBatchCommand;

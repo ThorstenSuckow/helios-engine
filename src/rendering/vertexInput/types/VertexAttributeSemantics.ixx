@@ -4,14 +4,14 @@
  */
 module;
 
-export module helios.engine.rendering.mesh.types.VertexAttributeSemantics;
+export module helios.engine.rendering.vertexInput.types:VertexAttributeSemantics;
 
 
-export namespace helios::engine::rendering::mesh::types {
+export namespace helios::engine::rendering::vertexInput::types {
 
 
     /**
-     * @brief Semantic slots understood by mesh/shader vertex pipelines.
+     * @brief Semantic slots understood by mesh/shader vertex vertexInputs.
      */
     enum class VertexAttributeSemantics {
 
@@ -19,6 +19,11 @@ export namespace helios::engine::rendering::mesh::types {
          * @brief Local-space vertex position.
          */
         Position,
+
+        /**
+         * @brief Vertex normal.
+         */
+        Normal,
 
         /**
          * @brief Texture coordinates.

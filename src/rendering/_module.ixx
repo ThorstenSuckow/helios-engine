@@ -10,6 +10,7 @@ export import helios.engine.rendering.RenderBackend;
 export import helios.engine.rendering.RenderDataResolver;
 export import helios.engine.rendering.RenderHandles;
 
+export import helios.engine.rendering.vertexInput;
 export import helios.engine.rendering.shader;
 export import helios.engine.rendering.mesh;
 export import helios.engine.rendering.texture;

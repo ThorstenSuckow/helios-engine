@@ -13,7 +13,7 @@ module;
 
 export module helios.engine.rendering.shader.types.VertexAttributeMappings;
 
-import helios.engine.rendering.mesh.types.VertexAttributeSemantics;
+import helios.engine.rendering.vertexInput.types;
 
 export namespace helios::engine::rendering::shader::types {
 
@@ -25,7 +25,7 @@ export namespace helios::engine::rendering::shader::types {
         /**
          * @brief Semantic key used by runtime systems.
          */
-        mesh::types::VertexAttributeSemantics semantics;
+        vertexInput::types::VertexAttributeSemantics semantics;
 
         /**
          * @brief Vertex attribute variable name expected by the shader program.
@@ -37,7 +37,7 @@ export namespace helios::engine::rendering::shader::types {
 
     struct VertexAttributeMappings {
 
-        using VertexAttributeSemantics = helios::engine::rendering::mesh::types::VertexAttributeSemantics;
+        using VertexAttributeSemantics = helios::engine::rendering::vertexInput::types::VertexAttributeSemantics;
         using VertexAttributeMapping = helios::engine::rendering::shader::types::VertexAttributeMapping;
 
         /**

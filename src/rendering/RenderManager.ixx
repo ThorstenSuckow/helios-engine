@@ -64,8 +64,6 @@ export namespace helios::engine::rendering {
         using ShaderHandle = TRenderHandles::ShaderHandle;
         using MeshHandle = TRenderHandles::MeshHandle;
 
-        std::vector<VertexAttributeConfigurationCommand<TRenderHandles>> vertexAttributeConfigurationCommands_;
-
         /**
          * @brief Converts an entity handle to a batch index.
          *
@@ -313,16 +311,6 @@ export namespace helios::engine::rendering {
         bool execute(ecs::common::container::EcsDataContainer& ecsDataContainer,
             RenderDataResolver& renderDataResolver, RenderBackend& renderBackend) noexcept {
 
-            // if there is any outstanding vertex attribute configuration tbd, do it here
-            for (auto& command : vertexAttributeConfigurationCommands_) {
-
-                renderBackend.configureVertexAttributes(
-                    *renderDataResolver.resolveMeshData(ecsDataContainer, command.meshHandle.value()),
-                   command.mappings, command.layouts
-                );
-            }
-            vertexAttributeConfigurationCommands_.clear();
-
             for (auto renderTargetIdx : activeRenderTargetIndices_) {
                 auto& renderTargetBatch = renderTargetBatches_[renderTargetIdx];
 
@@ -501,14 +489,6 @@ export namespace helios::engine::rendering {
         }
 
 
-        bool submit(VertexAttributeConfigurationCommand<TRenderHandles>&& configurationCommand) noexcept {
-
-            vertexAttributeConfigurationCommands_.push_back(std::move(configurationCommand));
-
-            return true;
-        }
-
-
         /**
          * @brief Registers this manager as handler for render commands.
          *
@@ -519,8 +499,7 @@ export namespace helios::engine::rendering {
             (commandHandlerRegistry.template handleCommands<
                 RenderSceneMemberCommand<TMemberHandles, TRenderHandles>,
                 RenderInstanceBatchCommand<TMemberHandles, TRenderHandles>,
-                RenderSceneCommand<TMemberHandles, TRenderHandles>,
-                VertexAttributeConfigurationCommand<TRenderHandles>
+                RenderSceneCommand<TMemberHandles, TRenderHandles>
             >(*this), ...);
 
             return true;
